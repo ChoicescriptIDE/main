@@ -1,0 +1,192 @@
+
+*comment NEW TO CHOICESCRIPT? CLICK 'Run this project' TO START TUTORIAL
+
+[b]Lesson #5[/b] - [b][i]Using Variables[/i][/b]
+
+[i]Switch to [b]lesson05[/b] and take a look at [b]Example #9[/b][/i]. Compare this with your own effort in scene01 and, if needed, correct your actual scripting to match the example shown.
+
+In this example we are using [b]${cmd11}[/b] to store a particular value for the [i]string[/i] variable called [b]class[/b], of either "warrior", "mage" or "thief" according to the player's actual choice. (Note that we have purposely [i]not[/i] set this particular string as "Warrior", "Mage" or "Thief" - i.e. with a capital letter for each as we would for a character's name, say - for a reason that will soon be made clear.)
+
+In addition, for each possible option we have also [b]${cmd11}[/b] a new numeric value for the [b]str[/b], [b]int[/b] and [b]dex[/b] variables respectively, also based on the specific choice made. These numeric values vary for each class, to better reflect the comparative strengths and weaknesses of each in the game.
+
+At risk of stating the obvious, it's worth noting that the player doesn't actually ever see what's happening when our scripting [i]overwrites[/i] (or otherwise [i]modifies[/i]) the stored value of a variable using the [b]${cmd11}[/b] command - it all happens behind the scenes. All the player sees is the [i]option text[/i] itself (as in [b]Example #9[/b] shown below) and then any actual [i]response text[/i], whether specific to a particular option or - as in this case - a general response after a choice is made.
+
+[i]Pray tell, noble hero, how do you foresee yourself being portrayed in legend?[/i]
+
+*comment Example #9 - setting multiple values for each Option choice
+
+*fake_choice
+	#A fearsome Warrior
+		*set class "warrior"
+		*set str 40
+		*set int 20
+		*set dex 30
+	#A powerful Mage
+		*set class "mage"
+		*set str 20
+		*set int 40
+		*set dex 30
+	#A skillful Thief
+		*set class "thief"
+		*set str 25
+		*set int 25
+		*set dex 40
+
+*comment Example #10 - Displaying the current value of a variable in narrative
+
+[i]Truly, hero, shall you become renown as a most formidable ${class} indeed![/i]
+
+In [b]Example #10[/b] we have a general narrative response (shown above) in which we mention the specific [b]class[/b] ([i]warrior[/i], [i]mage[/i] or [i]thief[/i]) chosen by the player. This variable was created in the startup file with a value of "Unknown" but has now been [b]${cmd11}[/b] according to the player's choice.
+
+The [i]current value[/i] of any [i]numeric[/i] or "[i]string[/i]" variable can be displayed within story narrative simply by enclosing the variable name itself (in this case, [b]class[/b]) within curly braces and preceded by the dollar [b]$[/b] symbol, as shown in [b]Example #10[/b]. Take a close look at that.
+
+The current values of multiple variables can all be displayed in the same line of narrative if desired, as shown in [b]Example #11[/b] and displayed below: 
+
+*comment Example #11 - Displaying the values of multiple variables in narrative
+
+[i]You are a $!{class} with Strength of ${str}, Intelligence of ${int}, and Dexterity of ${dex}.[/i]
+
+Look closely at how the [b]class[/b] type has been displayed slightly differently in [b]Example #11[/b] compared to the example at the top of the page: Inserting an exclamation mark [i]between[/i] the dollar symbol and the curly braces causes CS to capitalize the first letter of the "[i]string[/i]" value being displayed. It could of course simply have been [b]${cmd11}[/b] as (e.g.) "[b]W[/b]arrior" originally so it always displays like that without needing the exclamation mark, but then we wouldn't be able to use it as we did in the earlier example, i.e. all in lower case when it would read better that way.
+
+*comment Example #12 - Capitalizing a whole "string" value using !!
+
+We can also use two exclamation marks to force the game to display the entire "[i]string[/i]" value in capital letters as shown in [b]Example #12[/b], so displaying like this: $!!{class}
+
+*comment Example #13 - Using Bold & Italic formatting for a displayed value
+
+[b]Example #13[/b] demonstrates how a displayed value can also be formatted as either [b]bold[/b] or [i]italic[/i], so it displays as [b]$!{class}[/b] or [i]$!{class}[/i], or even [b][i]$!{class}[/i][/b] (using both formats). 
+
+*page_break
+
+Sometimes it reads or simply looks better to display some Stats as a list rather than bunched together within a line of narrative, for which the handy '[i]carriage return[/i]' style [b]${cmd6}[/b] formatting command is especially useful, as in the case of [b]Example #14[/b]:
+
+*comment Example #14 - Using *line_break to create a list of displayed Stats
+
+Class: $!{class}
+*line_break
+Strength: ${str}
+*line_break
+Intelligence: ${int}
+*line_break
+Dexterity: ${dex}
+
+[i]Without[/i] the ${cmd6} commands used in [b]Example #14[/b] to display the above list, the identical listing shown in [b]Example 15[/b] would actually be displayed in-game as follows:
+
+*comment Example #15 - The WRONG way to display a list of Stats in-game?
+
+Class: $!{class}
+Strength: ${str}
+Intelligence: ${int}
+Dexterity: ${dex}
+
+Arguably not as clear for the reader, but easy to improve with a little creative formatting as shown in [b]Example #16[/b] and displayed below:
+
+*comment Example #16 - Using creative formatting to improve legibility
+
+[b]Class[/b]: [i]$!{class}[/i]
+~ [b]Strength[/b]: ${str}
+~ [b]Intelligence[/b]: ${int}
+~ [b]Dexterity[/b]: ${dex}
+
+Compare all the above to the 'in-narrative' example we used earlier, and now repeated below:
+
+[i]You are a $!{class} with Strength of ${str}, Intelligence of ${int}, and Dexterity of ${dex}.[/i]
+
+Which method of displaying Stats in response narrative do [i]you[/i] prefer?
+
+[i][b]~~Exercise #14[/b] - Switch to [b]scene01[/b]. Following your 'class' ${cmd7}, report the new Stats settings back to the player in the form of a general response, using any of the methods described above. As before, resist the temptation to simply copy-paste your preference![/i]
+
+*page_break
+
+[i]Switch back to [b]lesson05[/b] and scroll down to continue following the examples.[/i]
+
+So far we have dealt only with [i]overwriting[/i] the stored value of variables, i.e. changing the value completely [i]regardless[/i] of what its current value might be. It is however possible to also only [i]modify[/i] a value, i.e. where we actually take its current value into account when making a new change using the [b]${cmd11}[/b] command. This is commonly (but not only) used for [i]numeric[/i] values.
+
+In [b]Example #17[/b] we are not only [i]overwriting[/i] the main character's (currently "Unknown") [b]race[/b] variable with a specific new "[i]string[/i]", we are also taking this opportunity to [i]modify[/i] some [i]Stats[/i] and even some [i]Hidden[/i] variables according to the player's actual [b]race[/b] choice.
+
+[i]Numeric[/i] variables are [i]modified[/i] using one of the permitted [i]arithmetic operators[/i], which is the fancy term for symbols like [b]+[/b] addition, [b]-[/b] subtraction, [b]/[/b] division and [b]*[/b] multiplication. The full list and description of available operators can be found on 
+*link http://choicescriptdev.wikia.com/wiki/Arithmetic_operators this page
+of the ChoiceScriptDev Wiki.
+
+Take a close look at the scripting for the [b]Example #17[/b] ${cmd7} shown below, and compare the variables being [i]modified[/i] here with their ${cmd2} entry in the [b]startup[/b] file to see which are being [i]referenced[/i] in each case. Bear in mind that we have already [b]${cmd11}[/b] some values higher.
+
+[i]Your ears are rather . . . pointy, great hero. Which proud people do you claim as your own?[/i]
+
+*comment Example #17 - Modifying, as opposed to Overwriting, numeric values
+
+*fake_choice
+	#Humans
+		*set race "human"
+		*set str +5
+		*set int +5
+		*set rep1 -5
+		*set rep3 +10
+		*set loc5 true
+	#Elves
+		*set race "elf"
+		*set int +5
+		*set dex +5
+		*set rep1 +20
+		*set rep2 -10
+		*set loc3 true
+	#Dwarves
+		*set race "dwarf"
+		*set str +15
+		*set dex -5
+		*set rep1 -10
+		*set rep2 +20
+		*set loc1 true
+	#Hobbits
+		*set race "hobbit"
+		*set dex +10
+		*set str -10
+		*set rep1 +10
+		*set rep2 +5
+		*set rep3 +15
+		*set loc4 true
+
+In [b]Example #17[/b], in addition to [b]${cmd11}[/b]ting the character's [b]race[/b] type according to the player's choice, we are also changing some basic Stats and also their relationship with some other races.
+
+Most important, using [i]arithmetic operators[/i] we have only [i]modified[/i] these numeric values, not completely [i]overwritten[/i] them with brand new values. To demonstrate this more clearly, below are shown the current Stats of your character as a result of your own [b]class[/b] and [b]race[/b] choices:
+
+[b]$!{race} $!{class}[/b]:~ 
+[b]Strength[/b]: ${str}
+~ [b]Intelligence[/b]: ${int}
+~ [b]Dexterity[/b]: ${dex}
+
+Although intended to be 'hidden' values (i.e. not normally displayed in-game) your Relationship ratings - which were each set with a default of 50 when created in the startup file - have as a result of your own [b]class[/b] and [b]race[/b] choices now been [i]modified[/i] to the new current values of:
+
+[b]Relationships[/b]:~
+[b]Elves[/b]: ${rep1}
+~ [b]Dwarves[/b]: ${rep2}
+~ [b]Hobbits[/b]: ${rep3}
+
+The final change we made as a result of each [b]race[/b] #Option was to mark as [i]true[/i] one game location, giving each character an initial "homeland" based on their race, e.g. an Elf hails from the [i]Whispering Wood[/i] region ([b]loc3[/b]) and a Dwarf from the [i]Black Iron Hills[/i] ([b]loc1[/b]).
+
+[b]To recap[/b]: at any point in our scripting -
+
+- the current value of any variable can be completely [i]overwritten[/i] using the [b]${cmd11}[/b] command
+*line_break
+- the current value of [i]numeric[/i] variables can also be [i]modified[/i] using [i]arithmetic operators[/i]
+*line_break
+- the current value of one [i]numeric[/i] variable can also be added to another (e.g. [b]${cmd11} str +dex[/b])
+*line_break
+- the current value of any variable can be displayed in-game where desired (i.e. "Stats")
+*line_break
+- "Hidden" variables can also be tweaked behind the scenes to keep track of a whole range of information, affected by the player's decisions and limited only by the author's creativity
+
+*page_break
+
+[i][b]~~Exercise #15[/b] - Switch to [b]scene01[/b]. Following the 'class' ${cmd7} and displaying of new Stats for the player, use [b]${cmd7}[/b] to prompt for a [b]race[/b] choice. Feel free to copy-paste the Tutorial example, but then [b]add two new race options[/b] of your own. Remember to use the [b]Tab[/b] key for indenting (IDE default), not the space bar, or the game will error.[/i]
+
+The purpose of this particular exercise is twofold: While it's important to properly grasp the distinction between [i]modifying[/i] as opposed to merely [i]overwriting[/i] the value of a numeric variable, it is equally important to also think about [i]game balance[/i] - and indeed, your overall design - from an early stage.
+
+For example, if you decide to include a Troll main character - i.e. probably massively overpowered in the [b]str[/b]ength department and distinctly lacking in [b]int[/b]elligence - you will probably also want to inflict significant penalties on that character's starting relationship values with all three main races encountered in the game, to balance out the fact that it will likely squash any physical challenge and so must face greater challenges in other ways.
+
+Similarly, if you add (e.g.) an Orc main character, you may also decide that the game needs a new region (i.e. [b]${cmd2} loc7 false[/b] adding to the [b]startup[/b] file) which would be this character's homeland and so be [b]${cmd11}[/b] [i]true[/i] for this race option at this particular point in your scripting.
+
+The main point here is that although your game world may be described for the player in flowery prose and delightful detail, the [i]essence[/i] of the world is condensed into numbers, strings and booleans - i.e. the values of variables. The more thought you put into this aspect of your design, the better may your world react and adapt to the actions and choices of the character journeying through it, and the more compelling and entertaining will that experience be.
+
+The story may be paramount, but the game system [i]behind[/i] the story can be every bit as important in the making of a good Choice Game - and [i]that[/i] comes down to variables.
+
+*finish Lesson #6 - [i]Scripting Conditions[/i]

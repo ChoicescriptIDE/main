@@ -1,0 +1,143 @@
+
+*comment NEW TO CHOICESCRIPT? CLICK 'Run this project' TO START TUTORIAL
+
+Welcome to the CS-IDE Tutorial for [i]Learning Basic ChoiceScript[/i].
+
+As the title suggests, this tutorial is not intended to be an in-depth guide to [i]every[/i] aspect of ChoiceScript. It is rather more of a primer, starting with a brief explanation of the basics before delving into actual scripting through a series of [i]Lessons[/i]. These lessons combine examples of typical scripting with the IDE's ability to demonstrate both [i]before[/i] and [i]after[/i] - the narrative and scripting on the left in the [i]Code Editor[/i], and on the right in the [i]Game Tab[/i] panel, how it appears in-game when code is executed (i.e. when a game is running). This tutorial has itself been written in ChoiceScript to better serve this purpose, using its own scripting for its examples.
+
+During the tutorial you will also encounter a series of [i]Exercises[/i] for you to carry out, serving as both an introduction to the basic workings of the CS-IDE as well as a means of putting the ChoiceScript [i]Lessons[/i] learned herein to actual practical use, in the creation of a [i]Test Project[/i]. Do attempt these Exercises when prompted to do so, as they will assist in your understanding.
+
+Once you've worked your way through this tutorial you should be in a better position to more easily absorb detailed information such as that provided on the 
+*link http://choicescriptdev.wikia.com ChoiceScriptDev Wiki
+or indeed, [i]Choice of Games[/i]' own 
+*link http://www.choiceofgames.com/make-your-own-games/choicescript-intro/ Introduction to ChoiceScript 
+pages.
+
+Keep in mind also that the IDE is itself a great tool for [i]experimenting with[/i] and learning CS! Even so, always remember that you're not alone: if ever you need help understanding something - or perhaps with resolving a particular problem - don't hesitate to post in the 
+*link http://www.choiceofgames.com/forum/categories/choicescript-help ChoiceScript Help 
+community forums. Many experienced authors have been where you are now and would be pleased to help you overcome any remaining hurdles.
+*choice
+	#Continue with Introduction: [i]The Basics[/i]
+		*goto next1
+	#Choose a particular [i]Scripting Lesson[/i]
+		*goto lessons
+*label next1
+So what is ChoiceScript, and how does it work?
+
+ChoiceScript ('CS' hereafter) is a [i]scripting language[/i] - simple programming, in essence - designed specifically to enable virtually anyone to write compelling multiple-choice textual story-games; [i]Interactive Novels[/i], to use the preferred term, or simply [i]Choice Games[/i] for short.
+
+A scripting language like CS works, and is governed, by what is known as a [i]control flow[/i]. Think of it as a single train on a rail network: there are many routes (different possible branches in the story) and various signals (CS [i]commands[/i]) and junctions (where the track / story branches based on prescribed [i]conditions[/i]) but the train itself - the [i]control flow[/i] - can only ever be on [i]one[/i] particular route, and on [i]a particular section of that track[/i], at any given moment in time. This in turn determines exactly what will be displayed for the player on the current 'page' in the game.
+
+It may also be helpful to bear in mind that, when running your game, CS essentially [i]reads[/i] a particular file [i]line by line[/i], just like a human does (only much faster!), executing each instruction in turn only when - or indeed, [i]if[/i] - it reaches that particular line. This is the actual [i]control flow[/i]. 
+
+This is all precisely governed by you - the game's author - as you have total control of the flow in how you script your game, using a combination of [i]Commands[/i], [i]Conditions[/i], [i]Indentation[/i] and game [i]Variables[/i] (each of which subjects will be briefly explained within this basic Introduction, then covered in greater detail within the actual Lessons).
+
+Unfortunately, when you get it wrong, the train derails (and the game either crashes outright or returns disjointed and confusing narrative to the player). The IDE has been designed at least in part to insure that when this happens, it happens right here - and so less likely in a public release version of your game - while often also making it easier to identify, understand and fix the issue so it never happens again for the exact same reason.
+
+*page_break Next: [i]Commands[/i]
+
+CS Commands are [i]scripting instructions[/i], with which we direct the [i]control flow[/i] and determine, at least in part, precisely what is displayed for the player.
+
+Commands are simply particular words, each having a specific meaning and purpose, but prefixed with the asterisk * symbol. As all of our scripting takes place in ordinary text (.txt) files, the presence of the asterisk symbol [i]as the first character on a new line[/i] is how, when running a game, CS differentiates between a Command instruction and ordinary story narrative.
+
+Although there are in total several dozen Commands, it's entirely possible to write a perfectly good Choice Game using just a handful of the most common ones. It is these we will focus on for the purpose of this basic tutorial. Some of the most common Commands are as follows:
+
+[b]${cmd2}[/b] 
+*line_break
+[b]${cmd3}[/b]
+*line_break
+[b]${cmd6}[/b]
+*line_break
+[b]${cmd8}[/b]
+*line_break
+[b]${cmd7}[/b]
+*line_break
+[b]${cmd4}[/b]
+*line_break
+[b]${cmd9}[/b]
+*line_break
+[b]${cmd10}[/b]
+*line_break
+[b]${cmd11}[/b]
+*line_break
+[b]${cmd12}[/b]
+*line_break
+[b]${cmd13}[/b]
+*line_break
+[b]${cmd15}[/b]
+*line_break
+[b]${cmd14}[/b]
+*line_break
+[b]${cmd16}[/b]
+
+*page_break Next: [i]Conditions[/i]
+
+Every Choice Game essentially revolves around [i]conditions[/i]. Conditions determine the flow of the story, the precise situations encountered in-game (many of which may often vary in some way each time a game is replayed), and the options made available to the player at each stage.
+
+Certain Commands, like [b]${cmd8}[/b], [b]${cmd13}[/b] and [b]${cmd14}[/b], are used to directly impose conditions or to otherwise determine route branching - to direct the [i]control flow[/i] - while others, like [b]${cmd4}[/b], [b]${cmd9}[/b] and [b]${cmd16}[/b], instruct CS in precisely [i]what to do[/i] when a particular condition is "true" (i.e. has been met by the player at that exact point) or "false" (has not yet been met).
+
+In scripting terms each individual condition - regardless of what it involves or which [i]Commands[/i] or [i]Variables[/i] it uses - can only ever be either "yes" [i][b]or[/b][/i] "no" ([b]true[/b] [i]or[/i] [b]false[/b]). There is no "maybe" or other middle ground possible. It may prove helpful to bear this basic scripting logic in mind as you progress with learning ChoiceScript and begin to develop your first game.
+
+It's also worth remembering that to a new CS author the subject of "conditions" often [i]sounds[/i] more complicated than it actually is! In reality most conditions used in a typical Choice Game are extremely simple and easy to understand - as you'll soon discover in the [i]Lessons[/i] section. 
+
+*page_break Next: [i]Indentation[/i]
+
+Another way in which we precisely govern the [i]control flow[/i] is by using [i]Indentation[/i] to create within our game files what is known as a [i]scripting hierarchy[/i].
+
+Indentation is simply blocks of space - either Tabs or actual spaces - at the [i]start[/i] of each new line, before either a Command or any other text (e.g. story narrative) on that line. Indentation is applied in 'levels', with one level being a Tab [i]or[/i] a particular number of spaces - so long as you remain consistent throughout a file. (NB: The IDE default for one indentation level is a Tab set to a visual length of four spaces, but the parameters of this can be changed under [i]Settings[/i].)
+
+Certain CS Commands require that [i]the following line[/i] must always by indented by one more level in order for it to be interpreted - for the [i]control flow[/i] to be directed - correctly. Luckily for our purposes, the IDE has a very useful 'Smart Indentation' function which, as we type our code, [i]automatically[/i] indents (and in many cases, also [i]dedents[/i]) where & when CS requires us to.
+
+Even though the IDE is capable of doing much of our indentation for us, it is still worth studying in greater detail the whole subject of a proper scripting hierarchy, just to understand it better. The most thorough explanation can be found in 
+*link http://choicescriptdev.wikia.com/wiki/Indentation:_Howto%26Tips this article
+on the ChoiceScriptDev Wiki.
+
+For the purpose of this tutorial, however, it will suffice for now to understand only that [i]indentation[/i] is one of the main means by which we direct the [i]control flow[/i] in our scripting. In fact, many commands and even much of your story narrative will likely not use any indentation at all - it is used only in certain circumstances, and following specific commands.
+
+Leaving the IDE's [i]smart indentation[/i] function turned [i]On[/i] will help you not only grasp with much greater ease the proper use of indentation,  over time it will actually help make your Choice Game development considerably more efficient and less prone to casual indentation errors.
+
+*page_break Next: [i]Game Variables[/i]
+
+CS is capable of storing information - [i]game data[/i], in essence - both at the start and throughout the course of a game. It does so using [i]Variables[/i], of which there are three distinct [i]Data Types[/i]:
+
+- [b]Numeric[/b] variables store a number
+*line_break
+- [b]String[/b] variables store "some text"
+*line_break
+- [b]Boolean[/b] variables store either [i]true[/i] or [i]false[/i]
+
+Regardless of the type of data stored, a variable's stored content is known as its [i]Value[/i].
+
+While some variables are created at the start of a new game and persist throughout the game - known as [i]Permanent[/i] variables - CS also allows the use of [i]Temporary[/i] variables for a short-term purpose. Permanent variables are created with the [b]${cmd2}[/b] command; Temporary variables with the [b]${cmd12}[/b] command. Both types of variables otherwise work in identical fashion, and each may contain a [i]Value[/i] of any one of the three [i]Data Types[/i] mentioned above.
+
+Each variable must be uniquely named when first created, but you are free to call your variables whatever you like provided that the first character of the name is a letter [b]a-z[/b]. Numbers may be used elsewhere in the name, however. For instance, it is common for similar variables to be named identically except for a number on the end, e.g. eq1, eq2, eq3, eq4, etc. Variable names should not contain capital letters or spaces, but under_scores (e.g. eq_1, eq_2, etc.) are fine.
+
+The actual [i]name[/i] of a variable is used to reference it in your scripting but is not displayed for a player to see. Its current [i]Value[/i] (the stored data it contains) will however sometimes be displayed. Values intended to be displayed in-game are known as "Stats", to differentiate between displayed variables - such as on the [i]Show Stats[/i] screen - and those only ever used behind-the-scenes for such as [i]conditional[/i] purposes, but there is no [i]actual[/i] difference beyond this casual grouping into either "Stats" or "Hidden" variables for easier understanding: all variables are essentially "Hidden" unless you to [i]choose[/i] to display some, making those "Stats".
+
+*page_break Next: [i]Scripting Lessons[/i]
+
+This concludes the [i]Introduction[/i] section of the tutorial. Let's now take a look at actual game development & scripting and put some of the basic explanations into a proper context.
+
+*label lessons
+Please select a lesson from the list below. If relatively new to ChoiceScript, we recommend starting with Lesson #1 and working your way steadily through each subsequent one in turn. If you need to take a break before completing all the lessons, you can later simply select & [i]Run[/i] the Tutorial again and use this menu to resume from where you left off.
+*choice
+	#Lesson #1 - [i]Projects & Scene Files[/i]
+		*goto_scene lesson01
+	#Lesson #2 - [i]The Startup File[/i]
+		*goto_scene lesson02
+	#Lesson #3 - [i]Game Narrative[/i]
+		*goto_scene lesson03
+	#Lesson #4 - [i]Player Interaction[/i]
+		*goto_scene lesson04
+	#Lesson #5 - [i]Using Variables[/i]
+		*goto_scene lesson05
+	#Lesson #6 - [i]Scripting Conditions[/i]
+		*goto_scene lesson06
+	#Lesson #7 - [i]Improving Interaction[/i]
+		*goto_scene lesson07
+	#Lesson #8 - [i]Enhancing Narrative[/i]
+		*goto_scene lesson08
+	#Lesson #9 - [i]'Show Stats' Screen[/i]
+		*goto_scene lesson09
+	#Lesson #10 - [i]Miscellaneous Topics[/i]
+		*goto_scene lesson10

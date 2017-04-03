@@ -1,0 +1,44 @@
+{
+  "name": "CSIDE",
+  "main": "index.html",
+  "version": "1.0.0",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-auto-install": "^0.3.1",
+    "grunt-browserify": "^5.0.0",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-compress": "^1.3.0",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-cssmin": "^1.0.2",
+    "grunt-contrib-uglify": "^2.0.0",
+    "grunt-execute": "^0.2.2",
+    "grunt-nw-builder": "^2.0.3",
+    "load-grunt-tasks": "^3.5.0",
+    "nw-builder": "^2.2.5",
+    "uglifyjs": "^2.4.10"
+  },
+  "dependencies": {
+    "bootstrap-menu": "^1.0.14",
+    "choicescript": "git://github.com/ChoicescriptIDE/choicescript.git",
+    "codemirror": "ChoicescriptIDE/CodeMirror.git",
+    "dropbox": "^2.5.2",
+    "knockout": "^3.2.0",
+    "mousetrap": "^1.6.0",
+    "trash": "^2.0.0",
+    "username": "^1.0.1"
+  },
+  "window": {
+    "show": true,
+    "title": "Choicescript IDE",
+    "icon": "img/cside.png",
+    "frame": false,
+    "position": "center",
+    "min_width": 900,
+    "min_height": 600
+  },
+  "webkit": {
+    "plugin": true
+  },
+  "chromium-args": "--allow-file-access-from-files"
+}

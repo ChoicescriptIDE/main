@@ -1,0 +1,408 @@
+
+*comment NEW TO CHOICESCRIPT? CLICK 'Run this project' BUTTON TO START TUTORIAL
+
+*comment ----------Ignore------------
+*comment Tutorial code required in the event this Lesson has been accessed in a new session without the reader first having set crucial values earlier.
+*if pcname = "Unknown"
+    *goto revisit
+*else
+    *goto continue
+*comment ----------Ignore------------
+
+*label continue
+[b]Lesson 7[/b] - [b][i]Improving Interaction[/i][/b]
+
+In this lesson we'll take a closer look at the versatile [b]${cmd8}[/b] command. In reality there is little we can do with [b]${cmd8}[/b] that we cannot also do with [b]${cmd7}[/b]; the difference is that CS has more stringent requirements for [b]${cmd8}[/b] and therefore does a significantly better job of catching any related scripting / branching errors during the development & testing stage.
+
+It is for this reason that I recommend using [b]${cmd7}[/b] only for the simplest interaction-prompting (involving no more than [b]${cmd11}[/b] or perhaps [b]${cmd13}[/b] [i]conditional[/i] options, as shown in earlier examples), where the story is intended to continue 'down the page' into the [i]general narrative[/i] regardless of the actual Option chosen or whether or not there is any specific response narrative. But for any interaction more involved or elaborate than this - such as the examples we'll look at during this lesson - then I highly recommend using [b]${cmd8}[/b] instead.
+
+The main difference to grasp is that [b]${cmd8}[/b] doesn't [i]automatically[/i] continue into the following [i]general narrative[/i] in linear fashion as [b]${cmd7}[/b] does by default. Indeed, it is a basic requirement of [b]${cmd8}[/b] that CS must instead always [i]be told what to do[/i] following each Option, so enabling the story to more readily diverge down completely different paths where required. Specific commands are used to redirect the story for [i]each[/i] Option presented to the player - namely either [b]${cmd4}[/b], [b]${cmd17}[/b], [b]${cmd16}[/b] or a simple [b]${cmd9}[/b] - usually [i]following[/i] any narrative response or other commands (e.g. [b]${cmd11}[/b]) specific to that Option. Each one in brief:
+
+[b]${cmd4}[/b], as you may recall from earlier lessons, is the command used to indicate [i]'End of Scene'[/i]. By default this command displays a [i]'Next Chapter'[/i] button for the player (although you may change the actual wording) and when clicked will [i]skip[/i] anything else in the current Scene file and load the next sequential Scene file listed in the [b]startup[/b] file's [b]${cmd5}[/b]. The [b]${cmd4}[/b] command may be used at any point in our scripting, including within a [b]${cmd8}[/b] body as the final redirectional command for a particular Option.
+
+*page_break
+
+[b]${cmd17}[/b] is very similar to [b]${cmd4}[/b], in that its purpose is to [i]immediately[/i] load and run a different Scene file. Unlike [b]${cmd4}[/b] however, you must specify a particular Scene file name to load (e.g. [b]${cmd17} lesson08[/b]) but note that it does not provide the player with a [i]'Next Chapter'[/i] button pause as with [b]${cmd4}[/b]. If a pause in the narrative flow is required, use a suitably-worded [b]${cmd3}[/b] command on the line immediately before [b]${cmd17}[/b].
+
+[b]${cmd17}[/b] is a very versatile and useful [i]redirectional[/i] command but is not actually needed to produce a perfectly good Choice Game ([b]${cmd4}[/b] should suffice for most needs).  It is however explained in greater detail later, with its own section in Lesson 10 - [i]Miscellaneous Topics[/i].
+
+[b]${cmd16}[/b] is also occasionally used at the end of a particular Option body, indicating [i]'Game Over'[/i] and presenting the player with a further list of options. It is most commonly used as the result of a player decision ending in their character's demise, or similar, and appears to the player as shown below (although note that I have used a [b]${cmd7}[/b] here to mimic the [b]${cmd16}[/b] command's displayed options, otherwise you would have to restart the Tutorial!).
+
+*fake_choice
+    #Play again.
+    #Play more games like this.
+    #Share this game with friends.
+    #Email me when new games are available.
+
+And finally, of the four 'redirectional' commands [b]${cmd9}[/b] is perhaps the most common command used for this specific purpose at the end of an Option in any [b]${cmd8}[/b] body, and is always used in partnership with the [b]${cmd10}[/b] command. Quite simply, when CS hits a line saying (e.g.) [b]${cmd9} ex01[/b] the [i]control flow[/i] will immediately [i]jump[/i] to the line saying [b]${cmd10} ex01[/b] and continue from there. If no such label name exists within the same Scene file, however, CS will return an error.
+
+We can use any combination of letters or numbers for our [b]${cmd10}[/b] names provided that each is unique within that Scene file (CS needs to reference it exactly). It must also be a single word so no spaces are allowed within the name string itself; under_scores are fine, however.
+
+Of particular importance, note that it makes no difference whether the corresponding [b]${cmd10}[/b] is above or below the [b]${cmd9}[/b] command, just so long as it exists in the same Scene file. Similarly, multiple [b]${cmd9}[/b] commands in different parts of the Scene can all reference the [i]exact same[/i] [b]${cmd10}[/b] name: this is often used as a means of ultimately bringing diverging story paths (usually as a result of choosing different Options, for instance) back to a single 'main route' in the story.
+
+Confused? Don't worry, it's simpler than it sounds! [i]Read this page again[/i], then continue...
+
+In [b]Example 22[/b] below we are repeating our previous [b]${cmd7}[/b] but instead have turned it into a [b]${cmd8}[/b] and are using [b]${cmd9}[/b] / [b]${cmd10}[/b] to demonstrate how this works. Study this example and the [b]${cmd10}[/b]s immediately below it (scroll down [b]lesson07[/b] in the [i]Code Editor[/i]).
+
+*comment Example 22 - a simple Choice where the story diverges as a result
+    
+*choice
+    #Sneak into the cavern and steal the witch's cauldron.
+        [i]This would be the narrative response for the First option.[/i]
+        *goto jump01
+    #Head into the cavern and confront the witch.
+        [i]This would be the narrative response for the Second option.[/i]
+        *goto jump02
+    #Refuse to accept the bandit leader's challenge.
+        [i]This would be the narrative response for the Third option.[/i]
+        *goto jump03
+
+*label jump01
+
+[i]This would be the additional narrative and / or scripting for [b]jump01[/b].[/i]
+*goto main01
+
+*label jump02
+
+[i]This would be the additional narrative and / or scripting for [b]jump02[/b].[/i]
+*goto main01
+
+*label jump03
+
+[i]This would be the additional narrative and / or scripting for [b]jump03[/b].[/i]
+*goto main01
+
+*label main01
+
+[i][b]main01[/b] is where [b]all[/b] the different paths converge once again back into the main storyline.[/i]
+
+The important points of [b]Example 22[/b] to consider are as follows:
+
+- The original [b]${cmd9}[/b] for any Option [i]could[/i] instead be a [b]${cmd4}[/b], [b]${cmd17}[/b] or [b]${cmd16}[/b], rather than a [b]${cmd9}[/b] jumping to a [b]${cmd10}[/b] as used here. The main point is that [i]each[/i] [b]${cmd8}[/b] option [b][i]must[/i][/b] end with one or the other - CS must [i]be told what to do[/i] in each case, rather than simply continue below into the [i]general narrative[/i] as [b]${cmd7}[/b] does by default.
+
+- That said, there is no real limit to how much narrative or additional scripting could take place in direct response to a particular Option [i]before[/i] the actual [b]${cmd9}[/b] (provided it is all properly [i]indented[/i]), nor within each of those [b]${cmd10}[/b] sections. Conversely, one or more of those Options could instead simply jump directly to [b]${cmd10} main01[/b] rather than to its own label section.
+
+- By the same token, no [b]${cmd8}[/b] Option ever actually needs [i]any[/i] response narrative or scripting of its own other than a simple [b]${cmd9}[/b]. For example, if a particular Option would lead to a whole new storyline branch consisting of perhaps hundreds of lines of narrative and code, then immediately giving that sub-plot its very own [b]${cmd10}[/b] section is a great way to handle things.
+
+- In summary: in [b]Example 22[/b] I have kept the narrative and scripting minimal so you can easily follow the jumps and thereby better grasp the process, but do bear in mind that with [b]${cmd9}[/b] / [b]${cmd10}[/b] combinations we can jump backwards and forwards throughout a Scene file, diverge the story down different paths as much as we like, and then ultimately bring it all back together with jumps to the 'main story' path - together with suitably-placed [b]${cmd3}[/b]s, of course, to avoid presenting the reader with too much narrative on any single page in-game.
+
+*page_break
+
+In [b]Example 23[/b] (below) we are repeating the same [b]${cmd8}[/b] encounter as before but are now elaborating on things a little to include some additional scripting both within the [b]${cmd8}[/b] body itself and within one of the corresponding [b]${cmd10}[/b] sections below it.
+
+We are also using a new [i]Temporary Variable[/i] within this scripting, being a [i]boolean[/i] (simple [i]true / false[/i]) variable which we have called [b]sneak_failed[/b], with an initial [i]Value[/i] of [i]false[/i].
+
+You may recall that, unlike a game's [i]Permanent Variables[/i] able to be declared exclusively in the [b]startup[/b] file using the [b]${cmd2}[/b] command, [i]Temporary Variables[/i] may instead be created in any ordinary Scene file as required, using the [b]${cmd12}[/b] command. They are otherwise named and used in identical fashion, with the only other difference being that a [b]${cmd12}[/b] variable persists in memory [i]only for the duration of the current Scene[/i]: once a new Scene is loaded in-game (using either [b]${cmd4}[/b] or [b]${cmd17}[/b]) [i]all[/i] temporary variables are immediately lost from memory.
+
+Unlike the earlier examples of this encounter with the bandits, in which we were using a [b]${cmd7}[/b] and [b]${cmd13}[/b] to make the first Option conditional on being either a Hobbit (natural sneak) or a Thief (trained sneak), this time we have decided to allow any character, of any race or class, to at least [i]attempt[/i] to sneak into the witch's cavern. Instead of making the Option itself conditional, we will make the chance of a successful sneak conditional on the protagonist's [b]dex[/b]terity skill and [b]${cmd11}[/b] the new [b]sneak_failed[/b] temporary variable accordingly. (N.B. For the purpose of the Tutorial, please select the [i]first[/i] Option below). Take a look at [b]Example 23[/b].
+
+*comment Example 23 - A little more elaborate Choice involving extra scripting
+
+*temp sneak_failed false
+
+*choice
+    #Sneak into the cavern and steal the witch's cauldron.
+        *if (dex > 50)
+            [i]This would be the response for [b]successfully[/b] sneaking.[/i]
+            *set dex +2
+            *goto main02
+        *else
+            [i]This would be the response for [b]failing[/b] to sneak.[/i]
+            *set sneak_failed true
+            *set dex +4
+            *goto jump04
+    #Head into the cavern and confront the witch.
+        *goto jump04
+    #Refuse to accept the bandit leader's challenge.
+        *goto jump05
+
+*label jump04
+
+[i]This would be the narrative and / or scripting for confronting the witch.[/i]
+
+*comment Example 24 - Using *if/*else to check conditions & determine outcome
+
+*if (sneak_failed = true)
+    [i]Fighting the witch would be [b]harder[/b] due to failing to sneak.[/i]
+    *goto main02
+*else
+    [i]Fighting the witch would be [b]easier[/b] due to prepared confrontation.[/i]
+    *goto main02
+
+*label jump05
+
+[i]This would be the narrative and / or scripting for fighting the bandits.[/i]
+*goto main02
+
+*label main02
+
+Within the first Option body we are making a [i]conditional[/i] check - [b]${cmd13}[/b] the value of [b]dex[/b] is currently [i]more than[/i] [b]50[/b], then the sneak is successful and the witch's cauldron stolen from under her nose (gain a little more dexterity and continue to main storyline), [b]${cmd14}[/b] (i.e. if dexterity is currently [i]50 or less[/i]) the witch is alerted and a confrontation will ensue: [b]sneak_failed[/b] is [b]${cmd11}[/b] to [b]true[/b] and our protagonist learns even more from failure ([b]dex[/b] +4) than success... assuming they survive to benefit from this hard-won experience, that is!
+
+Take a look at [b]Example 24[/b]. In the event of the player choosing to confront the witch directly, [i][b]or[/b][/i] of attempting but failing to sneak, we have used [b]${cmd9}[/b] to redirect the [i]control flow[/i] to [b]${cmd10}[/b] section [b]jump04[/b]. Within that section we are once again using an [b]${cmd13}[/b] / [b]${cmd14}[/b] combination, now conditional on whether or not [b]sneak_failed[/b] is [b]true[/b]. If it is true, it means that our protagonist attempted to sneak but failed in the attempt and alerted the witch to their presence. The resulting fight can therefore be made harder (using appropriate scripting), or in some other way different (perhaps only in narrative, for instance) than had they merely strode in ready to confront her by choosing the second option.
+
+Of particular importance, note that any use of [b]${cmd13}[/b] in conjunction with [b]${cmd14}[/b] must always end with [b]${cmd9}[/b] (or one of the other redirectional commands such as [b]${cmd4}[/b] or [b]${cmd16}[/b]) to [i]tell CS what to do[/i] in [i]each[/i] particular case - exactly the same as for each individual [b]${cmd8}[/b] Option.
+
+Also worth noting is that we are using incremental [b]jump##[/b] numbers throughout this Scene file, to ensure that each [b]${cmd10}[/b] name is [i]totally unique[/i] for specific [b]${cmd9}[/b] reference purposes. 
+
+*page_break
+
+In [b]Example 25[/b] (below) we are embellishing things even more by adding greater variety to the third option (refusing the bandit leader) while adding a brand new fourth option. In both of these cases we are also using new [i]conditional[/i] commands for the options themselves. As with our earlier use of [b]${cmd13}[/b] to make a particular option conditional, the command goes on the same line as the Option itself, immediately preceding it. Take a close look at these in the [i]Code Editor[/i].
+
+To make proper use of one of these conditional commands, [b]${cmd23}[/b], we are also giving this entire [b]${cmd8}[/b] its very own [b]${cmd10}[/b] section, called [b]repeat01[/b] - as will be explained.
+
+In addition, for the first time we are also making use of a [i]nested choice[/i] for the third option, which is the term used to describe [i]"a choice within a choice"[/i]. Should the player choose the third option below (and [i]only[/i] in that case) they will instantly be presented with a further [b]${cmd8}[/b] to make, specific to that particular option (hence being further [i]indented[/i] immediately below it).
+
+In the case of the new ([i]Throw gold...[/i]) fourth option, you will notice that it is visible but cannot actually be selected. For this option we have used the conditional [b]${cmd22}[/b] command, making the option available only if a specific condition is met (if [b]gold[/b] is [i]more than[/i] 50).
+
+For Tutorial purposes please select the [b]third[/b] ([i]Refuse bandit leader...[/i]) option below.
+
+*comment Resetting sneak_failed variable to false for Tutorial purposes
+
+*set sneak_failed false
+
+*comment Example 25 - an even more elaborate Choice with extra scripting
+
+*label repeat01
+*choice
+    #Sneak into the cavern and steal the witch's cauldron.
+        *if (dex > 50)
+            [i]This would be the response for [b]successfully[/b] sneaking.[/i]
+            *set dex +2
+            *goto main03
+        *else
+            [i]This would be the response for [b]failing[/b] to sneak.[/i]
+            *set dex +4
+            *set sneak_failed true
+            *goto jump06
+    #Head into the cavern and confront the witch.
+        *goto jump06
+    *hide_reuse #Refuse to accept the bandit leader's challenge.
+        [i]The bandit leader makes it clear - accept the challenge or die![/i]
+        
+        (For Tutorial purposes please choose the [i]first[/i] option below.)
+        *choice
+            #Reconsider and agree to accept the bandit leader's challenge.
+                [i]You succumb to intimidation and agree to enter the cave.[/i]
+                *goto repeat01
+            #Refuse the challenge again, and prepare to fight the bandits.
+                [i]You refuse to be intimidated and make ready to fight![/i]
+                *goto jump07
+    *selectable_if (gold > 50) #Throw gold into the air and run!
+        [i]You throw a large handful of gold into the air and flee from the bandits while they're all scrambling on the ground competing for it.[/i]
+        *set gold -28
+        *set int +2
+        *goto main03
+
+*label jump06
+*line_break
+[i]This would be the narrative and / or scripting for confronting the witch.[/i]
+*line_break
+*if (sneak_failed = true)
+    [i]Fighting the witch would be [b]harder[/b] due to failing to sneak.[/i]
+    *goto main03
+*else
+    [i]Fighting the witch would be [b]easier[/b] due to prepared confrontation.[/i]
+    *goto main03
+
+*label jump07
+
+[i]This would be the narrative and / or scripting for fighting the bandits.[/i]
+*goto main03
+
+*label main03
+
+Let's review what happened there: if you made the correct choices when prompted to do so, when you initially refused the bandit leader's challenge he bullied you into reconsidering your options. At that point the [i]control flow[/i] was directed by the [b]${cmd9} repeat01[/b] to jump [i][b]up[/b][/i] to [b]${cmd10} repeat01[/b], and then continued from there to display the original [b]${cmd8}[/b] once again.
+
+However, the [b]${cmd23}[/b] conditional command imposed on the third Option instructs CS to only display that option if it has [i]not been selected before[/i], and since that was the option you chose when originally presented with this particular [b]${cmd8}[/b], it removed it from the options available the second time this choice was presented, forcing you to choose a different option.
+
+As for the fourth ([i]Throw gold...[/i]) option, that one remained disabled on both occasions because you did not meet the stated condition (in this case, possessing more than 50 gold). Any option can be potentially disabled in this fashion, and using the value of [i]any[/i] variable as its condition. Whereas using a simple [b]${cmd13}[/b] (as in the earlier [b]${cmd7}[/b] examples) simply prevents the option from being displayed at all if the stated condition is not met, with [b]${cmd22}[/b] the option is always displayed but is simply disabled if the condition is not met. Its purpose is to subtly inform the player that other option(s) would be available at this point in the game if circumstances were different, or perhaps if different decisions had been taken at an earlier stage. Used correctly, [b]${cmd22}[/b] can encourage more replays of your game in an attempt to unlock disabled options and thereby possibly discover and explore different story paths.
+
+Note that unlike the simple but versatile [b]${cmd13}[/b] command, which has many practical uses in CS, both [b]${cmd23}[/b] and [b]${cmd22}[/b] are strictly [i]conditional[/i] commands for [i]Options[/i] only; neither are used for any purpose other than as demonstrated in [b]Example 25[/b].
+
+*page_break
+
+It is also possible to use [b]${cmd23}[/b] and [b]${cmd22}[/b] together to apply both conditions to [i]a single[/i] Option line. In [b]Example 26a[/b] I make use of this facility, together with a [b]${cmd9}[/b] / [b]${cmd10}[/b] combination to consistently [i]repeat[/i] a [b]${cmd8}[/b] until either no conditions are being met (and remaining options are disabled) [i]or[/i] the player chooses to move on by selecting the one [i]non[/i]-conditional Option. In short, with this combination of commands we can simulate [i]a store[/i].
+
+*comment Example 26a - Using *hide_reuse and *selectable_if together
+
+*label store
+
+This example uses the [b]${cmd10}[/b] named 'store' to repeat the [b]${cmd8}[/b] (and including this paragraph) with [i]each[/i] purchase made, with [b]${cmd23}[/b] removing from the list any Option already used, and [b]${cmd22}[/b] disabling any Option you can no longer afford while still leaving those items listed. Spend your gold, buying the most expensive item first.
+
+[i]You have ${gold} gold remaining.[/i]
+*choice
+    *hide_reuse *selectable_if (gold > 1) #Torch, 2 gold.
+        *set torch true
+        *set gold -2
+        [i]You purchase a flammable torch for 2 gold pieces.[/i]
+        *goto store
+    *hide_reuse *selectable_if (gold > 0) #Tinderbox & Flint, 1 gold.
+        *set gold -1
+        *set eq1 "Tinderbox & Flint"
+        [i]You purchase a tinderbox & flint for 1 gold piece.[/i]
+        *goto store
+    *hide_reuse *selectable_if (gold > 5) #Battered iron skullcap, 6 gold.
+        *set gold -6
+        *set helm "Battered Iron Skullcap"
+        *set def +2
+        [i]You purchase a battered iron skullcap for 6 gold pieces.[/i]
+        *goto store
+    *hide_reuse *selectable_if (gold > 2) #30' Rope, 3 gold.
+        *set gold -3
+        *set eq2 "30' Rope"
+        [i]You purchase 30' of rope for 3 gold pieces.[/i]
+        *goto store
+    *hide_reuse *selectable_if (gold > 49) #Sword of Champions, 50 gold.
+        *set gold -50
+        *set weapon "Sword of Champions"
+        *set att 10
+        [i]You purchase the mighty Sword of Champions for 50 gold pieces.[/i]
+        *goto store
+    *hide_reuse *selectable_if (gold > 7) #Leather jerkin, 8 gold.
+        *set gold -8
+        *set armour "Leather Jerkin"
+        *set def +3
+        [i]You purchase a leather jerkin for 8 gold pieces.[/i]
+        *goto store
+    *hide_reuse *selectable_if (gold > 4) #Wooden buckler, 5 gold.
+        *set gold -5
+        *set shield "Wooden Buckler"
+        *set def +2
+        [i]You purchase a wooden buckler for 5 gold pieces.[/i]
+        *goto store
+    *hide_reuse *selectable_if (gold > 11) #Cloak of Shadows, 12 gold.
+        *set gold -12
+        *set eq3 "Cloak of Shadows"
+        *set def +4
+        *set dex +3
+        [i]You purchase the mysterious Cloak of Shadows for 12 gold pieces.[/i]
+        *goto store
+    *hide_reuse *selectable_if (gold > 3) #Damaged short sword, 4 gold.
+        *set gold -4
+        *set weapon "Short Sword"
+        *set att 4
+        [i]You purchase a damaged short sword for 4 gold pieces.[/i]
+        *goto store
+    #Leave the store
+        [i]You leave the store.[/i]
+        *goto main04
+
+*label main04
+
+Although I used 'a store' to demonstrate [b]${cmd23}[/b] and [b]${cmd22}[/b] used together, the same principle of imposing a [i]condition[/i] on any [b]${cmd8}[/b] Options (in that case, how much gold the character had left) can apply to any Option and may use a variable of any type - whether [i]numeric[/i] as in that case, a "[i]string[/i]", or a simple true / false [i]boolean[/i].
+
+In [b]Example 26b[/b] I am using three different [b]${cmd22}[/b] conditions, each using a different data type, to determine which options the player may choose from. A final [i]non[/i]-conditional option has also been included to be certain that there will [i]always[/i] be at least one option available to choose - a [i]very[/i] important consideration when making Options conditional, to avoid error.
+
+The first option (using a "[i]string[/i]" variable) can be chosen only if you bought a [i]Cloak of Shadows[/i].
+
+The second option (using a true / false [i]boolean[/i]) can be chosen only if you already know the location of the [i]Black Iron Hills[/i].
+
+The third option (using a [i]numeric[/i] variable) can be chosen only if your [i]Reputation with Elves[/i] is currently 50 or more.
+
+*comment Example 26b - Using different variable types for conditional purposes
+
+*choice
+    *selectable_if (eq3 = "Cloak of Shadows") #Dale of Shadows
+        [i]You descend into the Dale of Shadows.[/i]
+        *goto main05
+    *selectable_if (loc1) #Black Iron Hills
+        [i]You ascend into the Black Iron Hills.[/i]
+        *goto main05
+    *selectable_if (rep1 > 49) #Whispering Wood
+        [i]The Elves permit you to enter the Whispering Wood.[/i]
+        *goto main05	
+    #Return to the village and seek a guide.
+        [i]You wisely decide to return to the village and seek a guide.[/i]
+        *goto main05
+
+*label main05
+
+In reality, instead of using a simple [b]${cmd9}[/b] for each of those particular [b]Example 26b[/b] options, were this a real game instead of a Tutorial we would of course be using either [b]${cmd4}[/b] or, more likely, [b]${cmd17}[/b], to take the player to various other Scene files, each devoted to one particular area of the game. Although it is entirely possible to use only a single Scene file for an entire game (indeed, it is possible to use only the [b]startup[/b] file), I strongly recommend [i]thinking[/i] about your overall game design in advance and aim to break it down into logical sections using multiple separate Scene files. If nothing else, it's a great way of measuring your progress and achieving goals along the way, but it can also be very useful for testing / debugging purposes.
+
+You may also have noticed that for the second option (Black Iron Hills) the condition required was simply [b](loc1)[/b], which appears to make little sense. [b]loc1[/b] is a [i]boolean[/i] (true/false) variable and it is permissible - for both [b]${cmd22}[/b] [i]and[/i] ordinary [b]${cmd13}[/b] - to check for [b]true[/b] simply by enclosing the variable name itself in parentheses. In essence, for a [i]boolean[/i] variable CS treats -
+
+[b]${cmd22} (loc1)[/b] - or - [b]${cmd13} (loc1)[/b]
+*line_break
+the same as -
+*line_break
+[b]${cmd22} (loc1 = true)[/b] - or - [b]${cmd13} (loc1 = true)[/b], respectively.
+
+A useful minor point to remember, if only because it saves on a bit of typing... :)
+
+[i][b]~~Exercise 17[/b] - Switch to [b]scene01[/b]. Add a story encounter resulting in a [b]${cmd8}[/b] comprising three Options, of which two Options are conditional on a variable of your choosing. Use [b]${cmd9}[/b] / [b]${cmd10}[/b] with some identifying label narrative for one Option, [b]${cmd4}[/b] for another, and [b]${cmd17}[/b] leading to [b]scene03[/b] for the third Option. Finally, also add a line of identifying narrative to both empty scene files (02 & 03 respectively) so you can tell them apart in-game.[/i]
+
+*finish Lesson #8 - [i]Enhancing Narrative[/i]
+
+
+*comment ----------Ignore------------
+*comment Tutorial code required in the event this Lesson has been accessed in a new session without the reader first having set critical values earlier.
+
+*label revisit
+
+As you have accessed this particular lesson in a new session without again "playing through" some of the earlier ones, the Tutorial is currently missing some information for example purposes. We'll quickly run through some missing choices before commencing the lesson...
+
+[i]Welcome, hero! By what name should lesser mortals address you?[/i]
+
+*fake_choice
+    #Xena
+        *set pcname "Xena"
+    #Conan
+        *set pcname "Conan"
+    #[i]None of the above[/i]
+        Please scribe your name, oh mighty hero!
+        *input_text pcname
+
+[i]Pray tell, noble hero, how do you foresee yourself being portrayed in legend?[/i]
+
+*fake_choice
+    #A fearsome Warrior
+        *set class "warrior"
+        *set str 40
+        *set int 20
+        *set dex 30
+    #A powerful Mage
+        *set class "mage"
+        *set str 20
+        *set int 40
+        *set dex 30
+    #A skillful Thief
+        *set class "thief"
+        *set str 25
+        *set int 25
+        *set dex 40
+
+[i]Your ears are rather . . . pointy, great hero. Which proud people do you claim as your own?[/i]
+
+*fake_choice
+    #Humans
+        *set race "human"
+        *set str +5
+        *set int +5
+        *set rep1 -5
+        *set rep3 +10
+        *set loc5 true
+    #Elves
+        *set race "elf"
+        *set int +5
+        *set dex +5
+        *set rep1 +20
+        *set rep2 -10
+        *set loc3 true
+    #Dwarves
+        *set race "dwarf"
+        *set str +15
+        *set dex -5
+        *set rep1 -10
+        *set rep2 +20
+        *set loc1 true
+    #Hobbits
+        *set race "hobbit"
+        *set dex +10
+        *set str -10
+        *set rep1 +10
+        *set rep2 +5
+        *set rep3 +25
+        *set loc4 true
+*set backpack true
+*goto continue
+*comment ----------Ignore------------

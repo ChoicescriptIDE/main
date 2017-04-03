@@ -1,0 +1,559 @@
+
+*comment NEW TO CHOICESCRIPT? CLICK 'Run this project' BUTTON TO START TUTORIAL
+
+[b]Lesson 10[/b] - [b][i]Miscellaneous Topics[/i][/b]
+
+In this final lesson we will discuss some slightly more advanced topics, included in the Tutorial for future reference purposes and also to better clarify / expand upon some subjects we only touched on in the Basic lessons.
+
+While I would encourage you to at least read through each of these topics before starting your own game development, please don't despair if you cannot immediately grasp all of what will be discussed here. Understanding [i]will[/i] come in time, with a little more practical experience under your belt. Remember to take another, closer look at this section in the not-too-distant future!
+
+*comment Tutorial Navigation Choice
+*choice
+    #Gender Considerations
+        *goto gender
+    #Multiple Conditions
+        *goto conditions
+    #Fairmath System
+        *goto fairmath
+    #Gosub / Return (Subroutines)
+        *goto subroutines
+    #Goto_Scene Redirection
+        *goto redirection
+    #Main Tutorial Lessons (1-9)
+        *goto_scene introduction lessons
+
+*label gender
+[b]Gender Considerations[/b]
+
+Gender is something many Choice Games players (indeed, [i]Choice of Games[/i] themselves) take very seriously indeed, so this is a subject also worthy of serious consideration from the very early stages of your game design.
+
+All Choice Games generally fall into one of three possible categories, either "genderless" (or "gender-neutral" as some prefer), "gender-locked" or "gender-friendly".
+
+A "genderless" game is one where the emphasis is on gameplay. The story itself is carefully written in such a way that the main character's gender is neither mentioned nor even inferred. The player is therefore left free to imagine the protagonist howsoever they wish.
+
+A genderless game can, however, be incredibly hard to do well, i.e. to the extent where the player doesn't even [i]notice[/i] (or at least, not until much later) that they have not been asked to choose a gender for the protagonist. The more descriptive the story, or the more detailed the game world (especially in terms of the number of characters in the story, and the extent of interaction with such) the harder it is to avoid any reference to gender without that actual [i]lack[/i] suddenly springing to the forefront of the player's mind - i.e. precisely the opposite effect to that intended.
+
+For this reason arguably the best approach to a completely "genderless" protagonist (especially for a first attempt at writing a Choice Game) is perhaps to aim for minimal [i]story[/i] and maximum actual [i]game[/i] behind the story - i.e. to focus heavily on game design elements and overall gameplay rather than descriptive prose and detailed character interaction.
+
+*page_break
+
+Conversely, a "gender-locked" game is one where the story revolves around either a male [b][i]or[/i][/b] female (or other) character, with no option for the player to select and play their own preference. There are various reasons why you might gender-lock your story, most commonly:
+
+- To better suit the setting, era and / or particular type of character being portrayed. Games with a firm historical setting, for instance, are more likely to be gender-locked for this reason. Often the author is aiming for authenticity but has no desire to portray a [i]particular[/i] gender in authentic fashion, at least where the main character is concerned (e.g. if set in an era renown for its abhorrent misogynistic practices / culture).
+
+- The author is simply not comfortable with (or confident of) writing the story to suit either / any gender, or may feel that they actually write [i]better[/i] when focused primarily on a particular gender for the main character - in exactly the same way as many ordinary novels (and indeed, some authors of such), for instance.
+
+- It's a "first attempt" and it's difficult enough just to learn ChoiceScript and practice your writing without also over-complicating things! Let's face it - it's hard work just to write an ordinary novel, and arguably two or three [i]times[/i] as hard to write a good Choice Game. There's a [i]reason[/i] why (at least in pre-CSIDE days!) more than [i]nine out of ten[/i] "first attempt" efforts failed to even reach the finish line...
+
+In the opinion of [i]this[/i] author all - or indeed, any [i]one[/i] - of the above are perfectly valid reasons for writing [i]your[/i] story [i]your[/i] way. However, it's a sad fact that "gender-locked" Choice Games do periodically come under fire from certain elements of the community, who really don't understand (or perhaps, couldn't care less) about the difficulties involved. Indeed, clearly some of these people would even prefer for you to [i]fail[/i] in your efforts rather than produce a gender-locked game, and that aim is precisely what drives them in their opposition. If despite this dire warning you do still decide to head down the gender-locked route, be prepared to possibly face some flak and having to defend your stance  - [i]regardless[/i] of your actual reason(s) for doing so.
+
+*page_break
+
+Many Choice Games allow the player to choose the gender of their protagonist, a route involving additional scripting considerations but having the distinct advantage of potentially appealing to a much wider audience (and less cause to invoke the ire of a particular segment of that audience, by avoiding gender-lock). Above all, perhaps, [i]Choice of Games[/i] themselves generally prefer their published games to be gender-friendly for maximum appeal and inclusivity.
+
+That said, all other considerations aside, the truly important question for you to ask yourself is this: do you really want to spend so much time producing something which ultimately may achieve as little as only 50% of its [i]real[/i] potential in terms of readership / sales? If the answer is [i]no[/i], it's well worth at least considering basic gender-friendly scripting.
+
+The first step is to add to your [i]startup[/i] file a group of new Permanent [i]"string"[/i] Variables, along the following lines but specific to your particular game setting / era:
+
+${cmd2} gender "male"
+*line_break
+${cmd2} he "he"
+*line_break
+${cmd2} him "him"
+*line_break
+${cmd2} his "his"
+*line_break
+${cmd2} boy "boy"
+*line_break
+${cmd2} man "man"
+*line_break
+${cmd2} mr "Mr."
+*line_break
+${cmd2} mister "mister"
+*line_break
+${cmd2} son "son"
+*line_break
+${cmd2} brother "brother"
+*line_break
+${cmd2} guy "guy"
+*line_break
+${cmd2} gentleman "gentleman"
+*line_break
+${cmd2} sir "sir"
+*line_break
+${cmd2} master "master"
+*line_break
+${cmd2} lord "lord"
+
+*page_break
+
+At some point fairly early in your story you will need to ascertain the player's preference for their character's gender. The more subtle and creative you can make this, the better (e.g. an early scene where they might need to dress for a formal engagement, with a choice of perhaps cocktail dress or suit & tie?) but failing all else - or simply to avoid any possibility of error - you could just ask them outright, as shown below in [b]Example 38[/b] (scroll down [b]Lesson 10[/b]).
+
+[b]Please note:[/b] [i]Without wishing to offend anyone, I will stick to the 'basics' here and leave the discussion of 'other' genders to those infinitely better suited to tackle such matters.[/i]
+*link https://forum.choiceofgames.com/search?q=gender Gender 
+[i]is a subject often discussed on the ChoiceScript Forums, for instance.[/i]
+
+*comment Example 38 - Switching variables to suit a female protagonist
+    
+[i]What gender are you?[/i]
+
+*choice
+    #Male
+        *goto next01
+    #Female
+        *set gender "female"
+        *set he "she"
+        *set him "her"
+        *set his "her"
+        *set boy "girl"
+        *set man "woman"
+        *set mr "Ms."
+        *set mister "miss"
+        *set son "daughter"
+        *set brother "sister"
+        *set guy "gal"
+        *set gentleman "lady"
+        *set sir "ma'am"
+        *set master "mistress"
+        *set lord "lady"
+        *goto next01
+
+*label next01
+
+In [b]Example 38[/b], should the player choose a male protagonist no changes to the gender group of variables need to be made, but in the event that their choice is to play a female character, all of those variables need to be overwritten with a new, more appropriate, value. The actual names of the variables themselves remain unchanged, of course, which simplifies things a great deal.
+
+These gender-specific forms of address can now be used within your narrative either when another character in the story is directly addressing the protagonist, or when two or more characters are discussing the protagonist within his / her hearing. In [b]Example 39[/b]:
+
+*comment Example 39 - Using gender-specific variables within narrative
+
+[i]"Escort this... ${gentleman} to the door. $!{he} is no longer welcome at this establishment."[/i]
+
+The above will read "gentleman" if you chose to play  a male character but "lady" if female. Likewise, the second sentence will begin with "He / She" accordingly: note the exclamation mark to capitalize the first letter of that string, being the first word of a new sentence.
+
+By this simple means you can allow for gender choice within your game, while the main [b]gender[/b] variable itself, with a value of "male" or "female" (or whatever), can be used throughout your narrative for providing conditional text specific to a particular gender, using [b]${cmd13}[/b] / [b]${cmd15}[/b] / [b]${cmd14}[/b] as needed - or even, in some cases, entirely different plot lines / branching for each.
+    
+*comment Tutorial Navigation Choice
+*choice
+    #Multiple Conditions
+        *goto conditions
+    #Fairmath System
+        *goto fairmath
+    #Gosub / Return (Subroutines)
+        *goto subroutines
+    #Goto_Scene Redirection
+        *goto redirection
+    #Main Tutorial Lessons (1-9)
+        *goto_scene introduction lessons
+
+*label conditions
+[b]Multiple Conditions[/b]
+
+In Lesson 6, [i]Scripting Conditions[/i], we discussed using the [b]${cmd13}[/b] command with one or two different conditions, using [b]and[/b] / [b]or[/b] as appropriate. To recap:
+
+While a single condition [i]on a line of its own[/i] does not actually require parentheses and may be used like this -
+
+[b]${cmd13}[/b] race = "hobbit"
+
+[i]or[/i] this -
+
+[b]${cmd13}[/b] (race = "hobbit")
+
+using two [i]numeric[/i] or [i]string[/i] conditions requires that both [i]must[/i] be wrapped in parentheses and employs either [b]and[/b] / [b]or[/b], like so...
+
+[b]${cmd13}[/b] (race = "hobbit") [b]and[/b] (class = "thief")
+
+or alternatively, where appropriate -
+
+[b]${cmd13}[/b] (race = "hobbit") [b]or[/b] (class = "thief")
+
+*page_break
+
+However, in the event that the line also contains [i]something else[/i], the first two conditions must be wrapped in an additional set of parentheses and so be treated as "a pair", e.g.
+
+[b]${cmd13}[/b] ((race = "hobbit") [b]or[/b] (class = "thief")) #This is a valid option
+
+or
+
+[b]${cmd13}[/b] ((race = "hobbit") [b]or[/b] (class = "thief")) [b]or[/b] (dex > 50)
+
+Note that the third condition does not on its own constitute "a pair" and so does not also require [i]extra[/i] parentheses, nor does the whole thing need wrapping in yet another set - unless there's once again [i]something else[/i] on the same line, such as an Option:
+
+[b]${cmd13}[/b] (((race = "hobbit") [b]or[/b] (class = "thief")) [b]or[/b] (dex > 50)) #This is a valid option
+
+Although by this stage you may as well keep things simple and just indent the Option itself on the following line, negating the need for those extra parentheses wrapping the whole expression.
+
+This simple syntax will suffice for the majority of conditional Options or narrative required in most situations, and may use any type of variable, but in actual fact there is no real limit to the number of conditions able to be evaluated in a single [b]${cmd13}[/b] statement, [i]if[/i] - pardon the pun - the situation / your game design warrants it.
+
+*page_break
+
+The only rule you need to remember is that each [i]pair[/i] of conditions must be enclosed within an [i]additional[/i] set of parentheses, as must each [i]pair of pairs[/i], as the following examples illustrate:
+
+[b]${cmd13}[/b] ((a = 1) and (b = 1)) or (c = 1)
+*line_break
+[b]${cmd13}[/b] ((a = 1) and (b = 1)) or ((c = 1) and (d = 1))
+*line_break
+[b]${cmd13}[/b] (((a = 1) and (b = 1)) or ((c = 1) and (d = 1))) or (e = 1)
+*line_break
+[b]${cmd13}[/b] (((a = 1) and (b = 1)) or ((c = 1) and (d = 1))) or ((e = 1) and (f = 1))
+*line_break
+[b]${cmd13}[/b] (((a = 1) and (b = 1)) or ((c = 1) and (d = 1))) or ((e = 1) and (f = 1)) or (g = 1)
+*line_break
+[b]${cmd13}[/b] (((a = 1) and (b = 1)) or ((c = 1) and (d = 1))) or (((e = 1) and (f = 1)) or ((g = 1) and (h = 1)))
+
+Whether to use [b]and[/b] or [b]or[/b] at each step will of course depend on precisely what you're trying to determine with that [b]${cmd13}[/b], but for a first game at least I would strongly advise not being too ambitious. Incorrect logic can result in hard-to-spot game design bugs, leading to false or otherwise unintended results but without generating actual game-stopping errors, so making them harder to resolve at the development / testing stage. Where possible - especially while still learning - consider instead breaking down your code into several successive, smaller [b]${cmd13}[/b] statements, each evaluating just two or three conditions in a step-by-step process and indented accordingly as logic dictates. You will likely find that method easier for tracing logic bugs if or when the need arises.
+
+Although the "pairs" system illustrated above is perhaps the simplest logic to learn and should serve for most purposes, it's not actually the only way to do things - nor is it [i]necessarily[/i] the best or even easiest way to do things in every situation.
+
+*page_break
+
+For example, instead of the standard "pairs" system of...
+
+[b]${cmd13}[/b] ((a = 1) and (b = 1)) or ((c = 1) and (d = 1))
+
+Where the situation warrants it you could do something like...
+
+[b]${cmd13}[/b] (((a = 1) and (b = 1)) and (c = 1)) or (d = 1)
+
+In this case the [b]${cmd13}[/b] will evaluate [i]true[/i] in the event that A, B & C are all true, [i]or[/i] if D alone is true (or if they are all true!). In any other event it will evaluate [i]false[/i]. If you look carefully you will see that A and B have been properly "paired", but by adjusting other parentheses accordingly the C condition has effectively been "joined" to that pair (rather than being paired with D as in the first example), while D now stands alone and the final [i]or[/i] may prove critical.
+
+In essence, you can change the determination of the [b]${cmd13}[/b] simply by adjusting the actual placement of the parentheses and carefully using [i]and[/i] / [i]or[/i] for each join as appropriate - as long as the parentheses [i]themselves[/i] are always used in pairs, i.e. an equal number of (opening and closing) sets. The above example has six of each, exactly the same as the "pairs" example.
+
+*page_break
+
+Confusion over the correct use / placement of parentheses is probably one of the toughest hurdles for most newcomers to overcome, so it helps to keep things as simple as possible until you get more into the swing of things. One of the ways you can try to do so is to use [i]boolean[/i] (simple true / false ) variables wherever possible in preference to [i]numeric[/i]  or [i]"string"[/i] variables, simply because you don't actually [i]need[/i] anywhere near as many parentheses. For example -
+
+[b]${cmd13}[/b]  backpack and torch
+*line_break
+...without any parentheses (evaluating [i]true[/i] if both are currently true, but [i]false[/i] if either one is false) is equally as valid as the syntax needed for [i]numeric[/i] or [i]string[/i] variables...
+
+[b]${cmd13}[/b] (a = 1) and (b = 1)
+
+Likewise -
+
+[b]${cmd13}[/b]  (backpack and torch) or heirloom
+*line_break
+...can often be less intimidating / easier to grasp than the [i]numeric[/i] or [i]string[/i] equivalent -
+
+[b]${cmd13}[/b] ((a = 1) and (b = 1)) or (c = 1)
+
+*comment Tutorial Navigation Choice
+*choice
+    #Gender Considerations
+        *goto gender
+    #Fairmath System
+        *goto fairmath
+    #Gosub / Return (Subroutines)
+        *goto subroutines
+    #Goto_Scene Redirection
+        *goto redirection
+    #Main Tutorial Lessons (1-9)
+        *goto_scene introduction lessons
+
+*label fairmath
+[b]Fairmath System[/b]
+
+In Lesson 5 we looked at [i]Using Variables[/i], both [i]overwriting[/i] them completely with a brand new value regardless of their current value, as well as only [i]modifying[/i] numeric variables by [i]adding to[/i] or [i]subtracting from[/i] their existing value by a specific amount.
+
+In Lesson 9 we discussed the [i]'Show Stats' screen[/i], where the current values of 'Stats' in the game are displayed, with numeric character Stats often being displayed in a 'percentile bar' format using the [b]${cmd25}[/b] command:
+
+*set str 40
+*set int 50
+*set dex 35
+*stat_chart
+    percent str Strength
+    percent int Intelligence
+    percent dex Dexterity
+*line_break
+One of the main problems from a game design point of view is how best to keep those values within an acceptable range (say, 1-100) in a typical playthru, when you may have little actual control over how a player may choose to play or which Stats they will focus on building.
+
+One way is to start all Stats fairly low and to allow only relatively small changes as a result of player choices during the course of a game, so it takes a long while to build up to very high values. Careful testing will ensure game balance, and it's also possible to write extra code to limit values within a specific range, but overall development can be more difficult than it needs to be.
+
+ChoiceScript directly addresses this issue with what it calls the [i]Fairmath[/i] system, aimed specifically at any numeric value intended to be displayed in [b]${cmd25}[/b] format. Rather than increasing (or decreasing) a numeric value by a fixed value (e.g. +5), Fairmath allows you to apply a [i]percentage[/i] change, while also ensuring that the end result will [i]never[/i] drop below 0 nor rise above 100.
+
+*page_break
+
+The only downside is that Fairmath only works with values already in the range of 0-100, meaning that it may cause game-stopping errors if anything else in your scripting adjusts a Fairmath value outside of this range. You can, however, still [b]${cmd11}[/b] specific values (such as early in the game, perhaps as a result of [b]class[/b] and [b]race[/b]-type choices, for example), provided the end result is [i]certain[/i] to remain within the 0-100 percentile range required for Fairmath to still work properly thereafter.
+
+All future changes to those specific values - during the normal course of play - should then take the form of a Fairmath percentile change rather than setting a particular value, or adding or subtracting a specific amount. Instead of [i]overwriting[/i] with such as...
+
+[b]${cmd11}[/b] str 30
+
+...or perhaps [i]modifying[/i] with something like...
+
+[b]${cmd11}[/b] str +5
+
+...all [i]future[/i] modifications to the [b]str[/b] variable would take the form of either...
+
+[b]${cmd11}[/b] str %+ 20
+
+...to [i]increase[/i] that variable by a particular percentage value, or...
+
+[b]${cmd11}[/b] str %- 20
+
+...to [i]decrease[/i] it by a percentage. Both of those examples are applying a 20% change: anywhere between 5% (a relatively small change) and 30% ([i]very[/i] significant) is common in Choice Games.
+
+*page_break
+
+The basic idea behind Fairmath is that the [i]higher[/i] a particular value [i]currently[/i] is, the harder it is to increase but the easier it is to decrease, while the [i]lower[/i] a value currently is, the faster it will rise and the slower it will fall. This is best illustrated by example; let's take the following values:
+
+*set str 10
+*set int 50
+*set dex 90
+*stat_chart
+    percent str Strength
+    percent int Intelligence
+    percent dex Dexterity
+*line_break
+If we apply a 20% increase to [i]all[/i] of these (e.g. [b]${cmd11}[/b] str %+ 20) we end up with the following:
+
+*set str %+ 20
+*set int %+ 20
+*set dex %+ 20
+*stat_chart
+    percent str Strength
+    percent int Intelligence
+    percent dex Dexterity
+*line_break
+Essentially, when [i]increasing[/i] a value with [b]%+[/b], Fairmath uses the [i]difference[/i] between the value itself and 100. For instance, the difference between [b]Strength[/b] (10) and 100 is 90, so Fairmath added 20% of 90 (18) to Strength, giving us a resulting value of (10+18=) [b]28[/b] - a big jump.
+
+The difference between [b]Intelligence[/b] (50) and 100 is 50, so Fairmath added 20% of 50 (10) to Intelligence, giving us a resulting value of (50+10=) [b]60[/b] - a moderate increase.
+
+The difference between [b]Dexterity[/b] (90) and 100 is only 10, so Fairmath added 20% of 10 (2) to Dexterity, giving us a resulting value of (90+2=) [b]92[/b] - a very small rise.
+
+*page_break
+
+Now if we reset all of those values back to what they were originally:
+*set str 10
+*set int 50
+*set dex 90
+*stat_chart
+    percent str Strength
+    percent int Intelligence
+    percent dex Dexterity
+*line_break
+And instead apply a 20% [i]decrease[/i] to each (e.g. [b]${cmd11}[/b] str %- 20), the result looks like this:
+*set str %- 20
+*set int %- 20
+*set dex %- 20
+*stat_chart
+    percent str Strength
+    percent int Intelligence
+    percent dex Dexterity
+*line_break
+Unlike for [i]increasing[/i] a value, where Fairmath uses the difference between the value and 100 to determine the degree of change, when [i]decreasing[/i] a value Fairmath instead uses the value itself.
+
+20% of [b]Strength[/b] (10) is only 2, giving us a resulting value of (10-2=) [b]8[/b] - a very small drop.
+*line_break
+20% of [b]Intelligence[/b] (50) is 10, giving us a resulting value of (50-10=) [b]40[/b] - a moderate fall.
+*line_break
+20% of [b]Dexterity[/b] (90) is 18, giving us a resulting value of (90-18=) [b]72[/b] - a significant drop.
+
+*comment Tutorial Navigation Choice
+*choice
+    #Gender Considerations
+        *goto gender
+    #Multiple Conditions
+        *goto conditions
+    #Gosub / Return (Subroutines)
+        *goto subroutines
+    #Goto_Scene Redirection
+        *goto redirection
+    #Main Tutorial Lessons (1-9)
+        *goto_scene introduction lessons
+
+*label subroutines
+*comment ----------Ignore------------
+*comment Tutorial code required in the event this Lesson has been accessed in a new session without the reader first having selected a Race during lesson05.
+*if race = "Unknown"
+    For the purpose of this particular Tutorial lesson, please select a Race:
+    *fake_choice
+        #Human
+            *set race "human"
+        #Elf
+            *set race "elf"
+        #Dwarf
+            *set race "dwarf"
+        #Hobbit
+            *set race "hobbit"
+*comment ----------Ignore------------
+
+[b]Subroutines - Using ${cmd18} / ${cmd27}  & ${cmd19}[/b]
+
+You may recall at the beginning of Lesson 8, [i]Enhancing Narrative[/i], we discussed the merits of writing nine lines of code simply to produce a race-specific narrative variation in the middle of a paragraph. I suggested that this sort of thing fully embraced the [i]very essence[/i] of responsive interactive fiction, while admittedly amounting to a fair bit of extra work for what [i]could[/i] also be argued is little gain for the actual time spent...
+
+
+*comment Example 40a - Calling a subroutine to provide race-specific variation
+
+*set npc_race "dwarf"
+*gosub hail
+
+[i]The grizzled dwarven blacksmith pauses in his hammering when you enter his workshop. He looks you up and down, dark eyes peering out from beneath remarkably bushy eyebrows, before nodding in welcome. "What can I do for you, [b]${greet}[/b]?" he finally asks, his gravelly voice bringing to mind a distant rumble of thunder in the Misty Mountains.[/i]
+
+In [b]Example 40a[/b] shown above (scroll down Lesson 10 to around line 385) I have repeated the same paragraph but had to write only [i]two[/i] extra lines of code to produce the same race-specific greeting (highlighted in bold above), by instead using the [b]${cmd18}[/b] command to call a prepared [i]subroutine[/i] where the actual scripting takes place.
+
+Moreover, being a subroutine instead of situation-specific code, I can now use the same system to produce a race-specific greeting in any Scene file in the game (again, with just two extra lines of code each time it is used) and have also expanded it to take account of not only the player-character's race, but also the non-player character's race. An Elf would have said (Example 40b):
+
+*comment Example 40b - Specifying that the non-player character is an Elf
+
+*set npc_race "elf"
+*gosub hail
+[i]"What can I do for you, [b]${greet}[/b]?"[/i]
+
+*comment Example 40c - Specifying that the non-player character is a Hobbit
+
+While a Hobbit would have said (Example 40c):
+
+*set npc_race "hobbit"
+*gosub hail
+[i]"What can I do for you, [b]${greet}[/b]?"[/i]
+
+In effect, in all cases both your [i]and[/i] the NPC's [b]race[/b] are used to determine the actual wording.
+
+*page_break
+
+This system works using a [i]Permanent Variable[/i] called [b]npc_race[/b]. Because the blacksmith in [b]Example 40a[/b] is a dwarf, before writing the meeting narrative I have simply overwritten the current value of that "string" variable with [b]${cmd11} npc_race "dwarf"[/b] (if the protagonist were about to meet an elf, I would instead use [b]${cmd11} npc_race "elf"[/b] as shown in Example 40b, etc.), followed by [b]${cmd18} hail[/b] to make use of the subroutine.
+
+[b]${cmd18}[/b] works very similar to the standard [b]${cmd9}[/b], in that 'hail' is simply a unique [b]${cmd10}[/b] name within the same Scene file. When CS hits a [b]${cmd18}[/b] line the [i]control flow[/i] will immediately [i]jump[/i] to the line of the corresponding [b]${cmd10}[/b] (in this case, 'hail') - you will find this in [b]Example 40d[/b], if you now scroll down to the very bottom of the Lesson 10 Scene file in the [i]Code Editor[/i].
+
+Having arrived at [b]${cmd10} hail[/b], the [i]control flow[/i] continues reading down the page, processing the [b]${cmd13}[/b] / [b]${cmd15}[/b] / [b]${cmd14}[/b] of that subroutine and testing each condition in turn until it hits a [b]${cmd19}[/b] command - at which point it [i]returns[/i] to the [b]${cmd18} hail[/b] line (388) from which it originated, and then continues from there into the blacksmith narrative. [b]${cmd19}[/b] is only ever used in conjunction with a [b]${cmd18}[/b] (or [b]${cmd27}[/b]), i.e. that's what [i]makes[/i] it a "subroutine".
+
+During that brief detour into the 'hail' subroutine, however, it will have [b]${cmd11}[/b] a new value for the Permanent "string" Variable called [b]greet[/b]. That string value (e.g. "longshanks" for a dwarf NPC addressing a human PC) will now be used within the blacksmith narrative (as shown in the original [b]Example 40a[/b] around line 385).
+
+The main advantage of [b]${cmd18}[/b] / [b]${cmd19}[/b] is that the entire 'hail' subroutine needed to be scripted only once but can now be used anywhere in the game simply by copy-pasting that entire label section into the bottom of any Scene file, so we can access it with a [b]${cmd18} hail[/b] as and when needed. Indeed, if you are using multiple subroutines for a variety of purposes you could place them all in a single, [i]dedicated[/i] subroutines file and use [b]${cmd27} ([i]scene[/i]) ([i]label[/i])[/b] to access any of them from any scene in the game, e.g. [b]${cmd27} routines hail[/b].
+
+*page_break
+
+While subroutines are especially ideal for returning conditional text strings for use in narrative - to make the game even more responsive to earlier player choices as demonstrated in that example - there are numerous other possibilities worth bearing in mind. The more inventive / creative the game system behind your story, the more subroutines are likely able to play a big part. Things like a combat system, an expanded inventory or other form of character 'possessions' - perhaps with changeable properties of their own - would all be more easily governed using extra variables and multiple subroutines for specific purposes.
+
+It's even possible for one subroutine to call another, and another, and so on using multiple [b]${cmd18}[/b] commands within subroutines themselves, before [i]finally[/i] hitting a [b]${cmd19}[/b], by which means quite complicated scripting can be devised. Although not recommended for a "first attempt" unless you have actual programming experience, it's nonetheless worth bearing in mind what is actually possible with subroutines - given the time, coding experience [i]and[/i] a good enough game idea to make proper use of them.
+
+In the meanwhile, it's at least worth remembering that subroutines exist and can be very useful indeed. In particular, if ever you find yourself copy-pasting the [i]same[/i] lines of code to use over and over again, pause for a moment and give some thought to whether or not it might be better to simply turn that particular code into a proper subroutine. The chances are, it probably is.
+
+*comment Tutorial Navigation Choice
+*choice
+    #Gender Considerations
+        *goto gender
+    #Multiple Conditions
+        *goto conditions
+    #Fairmath System
+        *goto fairmath
+    #Goto_Scene Redirection
+        *goto redirection
+    #Main Tutorial Lessons (1-9)
+        *goto_scene introduction lessons
+
+*label redirection
+[b]Goto_Scene Redirection[/b]
+
+As briefly mentioned in Lesson 7, [i]Improving Interaction[/i], [b]${cmd17}[/b] is a [i]redirectional[/i] command by which - where appropriate - we can force the game to immediately load a specific Scene file e.g. [b]${cmd17} lesson08[/b]. This is perhaps most commonly used following a particular [b]${cmd8}[/b] Option resulting in a significant branching of the story, but that is by no means its sole use or purpose.
+    
+[b]${cmd17}[/b] essentially allows us to more easily break things down into multiple Scene files, each covering different stages or perhaps major branches of the story, or even different areas of the game world - or a combination of all of  these.
+
+Unlike the other scene-loading command, [b]${cmd4}[/b], which provides a 'Next Chapter' button for the player by default, [b]${cmd17}[/b] has no such facility and so allows for seamless integration from the player's point of view. If a pause in the narrative flow is required, however, we can use a suitably-worded [b]${cmd3}[/b] on the line immediately above the [b]${cmd17}[/b] command.
+
+The other significant difference between the two scene-loading commands is that [b]${cmd4}[/b] does not allow us to specify a particular Scene name to load. It instead consults the [b]${cmd5}[/b] specified in [b]Startup[/b] to determine which Scene to load next, in strictly sequential order.
+
+Conversely, [b]${cmd17}[/b] allows us the flexibility to be more specific, to load (or even reload) any Scene of our choosing at any point, and in any order we desire. This actually has implications and uses beyond how we choose to build our game world  or craft the story of the character journeying through it, and it these wider implications and uses which are worth especially close consideration both in the early stages of our game design and throughout its development.
+
+*page_break
+
+The first possibility worth consideration is what I call a [i]Transit[/i] Scene, in that it would be a file frequently and / or regularly [i]reloaded[/i] throughout the course of the game. I further break this down into two specific types, although it should be noted that for many game designs a single Transit file could simultaneously serve [i]both[/i] purposes described below:
+
+A [i]Story Transit[/i] Scene is one to which our protagonist in the story often returns, either as dictated by the story itself or as a result of the player themselves selecting that (often-presented) Option. As an example, in our simple fantasy adventure the Story Transit Scene could depict the village used by our wandering adventurer as a base, perhaps providing much-needed rest & respite, hot meals, a warm bed, stores at which to buy supplies and sell their loot, and perhaps even interesting characters with which to repeatedly interact and maybe receive quests, advice or aid from. The possibilities are limited only by the author's creativity.
+
+This type of thing need not be restricted to this particular style of game, of course, but is perhaps the most obvious example to imagine how it might be reproduced in a Choice Game - using a specific [i]Story Transit Scene[/i], perhaps even called 'village', to which our protagonist may often return through appropriate use of the [b]${cmd17}[/b] command, saving much repeated scripting.
+
+Conversely, a [i]Game Transit Scene[/i] file, while also loaded on a regular basis using [b]${cmd17}[/b], would instead serve a specific [i]behind-the-scenes[/i] purpose and may even be entirely invisible to the player, in that it returns little or even no actual narrative. The scripting in such a file would be used to update [i]the game behind the story[/i], perhaps running conditional checks and other necessary calculations, and updating game variables accordingly. Having served its purpose in the blink of an eye, it would end with another [b]${cmd17}[/b], redirecting the player to the next stage of the actual story accordingly - and which may vary based on conditions determined within the Transit file itself (if it never actually varies, consider instead if [b]${cmd27}[/b] might not be better suited for your Transit scene). The advantage of a [i]Game Transit Scene[/i] is that it may contain a host of 'update' scripting necessary to [i]particular[/i] types of Choice Game designs, without having to repeat that code in each and every Scene file in the game.
+
+*page_break
+
+A Transit Scene file can also be used to provide a 'soft save' system for your game (if, for instance, the death of the protagonist is a common hazard), allowing the player to continue from an earlier 'checkpoint' rather than have to always replay from the very beginning of the story.
+
+The scripting for a 'soft save' system is detailed in 
+*link http://choicescriptdev.wikia.com/wiki/Practical_Scripting_Techniques#A_Soft_Save_is_Not_Hard.21 this section
+of the ChoiceScriptDev Wiki.
+
+It should be noted that [b]${cmd17}[/b] should not be used to casually reload the actual [b]startup[/b] file, as doing so will [i]reset[/i] all [i]Permanent Variables[/i] back to their default starting values.
+
+Last but by no means least, it's worth noting that [b]${cmd17}[/b] also allows you to jump directly to a particular [b]${cmd10}[/b] within the named scene file, e.g. [b]${cmd17} lesson08 main01[/b] (where [b]main01[/b] would be the actual label name). You can also, incidentally, use this method to avoid the Stats-resetting problem mentioned above if / when reloading the [b]startup[/b] file, by instead jumping directly to a particular [b]${cmd10}[/b] [i]below[/i] all of your [b]${cmd2}[/b] commands. All the same, there is not a single compelling reason for (or benefit to be had from) starting your story in the actual startup file... but there are certainly some advantages gained by [i]not[/i] doing so!
+
+*comment Tutorial Navigation Choice
+*choice
+    #Gender Considerations
+        *goto gender
+    #Multiple Conditions
+        *goto conditions
+    #Fairmath System
+        *goto fairmath
+    #Gosub / Return (Subroutines)
+        *goto subroutines
+    #Main Tutorial Lessons (1-9)
+        *goto_scene introduction lessons
+
+*comment Example 40d - A subroutine to *set a race-to-race greeting and *return
+
+*label hail
+*if npc_race = "dwarf"
+    *if race = "human"
+        *set greet "longshanks"
+        *return
+    *elseif race = "elf"
+        *set greet "my pointy-eared friend"
+        *return
+    *elseif race = "dwarf"
+        *set greet "my fine-bearded brother"
+        *return
+    *elseif race = "hobbit"
+        *set greet "stumpy"
+        *return
+    *else
+        *set greet "stranger"
+        *return
+*elseif npc_race = "elf"
+    *if race = "human"
+        *set greet "short-lived"
+        *return
+    *elseif race = "elf"
+        *set greet "noble cousin"
+        *return
+    *elseif race = "dwarf"
+        *set greet "dirt-grubber"
+        *return
+    *elseif race = "hobbit"
+        *set greet "halfling"
+        *return
+    *else
+        *set greet "stranger"
+        *return
+*elseif npc_race = "hobbit"
+    *if race = "human"
+        *set greet "good wanderer"
+        *return
+    *elseif race = "elf"
+        *set greet "enlightened one"
+        *return
+    *elseif race = "dwarf"
+        *set greet "my stout friend"
+        *return
+    *elseif race = "hobbit"
+        *set greet "brave adventurer"
+        *return
+    *else
+        *set greet "stranger"
+        *return
+*else
+    *if race = "human"
+        *set greet "human"
+        *return
+    *elseif race = "elf"
+        *set greet "elf"
+        *return
+    *elseif race = "dwarf"
+        *set greet "dwarf"
+        *return
+    *elseif race = "hobbit"
+        *set greet "hobbit"
+        *return
+    *else
+        *set greet "stranger"
+        *return

@@ -1,0 +1,16 @@
+<html>
+<h2>Command: bug</h2>
+<p>The *bug command acts as a sort of safety net for your code under specific conditions, and allows you to display a custom error message should a player
+manage to reach a part of the code they shouldn't.
+<pre>
+*if (bullets_in_gun < 3)
+	You have less than half a magazine left! Be careful!
+*if (bullets_in_gun < 7)
+	You have a full magazine. Mow 'em down!
+*bug Oops, something went wrong! Please report this as a bug.
+</pre>
+In the above example, if for some reason the variable "bullets_in_gun" exceeds 7 the game would have continued with
+whatever code followed this section, but likely would have ended up in a game stopping error later, leaving you clueless as to the cause.
+With the *bug command in place, your chosen message will be thrown in error instead, immediately alerting you, your testers or your players to the inconsistency.
+<p>Looking for a little more detail? Try the <a rel="external" href="http://choicescriptdev.wikia.com/wiki/Bug">wiki page</a>
+</html>

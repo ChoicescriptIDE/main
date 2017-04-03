@@ -1,0 +1,20 @@
+<h2>Command: create</h2>
+<p>Used to declare/define or 'create' a permanent (global) variable.
+<br>
+This command can only be used in a game's startup
+scene and it must come after all other initialization commands such as *title, *author and *scene_list.</p>
+<h3>Example Usage</h3>
+<pre>
+*title My Little Adventure
+
+*scene_list
+    startup
+    chapter1
+
+*create name "Unknown"
+*create gold 0
+*create backpack false
+
+We can now use the ${name}, ${gold} and ${backpack} variables!
+</pre>
+Looking for a little more detail? Try the <a rel="external" href="http://choicescriptdev.wikia.com/wiki/Create">wiki page</a>

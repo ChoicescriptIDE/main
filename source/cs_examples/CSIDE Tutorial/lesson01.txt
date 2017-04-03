@@ -1,0 +1,34 @@
+
+*comment NEW TO CHOICESCRIPT? CLICK 'Run this project' BUTTON TO START TUTORIAL
+
+[b]Lesson 1[/b] - [b][i]Projects & Scene Files[/i][/b]
+
+When you [i]Create a new project[/i] (using the '[b]+[/b]' button alongside [i]Scenes & Projects[/i], top-left), CSIDE will create a brand new project for you together with the two compulsory files required by [i]every[/i] Choice Game: [i][b]startup[/b][/i] and [i][b]choicescript_stats[/b][/i]. These two compulsory files will be explained in more detail as we progress through the Tutorial.
+
+[i][b]~~Exercise 1[/b] - Create a New Project for yourself now, and name it [b]Test Project[/b].[/i]
+
+You can sort your CSIDE Projects into a different order by dragging & dropping a Project's header bar above or below others in the list. Try that now, by dragging the new Test Project below the Tutorial. Your preferred order of listing will persist from one session to the next.
+
+A Choice Game may also contain any number of additional [i]Scene[/i] files. Within CSIDE, you add brand new Scene files to an existing Project simply by clicking the '[b]+[/b]' button located on that Project's header bar, and then immediately click the new ('Untitled') scene file to rename it, while it is still selected. (To rename an unselected scene file, a double-click is required.)
+
+Unlike the two compulsory files (which cannot be renamed) you are free to name your actual Scene files whatever you like; it is equally common to use descriptive names such as [b]dungeon[/b] as it is to use sequential names like [b]chapter03[/b]. Scene names must be unique within that Project and should not contain spaces (use under_scores instead if needed).
+
+Note that the actual players of your game will not themselves ever see any mention of your individual file names during the normal course of play.
+
+[i][b]~~Exercise 2[/b] - Now add a new Scene file to [b]Test Project[/b] and then rename it [b]scene01[/b][/i].
+
+*page_break
+
+As you add more Scene files, space may become tight with multiple projects open, so it's worth noting that you can [i]hide[/i] (or reveal) any project's entire file list simply by clicking the eye icon to the left of the project name. A project's current state will also persist between sessions.
+
+Scene files will contain your story narrative as well as the actual [i]scripting[/i] (also called "the code") required to turn this into a Choice Game. Although you may if you like begin your story in the  [b]startup[/b] file, it's often a good idea to use that file only for its own particular purposes (discussed in the next lesson) and begin your actual story narrative in the first proper scene file.
+
+While there is no hard and fast rule about how many different Scene files in total you should use for your game, as a general guideline it's not often a good idea to exceed about 2,500 lines of code and narrative in any [i]single[/i] file (or roughly 250KB in size), so just use as many different Scene files as you need to keep each one below this size. Although CS is capable of handling much larger files than this, very large individual files may result in noticeable loading lag for some players of your game on the web, ruining their immersion in the story for no good reason.
+
+[i][b]~~Exercise 3[/b] - Now add two more new Scene files to [b]Test Project[/b] and then rename them [b]scene02[/b] and [b]scene03[/b] respectively[/i].
+
+Your Test Project should now comprise the five files we will use during this Tutorial in creation of an actual  working mini-game: namely [i]startup[/i], [i]choicescript_stats[/i], and three [i]scene[/i] files.
+
+It's worth noting that you can [i]drag & drop[/i] any file to change the order of listing to your liking. CSIDE will remember the actual file order of each project from one session to the next. Try this now by dragging the [b]choicescript_stats[/b] file to the bottom of the [b]Test Project[/b] listing. You can also click the icon to the left of each Scene name to colour-code each as a personal visual reference aid during development (e.g. I tend to use green to indicate "scene complete").
+
+*finish Lesson #2 - [i]The Startup File[/i]

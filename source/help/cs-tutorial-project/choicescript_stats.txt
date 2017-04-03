@@ -1,0 +1,180 @@
+
+*comment NEW TO CHOICESCRIPT? CLICK 'Run this project' TO START TUTORIAL
+
+*comment Example #31 - Using text formatting for legibility & clarity
+[i][b]Character Details[/b][/i]
+*line_break
+[b]Name[/b]: $!!{pcname}
+*line_break
+[b]Race[/b]: [i]$!{race}[/i]
+*line_break
+[b]Class[/b]: [i]$!{class}[/i]
+
+*comment Example #32 - Creating a visual display chart for numeric Stats
+[i][b]Character Attributes[/b][/i]
+*stat_chart
+	percent str Strength
+	percent int Intelligence
+	percent dex Dexterity
+
+*comment Example #33 - Creating an Opposing Pair chart based on one value
+*temp mean 61
+*if pcname != "Unknown"
+	*stat_chart
+		opposed_pair mean
+			Meanness
+			Charity
+
+*comment Example #34 - Assigning textual strings to a range of numeric values
+*line_break
+[i][b]Relationships[/b][/i]
+*line_break
+*temp elves
+*if rep1 > 75
+	*set elves "great affection"
+	*goto next01
+*elseif rep1 > 65
+	*set elves "friendship and trust"
+	*goto next01
+*elseif rep1 > 55
+	*set elves "cautious friendship"
+	*goto next01
+*elseif rep1 > 45
+	*set elves "guarded neutrality"
+	*goto next01
+*elseif rep1 > 35
+	*set elves "distrust and wariness"
+	*goto next01
+*elseif rep1 > 25
+	*set elves "considerable loathing"
+	*goto next01
+*else
+	*set elves "outright hostility"
+	*goto next01
+
+*label next01
+*temp dwarves
+*if rep2 > 75
+	*set dwarves "great affection"
+	*goto next02
+*elseif rep2 > 65
+	*set dwarves "friendship and trust"
+	*goto next02
+*elseif rep2 > 55
+	*set dwarves "cautious friendship"
+	*goto next02
+*elseif rep2 > 45
+	*set dwarves "guarded neutrality"
+	*goto next02
+*elseif rep2 > 35
+	*set dwarves "distrust and wariness"
+	*goto next02
+*elseif rep2 > 25
+	*set dwarves "considerable loathing"
+	*goto next02
+*else
+	*set dwarves "outright hostility"
+	*goto next02
+
+*label next02
+*temp hobbits
+*if rep3 > 75
+	*set hobbits "great affection"
+	*goto next03
+*elseif rep3 > 65
+	*set hobbits "friendship and trust"
+	*goto next03
+*elseif rep3 > 55
+	*set hobbits "cautious friendship"
+	*goto next03
+*elseif rep3 > 45
+	*set hobbits "guarded neutrality"
+	*goto next03
+*elseif rep3 > 35
+	*set hobbits "distrust and wariness"
+	*goto next03
+*elseif rep3 > 25
+	*set hobbits "considerable loathing"
+	*goto next03
+*else
+	*set hobbits "outright hostility"
+	*goto next03
+
+*comment Example #35 - Using those textual strings within random sentences
+*label next03
+*temp pick
+*rand pick 1 4
+*if pick = 1
+	You are generally treated with ${elves} by the Elves you encounter.
+	*line_break
+	Dwarven folk more often than not treat you with ${dwarves}.
+	*line_break
+	Among Hobbits you've met, ${hobbits} tends to be their first reaction.
+	*goto next04
+*elseif pick = 2
+	Among Elves you've met, ${elves} tends to be their first reaction.
+	*line_break
+	You are generally treated with ${dwarves} by the Dwarves you encounter.
+	*line_break
+	Hobbit folk more often than not treat you with ${hobbits}.
+	*goto next04
+*elseif pick = 3
+	Elven folk more often than not treat you with ${elves}.
+	*line_break
+	Among Dwarves you've met, ${dwarves} tends to be their first reaction.
+	*line_break
+	You are generally treated with ${hobbits} by the Hobbits you encounter.
+	*goto next04
+*else
+	You are generally treated with ${elves} by the Elves you encounter.
+	*line_break
+	Among Dwarves you've met, ${dwarves} tends to be their first reaction.
+	*line_break
+	Hobbit folk more often than not treat you with ${hobbits}.
+	*goto next04
+
+*comment Example #36 - Displaying a list of textual Stats, some conditional
+*label next04
+
+[i][b]Equipment[/b][/i]
+*line_break
+[b]Pouch[/b]: ${gold} gold pieces
+*line_break
+[b]Weapon[/b]: ${weapon}
+*line_break
+[b]Armour[/b]: ${armour}
+*line_break
+*if shield != ""
+	[b]Shield[/b]: ${shield}
+	*line_break
+[b]Helmet[/b]: ${helm}
+
+*comment Example #37 - Joining & displaying conditional items horizontally
+[i][b]Inventory[/b][/i]
+*line_break
+*temp inventory "Bedroll"
+*if (backpack)
+	*set inventory &(", "&"Backpack")
+*if (heirloom)
+	*set inventory &(", "&"Family Heirloom")
+*if (torch)
+	*set inventory &(", "&"Torch")
+*if eq1 != ""
+	*set inventory &(", "&eq1)
+*if eq2 != ""
+	*set inventory &(", "&eq2)
+*if eq3 != ""
+	*set inventory &(", "&eq3)
+*if eq4 != ""
+	*set inventory &(", "&eq4)
+*if eq5 != ""
+	*set inventory &(", "&eq5)
+*if eq6 != ""
+	*set inventory &(", "&eq6)
+*if eq7 != ""
+	*set inventory &(", "&eq7)
+*if eq8 != ""
+	*set inventory &(", "&eq8)
+*if eq9 != ""
+	*set inventory &(", "&eq9)
+[i]${inventory}[/i].

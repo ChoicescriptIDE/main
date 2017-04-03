@@ -1,0 +1,84 @@
+
+*comment NEW TO CHOICESCRIPT? CLICK 'Run this project' BUTTON TO START TUTORIAL
+
+[b]Lesson 3[/b] - [b][i]Game Narrative[/i][/b]
+
+[i]Now select the Tutorial file called '[b]lesson03[/b]', in order to compare the text in the [i]Code Editor[/i] with what is displayed 'in-game'.[/i] As mentioned in the previous lesson, note that CS has now used the [b]${cmd5}[/b] in our [b]startup[/b] file to seamlessly run 'lesson03' after finishing 'lesson02'.
+
+You may also notice that the [b]${cmd1}[/b] text at the top of lesson03 has not been displayed in-game for the player. You may recall that ${cmd1} is used to leave reminder scripting notes for ourselves which are not displayed in the game itself.
+
+The next main difference between the 'raw' text and what is displayed 'in-game' is the use of formatting tags for [b]bold text[/b] and [i]italic text[/i] respectively, used here for the page header as well as these examples. Both types of common formatting can be used as desired within ordinary narrative, and [i]italic text[/i] can also be used on the [b]${cmd3}[/b] and [b]${cmd4}[/b] button text, as shown in the button scripting example below.
+
+Although you can of course type formatting tags manually as required, CSIDE also enables use of [b]Ctrl-B[/b] and [i]Ctrl-I[/i] (CMD-B/I for a Mac) as handy shortcuts for text formatting purposes, wrapping any selected text with the appropriate tags. If no text is currently selected, those shortcuts will instead place the tags where the cursor is, and with the cursor itself positioned [i]between[/i] the start & end tags ready to simply type your formatted word or phrase.
+
+[i][b]~~Exercise 9[/b] - Switch to file [b]scene01[/b] and type in an opening paragraph of narrative for our Test Project fantasy mini-game. Format some of the text with Ctrl-B and / or Ctrl-I.[/i]
+
+The [b]${cmd3}[/b] button below shows an example of [i]italic[/i] button text. ${cmd3} is a simple command used to break up longer stretches of narrative into two or more pages in-game.
+
+*comment Example 1 - Adding a button to break the game narrative into pages
+
+*page_break Example of [i]Italic Button Text[/i]
+
+[i]Switch back to [b]lesson03[/b] and scroll down to continue following the examples.[/i]
+
+If no text is added after the [b]${cmd3}[/b] command itself, it will simply display a [b]Next[/b] button like the one now shown below. Compare these two ${cmd3} examples in the [i]Code Editor[/i].
+
+As demonstrated here, the [i]control flow[/i] will display in-game, as a single page, every line of narrative it reads between one [b]${cmd3}[/b] command and the next, or until it hits a different command indicating the end of a page (e.g. one prompting the player to make a choice).  Using [b]${cmd3}[/b] you can make your actual narrative pages as long or as short as you like, all contained within the same [i]scene[/i] file. 
+
+Although CS will automatically add a scrollbar in-game for the player if needed for a longer page of narrative, as a general guideline it's usually best to avoid the dreaded "[i]wall of text[/i]" effect - i.e. displaying [i]too much[/i] narrative on any single page before the next break. 
+
+*comment Example 2 - A standard ('Next') page break button with no text change 
+
+*page_break
+
+Consider also the creative potential of a carefully-placed and suitably-worded [b]${cmd3}[/b], perhaps for such as helping to build narrative suspense:
+
+[i]You tip-toe carefully across the rough wooden floor of the old shack, your eyes straining in the dim light and with blood throbbing in your ears, knowing that the brutal killer is somewhere close by, his glistening blade dripping gore and poised to strike.[/i]
+
+[i]Breathing as softly as you can despite your pounding heart, you wipe your moist palms down your front, lick your dry lips, and take another tentative step.[/i]
+
+*comment Example 3 - A page break button using brief descriptive text for effect
+
+*page_break [i]A floorboard creaks . . .[/i]
+
+The same principal holds true for death scenes. If your game contains player-character deaths (or abrupt "game over" endings for any other reason) consider using a ${cmd3} [i]just before[/i] the character's fate is actually revealed. Nothing in a Choice Game ruins suspense more than [i]a whole page[/i] of fresh narrative loading only for the player to see, down at the very bottom...
+
+The same principal holds true for death scenes. If your game contains player-character deaths (or abrupt "game over" endings for any other reason) consider using a ${cmd3} [i]just before[/i] the character's fate is actually revealed. Nothing in a Choice Game ruins suspense more than [i]a whole page[/i] of fresh narrative loading only for the player to see, down at the very bottom...
+
+The same principal holds true for death scenes. If your game contains player-character deaths (or abrupt "game over" endings for any other reason) consider using a ${cmd3} [i]just before[/i] the character's fate is actually revealed. Nothing in a Choice Game ruins suspense more than [i]a whole page[/i] of fresh narrative loading only for the player to see, down at the very bottom...
+
+[i][b]Yes[/b][/i], I have deliberately filled this page with repeated text just to serve as an example of why this whole page of narrative has suddenly been rendered considerably less interesting - simply because the character's fate has already been revealed. (Needless to say, despite appearances all the standard "game over" options below do [i]in this case[/i] just continue the Tutorial!)
+
+*fake_choice
+    #Play again.
+    #Play more games like this.
+    #Share this game with friends.
+    #Email me when new games are available.
+
+Although proper use of the simple [b]${cmd3}[/b] command can make a significant difference to the overall appearance and general flow of your story, the most important [i]Game Narrative[/i] example to grasp is simply this: as the text for this tutorial itself demonstrates, any ordinary text typed [i]on a line of its own[/i] within the [i]Code Editor[/i] / scene file will generally be displayed as [i]story narrative[/i] in the game itself. It's that simple.
+
+Likewise, to break up our narrative into paragraphs all we have to do is leave a completely blank line between each one as we type, and CS will do exactly the same when displaying the narrative in-game for the player. Note, however, that it's not possible to indent the opening word of each paragraph - as seen in a paperback novel, say - as doing so would fall foul of CS's [i]indentation[/i] rules (which serve a vital [i]scripting[/i] purpose) and so would result in a game-stopping error.
+
+It's also worth noting that so far in this Tutorial we have used very little indentation for either narrative or scripting purposes, and the same will apply for the majority of Choice Games. For the most part you can simply concentrate on writing your story.
+
+Before we move on to the final part of the [i]Game Narrative[/i] lesson, however: 
+
+[i][b]~~Exercise 10[/b] - Switch to file [b]scene01[/b] and add a [b]${cmd3}[/b] command below your opening paragraph of narrative. Feel free to use your own button wording.[/i]
+
+Note that as soon as CSIDE recognises a legitimate CS command (in this case, when you type the '[b]k[/b]' in [b]${cmd3}[/b]) it will instantly change the text colour to reflect this. This helps you avoid misspelling vital commands, which would otherwise ultimately cause the game to crash.
+
+*page_break
+
+[i]Switch back to [b]lesson03[/b] and scroll right down to continue following the examples.[/i]
+
+The final example for this particular lesson is the [b]${cmd4}[/b] command. As with [b]${cmd3}[/b], ${cmd4} also displays a button for the player to click to continue, although the default wording for ${cmd4} is 'Next Chapter' instead of simply 'Next'.
+
+However, as with the [b]${cmd3} [/b]button, we can also use whatever text we like in place of the default wording, and can also use [i]italics[/i] - as shown in the wording and formatting on the ${cmd4} button used below.
+
+The main difference between the two commands is that whereas [b]${cmd3}[/b] simply breaks up longer stretches of narrative [i]from the same Scene file[/i] into shorter 'pages' for easier reading in-game, the [b]${cmd4}[/b] command instead instructs CS to now load the next sequential [i]Scene file[/i] listed in the [b]${cmd5}[/b] in the game's [b]startup[/b] file. When you click the [i]Lesson 4[/i] [b]${cmd4}[/b] button below, this is precisely what it will do.
+
+[b]${cmd4}[/b] is not, however, used only at the very end of a Scene file as in this case. It can actually be used anywhere within our scripting and is often executed as the result of a particular [i]Choice[/i] made by the player, or for some other specifically-scripted [i]condition[/i] requiring the game to [i]skip[/i] anything else in the current Scene and to jump forward to the next Scene file in the list. We will discuss this type of situation in greater detail later in the Tutorial.
+
+*comment Example 4 - A "finished with this scene" / "load next scene" button
+
+*finish Lesson #4 - [i]Player Interaction[/i]

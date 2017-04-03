@@ -1,0 +1,17 @@
+<pre>
+*choice
+	*disable_reuse #Tell.
+		*goto tell_them
+	*disable_reuse #Steal.
+		*goto not_steal
+	*selectable_if (defend_stand) #Defend Ross.
+		*set rosalia + 5
+		*set defend_stand false
+		*goto defend_ross
+	*selectable_if (defend_stand) #Agree with Blake.
+		*set rosalia - 5
+		*set defend_stand false
+		*goto agree_ross
+	#Ask to be excused.
+		*goto better_go
+</pre>

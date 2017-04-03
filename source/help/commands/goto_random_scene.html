@@ -1,0 +1,22 @@
+<html>
+<h2>Command: goto_random_scene</h2>
+<p>
+	*goto_random_scene acts as an extension to the <a href="commands/goto_scene.html" title="*goto_scene">*goto_scene</a> command. The primary
+	difference being that *goto_random_scene will send the player to a (you guessed it) random scene.
+</p>
+<p>
+	You can use the command 'as is' to send the player to any random scene in your scenes folder or you can provide parameter scenes (as in the example below).
+	Regardless of which method you choose keep in mind that Choicescript will keep track of scenes it has randomly selected and will not pick them again during 
+	that playthrough (although it will still allow access through use of *finish or *goto_scene).
+</p>
+<h3>Example Usage</h3>
+<pre>
+You step through the teleporter, heading for an unknown land...
+
+*goto_random_scene
+	green_grasslands
+	spooky_forest
+	barren_wastes
+</pre>
+Looking for a little more detail? Try the <a rel="external" href="http://choicescriptdev.wikia.com/wiki/Goto_random_scene">wiki page</a>
+</html>

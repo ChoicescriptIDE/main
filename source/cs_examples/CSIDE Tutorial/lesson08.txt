@@ -1,0 +1,180 @@
+
+*comment NEW TO CHOICESCRIPT? CLICK 'Run this project' BUTTON TO START TUTORIAL
+
+*comment ----------Ignore------------
+*comment Tutorial code required in the event this Lesson has been accessed in a new session without the reader first having selected a Race during lesson05.
+*if race = "Unknown"
+    For the purpose of this particular Tutorial lesson, please select a Race:
+    *fake_choice
+        #Human
+            *set race "human"
+        #Elf
+            *set race "elf"
+        #Dwarf
+            *set race "dwarf"
+        #Hobbit
+            *set race "hobbit"
+*comment ----------Ignore------------
+
+[b]Lesson 8[/b] - [b][i]Enhancing Narrative[/i][/b]
+
+Whichever way you look at it, or whatever tool(s) you use, writing [i]interactive[/i] fiction is in many ways considerably more demanding than writing an ordinary novel.
+
+As a method of developing text-based interactive games, however, CS naturally provides a variety of ways and means by which authors can strive to make things more interesting for, and responsive to, the reader. While it cannot write our stories for us, nor even help us to write [i]better[/i] (except perhaps as a tool with which to practise our passion!), what it can and does do is encourage us to [i]think[/i] more creatively simply by virtue of what it makes possible. Take the two-part [b]Example 27a[/b] & [b]27b[/b] (scroll down [b]lesson08[/b]) as a fairly typical [i]for instance[/i]:
+
+*comment Example 27a - Using a series of *if statements to *set a "string" value
+
+*temp greeting
+*if race = "human"
+    *set greeting "longshanks"
+*if race = "elf"
+    *set greeting "my pointy-eared friend"
+*if race = "dwarf"
+    *set greeting "my fine-bearded brother"
+*if race = "hobbit"
+    *set greeting "stumpy"
+
+*comment Example 27b - Using the resulting "string" value within story narrative 
+
+[i]The grizzled dwarven blacksmith pauses in his hammering when you enter his workshop. He looks you up and down, dark eyes peering out from beneath remarkably bushy eyebrows, before nodding a welcome. "What can I do for you, ${greeting}?" he finally asks, his gravelly voice bringing to mind a distant rumble of thunder in the Misty Mountains.[/i]
+
+While it could be argued that writing nine lines of code simply to produce a slight wording variation in the middle of a paragraph is somewhat excessive, consider for a moment the opposing argument. With those nine lines the author has fully embraced the [i]very essence[/i] of [i]interactive[/i] fiction, by making the player's earlier [i]Race[/i] choice meaningful and responsive within the narrative itself, not just something to influence Stats. While there's a limit to how much time we can afford to spend including this sort of thing in our stories, sometimes it's the little things that make all the difference to the reader. It's something for each of us to ponder, at least.
+
+Returning to the technical aspects of the actual scripting involved, you will probably have noticed that our [b]${cmd12} greeting[/b] command was not followed by a default value of any sort. Unlike [i]Permanent[/i] variables [b]${cmd2}[/b]d in the [b]startup[/b] file, it's worth noting that new [i]Temporary[/i] variables do not actually [i]require[/i] a default value, as long as a value is [b]${cmd11}[/b] before it is used.
+
+*page_break
+
+You may also have noticed in [b]Example 27a[/b] that, unlike conditions used in previous examples, I did not in this case use any parentheses, e.g. [b]${cmd13} (race = "human")[/b]. In the next [b]Example 28a[/b], I also do not use parentheses to check [b]${cmd13} extorted[/b] is [i]true[/i]. Quite simply, for a single condition [i]on a line of its own[/i], no parentheses are actually required. In most other situations, however (e.g. when the condition precedes an Option on the same line), conditions must be properly wrapped in parentheses in order to be correctly interpreted. There is however no actual harm in [i]always[/i] using parentheses for every condition in every situation, should you prefer.
+
+One thing worth bearing in mind is that conditional text need not always involve specific extra scripting and use of Temporary variables. While our dwarven blacksmith "greeting" narrative example is very specific to that particular character, in many such cases these things could be handled by adding more [i]Permanent Variables[/i] to your startup file (e.g. a whole range of race-based greetings, perhaps), able to be called on within your narrative as & when needed.
+
+When about to make use of a Temporary variable for some sort of conditional narrative, pause for a moment and give some thought to the possibility of using Permanent variables instead, so the same type of thing could more easily be employed elsewhere in your story with no additional, specific scripting requirement. It won't always apply, but it can be a useful exercise in creative thinking for your game development.
+
+Narrative conditions can apply either to tiny [b]${cmd12}[/b] [i]strings[/i] as used in the previous example, to entire paragraphs, or even to whole sections comprising multiple paragraphs, and may use the values of either [i]Permanent[/i] or [i]Temporary[/i] variables for their criteria.  [i]Temporary[/i] variables persist in memory only for the duration of the current Scene file, of course, but this does mean that you can also [i]reuse[/i] the names of [b]${cmd12}[/b] variables in different Scene files. (The same applies to [b]${cmd10}[/b] names, incidentally.)
+
+*page_break
+
+Temporary variables are especially useful for providing conditional narrative, used in conjunction with the versatile [b]${cmd13}[/b] command or perhaps [b]${cmd13}[/b] / [b]${cmd14}[/b], depending on the precise circumstances. Virtually any action or reaction on the part of the player-character can be stored as a Temporary variable for use shortly after (provided it's used within the same Scene file).
+
+[b]Example 28a[/b] is one such possibility. Remember the starving dwarf whose backpack you 'appropriated' for a mere one gold piece and a meal? Let's assume that encounter was earlier in this Scene file and that we had, [i]at that time[/i], set [i]true[/i] a Temporary boolean variable called [i]extorted[/i]. Then, somewhat later...
+
+*comment a new temporary variable purely for Tutorial purposes
+
+*temp extorted true
+
+*comment Example 28a - Using a Temporary variable for conditional narrative - for Tutorial purposes, imagine it was created  and / or set (true or false) much earlier in this scene file, but is only now being used...
+
+[i]You stumble into the sleepy village, utterly weary to the bone and with a stomach growling from hunger, but feeling triumphant in your successful escape from the bandits. You head toward the bright lights, laughter and merry music emanating from the local inn; a shining beacon of hope promising an end to your misery and misfortune. You push open the door, stagger over to the bar, and in a weary croak order a hot meal and warm bed for the night.[/i]
+
+*if extorted
+    [i]The dwarven innkeeper studies you intently, paying particular attention to your backpack. "You don't even remember me, do you?" he finally growls. You shake your head dumbly, but recognition slowly dawns. "Well, we're full, the kitchen is closed, and I'm all out of drink for the likes of you... On your way now, before I summon the guard. You and your backpack have a long trek ahead of you to the next village."[/i]
+    *goto main02
+*else
+    [i]You awaken the next morning refreshed and invigorated, eager and ready for the adventures ahead, having enjoyed a hearty meal and a good night's sleep entirely free of charge at 'The Friendly Dwarf' Inn in the quiet village of Sleepydale - courtesy of its grateful proprietor whom, a while back, you helped out on the road by sharing your limited rations. You stretch luxuriously and smile with contentment. Sometimes, what goes around, comes around.[/i]
+    *goto main02
+
+*label main02
+
+Temporary variables can also be used to provide conditional narrative in a very simple fashion using just the [b]${cmd13}[/b] command. In [b]Example 28b[/b] our vindictive dwarven innkeeper may simply have glared at your backpack, taken your money, and then said something like -
+
+*comment Example 28b - Simple use of a Temporary variable for conditional narrative
+
+*if extorted
+    [i]"Unfortunately we're quite full at the moment so you'll be doubling-up with the Ogress in room six. I understand she snores like a foghorn and smells like a cesspit, but you'll be pleased to know she's really very . . . erm . . . friendly, once she gets to know you. Sleep well, my friend."[/i]
+
+*page_break
+
+It's worth noting that sometimes your game may crash outright with something like -
+*line_break
+~[b]Error:[/b] "Non-existent variable [i]extorted[/i]"
+*line_break
+when it reaches the point where the Temporary value is actually used (the [b]${cmd13} extorted[/b] line).
+
+This occurs when the Options chosen by the player have inadvertently [i]bypassed[/i] the actual [b]${cmd12}[/b] line on which the variable was first created, meaning that it was never actually created at all during [i]this[/i] particular playthru. Sometimes the best way to be certain this never happens is simply to place all [b]${cmd12}[/b] commands near the very top of each Scene file, with a valid default value for each (e.g. in this case, [b]${cmd12} extorted false[/b]) and then simply [b]${cmd11}[/b] each accordingly later in your scripting where required. This way the variable will always exist, regardless.
+
+Of course, the error may simply mean that you slightly misspelled the actual variable name. :)
+
+
+
+You may recall from earlier lessons that the value of [i]numeric[/i] variables can be [i]modified[/i] using [b]${cmd11}[/b] and various arithmetic operators for such as addition and subtraction, rather than just be completely [i]overwritten[/i] with a brand new value. We actually have the same ability to [i]modify[/i] textual "[i]string[/i]" variables for narrative purposes, although the process is somewhat different and is called 
+*link http://choicescriptdev.wikia.com/wiki/Concatenation Concatenation 
+- that link will take you to the ChoiceScriptDev Wikia detailed examples.
+
+In brief: concatenation involves using [b]${cmd11}[/b] to join together two or more [i]string[/i] variables and store the resulting [i]longer[/i] string as a single value. Both Permanent and Temporary [i]string[/i] variables can be used for this purpose. In [b]Example 29[/b] we are combining two separate variables into a single string ([b]fullname[/b]), [i]including a comma and a space[/i], and then displaying it below:
+
+*comment Example 29 - combining two or more string values into a single one
+
+*temp name "Xena"
+*temp title "Warrior Princess"
+*temp fullname
+
+*set fullname (name&", ")&title
+
+${fullname}
+
+Were these all actual [i]Permanent[/i] variables, it enables our protagonist to now be addressed in narrative as [i]${name}[/i] ([b]name[/b]), [i]${title}[/i] ([b]title[/b]) [i]or[/i] [i]${fullname}[/i] ([b]fullname[/b]). By the same means, [i]entire sentences[/i] can be stored as values and joined together, if required.
+
+*page_break
+
+The sheer versatility of the [b]${cmd13}[/b] command allows it to be used either singularly on its own (as in [b]Example 28b[/b]), or repeatedly to determine a single [i]true[/i] value from a range of possibilities (as in the earlier [b]Example 27a[/b]), or in conjunction with [b]${cmd14}[/b] (as used in [i]true / false[/i] [b]Example 28a[/b]), or together with [b]${cmd15}[/b] [i]and[/i] [b]${cmd14}[/b] in situations where either or both the condition and narrative are wide-ranging and likely to branch the story even further.
+
+As an example of the latter, in [b]Example 30[/b] the entire third paragraph is conditionally displayed according to your [b]Race[/b] and is certain to branch the narrative quite considerably.
+
+*comment Example 30 - Using *if/*elseif/*else to determine narrative response
+
+[i]The young Elven huntress draws her bow fully, the tip of the shaft quivering ever so slightly with the strain but still pointing unerringly at your chest. At this close a range the wicked barb would surely skewer you like a suckling pig.[/i]
+
+[i]"I'm just passing through, I mean you no harm," you say hastily, raising your empty hands.[/i]
+
+*if race = "elf"
+    [i]The huntress frowns, clearly undecided. "You would claim kinship with me and mine, and yet I see no marks of family or clan upon your brow, no sign that you are anything other than what you appear - a renegade, outcast, or perhaps even a Banished One, driven from among your own people for unspeakable acts..." She tenses and aims anew. "What proof do you offer to stay my hand, vagrant?" she snarls.[/i]
+    *goto main01
+
+*elseif race = "dwarf"
+    [i]"I like not your kind, master dwarf," the huntress replies through clenched teeth. "Long have your people despoiled our lands, trespassed without so much as a by-your-leave, arrogantly laying claim to all they choose... Give me just one good reason why I should not now leave your loathsome, hairy, stunted corpse for the crows and maggots to feed upon?"[/i]
+    *goto main01
+
+*elseif race = "hobbit"
+    [i]The huntress lowers her bow, her mouth creasing in an amused smile. "Well, grateful indeed am I that one of the little folk would spare me their legendary wrath... Come, my own camp is just over the hill. I have a fine brace of conies roasting as we speak. Join me for supper, if you please. I should welcome a tale of your grand adventures in these troubled lands."[/i] 
+    *goto main01
+*else
+    [i]The huntress nods her understanding, but only partially lowers her bow. "So you may claim, but your kind are neither often seen nor are they especially welcome in these parts. Come, you will appear before the village elders and explain your presence in our lands... or reach for your weapon now, as you please." She shrugs slightly and smiles, chillingly.[/i]
+    *goto main01
+
+*label main01
+
+As you may expect, there is no real limit to the number of different [b]${cmd15}[/b] conditions able to be included in such a range, just so long as the whole thing starts with an [b]${cmd13}[/b] and ends with [b]${cmd14}[/b].
+
+In this sort of situation the [b]${cmd14}[/b] is used as a 'catch-all', in the event that [i]none of the above conditions are true[/i], which is why [b]${cmd14}[/b] alone [i]never[/i] has a specific condition of its own. In this particular case it would apply to a Human protagonist as well as one of any other Race not expressly included above, hence the general wording "[i]...your kind...[/i]" used in the narrative.
+
+*page_break [i]Other Narrative Considerations[/i] 
+
+To round off the [i]Enhancing Narrative[/i] lesson, a few general thoughts and suggestions based on experience some readers may be lacking, ergo: feel free to take this section with a pinch of salt, and to write [i]your[/i] stories [i]your[/i] way.
+
+The widely-accepted best format for interactive fiction of this type is [i]second-person narrative[/i], whereby the author is the narrator and the reader assumes the role of the main character - the [i]protagonist[/i] - in the story. This is typified by "You" as in [i]you do this[/i] or [i]you see that[/i]. While both first- and third-person narrative is possible in interactive faction, those forms generally do not always do as good a job of actually immersing the reader in the role of a specific character.
+
+By the same token, for second-person narrative the best way to word choice Options is generally as "I", as in [i]I will do this[/i] or [i]I will tell him that[/i]. Remember, in interactive fiction the reader is being invited to play [i]an active role[/i] in the story, so every choice they make should be [i]personal to them[/i], hence "I", "me" or "my" for Options text where appropriate, not "you" or "your" as used in the narrative.
+
+Also worth bearing in mind is that second-person narrative works best written in the [i]present tense[/i] as opposed to [i]past tense[/i] - for the main character (the reader) it is all happening [i]now[/i]:
+
+[i]"Get away from me!" [b]says[/b] the girl[/i], rather than [i]"Get away from me!" [b]said[/b] the girl[/i].
+
+Above all, it is worth remembering that this is a global medium (so be careful about using such as local slang terms or derogatory stereotypes, unless particularly suited to your story for some reason) and one ultimately accessed by the majority of readers via relatively tiny devices. The "[i]dreaded wall of text[/i]" when viewed on a typical computer screen may be seen as the "[i]dreaded Great Wall of China[/i]" when viewed on a very small screen... Aim to make good use of such as [b]${cmd3}[/b], [b]${cmd8}[/b] and [b]${cmd7}[/b] to break up your narrative at fairly regular intervals, and thereby keep things more interesting, engaging and compelling for the reader.
+
+*page_break [i]Final Exercises[/i]
+
+In our previous Exercise we concluded [b]scene01[/b] with a [b]${cmd8}[/b] of three Options leading to three very different outcomes. One option used [b]${cmd9}[/b] / [b]${cmd10}[/b] to continue the story within [b]scene01[/b], which should ultimately end with a [b]${cmd4}[/b] (thereby leading on to [b]scene02[/b]).
+
+Another of the three Options should itself have ended with [b]${cmd4}[/b] instead of [b]${cmd9}[/b], so immediately leading on to [b]scene02[/b] (the next sequential scene file) if selected.
+
+The third and final Option should have ended with [b]${cmd17} scene03[/b].
+
+[i][b]~~Exercise 18[/b] - Switch to [b]scene02[/b]. Add a story encounter resulting in an [b]${cmd13}[/b] / [b]${cmd15}[/b] / [b]${cmd14}[/b] combination using character [b]class[/b] (warrior, mage, thief) as the condition, bearing in mind that the final [b]${cmd14}[/b] never requires a specific condition of its own. In all three cases the narrative should conclude with a [b]${cmd9}[/b] / [b]${cmd10}[/b] to bring the diverging storylines back to the main path, where the general narrative concludes with [b]${cmd4}[/b] (so leading to [b]scene03[/b]).[/i]
+
+[i][b]~~Exercise 19[/b] - Now switch to [b]scene03[/b]. Create a [b]${cmd12}[/b] variable with a name of your choosing and a default value of [b]false[/b], followed by a story encounter resulting in a [b]${cmd8}[/b] of two Options, one of which [b]${cmd11}[/b]s that Temporary variable to [b]true[/b]. Make both Options [b]${cmd9}[/b] the same [b]${cmd10}[/b] section, where you have conditional [b]${cmd13}[/b] / [b]${cmd14}[/b] narrative using that Temporary variable. Finally, end [b]scene03[/b] with the [b]${cmd16}[/b] command rather than [b]${cmd4}[/b].[/i]
+
+The purpose of these final two general Exercises is to test and fine-tune your understanding of crucial CS scripting methodology, involving choices, the correct use of both [i]Permanent[/i] and [i]Temporary[/i] variables, conditional narrative, and proper scene redirection. Refer to the various examples in Lessons 7 & 8 as much as needed to achieve these two tasks, and then finally:
+
+[i][b]~~Exercise 20[/b] - Now [b]Run[/b] the Test Project and 'play' through it several times, choosing different Options each time, to see if CSIDE can find any errors in your scripting. If so, refer to the relevant Tutorial lesson to correct your scripting and better understand the issue(s).[/i]
+
+*finish Lesson #9 - [i]'Show Stats' Screen[/i]

@@ -1,0 +1,19 @@
+<html>
+<h2>Command: comment</h2>
+<p>Any text that is proceeded by *comment will not appear in the game. This command is primarily for leaving a note to yourself, such as a reminder as to why you did something a certain way. 
+<p>Anything preceded by *comment is also ignored by randomtest and quicktest,
+and so it is also useful if you're trying to test your game but a bit of code is causing a game stopping error and you don't know why, 
+you can simply comment out the bit of code and come back to it.</p>
+<h3>Example Usage</h3>
+<pre>
+*choice
+	*if ((has_sword) and (has_shield)) #Block and counter thrust
+		*comment you can only block and counter-thrust if you have BOTH a sword and shield.
+		*goto block_and_thrust
+	*if (has_sword) #Thrust
+		*goto thrust
+	*if (has_shield) #Block
+		*goto block	
+</pre>
+Looking for a little more detail? Try the <a rel="external" href="http://choicescriptdev.wikia.com/wiki/Comment">wiki page</a>
+</html>

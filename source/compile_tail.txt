@@ -1,0 +1,30 @@
+</head>
+<body>
+<div id="advertisement">
+</div>
+<div id="header">
+  <div id="identity"><a href="#" id="email">you@example.com</a><a href="#" id="logout">Sign Out</a></div>
+
+  <h1 class="gameTitle"><!-- My First ChoiceScript Game --></h1>
+<h2 id="author" class="gameTitle"><!--by INSERTINSERTINSERT --></h2>
+
+  <p id="headerLinks">
+      <!-- <a href="credits.html" id="aboutLink" class="spacedLink">About</a> -->
+    </p>
+  <p id="buttons"><button id="statsButton" class="spacedLink" onclick="showStats()">Show Stats</button> <button id="restartButton" class="spacedLink" onclick="restartGame('prompt')">Restart</button> <button id="achievementsButton" onclick="showAchievements()" class="spacedLink" style="display: none">Achievements</button></p>
+</div>
+<div id="main">
+<div id="text">
+</div>
+<script>
+startLoading();
+</script>
+</div>
+<div id="mobileLinks" class="webOnly">
+</div>
+<noscript>
+<p>This game requires JavaScript; please enable JavaScript and refresh this page.</p>
+</noscript>
+<a href="https://www.choiceofgames.com/make-your-own-games/choicescript-intro/">Make your own games with ChoiceScript</a>
+</body>
+</html>

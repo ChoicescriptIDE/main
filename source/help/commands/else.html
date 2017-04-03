@@ -1,0 +1,26 @@
+<html>
+<h2>Command: else</h2>
+<p>Used in conjunction with the *if command, *else is used when prior *if or *elseif checks fail.
+</p>
+<h3>Example Usage</h3>
+<pre>
+*create gender "male"
+*create garment "pants"
+
+*if gender = "male"
+	*set garment "pants"
+	*goto clothing
+*if gender = "female"
+	*set garment "dress"
+	*goto clothing
+*else
+	*set garment "barrel"
+	*goto clothing
+
+*label clothing
+Since you're a ${gender}, you pick the ${garment} to wear.
+
+*finish
+</pre>
+Looking for a little more detail? Try the <a rel="external" href="http://choicescriptdev.wikia.com/wiki/Else">wiki page</a>
+</html>

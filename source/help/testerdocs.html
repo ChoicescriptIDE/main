@@ -1,0 +1,134 @@
+<h1>Tester Documentation</h1>
+<p>
+	Writing up proper comprehensive documentation for the IDE is going to take a while, so the for the time being I've compiled
+	a list of the basics below. If there's anything I've missed out or that you're otherwise unsure about, just shoot me a PM and I'll be 
+	more than happy to explain it to you.
+</p>
+
+<h2>Scenes & Projects</h2>
+<p>
+	The Desktop IDE works with two types of objects: "scenes" and "projects" (i.e. 'games').
+	<br>
+	<br>
+	<i>Scenes</i> are simply .txt files and are treated as such within the IDE, which allows them to be opened, saved 
+	and closed as they would be in any ever other text editor. You can open multiple scene files at the same time by holding down
+	shift or control when selecting them (exactly like you would in any other windows application).
+	<br>
+	<br>
+	<i>Projects</i> are what the IDE uses to group scenes together. Projects are created automatically by the IDE
+	based on an opened scene's filepath. If two or more scenes from the same folder or directory are opened, the IDE will automatically 
+	assign them to the same project, creating it if it doesn't already exist. 
+	Once the last scene in a project is closed, the IDE will close the project.
+	<br>
+	<br>
+	A visual representation of all open scenes and projects is provided to the left of the IDE.
+	You can switch to a scene by selecting it, and switching to a scene in a different project will also select that project
+	(so the currently selected scene's project will be the one that's "run").
+	<br>
+	You can reorder scenes via drag and drop, you can also move or copy a scene by dragging and dropping it to
+	a target project. Moving a scene will permanently delete the file from the old project (directory).
+	<br>
+	You can collapse a project, hiding its open scenes at anytime by double-clicking its headbar.
+	<br>
+	<br>
+	You can perform a number of operations on both projects and scenes by right-clicking them and selecting the desired
+	option from its context menu.
+	<br>
+	<br>
+</p>
+
+<h2>Saving</h2>
+<p>
+	You can save a scene by using the CTRL+S keyboard shortcut, clicking its floppy disk icon or clicking its parent project's
+	floppy disk icon (which saves all of a project's open scenes).
+	<br>
+	A red floppy disk means that the scene has unsaved changes, a blue floppy disk means the scene state is the same as it
+	was when you last saved.
+	<br>
+	<br>
+	There is also an option for autosaving, which is turned on by default, but can be turned off in the settings panel.
+	If autosaving is turned on, all open scene files will be saved every five minutes.
+	<br>
+	<br>
+	<b>Save To... [Export]</b><br>
+	If you want to publish or backup your game, the IDE does have a 'Save To...' option under each project's context-menu.
+	The save to option will prompt you to select a folder and then the IDE will write copies of your scenes to that folder, without affecting the current project.
+	This method only writes OPEN scenes, so if you want to back them all up make sure you select the 'open all scenes' option first.
+	Also note that the IDE will NOT check for existing files before writing, so be sure your filepath is correct to avoid any undesirable data loss.	
+</p>
+
+<h2>Code Snippets</h2>
+<p>
+	Code snippets are exactly that, small snippets of code (or well, even plain text if you like) that you can quickly access and reuse.
+	You can create, edit and use snippets via the 'snippets' tab on the right panel. To use a snippet you can click its insert icon to insert the snippet to
+	your last cursor position or you can drag and drop the snippet into the editor at a place of your choosing.
+	<br>
+	<br>
+	Snippets are stored as text files and treated like scenes in terms of editing and deleting. To this end you can (and may wish) to create snippets manually via placing
+	.txt files in the snippets folder. The snippet folder itself should be found within your installation directory
+	on the same level as your Choicescript IDE.exe - if it's not there, or you accidentally delete it - run the IDE again and it should create one for your automatically.
+	<br>
+	Note that the snippet project and its scenes will not appear on the scene panel to the left but only under the snippets tab to the right.
+	Snippets are edited within the main editor much like any scene and a snippet will be highlighted whilst it is selected/being edited.
+</p>
+
+<h2>Persistent Sessions</h2>
+<p>
+	This is a new setting that is on by default, but can be turned off in the settings panel.
+	When this setting is on the IDE will keep track of your open scene files and your application settings.
+	Should you close the application with any scene files still open, the IDE will attempt to reopen them automatically
+	the next time you run it. Your settings will also be preserved and automatically reapplied.
+</p>
+
+<h2>Keyboard Shortcuts</h2>
+<p>
+	Note that the following shortcuts only function when the code editor has focus.
+	<br>
+	<b>IDE SHORTCUTS</b>
+	<br>
+	<b>CTRL + S</b> Save selected scene.
+	<br>
+	<b>CTRL + W</b> Close selected scene.
+	<br>
+	<b>CTRL + N</b> Add new scene to active/selected project.
+	<br>
+	<b>CTRL + O</b> Bring up the open scene/file dialog.
+	<br>
+	<b>SHIFT + CTRL + O</b> Open ALL the selected project's scenes.
+	<br>
+	<b>SHIFT + CTRL + P</b> Open or close the right panel.
+	<br>
+	<b>CTRL + Q</b> Quick run/test active/selected project.
+	<br>
+	<b>F11</b> Make code editor fullscreen.
+	<br>
+	<b>F11/ESC</b> Exit fullscreen code editor.
+	<br>
+	<br>
+	<b>BASIC TEXT SHORTCUTS</b>
+	<br>
+	<b>CTRL + Z</b> Undo last edit.
+	<br>
+	<b>CTRL + Y</b> Redo last undone edit.
+	<br>
+	<b>CTRL + Y</b> Redo last undone edit.
+	<br>
+	<b>CTRL + X</b> Cut selected text to clipboard.
+	<br>
+	<b>CTRL + C</b> Copy selected text to clipboard.
+	<br>
+	<b>CTRL + V</b> Paste text from clipboard.
+	<br>
+	<br>
+	<b>FIND/SEARCH/REPLACE SHORTCUTS</b>
+	<br>
+	<b>Ctrl-F</b> - Start searching
+	<br>
+	<b>Ctrl-G</b> - Find next
+	<br>
+	<b>Shift-Ctrl-G</b> - Find previous
+	<br>
+	<b>Shift-Ctrl-F</b> - Replace
+	<br>
+	<b>Shift-Ctrl-R</b> - Replace all
+</p>

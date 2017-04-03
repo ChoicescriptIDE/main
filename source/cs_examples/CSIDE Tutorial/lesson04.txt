@@ -1,0 +1,118 @@
+
+*comment NEW TO CHOICESCRIPT? CLICK 'Run this project' BUTTON TO START TUTORIAL
+
+[b]Lesson 4[/b] - [b][i]Player Interaction[/i][/b]
+
+[i]Now select the file called '[b]lesson04[/b]' to continue following the scripting examples.[/i]
+
+The player of a Choice Game interacts with it using a simple [i]multiple choice[/i] system, being offered two or more [b][i]Options[/i][/b] from which they must choose a particular path to take. Although a [b]${cmd8}[/b] or [b]${cmd7}[/b] command typically offers 2-4 Options, there is no [i]realistic[/i] limit (within the bounds of common sense - you have to script each one individually, after all!).
+
+We'll take a look first at the simple [b]${cmd7}[/b] command. Study the scripting for this in the [i]Code Editor[/i] before you select an option and click 'Next' in the Tutorial, to compare it with what's actually being displayed (below) for the player 'in-game'. The main points to note are:
+
+1. The lines of text displayed for the player as [i]Options[/i] are each denoted using just the [i]hash[/i] - [b]#[/b] - symbol (USA: [i]pound[/i] sign). To add more Options, you simply add more [i]hash[/i] lines.
+
+2. [b]${cmd7}[/b] uses [i]indentation[/i] - blocks of space at the start of a line - to direct the [i]control flow[/i]. The [b]#[/b] symbols must all line up neatly (be at the same [i]indentation level[/i]) to work properly.
+
+3. Each Option may have its own response narrative, which is [i]indented[/i] one more level. This could be a line or two, as used here, or even multiple lengthy paragraphs, so long as it is all correctly indented.
+
+*comment Example 5 - A fairly standard *fake_choice with simple responses
+
+*fake_choice
+    #Example 5 - This is the First Option text
+        [i]This is response narrative: you have selected the First Option.[/i]
+        
+        [i]This is the second paragraph response for the First Option.[/i]
+        
+    #Example 5 - This is the Second Option text
+        [i]This is response narrative: you have selected the Second Option.[/i]
+        
+        [i]This is the second paragraph response for the Second Option.[/i]
+        
+    #Example 5 - This is the Third Option text
+        [i]This is response narrative: you have selected the Third Option.[/i]
+        
+        [i]This is the second paragraph response for the Third Option.[/i]
+
+Now that you've chosen an option in-game, you'll see that the [i]response narrative[/i] assigned to that particular Option (i.e. further indented immediately below that Option, and [i]before[/i] the next Option) has been displayed at the top of the new page. [i]This[/i] paragraph of [i]general narrative[/i] immediately follows a  [b]${cmd7}[/b] - [i]regardless[/i] of which actual Option you chose.
+
+Note that for [b]${cmd7}[/b] the blank lines after each response paragraph serve the same purpose as do blank lines in ordinary narrative, i.e. paragraphing. If we don't want the Option response narrative in a separate paragraph from the following general narrative, all we need to do is omit those blank lines from our actual scripting, as in [b]Example 6[/b] shown below.
+
+Before choosing an Option and clicking [i]Next[/i], scroll down the [i]Code Editor[/i] so you can view both this and the previous ${cmd7} for comparison.
+
+*comment Example 6 - Similar to previous example, but no separate paragraphing
+
+*fake_choice
+    #Example 6 - This is the First Option text
+        [i]This is response narrative: you have selected the First Option.[/i]
+    #Example 6 - This is the Second Option text
+        [i]This is response narrative: you have selected the Second Option.[/i]
+    #Example 6 - This is the Third Option text
+        [i]This is response narrative: you have selected the Third Option.[/i]
+With no blank lines at all, CS will assume that the Option response narrative and the following general narrative are together intended to form a single paragraph, as demonstrated here.
+
+Note that once again, regardless of the Option chosen in-game, with [b]${cmd7}[/b] the [i]control flow[/i] diverges only temporarily - to display a [i]particular[/i] Option's own narrative response - before skipping the narrative responses for any  any other (non-chosen) Options and continuing down the page. Indeed, even that much extra response narrative isn't actually necessary, as the below [b]Example 7[/b] demonstrates.
+
+You may also have noticed that CS automatically provides a [i]Next[/i] button whenever the player is presented with a Choice to make, meaning that no [b]${cmd3}[/b] command is needed when using [b]${cmd7}[/b] or [b]${cmd8}[/b].
+
+Remember to continue scrolling down the [i]Code Editor[/i] panel as necessary to follow the example scripting and compare it to the resulting display in-game.
+
+*comment Example 7 - A *fake_choice with no Option-specific response narrative at all
+    
+*fake_choice
+    #Example 7 - This is the First Option text
+    #Example 7 - This is the Second Option text
+    #Example 7 - This is the Third Option text
+    #Example 7 - This is the Fourth Option text
+
+This is the simplest form of a ${cmd7} as it doesn't make a scrap of difference what the player chooses; with no actual Option narrative, the 'response' to any Choice made is always [i]exactly[/i] the same. What, then, you may ask, is the point of such a simplistic ${cmd7}? 
+
+[b]${cmd7}[/b] is an opportunity for the player to further interact with the story in a way that can be every bit as entertaining or rewarding for the player as would a fuller  [b]${cmd8}[/b] option, but without the need for additional scripting (or even narrative), thereby enhancing the game experience with considerably less effort. Judicious use of ${cmd7} can help to build character, stress plot details, aid immersion in the game world, and enhance interaction.
+
+However, [i]overuse[/i] of simplistic ${cmd7}s, or too obviously fake ([i]"How do you feel about that?"[/i] is common) can also have the exact opposite effect on an experienced player of Choice Games and may in fact  [i]sometimes[/i] spoil that player's enjoyment of your story. In a nutshell: ${cmd7} is only one tool in your scripting arsenal. By all means use it, but don't abuse it.
+
+The [b]${cmd11}[/b] command is one way in which we can make genuine use of a ${cmd7} to impact something in the game. [b]${cmd11}[/b] is used to change the current stored [i]Value[/i] of a variable, either by [i]overwriting[/i] it with a completely new value or [i]modifying[/i] it in some way. In the following ${cmd7} [b]Example 8[/b], we invite the player to choose their own character's name:
+
+[i]Welcome, hero! By what name should lesser mortals address you?[/i]
+
+*comment Example 8 - Changing the values of variables (game data) according to the player's choice
+    
+*fake_choice
+    #Xena
+        *set pcname "Xena"
+    #Conan
+        *set pcname "Conan"
+    #[i]None of the above[/i]
+        Please scribe your name, oh mighty hero!
+        *input_text pcname
+    
+[i]And so shall the heroic adventures of $!{pcname} be recorded in legend![/i]
+
+Bear in mind that there is no real limit to the number of Options we could have offered there, simply by adding more #[i]name[/i] Options to the ${cmd7} before [i]None of the above[/i].
+
+In the first two cases we are using [b]${cmd11}[/b] to store "[i]some text[/i]" as the new [b]value[/b] for the [i]string[/i] variable called [b]pcname[/b], allowing us to now display "[i]some text[/i]" in-game where appropriate.
+
+In the third case we are using [b]${cmd24}[/b] to allow the player to type in a name of their choice, which is the most common (but by no means only) use of this command. [b]${cmd24}[/b] also [i]automatically[/i] sets a new value for the specified variable, so no [b]${cmd11}[/b] is needed in that case.
+
+Regardless of the actual option chosen, as with previous [b]${cmd7}[/b] examples the narrative simply continues below, which is why neither the 'Xena' nor 'Conan' options require a specific narrative response of their own. The third option didn't [i]need[/i] a specific response either, but it reads better as a reminder of what information is being prompted for (rather than just displaying an input_text box on a completely blank page).
+
+Pay particular attention to the first line of narrative above, in which we name the character accurately in-game regardless of the actual name chosen by the player. We have done so by displaying the new [b]value[/b] of the [i]Permanent Variable[/i] called [b]pcname[/b]. This was originally created in the [b]startup[/b] file with the default value of "Unknown", but using [b]${cmd11}[/b] we have now changed that value to a specific "[i]string[/i]" - either [i]Xena[/i], [i]Conan[/i], or a name input by the player.
+
+Referencing, setting and displaying (the [i]value[/i] of) variables will be further expanded upon later in the Tutorial. Let's first tackle some actual [i]Player Interaction[/i] in our Test Project.
+
+*page_break
+
+Switch to file [b]scene01[/b] of the [b]Test Project[/b].
+
+[i][b]~~Exercise 11[/b] - Below your ${cmd3}, use a [b]${cmd7}[/b] command to prompt the player to choose a name for their character from a list of several options, or to enter a name of their own choosing. Use the [b]${cmd11}[/b] command to overwrite the value of [b]pcname[/b] accordingly for each option given, and use [b]${cmd24}[/b] as a final option for entering a name.[/i]
+
+Although it may be tempting to simply copy-paste the example shown in lesson04, avoid doing so and type it all in yourself to begin getting a feel for how [i]Smart Indentation[/i] works in CSIDE.
+
+For example, after typing your first [b]${cmd11} pcname "[i]some text[/i]"[/b] line and hitting enter, you'll see it places the cursor ready to immediately type in another correctly-indented line for that first Option. However, because you have nothing more to add for that Option in [i]this[/i] case, it will be necessary to use [i]Backspace[/i] four times (or one [i]Shift-Tab[/i]) to [i]dedent[/i] one level, ready to type the second name Option immediately in line with the first one above (as shown in the lesson04 example). Do however refer back to that example, by switching between lesson04 and scene01 as much as needed.
+
+[i][b]~~Exercise 12[/b] - Did you use a line of narrative to ask the player their character's name? If not, insert that now between the ${cmd3} and ${cmd7} commands![/i]
+
+As a general rule it's usually best to always have at least [i]some[/i] narrative on each page before any sort of player choice, even if the Options are self-explanatory. It just looks and reads better.
+
+[i][b]~~Exercise 13[/b] - Now use [b]${cmd7}[/b] to prompt the player to choose a Character Class of either warrior, mage or thief, and use [b]${cmd11}[/b] to overwrite the [b]class[/b] "string" variable accordingly. For each Option also [b]${cmd11}[/b] the [b]str[/b]ength, [b]int[/b]elligence and [b]dex[/b]terity numeric variables with a value of 20-40, as you feel best but being careful to maintain balance.[/i]
+
+*finish [i]Think about it . . .[/i]

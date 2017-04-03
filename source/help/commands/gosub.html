@@ -1,0 +1,37 @@
+<html>
+<h2>Command: gosub</h2>
+<p>*gosub allows you to create subroutines within a scene, allowing you to use a section of code multiple times. Another advantage of using *gosub is that it makes editing your code easier by making it so that if you need to edit a section of code that gets used often, you can simply edit the referenced code at the bottom of the scene file rather than editing the same code over and over again. 
+<p>It's worth noting, however, that you don't strictly have to have the referenced code at the bottom of the scene file, as it can go anywhere within the current scene, but it is good practice to do so since it makes it easier to find again. To use *gosub you have to make sure you have a *label to go to, and a *return at the end of the referenced section, essentially telling ChoiceScript "Okay, you've had your fun playing around at the end of the scene, now return home or I swear I'll stop this game right here! Don't test me!"
+<h3>Example Usage</h3>
+<pre>
+*create health "70"
+*create strength "90"
+
+*label potions
+Having just battled the evil face sucker, a.k.a. "The ex-girlfriend", you take a potion to revitalize yourself
+
+*choice
+	#Take a health potion
+		*set health + 50
+		*gosub check_stats
+		*goto potions
+	#Take a strength potion
+		*set strength + 50 
+		*gosub check_stats
+		*goto potions
+	#I'm good
+		*finish
+</pre>
+<p>
+And at the bottom of the scene file you would have something like this:
+<pre>
+*label check_stats
+
+*if health > 100
+	*set health 100
+*if strength > 100
+	*set strength 100
+*return
+</pre>
+Looking for a little more detail? Try the <a rel="external" href="http://choicescriptdev.wikia.com/wiki/Gosub">wiki page</a>
+</html>

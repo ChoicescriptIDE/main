@@ -1,0 +1,29 @@
+*comment __        __   _                          
+*comment \ \      / /__| | ___ ___  _ __ ___   ___ 
+*comment  \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \
+*comment   \ V  V /  __/ | (_| (_) | | | | | |  __/ 
+*comment    \_/\_/ \___|_|\___\___/|_| |_| |_|\___|
+*comment  _           ____ ____ ___ ____  _____ 
+*comment | |_ ___    / ___/ ___|_ _|  _ \| ____|
+*comment | __/ _ \  | |   \___ \| || | | |  _|  
+*comment | || (_) | | |___ ___) | || |_| | |___ 
+*comment  \__\___/   \____|____/___|____/|_____|
+
+Welcome, to the Desktop Version of the Choicescript IDE!
+
+--- more info/thank/you/help text ---
+
+If you're new to Choicescript, the Choicescript IDE (or both) we highly
+recommend you take the time to run through the documentation, which - to
+make it a bit more fun and relevant - is provided as a "game" written in 
+Choicescript and run via the Choicescript IDE!
+
+Curious? Just click 'Run' at the top to get started.
+
+If you otherwise feel comfortable or fancy getting stuck straight in, feel free to
+close these scenes via the appropriate X's - they won't load back up automatically,
+but they can be reaccessed at any time from the 'default_scenes' folder in your IDE
+installation's directory.
+
+Happy Scripting!
+

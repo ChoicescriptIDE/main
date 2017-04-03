@@ -1,0 +1,20 @@
+<html>
+<h2>Command: choice</h2>
+<p>The *choice command is central to any game written with ChoiceScript, and greatly aids in the interactivity of your project.
+With this command, you are able to provide the player with a series of choices, which can branch your story and effects your stats if you so choose.
+ Please note that when using the *choice command, each choice branch MUST end in a *goto, *goto_scene, *ending, or *finish command or it will end the game with an error.</p>
+<h3>Example Usage</h3>
+<pre>
+"How would you like your drink, sir?"
+
+*choice
+	#Shaken, not stirred.
+		*comment we could also have additional code/text here
+		*goto movie_cliche
+	#I don't care, just give it to me already!
+		*comment we could also have additional code/text here
+		*goto alcoholic_problems
+		
+</pre>
+Looking for a little more detail? Try the <a rel="external" href="http://choicescriptdev.wikia.com/wiki/Choice">wiki page</a>
+</html>

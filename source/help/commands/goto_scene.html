@@ -1,0 +1,16 @@
+<html>
+<h2>Command: goto_scene</h2>
+<p>Unlike the *finish command, which uses the *scene_list to tell which scene file to load up next, *goto_scene can jump to the beginning of any scene, <i>even if it isn't listed in the *scene_list</i>, as long as the scene .txt exists within your "scenes" folder.
+<p>You also never want to use *goto_scene to go back to startup, as that would cause ChoiceScript to re-run the *create commands at the beginning of the file, thereby resetting all of your stats to their default value.
+<h3>Example Usage</h3>
+<pre>
+You approach a giant fork in the plotline! Do you choose to follow option A or option B?
+
+*choice
+	#Option A
+		*goto_scene option_a
+	#Option B
+		*goto_scene option_b
+</pre>
+Looking for a little more detail? Try the <a rel="external" href="http://choicescriptdev.wikia.com/wiki/Goto_scene">wiki page</a>
+</html>

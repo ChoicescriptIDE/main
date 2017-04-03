@@ -1,0 +1,149 @@
+
+*comment NEW TO CHOICESCRIPT? CLICK 'Run this project' BUTTON TO START TUTORIAL
+
+*title Learning Basic ChoiceScript
+*author Bob Middleton
+*scene_list
+    introduction
+    lesson01
+    lesson02
+    lesson03
+    lesson04
+    lesson05
+    lesson06
+    lesson07
+    lesson08
+    lesson09
+    lesson10
+
+
+*comment EXAMPLE CHARACTER 'STATS' VARIABLES  (i.e. the 'value' of these variables may be displayed in-game)
+
+*create pcname "Unknown"
+*create class "Unknown"
+*create race "Unknown"
+*create str 0
+*create int 0
+*create dex 0
+
+*create backpack false
+*create torch false
+*create heirloom true
+*create gold 25
+*create weapon "Rusty Dagger"
+*create shield ""
+*create armour "Padded Jerkin"
+*create helm "Leather Skullcap"
+*create att 2
+*create def 5
+
+*create eq1 ""
+*create eq2 ""
+*create eq3 ""
+*create eq4 ""
+*create eq5 ""
+*create eq6 ""
+*create eq7 ""
+*create eq8 ""
+*create eq9 ""
+
+*comment EXAMPLE 'HIDDEN' VARIABLES - BEHIND-THE-SCENES GAME STUFF. These variable values are not intended to be displayed in-game. There is however no actual difference in how they are created, only in how they will eventually be used within our scripting.
+
+*create found_black_iron_hills false
+*create found_the_troll_tunnels false
+*create found_whispering_wood false
+*create found_dale_of_shadows false
+*create found_the_woodcutter_hut false
+*create found_wicked_witch_cavern false
+
+*create reputation_with_elves 50
+*create reputation_with_dwarves 50
+*create reputation_with_hobbits 50
+
+*comment MORE EXAMPLE 'HIDDEN' VARIABLES - ALTERNATE FORM TO THE ABOVE
+
+*comment Black Iron Hills
+*create loc1 false
+*comment The Troll Tunnels
+*create loc2 false
+*comment Whispering Wood
+*create loc3 false
+*comment Dale of Shadows
+*create loc4 false
+*comment The Woodcutter Hut
+*create loc5 false
+*comment Wicked Witch Cavern
+*create loc6 false
+
+*comment Reputation with Elves
+*create rep1 50
+*comment Reputation with Dwarves
+*create rep2 50
+*comment Reputation with Hobbits
+*create rep3 50
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*comment *** TUTORIAL VARIABLES ***
+
+*comment Ignore these - used within the Tutorial itself, not a part of it!
+
+*create cmd1 "*comment"
+*create cmd2 "*create"
+*create cmd3 "*page_break"
+*create cmd4 "*finish"
+*create cmd5 "*scene_list"
+*create cmd6 "*line_break"
+*create cmd7 "*fake_choice"
+*create cmd8 "*choice"
+*create cmd9 "*goto"
+*create cmd10 "*label"
+*create cmd11 "*set"
+*create cmd12 "*temp"
+*create cmd13 "*if"
+*create cmd14 "*else"
+*create cmd15 "*elseif"
+*create cmd16 "*ending"
+*create cmd17 "*goto_scene"
+*create cmd18 "*gosub"
+*create cmd19 "*return"
+*create cmd20 "*title"
+*create cmd21 "*author"
+*create cmd22 "*selectable_if"
+*create cmd23 "*hide_reuse"
+*create cmd24 "*input_text"
+*create cmd25 "*stat_chart"
+*create cmd26 "*rand"
+*create cmd27 "*gosub_scene"
+*create gender "male"
+*create he "he"
+*create him "him"
+*create his "his"
+*create boy "boy"
+*create man "man"
+*create mr "Mr."
+*create mister "mister"
+*create son "son"
+*create brother "brother"
+*create guy "guy"
+*create gentleman "gentleman"
+*create sir "sir"
+*create master "master"
+*create lord "lord"
+*create npc_race ""
+*create greet ""
+*finish

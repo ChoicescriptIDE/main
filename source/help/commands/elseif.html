@@ -1,0 +1,21 @@
+<html>
+<h2>Command: elseif</h2>
+<p>Used only after *if, *elseif allows you to specify what happens when the *if command passes.
+</p>
+<h3>Example Usage</h3>
+<pre>
+*if wounds = 0
+	Unscathed, you kick down the door and burst into the room.
+	*goto dramatic_entrance
+*elseif wounds = 1
+	With only minor wounds, you cringe as you knock down the door and burst into the room.
+	*goto im_here_sucker
+*elseif wounds = 2
+	Unable to knock down the door due to your injuries, you use the doorknob instead.
+	*goto so_lame
+*else
+	After having sustained so many injuries, you find yourself bleeding all over the floor. Before you even reach the door, you fall unconscious.
+	*goto thats_all_she_wrote
+</pre>
+Looking for a little more detail? Try the <a rel="external" href="http://choicescriptdev.wikia.com/wiki/Elseif">wiki page</a>
+</html>

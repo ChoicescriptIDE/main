@@ -1,0 +1,23 @@
+<html>
+<h2>Command: allow_reuse</h2>
+<p>Should only be used in conjunction with the *hide_reuse command.
+<br>
+The purpose of the *allow_reuse command is to allow a choice to be used multiple times when it otherwise would be hidden after having been used once.</p>
+<h3>Example Usage</h3>
+<pre>
+*hide_reuse
+*label beat_the_traffic
+
+You're in a hurry, but you're stuck at a light! What do you do?
+
+*choice
+	*allow_reuse #Keep waiting.
+		You may be impatient, but you're not dumb.
+		*goto beat_the_traffic
+	#Run the light!
+		The person in the passenger seat promptly smacks you in the back of the head for even thinking of it.
+		*goto beat_the_traffic
+		
+</pre>
+Looking for a little more detail? Try the <a rel="external" href="http://choicescriptdev.wikia.com/wiki/Allow_reuse">wiki page</a>
+</html>

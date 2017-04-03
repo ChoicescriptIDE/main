@@ -1,0 +1,156 @@
+
+*comment NEW TO CHOICESCRIPT? CLICK 'Run this project' BUTTON TO START TUTORIAL
+
+*comment ----------Ignore------------
+*comment Tutorial code required in the event this Lesson has been accessed in a new session without the reader first having set crucial values earlier.
+*if pcname = "Unknown"
+    *goto revisit
+*else
+    *goto continue
+*comment ----------Ignore------------
+
+*label continue
+[b]Lesson 9[/b] - [b][i]'Show Stats' Screen[/i][/b]
+
+Take a quick look at the example [i]Stats[/i] page by clicking the [i]Show Stats[/i] button above.
+
+Typically this presents useful character information in a variety of formats including graphical charts, semi-random text, and stats listed both vertically and horizontally. It also uses a fair amount of text formatting (a mixture of [b]bold[/b], [i]italic[/i] and [b]${cmd6}[/b] commands) to display information in as clear and aesthetically-pleasing a manner as possible.
+
+In total around 180 lines of code were needed to display just that single short page. Although this could be taken to mean that a decent Stats page requires even more work than the rest of the game, what it actually demonstrates is that CS is powerful and flexible enough to allow for some genuine creativity in the way information is compiled and presented to the player, if the author is so inclined and actually takes the time to experiment with different possibilities.
+
+While it could be argued that a Choice Game should be "all about the story", the Stats page is an opportunity to engage, inform and remind the player about the game [i]behind[/i] the story. Every possibility for inclusion should be carefully considered, if it would genuinely enhance the end result in some way. For instance, even with our relatively simple fantasy mini-game we could perhaps add textual indication of the protagonist's relative [b]att[/b]ack and [b]def[/b]end values, maybe some details about the known [b]loc#[/b] regions, and perhaps even add new [i]Permanent[/i] variables to record the various characters encountered and thereby display some information about them.
+
+While I am by no means suggesting that all or even any of these possibilities should be included just because they [i]can[/i] be, what I am suggesting is that it doesn't hurt to at least consider every possibility. Sometimes just thinking about things from a purely [i]Stats Page[/i] point of view can lead to intriguing ideas for new game features which may ultimately also enhance the story itself and the variety of options able to be presented to the player. It's something to consider, at least.
+
+*page_break
+
+Let's take a closer look at how our example Stats page has been created. Left-click to select and view the Tutorial's [b]choicescript_stats[/b] file (and also view [i]Show Stats[/i] often for comparison).
+
+In [b]Example 31[/b] we are using a variety of text formatting to display the player-character's [b]pcname[/b], [b]race[/b] and [b]class[/b], including exclamation marks to capitalize either the first letter of a [i]string[/i] or the entire thing. The [b]${cmd6}[/b] command enables us to list these main details neatly without unnecessary extra spacing between each line.
+
+[b]Example 32[/b] shows a typical [b]${cmd25}[/b] layout, with which CS displays eye-catching bar charts using the values of [i]numeric[/i] variables (preferably within the range of 0-100). If the variable name itself is not suitable for actual display (e.g. [b]str[/b]) then the actual text to be displayed for each individual bar can simply be added within the chart, as shown.
+
+[b]${cmd25}[/b]s can also be made [i]conditional[/i] using the versatile [b]${cmd13}[/b] and an extra level of indentation, as shown in [b]Example 33[/b]. By this means the chart will display only if all the stated conditions are met (in our case, if [b]pcname[/b] is [i]not equal to[/i] "Unknown").
+
+We can also use [i]Temporary[/i] variables on the Stats page, albeit used here simply to define a [b]mean[/b] value for the purpose of [b]Example 33[/b], the [i]Opposed Pair[/i] chart variation. This chart type also uses just a single numeric value, but allows [i]two[/i] text labels to be assigned and so displays as shown on our example Stats page. Take another look at that to compare the two.
+
+In reality [b]mean[/b] would of course be a new [i]Permanent [/i]variable, not a Temporary variable as used here - you may recall during the encounter with the starving dwarf, we raised the [i]design issue[/i] of whether or not to record the protagonist's miserly / charitable nature as an actual Stat.
+
+Although intended specifically for the Stats page, it's worth noting that the [b]${cmd25}[/b] command can actually be used in any Scene file if appropriate to a situation in your game; perhaps something of a Sci-fi or futuristic nature, for instance.
+
+*page_break
+
+Rather than always using bar charts to display precise [i]numeric[/i] values, it's also possible with a little extra coding to instead display them as approximate [i]textual descriptions[/i], as a guideline. In [b]Example 34[/b] we apply this method to our three 'Relationship' values - i.e. the protagonist's relationship with Elves, Dwarves and Hobbits respectfully.
+
+We begin by using a series of [b]${cmd13}[/b] / [b]${cmd15}[/b] / [b]${cmd14}[/b] to define a range of values and assign to each a suitable textual description, stored as a [i]Temporary[/i] variable ([b]elves[/b]). Consider how this works: remember that CS reads a file [i]line-by-line[/i], so as soon as it finds a [i]true[/i] condition (e.g. [b]${cmd15} rep1 [i]is more than[/i] 55[/b]) it [b]${cmd11}[/b]s the appropriate text and follows the [b]${cmd9}[/b] to jump to the start of the next section. If no actual condition is met it defaults to the [b]${cmd14}[/b] line before continuing.
+
+We repeat this for each of three races, using a separate and unique [i]Temporary[/i] variable for each, and in each case also [i]referencing[/i] a different [i]numeric[/i] variable ([b]rep#[/b]). The bulk of the actual code is of course identical, however, allowing us to simply copy-paste the [b]elves[/b] section and then edit it accordingly for each of [b]dwarves[/b] and [b]hobbits[/b] respectively.
+
+Once we have our temporary text descriptions for each of the three race relationship guidelines, [b]Example 35[/b] is where we actually display these within three appropriately-worded sentences.
+
+Although we could of course simply use three static, unchanging sentences for the display, I have elected to slightly randomize the whole thing so it is not always worded exactly the same way except for the relationships description itself. I achieve this with a new [b]${cmd12}[/b] variable, [b]pick[/b], to which I assign a random value between 1-4 using the [b]${cmd26}[/b] command.
+
+This value is then used to choose between four different sections, each containing the same three sentences but simply used in a different order. The order of [i]Elves, Dwarves, Hobbits[/i] does not actually change, however. By this means the text itself may vary slightly each and every time the player views the Stats page (try it and see), but in doing so does not make it any harder to find exactly the information they're looking for - e.g. [i]Hobbits[/i] info is [i]always[/i] on the third line.
+
+*page_break
+
+The [b]${cmd26}[/b] command, like [b]${cmd25}[/b], can actually be employed in any file, not just in [i]choicescript_stats[/i]. Generating a random value within a specific range can be very useful for various purposes (random paragraph responses, random redirection, random values for a combat system, etc.) but do bear in mind that adding randomness to your game can make things considerably harder to test properly as it's more difficult to guarantee that every possible eventuality has been covered. Use [b]${cmd26}[/b] selectively if at all, especially for a first game.
+
+In [b]Example 36[/b] we are again listing some main info in typical fashion, using text formatting for clarity, with the addition of making one particular item conditional - a [b]shield[/b] will be included in the list only if the player actually has one in their possession. If the [i]string[/i] is still "" blank as it was when [b]${cmd2}[/b]d in the [b]startup[/b] file, that line will not be displayed at all. Once again we are using [b]!=[/b] ([i]not equal to[/i]) for this condition, as used above for the [b]${cmd25}[/b] condition.
+
+And finally, in [b]Example 37[/b] we have decided to list [i]horizontally[/i] any additional [i]Inventory[/i] items the protagonist has in their possession, simply because it looks better this way. This method is however a little more complex, involving using 
+*link http://choicescriptdev.wikia.com/wiki/Concatenation Concatenation 
+(joining together multiple text [i]strings[/i] to form a single, longer [i]string[/i]) before displaying the end result.
+
+This type of inventory is made simpler by having a suitable default item (in our case, [b]Bedroll[/b]) assumed to [i]always[/i] be in the protagonist's possession. For each additional item which may be added, this allows us to [i]automatically[/i] first add to the [i]string[/i] a comma and a space - [b]&(",[/b] - followed by the actual item name; either "[i]Some Text[/i]" in the case of a [i]boolean[/i] variable currently [i]true[/i] (e.g. "Backpack"), or the actual value of a [i]string[/i] variable [i]if not blank[/i] (e.g. the value of [b]eq1[/b]). Any [i]false[/i] booleans or currently [b]""[/b] (blank) strings would not be included in the final list.
+
+Without that default [b]Bedroll[/b] item, we would have to make each and every [b]&(",[/b] part conditional on there being an item already present in the list, making the whole thing more intricate as shown in the ChoiceScriptDev Wikia 
+*link http://choicescriptdev.wikia.com/wiki/Stats%26Stats_Screen#Simple_Inventory_System alternate inventory
+- compare the two.
+
+*finish Lesson #10 - [i]Miscellaneous Topics[/i]
+
+
+*comment ----------Ignore------------
+*comment Tutorial code required in the event this Lesson has been accessed in a new session without the reader first having set critical values earlier.
+
+*label revisit
+
+As you have accessed this particular lesson in a new session without again "playing through" some of the earlier ones, the Tutorial is currently missing some information for example purposes. We'll quickly run through some missing choices before commencing the lesson...
+
+[i]Welcome, hero! By what name should lesser mortals address you?[/i]
+
+*fake_choice
+    #Xena
+        *set pcname "Xena"
+    #Conan
+        *set pcname "Conan"
+    #[i]None of the above[/i]
+        Please scribe your name, oh mighty hero!
+        *input_text pcname
+
+[i]Pray tell, noble hero, how do you foresee yourself being portrayed in legend?[/i]
+
+*fake_choice
+    #A fearsome Warrior
+        *set class "warrior"
+        *set str 40
+        *set int 20
+        *set dex 30
+    #A powerful Mage
+        *set class "mage"
+        *set str 20
+        *set int 40
+        *set dex 30
+    #A skillful Thief
+        *set class "thief"
+        *set str 25
+        *set int 25
+        *set dex 40
+
+[i]Your ears are rather . . . pointy, great hero. Which proud people do you claim as your own?[/i]
+
+*fake_choice
+    #Humans
+        *set race "human"
+        *set str +5
+        *set int +5
+        *set rep1 -5
+        *set rep3 +10
+        *set loc5 true
+    #Elves
+        *set race "elf"
+        *set int +5
+        *set dex +5
+        *set rep1 +20
+        *set rep2 -10
+        *set loc3 true
+    #Dwarves
+        *set race "dwarf"
+        *set str +15
+        *set dex -5
+        *set rep1 -10
+        *set rep2 +20
+        *set loc1 true
+    #Hobbits
+        *set race "hobbit"
+        *set dex +10
+        *set str -10
+        *set rep1 +10
+        *set rep2 +5
+        *set rep3 +25
+        *set loc4 true
+
+*set gold 3
+*set backpack true
+*set torch true
+*set eq1 "Tinderbox & Flint"
+*set helm "Battered Iron Skullcap"
+*set eq2 "30' Rope"
+*set armour "Leather Jerkin"
+*set shield "Wooden Buckler"
+*set eq3 "Cloak of Shadows"
+*set dex +3
+*set weapon "Short Sword"
+*goto continue
+*comment ----------Ignore------------

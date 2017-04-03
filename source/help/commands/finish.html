@@ -1,0 +1,17 @@
+<html>
+<h2>Command: finish</h2>
+<p>*finish can be used anywhere in the game, whether it be after a paragraph or as part of an option in a *choice table. *finish will skip over the rest of the chapter and on to the next chapter listed in the *scene_list at the beginning of startup.txt.
+<p>By default when used after a paragraph, Choicescript will display a button at the bottom of the screen with the words "Next Chapter" on it, but you can customize the text displayed by following the *finish command with the desired text.
+<h3>Example Usage</h3>
+<pre>
+*scene_list
+	startup
+	chapter_1
+	chapter_2
+	chapter_3
+
+Man, this chapter sucks.
+*finish Let's blow this joint
+</pre>
+Looking for a little more detail? Try the <a rel="external" href="http://choicescriptdev.wikia.com/wiki/Finish">wiki page</a>
+</html>

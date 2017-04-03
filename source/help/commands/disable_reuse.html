@@ -1,0 +1,47 @@
+<html>
+<h2>Command: disable_reuse</h2>
+<p>Used with *choice options and a *label/*goto (or *gosub) combo. The *disable_reuse command greys out an option in a *choice table after it's first been used,
+preventing its reselection.</p>
+<h3>Example Usage</h3>
+<pre>
+*label bake_a_cake
+Time to bake a cake... What do you do next?
+
+*choice
+	*disable_reuse #Add the eggs
+		You crack the eggs and add them to the bowl.
+		*goto bake_a_cake
+	#Add Milk
+		*set milk_amount + 1
+		You add milk to the bowl.
+		*goto bake_a_cake
+	#Add Flour
+		*set flour_amount + 1
+		You add flour to the bowl.
+		*goto bake_a_cake
+	#Stir
+		*set stir_amount + 1
+		You stir the mixture.
+		*goto bake_a_cake
+	#Put it in the Oven
+		You pour the mixture into the baking tray and place it in the oven.
+		*finish
+</pre>
+<br>
+<p>
+	You can also use the *disable_reuse command in a global context so that ALL choice options in the current scene file are disabled after one use by default.
+</p>
+<h3>Example Usage</h3>
+<pre>
+	*comment this is the top of our scene file
+	*disable_reuse
+	
+	*comment lots of code
+	... ...
+	*choice
+		#
+	
+</pre>
+Note that each #option that you use *disable_reuse with must be on the same line as the *disable_reuse command.
+<p>Looking for a little more detail? Try the <a rel="external" href="http://choicescriptdev.wikia.com/wiki/Disable_reuse">wiki page</a>
+</html>
