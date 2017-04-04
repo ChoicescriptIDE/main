@@ -2497,6 +2497,27 @@ function IDEViewModel() {
         }
       }),
       new CSIDESetting({
+        "id": "spell_dic",
+        "name": "Spell Check Dictionary",
+        "value": "en_US",
+        "type": "variable",
+        "cat": "editor",
+        "options": [{
+          "desc": "US",
+          "value": "en_US"
+        }, {
+          "desc": "GB",
+          "value": "en_GB"
+        }],
+        "desc": "The dictionary to spellcheck against",
+        "apply": function(val) {
+          typo = new Typo(val, typo._readFile("lib/typo/dictionaries/" + val + "/" + val + ".aff"), typo._readFile("lib/typo/dictionaries/" + val + "/" + val + ".dic"), {
+            platform: 'any'
+          });
+          editor.forceSyntaxRedraw();
+        }
+      }),
+      new CSIDESetting({
         "id": "visible-tabs",
         "name": "Visible Tabs",
         "value": false,
@@ -2617,27 +2638,6 @@ function IDEViewModel() {
         "apply": function(val) {
           $('#editor-wrap').css("font-size", val);
           editor.refresh();
-        }
-      }),
-      new CSIDESetting({
-        "id": "spell_dic",
-        "name": "Spell Check Dictionary",
-        "value": "en_US",
-        "type": "variable",
-        "cat": "editor",
-        "options": [{
-          "desc": "US",
-          "value": "en_US"
-        }, {
-          "desc": "GB",
-          "value": "en_GB"
-        }],
-        "desc": "The dictionary to spellcheck against",
-        "apply": function(val) {
-          typo = new Typo(val, typo._readFile("lib/typo/dictionaries/" + val + "/" + val + ".aff"), typo._readFile("lib/typo/dictionaries/" + val + "/" + val + ".dic"), {
-            platform: 'any'
-          });
-          editor.forceSyntaxRedraw();
         }
       }),
       new CSIDESetting({
