@@ -24,8 +24,8 @@ body {
 	border: none;
 	margin: 0px;
 	padding: 0px;
-  font-family: "Century Gothic", "CenturyGothic", "AppleGothic", "arial";
-  background-color: #EEE;
+	font-family: "Century Gothic", "AppleGothic", "Arial", "Helvetica", "sans-serif";
+	background-color: #EEE;
 }
 
 a, button, div, span {
