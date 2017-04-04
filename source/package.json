@@ -1,7 +1,7 @@
 {
   "name": "CSIDE",
   "main": "index.html",
-  "description": "The Choicescript IDE",
+  "description": "The ChoiceScript IDE",
   "version": "1.0.0",
   "keywords": [
     "choicescript",
@@ -27,7 +27,7 @@
   },
   "window": {
     "show": true,
-    "title": "Choicescript IDE",
+    "title": "ChoiceScript IDE",
     "icon": "img/cside.png",
     "frame": false,
     "position": "center",
