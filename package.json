@@ -1,5 +1,5 @@
 {
-  "name": "CSIDE",
+  "name": "ChoiceScript IDE",
   "main": "index.html",
   "version": "1.0.0",
   "devDependencies": {
@@ -30,7 +30,7 @@
   },
   "window": {
     "show": true,
-    "title": "Choicescript IDE",
+    "title": "ChoiceScript IDE",
     "icon": "img/cside.png",
     "frame": false,
     "position": "center",
