@@ -16,6 +16,13 @@ html {
 	overflow: hidden;
 }
 
+/* Provide Century Gothic in ttf format - won't work in all cases, but it's a start */
+@font-face {
+  font-family: 'Century Gothic';
+  src:
+    url('font/century_gothic.ttf') format('truetype');
+}
+
 body {
 	height: 100%;
 	width: 100%;

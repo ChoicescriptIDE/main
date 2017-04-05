@@ -65,6 +65,7 @@ module.exports = function(grunt) {
               'lib/jquery/jquery-1.11.3.min.js', // for help tab page
               'lib/marked/marked.min.js',        // ...
               'node_modules/**',
+              'css/font/century_gothic.ttf',     // 'Century Gothic' font
             ],
             dest: 'build'
           },
@@ -88,7 +89,7 @@ module.exports = function(grunt) {
 
           "node_modules/cside-codemirror/lib/codemirror.js",
           "node_modules/cside-codemirror/mode/choicescript/choicescript-new.js",
-          
+
           "node_modules/dropbox/dist/Dropbox-sdk.min.js",
 
           "source/lib/mousetrap/mousetrap.min.js",
