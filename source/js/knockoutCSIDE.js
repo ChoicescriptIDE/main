@@ -391,34 +391,46 @@ function IDEViewModel() {
     self.exportScenes = function() {
       fh.selectFolder(function(newPath) {
         if (newPath) {
-          __copyProjectTo(path(), newPath, function(err) {
-            if (err) {
-              notification("Error", err.message, {
-                type: "error"
-              });
-              return;
-            }
-            var buttons = [{
-              addClass: 'btn btn-default',
-              text: 'Show Folder',
-              onClick: function(note) {
-                __openFolder(newPath);
-                note.close();
+          bootbox.confirm("<h3>Warning</h3><p>This will <b>overwrite</b> any files with the same name in '<i>" + newPath + "</i>'.<br>Are you sure you wish to continue?</p>",
+            function(result) {
+              if (result) {
+                __copyProjectTo(path(), newPath, function(err) {
+                  if (err) {
+                    notification("Error", err.message, {
+                      type: "error"
+                    });
+                    return;
+                  }
+                  var buttons = [{
+                    addClass: 'btn btn-default',
+                    text: 'Show Folder',
+                    onClick: function(note) {
+                      __openFolder(newPath);
+                      note.close();
+                    }
+                  }]
+                  var n = notification("Game Exported Successfully", "All scenes exported successfully to " + newPath, {
+                    type: "success",
+                    buttons: buttons
+                  });
+                  n.setTimeout(10000);
+                });
               }
-            }]
-            var n = notification("Game Exported Successfully", "All scenes exported successfully from " + path(), {
-              type: "success",
-              buttons: buttons
-            });
-            n.setTimeout(10000);
-          });
+            }
+          );
         }
       });
     }
     self.compile = function() {
-      fh.selectFolder(function(path) {
-        if (path) {
-          __fullCompile(self, path);
+      fh.selectFolder(function(newPath) {
+        if (newPath) {
+          bootbox.confirm("<h3>Warning</h3><p>This will <b>overwrite</b> any file with the same name in '<i>" + newPath + "</i>'.<br>Are you sure you wish to continue?</p>",
+            function(result) {
+              if (result) {
+                __fullCompile(self, newPath);
+              }
+            }
+          );
         }
       });
     }
@@ -1252,30 +1264,36 @@ function IDEViewModel() {
       }, [
         new menuOption("Copy file to folder", function(menu) {
           var scene = menu.getTarget();
-          fh.selectFolder(function(path) {
-            if (path) {
-              fh.copyFile(scene.getPath(), path + scene.getName() + ".txt", function(err, data) {
-                if (err) {
-                  notification("Export Failed", err.message, {
-                    type: "error"
-                  });
-                } else {
-                  var note;
-                  var buttons = [{
-                    addClass: 'btn btn-default',
-                    text: 'Show Folder',
-                    onClick: function(note) {
-                      __openFolder(path);
-                      note.close();
-                    }
-                  }];
-                  note = notification("Export Succesful", "Copied " + scene.getName() + " to " + path, {
-                    type: "success",
-                    buttons: buttons
-                  });
-                  note.setTimeout(3000);
+          fh.selectFolder(function(newPath) {
+            if (newPath) {
+              bootbox.confirm("<h3>Warning</h3><p>This will <b>overwrite</b> any file with the same name in '<i>" + newPath + "</i>'.<br>Are you sure you wish to continue?</p>",
+                function(result) {
+                  if (result) {
+                    fh.copyFile(scene.getPath(), newPath + scene.getName() + ".txt", function(err, data) {
+                      if (err) {
+                        notification("Export Failed", err.message, {
+                          type: "error"
+                        });
+                      } else {
+                        var note;
+                        var buttons = [{
+                          addClass: 'btn btn-default',
+                          text: 'Show Folder',
+                          onClick: function(note) {
+                            __openFolder(newPath);
+                            note.close();
+                          }
+                        }];
+                        note = notification("Export Succesful", "Copied " + scene.getName() + " to " + newPath, {
+                          type: "success",
+                          buttons: buttons
+                        });
+                        note.setTimeout(3000);
+                      }
+                    });
+                  }
                 }
-              });
+              );
             }
           });
         }),
