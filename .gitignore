@@ -4,3 +4,4 @@ nwjsBuild/*
 nwjsCache/*
 /node_modules/*
 inno/*
+!inno/*.iss
