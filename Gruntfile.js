@@ -89,6 +89,16 @@ module.exports = function(grunt) {
 
           "node_modules/cside-codemirror/lib/codemirror.js",
           "node_modules/cside-codemirror/mode/choicescript/choicescript-new.js",
+            //plugins
+            "node_modules/cside-codemirror/addon/dialog/dialog.js",
+            "node_modules/cside-codemirror/addon/hint/show-hint.js",
+            "node_modules/cside-codemirror/addon/hint/anyword-hint.js",
+            "node_modules/cside-codemirror/addon/display/fullscreen.js",
+            "node_modules/cside-codemirror/addon/edit/matchbrackets.js",
+            "node_modules/cside-codemirror/addon/mode/simple.js",
+            "node_modules/cside-codemirror/addon/mode/overlay.js",
+            "node_modules/cside-codemirror/addon/search/search.js",
+            "node_modules/cside-codemirror/addon/search/searchcursor.js",
 
           "node_modules/dropbox/dist/Dropbox-sdk.min.js",
 
