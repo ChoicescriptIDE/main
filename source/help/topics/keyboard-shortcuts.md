@@ -14,8 +14,8 @@
 | Wrap or insert italic tags     | CTRL + I            | CMD + I             |
 | Wrap or insert bold tags       | CTRL + B            | CMD + B             |
 | Wrap or insert variable tags   | CTRL + D            | CMD + D             |
-| Move selected text up a line   | SHIFT + CTRL + UP   | SHIFT + CTRL + UP   |
-| Move selected text down a line | SHIFT + CTRL + DOWN | SHIFT + CTRL + DOWN |
+| Move selected text up a line   | SHIFT + CTRL + UP   | CMD + ALT + UP   |
+| Move selected text down a line | SHIFT + CTRL + DOWN | CMD + ALT + DOWN |
 | Toggle full-window editor      | ESC / F11           | ESC / F11           |
 | Toggle console                 | SHIFT + CTRL + C    | SHIFT + CMD + C     |
 
