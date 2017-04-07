@@ -48,5 +48,6 @@
 | Find previous                       | SHIFT + CTRL + G    | SHIFT + CMD + G          |
 | Replace                             | SHIFT + CTRL + F    | CMD + OPTION + F         |
 | Replace all                         | SHIFT + CTRL + R    | SHIFT + CMD + OPTION + F |
+| Jump to line                        | ALT + G             | ALT + G                  |
 
 **Next Topic**: [Project Options](topics/project-options.md "Project Options")

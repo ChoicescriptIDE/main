@@ -99,6 +99,7 @@ module.exports = function(grunt) {
             "node_modules/cside-codemirror/addon/mode/overlay.js",
             "node_modules/cside-codemirror/addon/search/search.js",
             "node_modules/cside-codemirror/addon/search/searchcursor.js",
+            "node_modules/cside-codemirror/addon/search/jump-to-line.js",
 
           "node_modules/dropbox/dist/Dropbox-sdk.min.js",
 
