@@ -985,19 +985,7 @@ function IDEViewModel() {
           });
         }
       }
-      /*    function printScene() {
-              var new_win = gui.Window.open('', {show:false});
-              new_win.on('loaded', function() {
-                new_win.window.document.write(cmDoc.getValue());
-                new_win.show();
-                new_win.window.print();
-                new_win.close();
-              });
-          }
-          self.print = function() {
-              print();
-          }*/
-      //Prevent editing while saving (basically fakes a read-only document)
+    //Prevent editing while saving (basically fakes a read-only document)
     CodeMirror.on(cmDoc, "beforeChange", function(cm, change) {
       if (saving() && loaded()) {
         change.cancel();
