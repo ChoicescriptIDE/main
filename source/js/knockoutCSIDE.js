@@ -489,9 +489,6 @@ function IDEViewModel() {
     });
     path(sceneData.path);
     var name = ko.observable(getSceneName(path()));
-    var charCount = ko.observable(0);
-    var wordCount = ko.observable(0);
-    var selectedChars = ko.observable(0);
     var isImportant = name().toUpperCase().match(reservedSceneNames);
     var source = sceneData.source || platform; //won't change - so doesn't need to be an observable?
     var loaded = ko.observable(false);
@@ -504,6 +501,9 @@ function IDEViewModel() {
     var inErrState = ko.observable(false);
     var errStateMsg = ko.observable("");
     var cmDoc = CodeMirror.Doc(sceneData.contents || "", "choicescript"); //won't change - so doesn't need to be an observable?
+    var charCount = ko.observable(sceneData.contents ? sceneData.contents.length : 0); //prepopulate otherwise .load() text replacement results in '0' on new startup.txts
+    var wordCount = ko.observable(0);
+    var selectedChars = ko.observable(0);
     var history = cmDoc.getHistory();
     var fileStats = sceneData.stats || {
       "mtime": new Date()
