@@ -1160,6 +1160,8 @@ function IDEViewModel() {
     var platform = (process.platform === "darwin" ? platform = "mac_os" : platform = process.platform);
     var execPath = (platform === "mac_os") ? process.execPath.substring(0, process.execPath.lastIndexOf('/') + 1) : process.execPath.substring(0, process.execPath.lastIndexOf('\\') + 1);
     var updating = false;
+    var autoSaveFn = null;
+    var autoUpdateCheckFn = null;
     self.isUpdating = function() {
       return updating;
     }
@@ -2689,6 +2691,9 @@ function IDEViewModel() {
         "type": "binary",
         "desc": "Save all unsaved changes automatically (every 5 minutes)",
         "apply": function(val) {
+          if (typeof autoSaveFn != "undefined" && autoSaveFn) {
+            clearInterval(autoSaveFn);
+          }
           if (val) {
             autoSaveFn = setInterval(function() {
               ///var status = notification("Saving...", "Please wait", {closeWith: false, timeout: false});
@@ -2699,11 +2704,7 @@ function IDEViewModel() {
                 //status.close();
               });
             }, 300000);
-          } else {
-            if (typeof autoSaveFn != "undefined" && autoSaveFn) {
-              clearInterval(autoSaveFn);
-            }
-          }
+          } else {}
         }
       }),
       new CSIDESetting({
@@ -2826,85 +2827,28 @@ function IDEViewModel() {
         }],
         "desc": "",
         "apply": function(channel) {
-          if (channel != "none" && usingNode) {
-            var n = notification("", "<i class='fa fa-refresh fa-spin'></i> Checking for updates...", {
-              closeWith: false,
-              timeout: false
-            });
-            updater.checkForUpdates({
-              cside: CSIDE_version,
-              nw: nw_version
-            }, channel, function(err, update) {
-              n.close();
-              if (err) {
-                notification("Connection Error", "Failed to obtain update data from server. " + err.message, {
-                  type: "error"
-                });
-              } else if (update) {
-                var buttons = [{
-                  addClass: 'btn btn-default',
-                  text: 'Download',
-                  onClick: function(note) {
-                    note.close();
-                    if (updating) return; //don't allow simultaneous updates
-                    var status = notification("Downloading Update", "Do not close the program", {
-                      progress: true,
-                      closeWith: false,
-                      timeout: false
-                    });
-                    var eventHandlers = {
-                      progress: function(val) {
-                        if (!isNaN(val)) {
-                         status.setProgress(val);
-                        }
-                      },
-                      error: function(title, msg) {
-                        notification(title, msg, {
-                          type: "error"
-                        });
-                      }
-                    }
-                    updating = true;
-                    updater.update(channel, eventHandlers, function(err) {
-                      status.close();
-                      updating = false;
-                      if (err) {
-                        notification("Update Failed", err.message, {
-                          type: "error"
-                        });
-                        updater.restore(function(err) {
-                          if (err) {
-                            notification("Warning - Package Corruption", err.message, {
-                              type: "error"
-                            });
-                          } else {
-                            notification("Rollback Succesful", "The previous app package has been restored");
-                          }
-                        });
-                      } else {
-                        notification("Update Complete", "Please restart the application.", {
-                          type: "success"
-                        })
-                      }
-                    });
-                  }
-                }, {
-                  addClass: 'btn btn-default',
-                  text: 'Cancel',
-                  onClick: function(note) {
-                    note.close();
-                  }
-                }]
-                notification("Update Available", update.desc, {
-                  closeWith: false,
-                  timeout: false,
-                  buttons: buttons
-                });
-              }
-            });
-          } else {
-            //do nothing
+          if (typeof autoUpdateCheckFn != "undefined" && autoUpdateCheckFn) {
+            clearInterval(autoUpdateCheckFn);
           }
+          if (channel != "none" && usingNode) {
+            var autoUpdate = function() {
+              var n = notification("", "<i class='fa fa-refresh fa-spin'></i> Checking for updates...", { closeWith: false, timeout: false });
+              updater.checkForUpdates({
+                cside: CSIDE_version,
+                nw: nw_version
+              }, channel, function(err, update) {
+                n.close();
+                if (err) {
+                  notification("Connection Error", "Failed to obtain update data from server. " + err.message, { type: "error" });
+                } else if (update) {
+                  __showUpdatePrompt(channel, update);
+                }
+              });
+            }
+            autoUpdateCheckFn = setInterval(autoUpdate, 1000 * 60 * 60);
+            autoUpdate();
+          }
+          else {}
         }
       }),
       new CSIDESetting({
@@ -4091,6 +4035,63 @@ function IDEViewModel() {
         });
       });
     });
+  }
+
+  function __rollbackUpdate() {
+    updater.restore(function(err) {
+      if (err) {
+        notification("Warning - Rollback failed: Package Corrupt", err.message, {
+          type: "error", timeout: 10000
+        });
+      } else {
+        notification("Rollback Succesful", "The previous app package has been restored");
+      }
+    });
+  }
+
+  function __update(channel) {
+    if (updating) return; //don't allow simultaneous updates
+    var status = notification("Downloading Update", "Do not close the program", { progress: true, closeWith: false, timeout: false });
+    var eventHandlers = {
+      progress: function(val) {
+        if (!isNaN(val)) {
+         status.setProgress(val);
+        }
+      },
+      error: function(title, msg) {
+        notification(title, msg, { type: "error" });
+      }
+    }
+    updating = true;
+    updater.update(channel, eventHandlers, function(err) {
+      status.close();
+      updating = false;
+      if (err) {
+        notification("Update Failed", err.message, { type: "error", timeout: 10000 });
+        __rollbackUpdate();
+      } else {
+        notification("Update Complete", "Please restart the application.", { type: "success" });
+      }
+    });
+  }
+
+  function __showUpdatePrompt(channel, update) {
+    var buttons = [{
+      addClass: 'btn btn-default',
+      text: 'Download',
+      onClick: function(note) {
+        note.close();
+        __update(channel);
+      }
+    },
+    {
+      addClass: 'btn btn-default',
+      text: 'Cancel',
+      onClick: function(note) {
+        note.close();
+      }
+    }];
+    notification("Update Available", update.desc, { closeWith: false, timeout: false, buttons: buttons });
   }
 
   function __updateConfig() {
