@@ -4675,10 +4675,6 @@ function IDEViewModel() {
       }, this);
     }
 
-    function toolbarOption() {
-
-    }
-
     var toolbarMenus = ko.observableArray(
       [
         new toolbarMenu({
