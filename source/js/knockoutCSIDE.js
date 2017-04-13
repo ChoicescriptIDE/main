@@ -1338,7 +1338,16 @@ function IDEViewModel() {
     );
   }
 
-  if (platform === "mac_os") { //platform !== "web-dropbox"
+  var projects = ko.observableArray([]);
+  var selectedScene = ko.observable(null)
+  var selectedProject = ko.computed(function() {
+    return selectedScene() ? selectedScene().getProject() : null;
+  });
+  self.getSelectedProject = ko.computed(function() {
+    return selectedProject();
+  }, this);
+
+  if (platform === "mac_os") {
     var nativeMenuBar = new nw.Menu({
       type: "menubar"
     });
@@ -1412,39 +1421,29 @@ function IDEViewModel() {
       }), index);
     })();
 
-    if (platform != "mac_os")
-      nw.Window.get().menu = win.menu; //display on Windows
+    if (platform != "mac_os") {
+      nw.Window.get().menu = win.menu; // display on Windows
+    }
+    else {
+      ko.extenders.updateMenuBarStates = function(target, option) {
+        target.subscribe(function(scene) {
+          var b = scene ? true : false;
+          var projectIndex = ((platform === "mac_os") ? 3 : 1);
+          var sceneIndex = ((platform === "mac_os") ? 4 : 2);
+          win.menu = nw.Window.get().menu;
+          for (var index = projectIndex; index <= sceneIndex; index++) {
+            for (var item = 0; item < win.menu.items[index].submenu.items.length; item++) {
+              win.menu.items[index].submenu.items[item].enabled = b;
+            }
+          }
+          nw.Window.get().menu = win.menu;
+        });
+        return target;
+      };
+      selectedScene.extend({ updateMenuBarStates: "" });
+      selectedScene.valueHasMutated(); //force initialMenubarStates call
+    }
   }
-
-  ko.extenders.updateMenuBarStates = function(target, option) {
-    target.subscribe(function(scene) {
-      var b = scene ? true : false;
-      var projectIndex = ((platform === "mac_os") ? 3 : 1);
-      var sceneIndex = ((platform === "mac_os") ? 4 : 2);
-      for (var index = projectIndex; index <= sceneIndex; index++) {
-        for (var item = 0; item < win.menu.items[index].submenu.items.length; item++) {
-          win.menu.items[index].submenu.items[item].enabled = b;
-        }
-      }
-      nw.Window.get().menu = win.menu;
-    });
-    return target;
-  };
-  var projects = ko.observableArray([]);
-  if (platform === "mac_os") {
-    var selectedScene = ko.observable(false).extend({
-      updateMenuBarStates: ""
-    });
-    selectedScene(null); //force initialMenubarStates call
-  } else {
-    var selectedScene = ko.observable(null);
-  }
-  var selectedProject = ko.computed(function() {
-    return selectedScene() ? selectedScene().getProject() : null;
-  });
-  self.getSelectedProject = ko.computed(function() {
-    return selectedProject();
-  }, this);
 
   var reservedSceneNames = "(STARTUP|CHOICESCRIPT_STATS)"; //Should be in upper case
   var validSceneColours = ko.observableArray(["rgb(125, 186, 125)", "rgb(172, 209, 240)", "rgb(228, 144, 150)",
