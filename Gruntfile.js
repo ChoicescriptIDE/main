@@ -186,7 +186,8 @@ module.exports = function(grunt) {
           platforms: ['osx64'],
           macIcns: './source/img/cside.icns',
           buildDir: './nwjsBuild',
-          cacheDir: './nwjsCache'
+          cacheDir: './nwjsCache',
+          version: '0.21.0'
         },
         src: ['./build/**/*']
       },
@@ -195,7 +196,8 @@ module.exports = function(grunt) {
           platforms: ['win64'],
           winIco: './source/img/cside.ico',
           buildDir: './nwjsBuild',
-          cacheDir: './nwjsCache'
+          cacheDir: './nwjsCache',
+          version: '0.21.0'
         },
         src: ['./build/**/*']
       }
