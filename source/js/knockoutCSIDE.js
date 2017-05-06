@@ -1612,6 +1612,7 @@ function IDEViewModel() {
     "readDir": function(path, callback, dbMetaData) {
       switch (platform) {
         case "web-dropbox":
+          path = (path == "/") ? "" : path;
           db.filesListFolder({path:path})
             .then(function(response) {
               // extra db metadata for file explorer
