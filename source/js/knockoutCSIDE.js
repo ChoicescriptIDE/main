@@ -4560,6 +4560,9 @@ function IDEViewModel() {
   if (!usingNode) {
     var fileBrowser = new fileBrowser();
     ko.applyBindings(fileBrowser, $('#file-browser-canvas')[0]);
+    self.webFileBrowserClosed = ko.computed(function() {
+      return !fileBrowser.isVisible();
+    });
   }
 
   function contextMenu(newTarget, newOptions) {
