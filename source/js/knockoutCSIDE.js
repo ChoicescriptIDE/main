@@ -114,9 +114,7 @@ function IDEViewModel() {
     self.getPath = ko.computed(function() {
       return path();
     }, this);
-    self.getScenes = ko.computed(function() {
-      return scenes();
-    }, this);
+    self.getScenes = scenes;
     self.getIssues = ko.computed(function() {
       return issues();
     }, this);
@@ -1823,9 +1821,7 @@ function IDEViewModel() {
   self.dbAuth = ko.computed(function() {
     return dropboxAuthorised();
   }, this);
-  self.getProjects = ko.computed(function() {
-    return projects();
-  }, this);
+  self.getProjects = projects;
   self.getSelectedScene = ko.computed(function() {
     return selectedScene();
   }, this);
@@ -4124,115 +4120,75 @@ function IDEViewModel() {
     }
     __updateConfig();
   }
+  self.updatePersistenceList = function() {
+    __updatePersistenceList();
+  }
   self.makeSortable = function(data) {
     __makeSortable(data);
   }
 
-  function __updateProjectOrder(sortable, event, ui) {
-    var list = $(sortable).children();
-    if (list.length < 2) return; //there's no point sorting
-    for (var i = 0; i < list.length; i++) {
-      ko.dataFor(list[i]).order = i;
-    }
-    self.getProjects().sort(function(left, right) {
-      return left.order == right.order ? 0 : (left.order < right.order ? -1 : 1) //CJW might have bugged this (as it's out of scope)
-    });
-    __updatePersistenceList();
-  }
+  /*
+    arg.item - the actual item being moved
+    arg.sourceIndex - the position of the item in the original observableArray
+    arg.sourceParent - the original observableArray
+    arg.sourceParentNode - the container node of the original list
+    arg.targetIndex - the position of the item in the destination observableArray
+    arg.targetParent - the destination observableArray
+    arg.cancelDrop - this defaults to false and can be set to true to indicate that the drop should be cancelled.
+  */
+  function dragSceneEvent(arg, event, ui) {
+    console.log(arg, arg.item, arg.targetParent, arg.targetParent(), event, ui, ui.target);
+    console.log();
+    if (arg.sourceParent == arg.targetParent)
+      return;
 
-  function __updateSceneOrder(sortable, event, ui) {
-    var list = $(sortable).children();
-    if (list.length < 2) return; //there's no point sorting
-    for (var i = 0; i < list.length; i++) {
-      ko.dataFor(list[i]).order = i;
-    }
-    ko.dataFor(list[0]).getProject().getScenes().sort(function(left, right) {
-      return left.order == right.order ? 0 : (left.order < right.order ? -1 : 1) //CJW might have bugged this (as it's out of scope)
-    })
-    __updatePersistenceList();
-  }
+    var targetProject = ko.dataFor(event.target);
+    var movingScene = arg.item;
+    arg.cancelDrop = true;
 
-  function __makeSortable(data) {
-    var elem = data[1];
-    //projects
-    $(elem).parent().sortable({
-      axis: "y",
-      cancel: "input:not([readonly]), button",
-      start: function(event, ui) {
-        ui.item.data('original_pos', ui.item.index());
-      },
-      //track project order
-      stop: function(event, ui) {
-        if (ui.item.index() === ui.item.data('original_pos')) {
-          return;
+    function execute(action) {
+      sceneExists(arg.item.getName(), targetProject, function(exists) {
+        if (exists) {
+          $(ui.sender).sortable('cancel');
+          arg.cancelDrop = true;
+          bootbox.alert("This project already has a scene by that name.");
+        } else {
+          action();
         }
-        __updateProjectOrder(this, event, ui);
-      }
-    });
-    //scenes
-    $(elem).find(".project").sortable({
-      axis: "y",
-      cancel: "input:not([readonly]), button",
-      items: ".scene",
-      connectWith: "#main-project-wrap > .project-wrapper > .project",
-      placeholder: "project-hover",
-      containment: $("#main-project-wrap"),
-      start: function(event, ui) {
-        ui.item.data('original_pos', ui.item.index());
-      },
-      receive: function(event, ui) {
-        var targetProject = ko.dataFor(this);
-        var movingScene = ko.dataFor(ui.item[0]);
-
-        function execute(action) {
-          sceneExists(movingScene.getName(), targetProject, function(exists) {
-            $(ui.sender).sortable('cancel');
-            if (exists) {
-              bootbox.alert("This project already has a scene by that name.");
-            } else {
-              action();
-            }
-          });
-        }
-        bootbox.dialog({
-          message: "Would you like to <b>move</b> or <b>copy</b> this scene to this project?",
-          title: "What would you like to do?",
-          buttons: {
-            copy: {
-              label: "Copy",
-              className: "btn-primary",
-              callback: function() {
-                execute(function() {
-                  movingScene.copyTo(targetProject);
-                });
-              }
-            },
-            move: {
-              label: "Move",
-              callback: function() {
-                execute(function() {
-                  movingScene.moveTo(targetProject);
-                });
-              }
-            },
-            cancel: {
-              label: "Cancel",
-              callback: function() {
-                $(ui.sender).sortable('cancel');
-              }
-            }
+      });
+    }
+    bootbox.dialog({
+      message: "Would you like to <b>move</b> or <b>copy</b> this scene to this project?",
+      title: "What would you like to do?",
+      buttons: {
+        copy: {
+          label: "Copy",
+          className: "btn-primary",
+          callback: function() {
+            execute(function() {
+              movingScene.copyTo(targetProject);
+            });
           }
-        });
-      },
-      //track scene order
-      stop: function(event, ui) {
-        if (ui.item.index() === ui.item.data('original_pos')) {
-          return;
+        },
+        move: {
+          label: "Move",
+          callback: function() {
+            execute(function() {
+              movingScene.moveTo(targetProject);
+            });
+          }
+        },
+        cancel: {
+          label: "Cancel",
+          callback: function() {
+          }
         }
-        __updateSceneOrder(this, event, ui);
       }
     });
   }
+
+  self.dragSceneEvent = dragSceneEvent;
+
   ko.bindingHandlers.bindIframe = {
     init: function(element, valueAccessor) {
       function bindIframe() {

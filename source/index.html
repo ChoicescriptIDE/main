@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 
@@ -107,8 +107,7 @@
         <button title="Create a new project" class="create-project-btn col-anim" data-bind="click: createProject, style: { backgroundColor: getUIColour(-12) }"><i class="fa fa-plus col-anim"></i></button>
         <button title="Open new scene files" class="open-scenes-btn col-anim" data-bind="click: openFileBrowser, style: { backgroundColor: getUIColour(-12) }"><i class="fa fa-folder-open col-anim"></i></button>
       </div>
-      <ul id="main-project-wrap" data-bind="template: { foreach: getProjects, beforeRemove: fadeOutAndUp, afterAdd: fadeIn, afterRender: makeSortable }">
-        <li class="project-wrapper">
+      <ul id="main-project-wrap" data-bind="sortable: { data: getProjects, allowDrop: false, connectClass: 'null', afterMove: cside.updatePersistenceList, options: { axis: 'y', cancel: 'input:not([readonly]), button, .scene', items: '.project-wrapper', containment: $('#main-project-wrap') } }"><li class="project-wrapper">
           <div class="project-header" data-bind="css: { 'project-header-selected': $data == $root.getSelectedProject(), 'collapsed': isExpanded() === false }, style: { backgroundColor: $root.getUIColour(-5), color: $root.getUIColour(100) }" class="col-anim">
             <button data-bind="attr: { title: 'Toggle visibility of project ' + getName() }, click: setExpand, css: isExpanded() ? 'fa fa-eye' : 'fa fa-eye-slash'" class="col-anim"></button>
             <!-- <span data-bind="fadeVisible: beingEdited() ? false : true, event: { dblclick: rename }, text: getName, attr: { title: getPath }"></span> -->
@@ -120,7 +119,7 @@
             <!-- /ko -->
           </div>
           <!-- lack of whitespace (line breaks) around scenes <li> is deliberate to avoid a jQuery + knockout bug -->
-          <ul class="project" data-bind="foreach: getScenes, fadeAndSlideVisible: isExpanded, css: { 'project-collapsed': isExpanded() != true }"><li class="scene" data-bind="click: getErrState() ? load : select, css: { 'scene-selected': $data === $root.getSelectedScene() }">
+          <ul class="project" data-bind="fadeAndSlideVisible: isExpanded, css: { 'project-collapsed': isExpanded() != true }, sortable: { data: getScenes, beforeMove: cside.dragSceneEvent, afterMove: cside.updatePersistenceList, options: { axis: 'y', cancel: 'input:not([readonly]), button', items: '.scene', connectWith: '#main-project-wrap > .project-wrapper > .project', placeholder: 'project-hover', containment: $('#main-project-wrap')} }"><li class="scene" data-bind="click: getErrState() ? load : select, css: { 'scene-selected': $data === $root.getSelectedScene() }">
               <button class="save-scene" data-bind="click: getErrState() ? close : save, clickBubble: false, attr: { title: getErrState() ? getErrStateMsg : isReadOnly() ? 'Read-only' : 'Save ' + getName() + '.txt' }"><i data-bind="css: getState"></i></button>
               <button class="color-marker handle"  data-bind="attr: { title: 'Click to colour project ' + getName() }, click: recolour, clickBubble: false, style: { backgroundColor: getMarkColour }"></button>
               <!-- <span data-bind="text: getName(), event: { dblclick: rename }, attr: { title: getName }, fadeVisible: beingEdited() ? false : true"></span> -->
@@ -132,8 +131,7 @@
                 <li class="colour-selector" data-bind="style: { backgroundColor: $data }, click: $parent.recolour, clickBubble: false"></li>
               </ul>
             </li></ul>
-        </li>
-      </ul>
+        </li></ul>
     </div>
 		<div id="page-content-wrapper">
 			<div id="second-wrap">

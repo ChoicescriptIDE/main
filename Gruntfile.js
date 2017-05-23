@@ -108,6 +108,7 @@ module.exports = function(grunt) {
 
           "source/lib/knockout/knockout-3.2.0.js",
           "source/lib/knockout/knockout-jqueryui.min.js",
+          "source/lib/knockout/knockout-sortable.min.js",
           "source/js/knockoutCSIDE.js",
 
           "source/lib/encoding/encoding.js",
