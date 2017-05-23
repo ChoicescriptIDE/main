@@ -4387,7 +4387,7 @@ function IDEViewModel() {
 
       function fileFolderItem(data) {
         var thisFileFolder = this;
-        thisFileFolder.is_folder = (data[".tag"] == "folder");
+        thisFileFolder.is_folder = (data[".tag"] == "folder") || data.isFolder || data.is_folder;
         thisFileFolder.name = data.name;
         thisFileFolder.path = data.path;
         thisFileFolder.icon = data.icon ? data.icon : data.isFolder ? 'fa fa-folder-o fa-lg' : 'fa fa-file-o fa-lg';
