@@ -4066,7 +4066,7 @@ function IDEViewModel() {
         notification("Update Failed", err.message, { type: "error", timeout: 10000 });
         __rollbackUpdate();
       } else {
-        notification("Update Complete", "Please restart the application.", { type: "success" });
+        notification("Update Complete", "Please restart the application.", { closeWith: false, timeout: false, type: "success" });
       }
     });
   }
