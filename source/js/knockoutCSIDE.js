@@ -2946,23 +2946,23 @@ function IDEViewModel() {
       $('#page-content-wrapper').animate({
         "left": 230
       }, 300, function() {
-        //
+        editor.refresh();
       });
       $('#sidebar').animate({
         "left": 0
       }, 300, function() {
-        //
+        editor.refresh();
       });
     } else {
       $('#page-content-wrapper').animate({
         "left": 0
       }, 300, function() {
-        //
+        editor.refresh();
       });
       $('#sidebar').animate({
         "left": -230
       }, 300, function() {
-        //
+        editor.refresh();
       });
     }
   }
@@ -3072,7 +3072,9 @@ function IDEViewModel() {
     if (action == "close" && isOpen || !action && isOpen) {
       $('.right-wrap').animate({
         right: '-50%'
-      }, 500);
+      }, 500, function() {
+		editor.refresh();
+	  });
       $('.left-wrap').animate({
         width: '100%'
       }, 500, function() {
@@ -3082,7 +3084,9 @@ function IDEViewModel() {
     } else if (action == "open" && !isOpen || !action && !isOpen) {
       $('.left-wrap').animate({
         width: '50%'
-      }, 500);
+      }, 500, function() {
+		editor.refresh();
+	  });
       $('.right-wrap').animate({
         right: '0%'
       }, 500, function() {
