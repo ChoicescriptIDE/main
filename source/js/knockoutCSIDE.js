@@ -827,18 +827,44 @@ function IDEViewModel() {
 
       function checkDate(newfileStats) {
         var newlyModifiedAt = newfileStats.mtime || newfileStats.modifiedAt;
-        if (newlyModifiedAt.getTime() > lastModifiedAt.getTime()) {
-          bootbox.confirm("<h3>Warning</h3><p>'" + name() + ".txt' of <b>" + self.getProject().getName() + "</b> has been modified by another program or process \
-						since it was opened. Are you sure you wish to save it?",
-            function(result) {
-              if (result) {
-                saveScene(callback);
-              } else {
-                saving(false);
-                return;
+        if (newlyModifiedAt.getTime() > (lastModifiedAt.getTime() + 1000)) {
+          bootbox.dialog({
+            message: "'" + name() + ".txt' of <b>" + self.getProject().getName() + "</b> appears to have been modified by another program or process \
+						since it was last saved. Are you sure you wish to save it?",
+            title: "Conflict Warning",
+            buttons: {
+              cancel: {
+                label: "Cancel",
+                callback: function() {
+                  saving(false);
+				  return;
+                }
+              },
+			  reload: {
+                label: "Reload",
+                callback: function() {
+                  saving(false);
+                  self.load(function(err, scene) {
+                    if (!err) {
+                      scene.select();
+                    }
+                  });
+				  return;
+                }
+              },
+			  yes: {
+                label: "Save",
+                className: "btn-primary",
+                callback: function() {
+                  saveScene(callback);
+                }
               }
+            },
+            onEscape: function() {
+			  saving(false);
+			  return;
             }
-          );
+	       });
         } else {
           saveScene(callback);
         }
