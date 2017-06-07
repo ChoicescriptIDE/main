@@ -1,7 +1,7 @@
 {
-  "name": "ChoiceScript IDE",
+  "name": "CSIDE",
   "main": "index.html",
-  "version": "1.0.0.4",
+  "version": "1.0.1",
   "devDependencies": {
     "grunt": "^1.0.1",
     "grunt-auto-install": "^0.3.1",
