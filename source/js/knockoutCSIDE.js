@@ -1160,6 +1160,7 @@ function IDEViewModel() {
     var updating = false;
     var autoSaveFn = null;
     var autoUpdateCheckFn = null;
+	var autoSuggestFn = null;
     self.isUpdating = function() {
       return updating;
     }
@@ -1443,6 +1444,10 @@ function IDEViewModel() {
     }
   }
 
+  var autoFormatMap = { 
+    "...": "…", // ellipsis
+    "--": "—" 	// emdash
+  };
   var reservedSceneNames = "(STARTUP|CHOICESCRIPT_STATS)"; //Should be in upper case
   var validSceneColours = ko.observableArray(["rgb(125, 186, 125)", "rgb(172, 209, 240)", "rgb(228, 144, 150)",
     "rgb(237, 216, 161)", "rgb(161, 165, 237)", "rgb(224, 161, 237)", "rgb(163, 163, 163)", "rgb(230, 230, 230)"
@@ -1466,6 +1471,7 @@ function IDEViewModel() {
         "theme": "cs-dark",
         "spellcheck": true,
         "autosuggest": false,
+        "autoformat": true,
         "word-count": 2,
         "visible-tabs": false
       },
@@ -2245,6 +2251,40 @@ function IDEViewModel() {
     elt.style.textIndent = "-" + (leftMargin / (indentLevel + 1)) + "px";
   });
 
+  editor.on("inputRead", function(cm, change) {
+	if (change.text.length == 1) {
+		
+	  if (editor.getOption("autoformat")) { // auto-replace em-dash etc.
+	    var tok = cm.getTokenAt(change.from); // try ?precise option if there are future issues
+	    if (tok.type == "formattable") {
+	      var replacement = autoFormatMap[tok.string];
+	      if (typeof replacement != "undefined") {
+		    cm.changeGeneration(true);
+		    cm.replaceRange(replacement, {line: change.from.line, ch: tok.start}, {line: change.from.line, ch: tok.end});
+	      }
+	    }
+	  }
+	  
+	  if (editor.getOption("autosuggest")) {
+	    if (change.text[0].match(/\w$/)) { //only fire on word characters
+		  if (autoSuggestFn) {
+		    clearTimeout(autoSuggestFn);
+		  }
+		  autoSuggestFn = setTimeout(function() {
+		    CodeMirror.showHint(cm, null, {
+			  completeSingle: false,
+			  extraKeys: {
+			    Enter: function() {
+			      return false;
+			    }
+			  }
+		    });
+		  }, 150);
+	    }
+	  }
+	}
+  });
+
 
 
   editor.refresh();
@@ -2458,33 +2498,18 @@ function IDEViewModel() {
         "cat": "editor",
         "desc": "Prompt quick-complete word suggestions as you type",
         "apply": function(val) {
-          if (val) {
-            var setting = this;
-            //assign function event to the editor instance
-            setting.timeout;
-            editor.on("inputRead", function(cm, change) {
-              if (!setting.getValue()) {
-                return;
-              }
-              if (change.text.length == 1) {
-                if (change.text[0].match(/\w$/)) { //only fire on word characters
-                  if (setting.timeout) {
-                    clearTimeout(setting.timeout);
-                  }
-                  setting.timeout = setTimeout(function() {
-                    CodeMirror.showHint(cm, null, {
-                      completeSingle: false,
-                      extraKeys: {
-                        Enter: function() {
-                          return false;
-                        }
-                      }
-                    });
-                  }, 150);
-                }
-              }
-            });
-          }
+          editor.setOption("autosuggest", val);
+        }
+      }),
+      new CSIDESetting({
+        "id": "autoformat",
+        "name": "Auto Format",
+        "value": true,
+        "type": "binary",
+        "cat": "editor",
+        "desc": "Automatically replace certain character combinations with their formatted equivalents",
+        "apply": function(val) {
+          editor.setOption("autoformat", val);
         }
       }),
       new CSIDESetting({
