@@ -157,11 +157,11 @@ function IDEViewModel() {
         }
       }
     });
-    self.getWordCount = function(exclCommandLines) {
+    self.getWordCount = function(exclCommandLines, selected) {
       exclCommandLines = exclCommandLines || false;
       var wordCount = 0;
       for (var i = 0; i < scenes().length; i++) {
-        wordCount = (wordCount + scenes()[i].getWordCount(exclCommandLines));
+        wordCount = (wordCount + scenes()[i].getWordCount(exclCommandLines, selected));
       }
       return wordCount;
     }
@@ -609,8 +609,8 @@ function IDEViewModel() {
         return wordCount() + suffix;
       }
     };
-    self.getWordCount = function(exclCommandLines) {
-      return __wordCount(cmDoc.getValue(), exclCommandLines);
+    self.getWordCount = function(exclCommandLines, selected) {
+      return selected ?  __wordCount(cmDoc.getSelection(), exclCommandLines) : __wordCount(cmDoc.getValue(), exclCommandLines);
     };
     self.getState = ko.computed(function() {
       if (saving())
@@ -1028,8 +1028,7 @@ function IDEViewModel() {
       //}
     });
     CodeMirror.on(cmDoc, "cursorActivity", function(cm) {
-      var selection = cmDoc.getSelection();
-      selectedChars(selection.length);
+      selectedChars(cmDoc.getSelection().length);
     });
   }
 
@@ -3349,22 +3348,19 @@ function IDEViewModel() {
     var incWordCount = sceneOrProject.getWordCount();
     var exWordCount = sceneOrProject.getWordCount(true);
     var charCount = sceneOrProject.getCharCount();
-    var msg = "<h3>" + sceneOrProject.getName() + "</h3><br><h4>Word Count</h4> \
+	var type = sceneOrProject.constructor.name.substring("CSIDE".length, sceneOrProject.constructor.name.length);
+	var selectedTitle = (type == "Scene") ? "Currently Selected Text (this scene)" : "Currently Selected Text (in all scenes)";
+    var msg = "<h3>" + type + " - " + sceneOrProject.getName() + "</h3><br><h4>Word Count</h4> \
 		    Including command lines: " + sceneOrProject.getWordCount() +
       "<br>Excluding command lines: " + sceneOrProject.getWordCount(true);
-    msg += "<br><br><h4>Character count</h4>Character count: " + sceneOrProject.getCharCount();
-    if ((sceneOrProject.constructor.name === "CSIDEScene") && (selectedScene() === sceneOrProject)) {
-      var selection = editor.getSelection();
-      if (selection.length > 0) { //safe, but perhaps poorly structured?? CJW
-        incWordCount = __wordCount(selection, false);
-        exWordCount = __wordCount(selection, true);
-        charCount = sceneOrProject.getCharCount(true);
-        msg += "<br><br><h4>Current Selection</h4> \
-                    Words including command lines: " + incWordCount +
-          "<br>Words excluding command lines: " + exWordCount +
-          "<br>Characters: " + sceneOrProject.getCharCount(true);
-      }
-    }
+    msg += "<br>Characters: " + sceneOrProject.getCharCount();
+	incWordCount = sceneOrProject.getWordCount(false, true);
+	exWordCount = sceneOrProject.getWordCount(true, true);
+	charCount = sceneOrProject.getCharCount(true);
+	msg += "<br><br><h4>" + selectedTitle + "</h4> \
+				Words including command lines: " + incWordCount +
+	  "<br>Words excluding command lines: " + exWordCount +
+	  "<br>Characters: " + charCount;
     msg += "<br><br>Please note that these figures are only approximations.<br>Project word counts only include those of open scenes.";
     bootbox.alert(msg);
   }
