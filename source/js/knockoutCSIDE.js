@@ -3350,19 +3350,20 @@ function IDEViewModel() {
     var charCount = sceneOrProject.getCharCount();
 	var type = sceneOrProject.constructor.name.substring("CSIDE".length, sceneOrProject.constructor.name.length);
 	var selectedTitle = (type == "Scene") ? "Currently Selected Text (this scene)" : "Currently Selected Text (in all scenes)";
-    var msg = "<h3>" + type + " - " + sceneOrProject.getName() + "</h3><br><h4>Word Count</h4> \
+    var title = (type + " - " + sceneOrProject.getName());
+	var msg = "<h5>Word Count</h5> \
 		    Including command lines: " + sceneOrProject.getWordCount() +
       "<br>Excluding command lines: " + sceneOrProject.getWordCount(true);
     msg += "<br>Characters: " + sceneOrProject.getCharCount();
 	incWordCount = sceneOrProject.getWordCount(false, true);
 	exWordCount = sceneOrProject.getWordCount(true, true);
 	charCount = sceneOrProject.getCharCount(true);
-	msg += "<br><br><h4>" + selectedTitle + "</h4> \
+	msg += "<br><br><h5>" + selectedTitle + "</h5> \
 				Words including command lines: " + incWordCount +
 	  "<br>Words excluding command lines: " + exWordCount +
 	  "<br>Characters: " + charCount;
     msg += "<br><br>Please note that these figures are only approximations.<br>Project word counts only include those of open scenes.";
-    bootbox.alert(msg);
+    bootbox.alert({message: msg, title: title});
   }
 
   function __createImageScene(project, path) {
