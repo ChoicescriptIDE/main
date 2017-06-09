@@ -2873,11 +2873,14 @@ function IDEViewModel() {
         }],
         "desc": "",
         "apply": function(channel) {
+          var self = this;
           if (typeof autoUpdateCheckFn != "undefined" && autoUpdateCheckFn) {
             clearInterval(autoUpdateCheckFn);
           }
           if (channel != "none" && usingNode) {
             var autoUpdate = function() {
+              if (self.prompt && !self.prompt.closed) // prevent notification stacking
+                return;
               var n = notification("", "<i class='fa fa-refresh fa-spin'></i> Checking for updates...", { closeWith: false, timeout: false });
               updater.checkForUpdates({
                 cside: CSIDE_version,
@@ -2887,7 +2890,7 @@ function IDEViewModel() {
                 if (err) {
                   notification("Connection Error", "Failed to obtain update data from server. " + err.message, { type: "error" });
                 } else if (update) {
-                  __showUpdatePrompt(channel, update);
+                  self.prompt = __showUpdatePrompt(channel, update);
                 }
               });
             }
@@ -4139,7 +4142,7 @@ function IDEViewModel() {
         note.close();
       }
     }];
-    notification("Update Available", update.desc, { closeWith: false, timeout: false, buttons: buttons });
+    return notification("Update Available", update.desc, { closeWith: false, timeout: false, buttons: buttons });
   }
 
   function __updateConfig() {
