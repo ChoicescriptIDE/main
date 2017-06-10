@@ -70,7 +70,7 @@
 	<div class="main-wrap" data-bind="style: { borderColor: getUIColour(-30) }">
     <div id="headbar" data-bind="style: { backgroundColor: getUIColour() }, event: { dblclick: getPlatform() === 'web-dropbox' ? null : session.win.toggleMaximize() }" class="col-anim">
     <!-- ko if: getPlatform() != "mac_os" -->
-      <ul data-bind="foreach: getToolbarMenus" id="toolbar"><li data-bind="fadeVisible: (isActive() && $root.webFileBrowserClosed), style: { backgroundColor: $root.getUIColour(-20) }">
+      <ul data-bind="foreach: getToolbarMenus" id="toolbar"><li data-bind="fadeVisible: (isActive() && ($root.getPlatform() != 'web-dropbox' || $root.webFileBrowserClosed)), style: { backgroundColor: $root.getUIColour(-20) }">
         <button data-bind="click: toggle, html: getTitle, style: { backgroundColor: $root.getUIColour(-12) }"></button>
         <div class="menu" data-bind="fadeVisible: isExpanded, style: { backgroundColor: $root.getUIColour(-20) }, event: { mouseleave: toggle.bind(null, false) }">
             <ul data-bind="foreach: getOptions">
