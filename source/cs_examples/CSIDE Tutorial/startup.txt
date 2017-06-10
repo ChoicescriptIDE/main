@@ -1,7 +1,7 @@
 
-*comment NEW TO CHOICESCRIPT? CLICK 'Run this project' BUTTON TO START TUTORIAL
+*comment NEW TO CHOICESCRIPT? CLICK THE > 'Run project CSTutorial' BUTTON TO START TUTORIAL
 
-*title Learning Basic ChoiceScript
+*title Learning Basic ChoiceScript (v1.01)
 *author Bob Middleton
 *scene_list
     introduction

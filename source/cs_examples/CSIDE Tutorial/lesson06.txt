@@ -1,5 +1,5 @@
 
-*comment NEW TO CHOICESCRIPT? CLICK 'Run this project' BUTTON TO START TUTORIAL
+*comment NEW TO CHOICESCRIPT? CLICK THE > 'Run project CSTutorial' BUTTON TO START TUTORIAL
 
 *comment ----------Ignore------------
 *comment Tutorial code required in the event this Lesson has been accessed in a new session without the reader first having set crucial values earlier.
@@ -16,21 +16,21 @@ In the previous lesson, [i]Using Variables[/i], we discussed the distinct and im
 
 In [b]Example 18[/b] (below) we are once again making use of both [i]overwriting[/i] and [i]modifying[/i] variables. Should the player choose the first option, we are overwriting the value of [b]backpack[/b] while merely modifying the value of [b]gold[/b]; for the second and third options we are modifying the value of [b]rep2[/b] (Reputation with Dwarves), either increasing or reducing it by just 5 points. We are also making a specific response in each case, before continuing with general narrative.
 
-[i]Just as you settle down by the side of the trail to enjoy the last of your delicious-smelling coney stew - knowing full well that it's likely your last good meal before the next village - a shabby dwarf stumbles into your camp, calling out a weak hail. A torn tunic, leaking boots, rusty warhammer and empty (if sturdy-looking) backpack speak volumes of his fortunes of late... He lights up at sight of your meal, licking his lips and drooling slightly in the manner of the truly hungry. His coin pouch is clearly as flat as his shrunken stomach.[/i]
+[i]Just as you settle down by the side of the trail to enjoy the last of your delicious-smelling coney stew—knowing full well that it's likely your last good meal before the next village—a shabby dwarf stumbles into your camp, calling out a weak hail. A torn tunic, leaking boots, rusty war-hammer and empty (if sturdy-looking) backpack speak volumes of his fortunes of late… He lights up at sight of your meal, licking his lips and drooling slightly in the manner of the truly hungry. His coin pouch is clearly as flat as his shrunken stomach.[/i]
 
 ([b]NB:[/b] For the purpose of later Tutorial examples, please choose the [i]first[/i] Option below.)
 
 *comment Example 18 - Overwriting 'backpack' while Modifying 'gold' or 'rep2'
 
 *fake_choice
-    #Offer to buy the backpack for 1 gold and a meal.
+    #I will offer to buy the backpack for 1 gold and a meal.
         *set backpack true
         *set gold -1
         [i]"Beggars can't be choosers," he mutters, handing it over.[/i]
 
         [i]You have acquired a sturdy backpack for only one gold piece![/i]
 
-    #Take pity on the wanderer and offer to share my meagre supplies.
+    #I will take pity on the wanderer and offer to share my meager supplies.
         *set rep2 +5
         [i]You share your dwindling rations with the hungry dwarf.[/i]
 
@@ -38,7 +38,7 @@ In [b]Example 18[/b] (below) we are once again making use of both [i]overwriting
         *set rep2 -5
         [i]You politely but firmly refuse to aid the poor hungry dwarf.[/i]
         
-Although that example raises an immediate overall design point - should we use a new variable to keep track of just how miserly / charitable the main character proves to be, and what effects or consequences might this have later on in the story? - there are two more-specific issues here. Take another look at [b]Example 18[/b] . . . can you figure out what these might be?
+Although that example raises an immediate overall design point—should we use a new variable to keep track of just how miserly / charitable the main character proves to be, and what effects or consequences might this have later on in the story?—there are two more-specific issues here. Take another look at [b]Example 18[/b]… can you figure out what these might be?
 
 The first of these issues is that we are [i]assuming[/i] our protagonist doesn't yet possess a backpack and so may be interested in acquiring one, hence the first option. There's nothing wrong with this assumption if we [i]know[/i] it's the very first opportunity they've had to acquire one, but what if it's the second or indeed even later chance? Ideally, we don't want to keep repeating a particular option in cases where the player would no longer have any real interest in that option.
 
@@ -49,14 +49,14 @@ In [b]Example 19[/b] we are using a simple [b]${cmd13}[/b] command to check the 
 *comment Example 19 - Making an Option conditional on the value of a variable
 
 *fake_choice
-    *if (backpack = false) #Offer to buy the backpack for 1 gold and a meal.
+    *if (backpack = false) #I will offer to buy the backpack for 1 gold and a meal.
         *set backpack true
         *set gold -1
         [i]"Beggars can't be choosers," he mutters, handing it over.[/i]
         
         [i]You have acquired a sturdy backpack for only one gold piece![/i]
             
-    #Take pity on the wanderer and offer to share my meagre supplies.
+    #I will take pity on the wanderer and offer to share my meager supplies.
         *set rep2 +5
         [i]You share your dwindling rations with the hungry dwarf.[/i]
         
@@ -68,7 +68,7 @@ Note that in this type of situation (applying a condition to an Option) the othe
 
 You may recall that CS essentially reads a file [i]line-by-line[/i], so consider what is happening in [b]Example 19[/b]: When CS reaches the [b]${cmd13}[/b] line it checks the value of the [b]backpack[/b] variable, determines that this condition has [i]not[/i] been met (because a backpack was bought in the previous Choice, making the value of that variable currently [b]true[/b]) and so [i]skips[/i] everything immediately following / indented below it. Therefore only the bottom two options were displayed in-game.
 
-The second issue referred to earlier relates to the [b]gold[/b] value: does our protagonist actually have enough gold at this moment in time to buy the backpack? In [b]Example 20[/b] we are adding a check for this condition to the same [b]${cmd13}[/b] line, using [b]and[/b] between the two conditions to say that [i]both[/i] conditions must be met for this Option to be displayed.
+The second issue referred to earlier concerns the [b]gold[/b] value: does our protagonist actually have enough gold at this moment in time to buy the backpack? In [b]Example 20[/b] we are adding a check for this condition to the same [b]${cmd13}[/b] line, using [b]and[/b] between the two conditions to say that [i]both[/i] conditions must be met for this Option to be displayed.
 
 As the backpack can be bought from the desperate dwarf for a single gold piece, all we need to do is make sure that our protagonist has [i]more than[/i] zero gold currently available, using one of the 
 *link http://choicescriptdev.wikia.com/wiki/If conditional operators
@@ -82,14 +82,14 @@ possible in CS. (Note that for the purpose of the following example we are inten
 
 *fake_choice
     *if (backpack = false) and (gold > 0)
-        #Offer to buy the backpack for 1 gold and a meal.
+        #I will offer to buy the backpack for 1 gold and a meal.
             *set backpack true
             *set gold -1
             [i]"Beggars can't be choosers," he mutters, handing it over.[/i]
             
             [i]You have acquired a sturdy backpack for only one gold piece![/i]
             
-    #Take pity on the wanderer and offer to share my meagre supplies.
+    #I will take pity on the wanderer and offer to share my meager supplies.
         *set rep2 +5
         [i]You share your dwindling rations with the hungry dwarf.[/i]
         
@@ -103,7 +103,7 @@ This syntax is equally valid for the exact same reason as the first method - i.e
 
 We can also use [b]or[/b] in place of [b]and[/b] when checking two conditions. This would be used where only [i]one[/i] of the conditions needs to be met, rather than both, as shown in [b]Example 21[/b] below. (If you see only two Options, it's because you are neither a Hobbit nor a Thief of any race!)
 
-[i]"All you have to do," explains the scarred bandit leader patiently, as if speaking to a village dullard, "is go into that cavern there and bring me the old woman's cooking pot . . . This test will prove your ability as well as demonstrate your willingness to join our merry little band. Nothing could be simpler!"[/i]
+[i]"All you have to do," explains the scarred bandit leader patiently, as if speaking to a village dullard, "is go into that cavern there and bring me the old woman's cooking pot… This test will prove your ability as well as demonstrate your willingness to join our merry little band. Nothing could be simpler!"[/i]
 
 *comment Example 21 - Using 'or' to check if EITHER condition is valid
 
@@ -122,7 +122,7 @@ In [b]Example 21[/b] the first option would be displayed only if the protagonist
 
 Had we used [b]and[/b] instead of [b]or[/b] for those two conditions, [i]only[/i] a [b]Hobbit Thief[/b] would be capable of sneaking into the cave, not any other Hobbit (e.g. a Hobbit Warrior or Mage) nor a Thief of any other race. Study that [b]${cmd13}[/b] statement until you fully appreciate why this would be.
 
-Conditions can be applied in other ways too, not only to specific options. They can be used to improve interaction, enhance and vary narrative responses, and provide additional replay value for players of your game - all of which subjects will be covered in more detail before the end of the Tutorial. For now, however -
+Conditions can be applied in other ways too, not only to specific options. They can be used to improve interaction, enhance and vary narrative responses, and provide additional replay value for players of your game—all of which subjects will be covered in more detail before the end of the Tutorial. For now, however:
 
 [i][b]~~Exercise 16[/b] - Switch to [b]scene01[/b]. Following the 'race' ${cmd7}, add an imaginative opening story scene for our protagonist leading to an encounter and a choice to make, and use [b]${cmd7}[/b] to prompt for a decision to be made. Use the [b]${cmd13}[/b] command and either [b]race[/b] or [b]class[/b] variable to make one or more of the options conditional. Follow with general narrative.[/i]
 
@@ -136,33 +136,33 @@ The challenge of this particular exercise is not only to come up with a suitable
 
 *label revisit
 
-As you have accessed this particular lesson in a new session without again "playing through" some of the earlier ones, the Tutorial is currently missing some information for example purposes. We'll quickly run through some missing choices before commencing the lesson...
+As you have accessed this particular lesson in a new session without again "playing through" some of the earlier ones, the Tutorial is currently missing some information for example purposes. We'll quickly run through some missing choices before commencing the lesson…
 
 [i]Welcome, hero! By what name should lesser mortals address you?[/i]
 
 *fake_choice
-    #Xena
+    #Xena.
         *set pcname "Xena"
-    #Conan
+    #Conan.
         *set pcname "Conan"
-    #[i]None of the above[/i]
+    #[i]None of the above[/i].
         Please scribe your name, oh mighty hero!
         *input_text pcname
 
 [i]Pray tell, noble hero, how do you foresee yourself being portrayed in legend?[/i]
 
 *fake_choice
-    #A fearsome Warrior
+    #A fearsome Warrior.
         *set class "warrior"
         *set str 40
         *set int 20
         *set dex 30
-    #A powerful Mage
+    #A powerful Mage.
         *set class "mage"
         *set str 20
         *set int 40
         *set dex 30
-    #A skillful Thief
+    #A skillful Thief.
         *set class "thief"
         *set str 25
         *set int 25
@@ -171,28 +171,28 @@ As you have accessed this particular lesson in a new session without again "play
 [i]Your ears are rather . . . pointy, great hero. Which proud people do you claim as your own?[/i]
 
 *fake_choice
-    #Humans
+    #Humans.
         *set race "human"
         *set str +5
         *set int +5
         *set rep1 -5
         *set rep3 +10
         *set loc5 true
-    #Elves
+    #Elves.
         *set race "elf"
         *set int +5
         *set dex +5
         *set rep1 +20
         *set rep2 -10
         *set loc3 true
-    #Dwarves
+    #Dwarves.
         *set race "dwarf"
         *set str +15
         *set dex -5
         *set rep1 -10
         *set rep2 +20
         *set loc1 true
-    #Hobbits
+    #Hobbits.
         *set race "hobbit"
         *set dex +10
         *set str -10

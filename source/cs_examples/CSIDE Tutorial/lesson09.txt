@@ -1,5 +1,5 @@
 
-*comment NEW TO CHOICESCRIPT? CLICK 'Run this project' BUTTON TO START TUTORIAL
+*comment NEW TO CHOICESCRIPT? CLICK THE > 'Run project CSTutorial' BUTTON TO START TUTORIAL
 
 *comment ----------Ignore------------
 *comment Tutorial code required in the event this Lesson has been accessed in a new session without the reader first having set crucial values earlier.
@@ -34,7 +34,7 @@ In [b]Example 31[/b] we are using a variety of text formatting to display the pl
 
 We can also use [i]Temporary[/i] variables on the Stats page, albeit used here simply to define a [b]mean[/b] value for the purpose of [b]Example 33[/b], the [i]Opposed Pair[/i] chart variation. This chart type also uses just a single numeric value, but allows [i]two[/i] text labels to be assigned and so displays as shown on our example Stats page. Take another look at that to compare the two.
 
-In reality [b]mean[/b] would of course be a new [i]Permanent [/i]variable, not a Temporary variable as used here - you may recall during the encounter with the starving dwarf, we raised the [i]design issue[/i] of whether or not to record the protagonist's miserly / charitable nature as an actual Stat.
+In reality [b]mean[/b] would of course be a new [i]Permanent [/i]variable, not a Temporary variable as used here—you may recall during the encounter with the starving dwarf, we raised the [i]design issue[/i] of whether or not to record the protagonist's miserly / charitable nature as an actual Stat.
 
 Although intended specifically for the Stats page, it's worth noting that the [b]${cmd25}[/b] command can actually be used in any Scene file if appropriate to a situation in your game; perhaps something of a Sci-fi or futuristic nature, for instance.
 
@@ -56,13 +56,13 @@ This value is then used to choose between four different sections, each containi
 
 The [b]${cmd26}[/b] command, like [b]${cmd25}[/b], can actually be employed in any file, not just in [i]choicescript_stats[/i]. Generating a random value within a specific range can be very useful for various purposes (random paragraph responses, random redirection, random values for a combat system, etc.) but do bear in mind that adding randomness to your game can make things considerably harder to test properly as it's more difficult to guarantee that every possible eventuality has been covered. Use [b]${cmd26}[/b] selectively if at all, especially for a first game.
 
-In [b]Example 36[/b] we are again listing some main info in typical fashion, using text formatting for clarity, with the addition of making one particular item conditional - a [b]shield[/b] will be included in the list only if the player actually has one in their possession. If the [i]string[/i] is still "" blank as it was when [b]${cmd2}[/b]d in the [b]startup[/b] file, that line will not be displayed at all. Once again we are using [b]!=[/b] ([i]not equal to[/i]) for this condition, as used above for the [b]${cmd25}[/b] condition.
+In [b]Example 36[/b] we are again listing some main info in typical fashion, using text formatting for clarity, with the addition of making one particular item conditional—a [b]shield[/b] will be included in the list only if the player actually has one in their possession. If the [i]string[/i] is still "" blank as it was when [b]${cmd2}[/b]d in the [b]startup[/b] file, that line will not be displayed at all. Once again we are using [b]!=[/b] ([i]not equal to[/i]) for this condition, as used above for the [b]${cmd25}[/b] condition.
 
 And finally, in [b]Example 37[/b] we have decided to list [i]horizontally[/i] any additional [i]Inventory[/i] items the protagonist has in their possession, simply because it looks better this way. This method is however a little more complex, involving using 
 *link http://choicescriptdev.wikia.com/wiki/Concatenation Concatenation 
 (joining together multiple text [i]strings[/i] to form a single, longer [i]string[/i]) before displaying the end result.
 
-This type of inventory is made simpler by having a suitable default item (in our case, [b]Bedroll[/b]) assumed to [i]always[/i] be in the protagonist's possession. For each additional item which may be added, this allows us to [i]automatically[/i] first add to the [i]string[/i] a comma and a space - [b]&(",[/b] - followed by the actual item name; either "[i]Some Text[/i]" in the case of a [i]boolean[/i] variable currently [i]true[/i] (e.g. "Backpack"), or the actual value of a [i]string[/i] variable [i]if not blank[/i] (e.g. the value of [b]eq1[/b]). Any [i]false[/i] booleans or currently [b]""[/b] (blank) strings would not be included in the final list.
+This type of inventory is made simpler by having a suitable default item (in our case, [b]Bedroll[/b]) assumed to [i]always[/i] be in the protagonist's possession. For each additional item which may be added, this allows us to [i]automatically[/i] first add to the [i]string[/i] a comma and a space— [b]&(",[/b] —followed by the actual item name; either "[i]Some Text[/i]" in the case of a [i]boolean[/i] variable currently [i]true[/i] (e.g. "Backpack"), or the actual value of a [i]string[/i] variable [i]if not blank[/i] (e.g. the value of [b]eq1[/b]). Any [i]false[/i] booleans or currently [b]""[/b] (blank) strings would not be included in the final list.
 
 Without that default [b]Bedroll[/b] item, we would have to make each and every [b]&(",[/b] part conditional on there being an item already present in the list, making the whole thing more intricate as shown in the ChoiceScriptDev Wikia 
 *link http://choicescriptdev.wikia.com/wiki/Stats%26Stats_Screen#Simple_Inventory_System alternate inventory
@@ -76,33 +76,33 @@ Without that default [b]Bedroll[/b] item, we would have to make each and every [
 
 *label revisit
 
-As you have accessed this particular lesson in a new session without again "playing through" some of the earlier ones, the Tutorial is currently missing some information for example purposes. We'll quickly run through some missing choices before commencing the lesson...
+As you have accessed this particular lesson in a new session without again "playing through" some of the earlier ones, the Tutorial is currently missing some information for example purposes. We'll quickly run through some missing choices before commencing the lesson…
 
 [i]Welcome, hero! By what name should lesser mortals address you?[/i]
 
 *fake_choice
-    #Xena
+    #Xena.
         *set pcname "Xena"
-    #Conan
+    #Conan.
         *set pcname "Conan"
-    #[i]None of the above[/i]
+    #[i]None of the above[/i].
         Please scribe your name, oh mighty hero!
         *input_text pcname
 
 [i]Pray tell, noble hero, how do you foresee yourself being portrayed in legend?[/i]
 
 *fake_choice
-    #A fearsome Warrior
+    #A fearsome Warrior.
         *set class "warrior"
         *set str 40
         *set int 20
         *set dex 30
-    #A powerful Mage
+    #A powerful Mage.
         *set class "mage"
         *set str 20
         *set int 40
         *set dex 30
-    #A skillful Thief
+    #A skillful Thief.
         *set class "thief"
         *set str 25
         *set int 25
@@ -111,28 +111,28 @@ As you have accessed this particular lesson in a new session without again "play
 [i]Your ears are rather . . . pointy, great hero. Which proud people do you claim as your own?[/i]
 
 *fake_choice
-    #Humans
+    #Humans.
         *set race "human"
         *set str +5
         *set int +5
         *set rep1 -5
         *set rep3 +10
         *set loc5 true
-    #Elves
+    #Elves.
         *set race "elf"
         *set int +5
         *set dex +5
         *set rep1 +20
         *set rep2 -10
         *set loc3 true
-    #Dwarves
+    #Dwarves.
         *set race "dwarf"
         *set str +15
         *set dex -5
         *set rep1 -10
         *set rep2 +20
         *set loc1 true
-    #Hobbits
+    #Hobbits.
         *set race "hobbit"
         *set dex +10
         *set str -10

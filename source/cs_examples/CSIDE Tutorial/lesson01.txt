@@ -1,5 +1,5 @@
 
-*comment NEW TO CHOICESCRIPT? CLICK 'Run this project' BUTTON TO START TUTORIAL
+*comment NEW TO CHOICESCRIPT? CLICK THE > 'Run project CSTutorial' BUTTON TO START TUTORIAL
 
 [b]Lesson 1[/b] - [b][i]Projects & Scene Files[/i][/b]
 
@@ -29,6 +29,8 @@ While there is no hard and fast rule about how many different Scene files in tot
 
 Your Test Project should now comprise the five files we will use during this Tutorial in creation of an actual  working mini-game: namely [i]startup[/i], [i]choicescript_stats[/i], and three [i]scene[/i] files.
 
-It's worth noting that you can [i]drag & drop[/i] any file to change the order of listing to your liking. CSIDE will remember the actual file order of each project from one session to the next. Try this now by dragging the [b]choicescript_stats[/b] file to the bottom of the [b]Test Project[/b] listing. You can also click the icon to the left of each Scene name to colour-code each as a personal visual reference aid during development (e.g. I tend to use green to indicate "scene complete").
+It's worth noting that you can [i]drag & drop[/i] any file to change the order of listing to your liking. CSIDE will remember the actual file order of each project from one session to the next. Try this now by dragging the [b]choicescript_stats[/b] file to the bottom of the [b]Test Project[/b] listing.
+
+You can also click the icon to the left of each Scene name to color-code each as a personal visual reference aid during development (e.g. I tend to use green to indicate "scene complete").
 
 *finish Lesson #2 - [i]The Startup File[/i]

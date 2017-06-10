@@ -1,5 +1,5 @@
 
-*comment NEW TO CHOICESCRIPT? CLICK 'Run this project' BUTTON TO START TUTORIAL
+*comment NEW TO CHOICESCRIPT? CLICK THE > 'Run project CSTutorial' BUTTON TO START TUTORIAL
 
 *comment Example 31 - Using text formatting for legibility & clarity
 [i][b]Character Details[/b][/i]

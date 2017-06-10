@@ -1,18 +1,18 @@
 
-*comment NEW TO CHOICESCRIPT? CLICK 'Run this project' BUTTON TO START TUTORIAL
+*comment NEW TO CHOICESCRIPT? CLICK THE > 'Run project CSTutorial' BUTTON TO START TUTORIAL
 
 *comment ----------Ignore------------
 *comment Tutorial code required in the event this Lesson has been accessed in a new session without the reader first having selected a Race during lesson05.
 *if race = "Unknown"
     For the purpose of this particular Tutorial lesson, please select a Race:
     *fake_choice
-        #Human
+        #Human.
             *set race "human"
-        #Elf
+        #Elf.
             *set race "elf"
-        #Dwarf
+        #Dwarf.
             *set race "dwarf"
-        #Hobbit
+        #Hobbit.
             *set race "hobbit"
 *comment ----------Ignore------------
 
@@ -20,7 +20,7 @@
 
 Whichever way you look at it, or whatever tool(s) you use, writing [i]interactive[/i] fiction is in many ways considerably more demanding than writing an ordinary novel.
 
-As a method of developing text-based interactive games, however, CS naturally provides a variety of ways and means by which authors can strive to make things more interesting for, and responsive to, the reader. While it cannot write our stories for us, nor even help us to write [i]better[/i] (except perhaps as a tool with which to practise our passion!), what it can and does do is encourage us to [i]think[/i] more creatively simply by virtue of what it makes possible. Take the two-part [b]Example 27a[/b] & [b]27b[/b] (scroll down [b]lesson08[/b]) as a fairly typical [i]for instance[/i]:
+As a method of developing text-based interactive games, however, CS naturally provides a variety of ways and means by which authors can strive to make things more interesting for, and responsive to, the reader. While it cannot write our stories for us, nor even help us to write [i]better[/i] (except perhaps as a tool with which to practice our passion!), what it can and does do is encourage us to [i]think[/i] more creatively simply by virtue of what it makes possible. Take the two-part [b]Example 27a[/b] & [b]27b[/b] (scroll down [b]lesson08[/b]) as a fairly typical [i]for instance[/i]:
 
 *comment Example 27a - Using a series of *if statements to *set a "string" value
 
@@ -56,7 +56,7 @@ Narrative conditions can apply either to tiny [b]${cmd12}[/b] [i]strings[/i] as 
 
 Temporary variables are especially useful for providing conditional narrative, used in conjunction with the versatile [b]${cmd13}[/b] command or perhaps [b]${cmd13}[/b] / [b]${cmd14}[/b], depending on the precise circumstances. Virtually any action or reaction on the part of the player-character can be stored as a Temporary variable for use shortly after (provided it's used within the same Scene file).
 
-[b]Example 28a[/b] is one such possibility. Remember the starving dwarf whose backpack you 'appropriated' for a mere one gold piece and a meal? Let's assume that encounter was earlier in this Scene file and that we had, [i]at that time[/i], set [i]true[/i] a Temporary boolean variable called [i]extorted[/i]. Then, somewhat later...
+[b]Example 28a[/b] is one such possibility. Remember the starving dwarf whose backpack you 'appropriated' for a mere one gold piece and a meal? Let's assume that encounter was earlier in this Scene file and that we had, [i]at that time[/i], set [i]true[/i] a Temporary boolean variable called [i]extorted[/i]. Then, somewhat later…
 
 *comment a new temporary variable purely for Tutorial purposes
 
@@ -67,10 +67,10 @@ Temporary variables are especially useful for providing conditional narrative, u
 [i]You stumble into the sleepy village, utterly weary to the bone and with a stomach growling from hunger, but feeling triumphant in your successful escape from the bandits. You head toward the bright lights, laughter and merry music emanating from the local inn; a shining beacon of hope promising an end to your misery and misfortune. You push open the door, stagger over to the bar, and in a weary croak order a hot meal and warm bed for the night.[/i]
 
 *if extorted
-    [i]The dwarven innkeeper studies you intently, paying particular attention to your backpack. "You don't even remember me, do you?" he finally growls. You shake your head dumbly, but recognition slowly dawns. "Well, we're full, the kitchen is closed, and I'm all out of drink for the likes of you... On your way now, before I summon the guard. You and your backpack have a long trek ahead of you to the next village."[/i]
+    [i]The dwarven innkeeper studies you intently, paying particular attention to your backpack. "You don't even remember me, do you?" he finally growls. You shake your head dumbly, but recognition slowly dawns. "Well, we're full, the kitchen is closed, and I'm all out of drink for the likes of you… On your way now, before I summon the guard. You and your backpack have a long trek ahead of you to the next village."[/i]
     *goto main02
 *else
-    [i]You awaken the next morning refreshed and invigorated, eager and ready for the adventures ahead, having enjoyed a hearty meal and a good night's sleep entirely free of charge at 'The Friendly Dwarf' Inn in the quiet village of Sleepydale - courtesy of its grateful proprietor whom, a while back, you helped out on the road by sharing your limited rations. You stretch luxuriously and smile with contentment. Sometimes, what goes around, comes around.[/i]
+    [i]You awaken the next morning refreshed and invigorated, eager and ready for the adventures ahead, having enjoyed a hearty meal and a good night's sleep entirely free of charge at 'The Friendly Dwarf' Inn in the quiet village of Sleepydale—courtesy of its grateful proprietor whom, a while back, you helped out on the road by sharing your limited rations. You stretch luxuriously and smile with contentment. Sometimes, what goes around, comes around.[/i]
     *goto main02
 
 *label main02
@@ -127,39 +127,39 @@ As an example of the latter, in [b]Example 30[/b] the entire third paragraph is 
 [i]"I'm just passing through, I mean you no harm," you say hastily, raising your empty hands.[/i]
 
 *if race = "elf"
-    [i]The huntress frowns, clearly undecided. "You would claim kinship with me and mine, and yet I see no marks of family or clan upon your brow, no sign that you are anything other than what you appear - a renegade, outcast, or perhaps even a Banished One, driven from among your own people for unspeakable acts..." She tenses and aims anew. "What proof do you offer to stay my hand, vagrant?" she snarls.[/i]
+    [i]The huntress frowns, clearly undecided. "You would claim kinship with me and mine, and yet I see no marks of family or clan upon your brow, no sign that you are anything other than what you appear—a renegade, outcast, or perhaps even a Banished One, driven from among your own people for unspeakable acts…" She tenses and aims anew. "What proof do you offer to stay my hand, vagrant?" she snarls.[/i]
     *goto main01
 
 *elseif race = "dwarf"
-    [i]"I like not your kind, master dwarf," the huntress replies through clenched teeth. "Long have your people despoiled our lands, trespassed without so much as a by-your-leave, arrogantly laying claim to all they choose... Give me just one good reason why I should not now leave your loathsome, hairy, stunted corpse for the crows and maggots to feed upon?"[/i]
+    [i]"I like not your kind, master dwarf," the huntress replies through clenched teeth. "Long have your people despoiled our lands, trespassed without so much as a by-your-leave, arrogantly laying claim to all they choose… Give me just one good reason why I should not now leave your loathsome, hairy, stunted corpse for the crows and maggots to feed upon?"[/i]
     *goto main01
 
 *elseif race = "hobbit"
-    [i]The huntress lowers her bow, her mouth creasing in an amused smile. "Well, grateful indeed am I that one of the little folk would spare me their legendary wrath... Come, my own camp is just over the hill. I have a fine brace of conies roasting as we speak. Join me for supper, if you please. I should welcome a tale of your grand adventures in these troubled lands."[/i] 
+    [i]The huntress lowers her bow, her lips creasing in an amused smile. "Well, grateful indeed am I that one of the little folk would spare me their legendary wrath… Come, my own camp is just over the hill. I have a fine brace of conies roasting as we speak. Join me for supper, if you please. I should welcome a tale of your grand adventures in these troubled lands."[/i] 
     *goto main01
 *else
-    [i]The huntress nods her understanding, but only partially lowers her bow. "So you may claim, but your kind are neither often seen nor are they especially welcome in these parts. Come, you will appear before the village elders and explain your presence in our lands... or reach for your weapon now, as you please." She shrugs slightly and smiles, chillingly.[/i]
+    [i]The huntress nods her understanding, but only partially lowers her bow. "So you may claim, but your kind are neither often seen nor are they especially welcome in these parts. Come, you will appear before the village elders and explain your presence in our lands… or reach for your weapon now, as you please." She shrugs slightly and smiles, chillingly.[/i]
     *goto main01
 
 *label main01
 
 As you may expect, there is no real limit to the number of different [b]${cmd15}[/b] conditions able to be included in such a range, just so long as the whole thing starts with an [b]${cmd13}[/b] and ends with [b]${cmd14}[/b].
 
-In this sort of situation the [b]${cmd14}[/b] is used as a 'catch-all', in the event that [i]none of the above conditions are true[/i], which is why [b]${cmd14}[/b] alone [i]never[/i] has a specific condition of its own. In this particular case it would apply to a Human protagonist as well as one of any other Race not expressly included above, hence the general wording "[i]...your kind...[/i]" used in the narrative.
+In this sort of situation the [b]${cmd14}[/b] is used as a 'catch-all', in the event that [i]none of the above conditions are true[/i], which is why [b]${cmd14}[/b] alone [i]never[/i] has a specific condition of its own. In this particular case it would apply to a Human protagonist as well as one of any other Race not expressly included above, hence the general wording "[i]…your kind…[/i]" used in the narrative.
 
 *page_break [i]Other Narrative Considerations[/i] 
 
 To round off the [i]Enhancing Narrative[/i] lesson, a few general thoughts and suggestions based on experience some readers may be lacking, ergo: feel free to take this section with a pinch of salt, and to write [i]your[/i] stories [i]your[/i] way.
 
-The widely-accepted best format for interactive fiction of this type is [i]second-person narrative[/i], whereby the author is the narrator and the reader assumes the role of the main character - the [i]protagonist[/i] - in the story. This is typified by "You" as in [i]you do this[/i] or [i]you see that[/i]. While both first- and third-person narrative is possible in interactive faction, those forms generally do not always do as good a job of actually immersing the reader in the role of a specific character.
+The widely-accepted best format for interactive fiction of this type is [i]second-person narrative[/i], whereby the author is the narrator and the reader assumes the role of the main character—the [i]protagonist[/i]—in the story. This is typified by "You" as in [i]you do this[/i] or [i]you see that[/i]. While both first- and third-person narrative is possible in interactive faction, those forms generally do not always do as good a job of actually immersing the reader in the role of a specific character.
 
-By the same token, for second-person narrative the best way to word choice Options is generally as "I", as in [i]I will do this[/i] or [i]I will tell him that[/i]. Remember, in interactive fiction the reader is being invited to play [i]an active role[/i] in the story, so every choice they make should be [i]personal to them[/i], hence "I", "me" or "my" for Options text where appropriate, not "you" or "your" as used in the narrative.
+By the same token, for second-person narrative the best way to word choice Options is generally in the first person, as in [i]I will do this[/i] or [i]I will tell him that[/i]. Remember, in interactive fiction the reader is being invited to play [i]an active role[/i] in the story, so every choice they make should be [i]personal to them[/i], hence "I", "me" or "my" for Options text where appropriate, not "you" or "your" as used in the narrative.
 
-Also worth bearing in mind is that second-person narrative works best written in the [i]present tense[/i] as opposed to [i]past tense[/i] - for the main character (the reader) it is all happening [i]now[/i]:
+Also worth bearing in mind is that second-person narrative works best written in the [i]present tense[/i] as opposed to [i]past tense[/i]—for the main character (the reader) it is all happening [i]now[/i]:
 
 [i]"Get away from me!" [b]says[/b] the girl[/i], rather than [i]"Get away from me!" [b]said[/b] the girl[/i].
 
-Above all, it is worth remembering that this is a global medium (so be careful about using such as local slang terms or derogatory stereotypes, unless particularly suited to your story for some reason) and one ultimately accessed by the majority of readers via relatively tiny devices. The "[i]dreaded wall of text[/i]" when viewed on a typical computer screen may be seen as the "[i]dreaded Great Wall of China[/i]" when viewed on a very small screen... Aim to make good use of such as [b]${cmd3}[/b], [b]${cmd8}[/b] and [b]${cmd7}[/b] to break up your narrative at fairly regular intervals, and thereby keep things more interesting, engaging and compelling for the reader.
+Above all, it is worth remembering that this is a global medium (so be careful about using such as local slang terms or derogatory stereotypes, unless particularly suited to your story for some reason) and one ultimately accessed by the majority of readers via relatively tiny devices. The "[i]dreaded wall of text[/i]" when viewed on a typical computer screen may be seen as the "[i]dreaded Great Wall of China[/i]" when viewed on a very small screen… Aim to make good use of such as [b]${cmd3}[/b], [b]${cmd8}[/b] and [b]${cmd7}[/b] to break up your narrative at fairly regular intervals, and thereby keep things more interesting, engaging and compelling for the reader.
 
 *page_break [i]Final Exercises[/i]
 
