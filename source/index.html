@@ -234,7 +234,7 @@
     								<!-- ko if: id == 'settings' -->
     									<script type="text/html" id="setting-option-template">
     										<!-- ko if: getType() == "binary" -->
-    											<li data-bind="click: toggle">
+    											<li data-bind="click: toggle, visible: isVisible">
                             <i data-bind="css: getValue() ? 'fa fa-check-square-o fa-lg fa-fw setting-on' : 'fa fa-square-o fa-lg fa-fw setting-off'"></i>
     												<span class="setting-name" data-bind="text: getName()"></span>
                             <br>
@@ -242,7 +242,7 @@
     											</li>
     										<!-- /ko -->
     										<!-- ko if: getType() != "binary" -->
-    											<li>
+    											<li data-bind="visible: isVisible">
     												<span class="setting-name" data-bind="text: getName()"></span>
                             <br>
                             <span class="desc" data-bind="text: getDesc()"></span>

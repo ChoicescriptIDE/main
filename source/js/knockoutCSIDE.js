@@ -1099,6 +1099,7 @@ function IDEViewModel() {
     var type = settingData.type || "binary";
     var cat = settingData.cat || "app";
     var desc = ko.observable(settingData.desc || "");
+	var visible = ko.observable(true);
 
     if (type === "binary") {
       var options = [{
@@ -1134,6 +1135,9 @@ function IDEViewModel() {
     setting.getDesc = ko.computed(function() {
       return desc();
     }, this);
+	setting.isVisible = ko.computed(function() {
+      return visible();
+	}, this);
 
     //MUTATOR METHODS
     setting.setDesc = function(val) {
@@ -1160,6 +1164,10 @@ function IDEViewModel() {
         value(newVal);
       }
     }
+	setting.setVisibility = function(newVal) {
+      if (typeof newVal == "boolean")
+        visible(newVal);
+	}
 
     setting.extAPI = {
       getName: setting.getName,
@@ -1167,7 +1175,8 @@ function IDEViewModel() {
       getDesc: setting.getDesc,
       getValue: setting.getValue,
       toggle: setting.toggle,
-      getOptions: setting.getOptions
+      getOptions: setting.getOptions,
+	  isVisible: setting.isVisible
     }
   }
 
