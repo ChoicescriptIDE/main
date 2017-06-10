@@ -24,14 +24,14 @@
 | Action                              | Windows             | Mac                 |
 | ----------------                    | --------            | --------            |
 | Close selected scene                | CTRL + W            | CMD + W             |
-| Close selected Project (all scenes) | SHIFT + CTRL + W    | SHIFT + CMD + W     |
-| Add new scene to selected Project   | CTRL + N            | CMD + N             |
+| Close selected project (all scenes) | SHIFT + CTRL + W    | SHIFT + CMD + W     |
+| Add new scene to selected project   | CTRL + N            | CMD + N             |
 | Save selected scene                 | CTRL + S            | CMD + S             |
-| Save selected Project (all scenes)  | SHIFT + CTRL + S    | SHIFT + CMD + S     |
+| Save selected project (all scenes)  | SHIFT + CTRL + S    | SHIFT + CMD + S     |
 | Open scenes                         | CTRL + O            | CMD + O             |
-| Open all scenes of selected Project | SHIFT + CTRL + O    | SHIFT + CMD + O     |
-| Run QuickTest on selected Project   | CTRL + T            | CMD + T             |
-| Run RandomTest on selected Project  | SHIFT + CTRL + T    | SHIFT + CMD + T     |
+| Open all scenes of selected project | SHIFT + CTRL + O    | SHIFT + CMD + O     |
+| Run Quicktest on selected project   | CTRL + T            | CMD + T             |
+| Run Randomtest on selected project  | SHIFT + CTRL + T    | SHIFT + CMD + T     |
 | Quit application                    | SHIFT + CTRL + Q    | CMD + Q             |
 | Toggle panel section                | SHIFT + CTRL + .    | SHIFT + CMD + .     |
 | Toggle scene section                | SHIFT + CTRL + ,    | SHIFT + CMD + ,     |
