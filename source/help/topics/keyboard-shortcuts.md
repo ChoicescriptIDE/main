@@ -2,7 +2,7 @@
 
 ### Editor Shortcuts
 
-| Action                         | Windows             | MAC OS X            |
+| Action                         | Windows             | Mac                 |
 | ----------------               | --------            | --------            |
 | Undo last change               | CTRL + Z            | CMD + Z             |
 | Redo last (undone change)      | CTRL + Y            | SHIFT + CMD + Z     |
@@ -21,7 +21,7 @@
 
 ### Global Shortcuts
 
-| Action                              | Windows             | MAC OS X            |
+| Action                              | Windows             | Mac                 |
 | ----------------                    | --------            | --------            |
 | Close selected scene                | CTRL + W            | CMD + W             |
 | Close selected Project (all scenes) | SHIFT + CTRL + W    | SHIFT + CMD + W     |
@@ -41,7 +41,7 @@
 
 ### Find/Search/Replace Shortcuts
 
-| Action                              | Windows             | MAC OS X                 |
+| Action                              | Windows             | Mac                      |
 | ----------------                    | --------            | --------                 |
 | Find                                | CTRL + F            | CMD + F                  |
 | Find next                           | CTRL + G            | CMD + G                  |
