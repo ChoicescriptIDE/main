@@ -2883,6 +2883,10 @@ function IDEViewModel() {
         "desc": "",
         "apply": function(channel) {
           var self = this;
+          if (platform == "web-dropbox") {  // no update-channel on web version
+            self.setVisibility(false);
+            return;
+          }
           if (typeof autoUpdateCheckFn != "undefined" && autoUpdateCheckFn) {
             clearInterval(autoUpdateCheckFn);
           }
