@@ -5,7 +5,7 @@
 | Action                         | Windows             | Mac                 |
 | ----------------               | --------            | --------            |
 | Undo last change               | CTRL + Z            | CMD + Z             |
-| Redo last (undone change)      | CTRL + Y            | SHIFT + CMD + Z     |
+| Redo last change               | CTRL + Y            | SHIFT + CMD + Z     |
 | Cut                            | CTRL + X            | CMD + X             |
 | Copy                           | CTRL + C            | CMD + C             |
 | Paste                          | CTRL + V            | CMD + V             |
