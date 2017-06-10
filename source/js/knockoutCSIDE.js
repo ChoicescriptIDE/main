@@ -4502,7 +4502,7 @@ function IDEViewModel() {
           forcedValue ? thisFileFolder.selected(forcedValue) : thisFileFolder.selected() ? thisFileFolder.selected(false) : thisFileFolder.selected(true);
           self.selection.push(thisFileFolder);
         }
-        if (data.isFolder && !self.selectingFolder) {
+        if (data.isFolder) {
           thisFileFolder.open = function() {
             self.redraw(thisFileFolder.path);
           }
