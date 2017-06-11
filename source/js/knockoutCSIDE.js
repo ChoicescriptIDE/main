@@ -56,6 +56,12 @@ function IDEViewModel() {
     });
     return target;
   };
+  ko.extenders.lowerCase = function(target, option) {
+    target.subscribe(function(val) {
+      target(val.toLowerCase());
+	});
+    return target;
+  };
   ko.extenders.callFunc = function(target, option) {
     target.subscribe(function() {
       option.func();
@@ -486,7 +492,10 @@ function IDEViewModel() {
       normalizePaths: ""
     });
     path(sceneData.path);
-    var name = ko.observable(getSceneName(path()));
+    var name = ko.observable("").extend({
+      lowerCase: ""
+    });
+	name(getSceneName(path()));
     var isImportant = name().toUpperCase().match(reservedSceneNames);
     var source = sceneData.source || platform; //won't change - so doesn't need to be an observable?
     var loaded = ko.observable(false);
