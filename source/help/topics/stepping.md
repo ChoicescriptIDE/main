@@ -18,4 +18,4 @@ Stepping slows down the processing of your game code to let you to check for err
 
 - [Testing & Debugging](topics/testing-and-debugging.md "Testing & Debugging")
 
-- [QuickTest & RandomTest](topics/quicktest-and-randomtest.md "QuickTest & RandomTest")
+- [Quicktest & Randomtest](topics/quicktest-and-randomtest.md "Quicktest & Randomtest")
