@@ -16,7 +16,7 @@ If the name is valid, CSIDE will create a new folder for you. A confirmation mes
 
 The default folder location (.../ChoiceScript Projects/) can be changed in the Settings tab.
 
-A new project always contains the two compulsory files required for every ChoiceScript game: 'startup' and 'choicescript_stats'. Additional scene files can later be added to your new project as needed.
+A new project always contains the two compulsory files required for every ChoiceScript game: 'startup' and 'choicescript_stats'. Additional scene files can be added to your new project as needed.
 
 
 ### Importing an Existing Project
