@@ -31,7 +31,7 @@ As you play-test your game, the Console logs entries relating to variable creati
 
 **General Console Commands**: The Console will accept and log any correct command; an invalid command will return an error message. The command line buffers recent entries, so mistyped commands can be quickly corrected by pressing UP, making the necessary correction, and then pressing ENTER. Recent commands can be quickly cycled through by using UP/DOWN, allowing easy re-entry of common commands.
 
-**Using the *console_ Command in Game Files**: For purposes of thorough repeat testing, you can also insert certain *console_ commands directly into your game's scene files. See below under 'Console Commands in Scene Files' for details.
+**Using the \*console_ Command in Game Files**: For purposes of thorough repeat testing, you can also insert certain \*console_ commands directly into your game's scene files. See below under 'Console Commands in Scene Files' for details.
 
 > Note: Commands entered into the Console only impact the main game running in the Game Tab Panel. The Console does not affect a game running in Popout. This can be useful for comparing your current game's output against a version where you have input different variables, or made other changes via Console.
 
@@ -65,29 +65,29 @@ As you play-test your game, the Console logs entries relating to variable creati
 
 You can use the following commands to choose which variable values the Console will log and display during play-testing.
 
-\*help**: Displays useful reminders for interacting with the Console.
+**\*help**: Displays useful reminders for interacting with the Console.
 
-\*help [command name]**: Provides information about the named command. For instance, '\*help track_all' would return information about the \*track_all function.
+**\*help [command name]**: Provides information about the named command. For instance, '\*help track_all' would return information about the \*track_all function.
 
-\*clear**: Wipes all current logs, clearing the Console panel.
+**\*clear**: Wipes all current logs, clearing the Console panel.
 
-\*track [var1] [var2] [var3] [etc]**: Tracks the individually named variable(s), e.g. \*track strength wisdom charity
+**\*track [var1] [var2] [var3] [etc]**: Tracks the individually named variable(s), e.g. \*track strength wisdom charity
 
-\*untrack [var1] [var2] [var3] [etc]**: Stops tracking the individually named variable(s), e.g. \*untrack strength wisdom charity
+**\*untrack [var1] [var2] [var3] [etc]**: Stops tracking the individually named variable(s), e.g. \*untrack strength wisdom charity
 
-\*untrack**: Stops tracking all variables which the Console is currently set to individually track.
+**\*untrack**: Stops tracking all variables which the Console is currently set to individually track.
 
-\*track_list**: Lists the names and current values of all variables being individually tracked. Returns 'Empty' if no variables are currently individually tracked.
+**\*track_list**: Lists the names and current values of all variables being individually tracked. Returns 'Empty' if no variables are currently individually tracked.
 
-\*track_list [optional filter]**: As above, but lists only those variables containing the filter text, e.g. stats, temps, or any combination of characters precisely matching any part of the variable name. For instance, typing '*track enemy1 enemy2 friend1' and then using '*track_list enemy' would return 'enemy1' and 'enemy2' but not 'friend1'.
+**\*track_list [optional filter]**: As above, but lists only those variables containing the filter text, e.g. stats, temps, or any combination of characters precisely matching any part of the variable name. For instance, typing '*track enemy1 enemy2 friend1' and then using '*track_list enemy' would return 'enemy1' and 'enemy2' but not 'friend1'.
 
-\*track_all**: Overrides but does not remove the individual track variable list and logs all variable changes.
+**\*track_all**: Overrides but does not remove the individual track variable list and logs all variable changes.
 
-\*untrack_all**: Turns off track_all. Individually-tracked variables will continue to be logged in the Console panel.
+**\*untrack_all**: Turns off track_all. Individually-tracked variables will continue to be logged in the Console panel.
 
-\*run**: Loads and runs the currently-selected project as if you had refreshed the game using the 'Run project' icon on the project header bar.
+**\*run**: Loads and runs the currently-selected project as if you had refreshed the game using the 'Run project' icon on the project header bar.
 
-Note that a fresh 'run' (for instance, after making and saving changes in one or more scene files) will deactivate the current Console tracking settings, meaning the required tracking commands must be entered again. Conversely, when restarting, either by using the *restart command in Console or clicking the 'restart' button in the Game Tab panel, the game repeats from the start using the default data already held in memory. This preserves both the most recently run version of the game and the current Console tracking settings.
+> Note that a fresh 'run' (for instance, after making and saving changes in one or more scene files) will deactivate the current Console tracking settings, meaning the required tracking commands must be entered again. Conversely, when restarting, either by using the \*restart command in Console or clicking the 'restart' button in the Game Tab panel, the game repeats from the start using the default data already held in memory. This preserves both the most recently run version of the game and the current Console tracking settings.
 
 It is also possible to make a list of variables you would like the Console to track, and include them in the text of your game. This can save considerable time and streamline repeat testing. For more information, see the section below on using Console commands in scene files.
 
@@ -98,23 +98,29 @@ You can also insert certain \*console commands directly into the code of your sc
 
 The following commands may be used in the game code, and function as described above:
 
-	\*console_clear
-	\*console_track [var1] [var2] [etc.]
-	\*console_untrack [var1] [var2] [etc.]
-	\*console_track_list [optional filter]
-	\*console_track_all
-	\*console_untrack_all
-	\*console_log [output]
+\*console_clear
+
+\*console_track [var1] [var2] [etc.]
+
+\*console_untrack [var1] [var2] [etc.]
+
+\*console_track_list [optional filter]
+
+\*console_track_all
+
+\*console_untrack_all
+
+\*console_log [output]
 
 In addition, \*console_log can print the value of a variable (or other valid expression) into the Console at a particular point in your game. For example:
 
-	\*console_log strength
+> \*console_log strength
 
 This command will display the current in-game value of the variable 'strength' in the Console panel.
 
 If you type:
 
-	\*console_log (((var1 > 50) and (var2 < 50)) and (var3 < 50)) or (var4 != "Unknown")
+> \*console_log (((var1 > 50) and (var2 < 50)) and (var3 < 50)) or (var4 != "Unknown")
 
 The Console will display either 'true' or 'false depending on the current evaluation of the expression.
 
@@ -122,7 +128,7 @@ You could use this to insert a \*console_log line just before a \*choice where t
 
 \*console_log is also useful to note or comment on the information currently displayed in the Console. For instance, with the current example, if that expression affects the text beneath option one, you could place this command on the line above the variable check:
 
-	\*console_log "The following line is the evaluation for Option 1"
+> \*console_log "The following line is the evaluation for Option 1"
 
 Then the text 'The following line is the evaluation for Option 1' would display in the Console before the value output for the variable expression.
 
