@@ -15,9 +15,9 @@ There is no technical limit on the number of scenes you can create. However, it 
 
 If this is your first foray into developing ChoiceScript games, there are a couple of old but very useful articles which can give you some pointers for planning your game's design:
 
-[How to plan a ChoiceScript game](https://www.choiceofgames.com/2010/05/planning-a-choicescript-game/)
+- [How to plan a ChoiceScript game](https://www.choiceofgames.com/2010/05/planning-a-choicescript-game/)
 
-[Vignette (scene) Structure](https://www.choiceofgames.com/2010/01/vignette-structure-as-a-means-of-controlling-branching/)
+- [Vignette (scene) Structure](https://www.choiceofgames.com/2010/01/vignette-structure-as-a-means-of-controlling-branching/)
 
 
 **Next Topic**: [Keyboard Shortcuts](topics/keyboard-shortcuts.md "Keyboard Shortcuts")
