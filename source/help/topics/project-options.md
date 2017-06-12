@@ -1,58 +1,63 @@
 ## Project Options
 
-CSIDE enables you to easily and directly manipulate one or more ChoiceScript game projects in various ways and means. This page gives you a brief overview of these ways and means. You can check out [Projects](topics/projects.md "Projects") for a more
-detailed explanation on what they are and how they're represented and handled by CSIDE.
+CSIDE is designed so you can easily edit one or more ChoiceScript projects, developing and testing your games in a single, streamlined environment. You can create, reorder, and run your projects, control your individual scenes, and more!
 
+This page gives a brief overview of project options. Check out [Projects](topics/projects.md "Projects") for a more detailed explanation of what projects are and how CSIDE handles them.
 
 ### General Functionality
 
-- Brand new projects can be created within CSDE by clicking the '+' icon alongside the 'Scenes & Projects' header.
+- Brand new projects can be created by clicking the '+' icon alongside the 'Scenes & Projects' header.
 
-- Existing game files can be imported into CSIDE (effectively creating a new Project but using existing content) by clicking the folder alongside the 'Scenes & Projects' header and selecting the actual .txt files to import.
+- Existing game files can be imported into CSIDE (effectively creating a new project in CSIDE from existing content). Click the folder ('open scenes') button alongside the 'Scenes & Projects' header, then select the .txt files you want to import.
 
 
 ### Project Header Bar
 
-- A Project can be renamed at any time by double-clicking the Project header bar.
+- **Rename**: A project can be renamed at any time by double-clicking the project header bar.
 
-- Projects can be reordered as desired by dragging & dropping a Project header bar above or below other projects in the list. The new Project order will persist between sessions.
+- **Reorder**: Projects can be reordered by dragging and dropping a project header bar above or below other projects in the list. The new project order will persist between sessions.
 
-- A project's entire scene list (excluding only the Project header bar itself) can be hidden - or revealed - by clicking the eye icon to the left of the Project name, reducing clutter without requiring that a Project be closed.
+- **Hide Scenes**: A project's entire scene list (excluding only the project's header bar) can be hidden or revealed by clicking the eye ('toggle visibility') button to the left of the project's name. This reduces clutter while leaving the project open for easy access.
 
-- Save Project: clicking the floppy disk icon on the header bar will save all currently unsaved scene files related to this project.
+- **Save Project**: Click the floppy disk ('save project') button on the header bar to save all currently unsaved scene files relating to that project. The floppy disk indicators on all unsaved scene files will then turn from red to grey, indicating that there are no unsaved changes.
 
-- Add New Scene: clicking the '+' icon on the Project header bar will add a new 'Untitled' scene file to this project. (Clicking the new scene immediately after will allow you to instantly rename it.)
+- **Add New Scene**: Click the '+' ('add scene') button on the project header bar to add a new 'Untitled' scene file to that project. To rename the scene, click it immediately after creation. After scene creation, rename using double-click to select the scene and open the name editor.
 
-- Run Game: clicking the right-arrow icon on the header bar will run this Project within CSIDE and open / display it in the Game Tab panel on the right of the user interface.
+- **Run Game**: Click the '►' ('run project') button on the project header bar to run your project within CSIDE. This will open or display the project in the Game Tab Panel on the right of the application.
+
 
 
 ### Project Context Menu
 
-Additional Project options are available via a context menu, either by right-clicking a project's header bar or by selecting any scene file related to that Project and clicking the ('Project') Folder icon at the top-left of the user interface. The Project menu options are as follows:
+Additional project options are available via a context menu, accessed by right-clicking a project header bar. Alternatively, select any scene file related to that project and use the app's main menu ('Project') button. The main menu in Windows and Web versions can be found in the top-left, above the Scenes & Projects tab. On Mac a native app toolbar is used.
 
-- **Add New Scene**: adds a new 'Untitled' scene file to the selected project.
+Project menu options are as follows:
 
-- **Open All Scenes**: opens (i.e. imports into this project) all valid .txt files located in the Project folder. Used in the event that not all scene files located in this folder have previously been opened within CSIDE, or if one of more scene files have subsequently been closed.
+- **Add New Scene**: Adds a new 'Untitled' scene file to the selected project.
 
-- **Reload All Scenes**: ensures that file content in CSIDE matches that of the saved .txt files (in the event, for instance, that one or more files have been edited outside of CSIDE while the software is running).
+- **Open All Scenes**: Opens (that is, imports into this project) all valid .txt files located in the same folder. This is used to open additional scene files in the project, in the instance that one or more scene files have been closed, or if some scene files were not selected when the project was imported to CSIDE.
 
-- **Review - Word Count**: pops up a window displaying the approximate word count of the Project as a whole, both including and excluding command lines.
+- **Reload All Scenes**: Ensures that file content in CSIDE matches that of the saved .txt file. This can be used if one or more files have been edited outside of CSIDE whilst it is still running.
 
-- **Import - Image (as scene)**: by default, when running a play-test game within CSIDE any use of the \*image command in your scripting will attempt to reference the external image from the project's directory (the same folder as the scene files). If desired, however, with the 'Import - Image' option you can also convert a copy of your intended image into a data string that can be stored directly inside its own scene file. This comes with a small overhead in terms of image size, but allows support for images in compiled games. If the image conversion is successful, a pop-up window will display with a \*gosub_scene command for you to copy & paste into your other scene files, wherever you wish for the image to appear in your game.
-> **WARNING** As image scenes contain the data for an entire image file, they have the potential to get rather large. As such you should avoid opening them within CSIDE for performance reasons - you would get no benefit from doing so. CSIDE itself ignores all scene files prefixed with 'csideimg' when being asked to 'Open All Scenes' etc. If you wish to replace an image via an image scene, simply delete the old one and then reimport the image.
+- **Review - Word Count**: Opens a window with the word count of the project as a whole, both including and excluding command lines. This will also display a word count of all selected text in all of that project's open scenes.
 
-- **Export - All Scenes to folder**: saves a copy of the entire Project to a different, specified folder (either new or existing). Useful for producing a separate backup of your Project at periodic intervals during development, or for publishing a beta test version of your game to places such as the 'Public' folder of a Dropbox account.
+- **Import - Image (As Scene)**: Allows you to import an image into your project, encoded within a scene file. See the topic on [Image Scenes](topics/image-scenes.md "Image Scenes") for more information.
 
-- **Export - Compiled Game**: creates a compiled HTML version of your current Project able to be uploaded to a website - or perhaps simply placed in an ordinary Dropbox folder - for reasons such as public beta testing purposes (see the [Publishing & Exporting](topics/publishing-and-exporting.md "Publishing & Exporting") topic for further details).
+- **Export - All Scenes to Folder**: Saves a copy of the entire project to a new or existing folder. This is useful for producing regular backups of a project during development.
 
-- **Test Project - Quicktest**: pops up the Test window and runs the Project through the automated - [Quicktest](topics/quicktest-and-randomtest.md "QuickTest & RandomTest") routine. In addition to helping resolve scripting errors, a finished Project must pass this test in order to be considered for publication by Choice of Games LLC.
+- **Export - Compiled Game**: Creates a compiled HTML version of the current project, which can be then played in a browser or uploaded to a website. Please see the [Publishing & Exporting](topics/publishing-and-exporting.md "Publishing & Exporting") topic for more details. This is only supported in the desktop versions of CSIDE.
 
-- **Test Project - Randomtest**: pops up the Test window and runs the Project through the automated [Randomtest](topics/quicktest-and-randomtest.md "QuickTest & RandomTest") routine. In addition to helping resolve logic / continuity errors, a finished Project must pass this test in order to be considered for publication by Choice of Games LLC.
+- **Test Project - Quicktest**: Brings up the Quicktest Window and runs the project through the automated test routine. Quicktest helps find and analyse scripting errors; in addition, a finished project must pass Quicktest in order to be considered for publication by Choice of Games/Hosted Games LLC. Please see [Testing & Debugging](topics/testing-and-debugging.md "Testing & Debugging") for more details.
 
-- **Open Folder in Finder/Explorer**: enables direct access to the folder in which the project's .txt files are located. This is also the only means by which you may actually permanently delete an unwanted Project folder from within CSIDE - by selecting that folder in Explorer and hitting your Delete key.
+- **Test Project - Randomtest**: Brings up the Randomtest Window and runs the project through the automated test routine. Randomtest helps find and analyse logic and continuity errors; in addition, a finished project must pass Randomtest in order to be considered for publication by Choice of Games/Hosted Games LLC. Please see [Testing & Debugging](topics/testing-and-debugging.md "Testing & Debugging") for more details.
 
-- **Show / Hide Project**: will hide from view (or reveal, if hidden) the project's entire file list excluding only the Project header bar itself, reducing clutter without requiring that a Project be closed. (N.B. Clicking the eye icon to the left of the Project name achieves the same effect.)
+- **Open Folder in Explorer/Finder**: Displays the folder containing a project's .txt files in either Explorer or Finder. This is the only way to permanently delete a project folder from within CSIDE. To delete the project folder, select it in Explorer/Finder and press DEL (Windows) or CMD-DEL (Mac).
 
-- **Close Project**: removes the Project from CSIDE in its entirety, but does not actually delete the folder itself nor any of its contents. A closed Project may later be reopened using the main 'Open new scene files' option, as if importing it for the very first time.
+> **Note**: Deletion of its files does not automatically remove the project listing from within CSIDE. After deleting the project from Explorer/Finder, select 'close project' from the project menu to remove its listing from the Scenes & Projects tab.
+
+- **Show/Hide Project**: Hides or reveals the project's entire scene list, excluding only the project header. This reduces clutter while leaving the project open for easy access. (N.B. Clicking the eye ('toggle visibility') button to the left of the project name also hides/reveals the scene list.)
+
+- **Close Project**: Removes the entire project from CSIDE. This does not delete the project folder or its contents. Any closed project may be reopened using the 'Open New Scene Files' option, as if importing that project for the very first time.
+
 
 **Next Topic**: [Scene Options](topics/scene-options.md "Scene Options")
