@@ -24,6 +24,6 @@ If you're still uncertain, or if you aren't sure what ChoiceScript is, check out
 
 Happy scripting! 
 
-\— The CSIDE Team
+— The CSIDE Team
 
 **Next Topic**: [User Interface Overview](getting-started/user-interface.md "User Interface")
