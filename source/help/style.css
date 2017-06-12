@@ -14,6 +14,13 @@ body {
     color:rgb(105, 105, 105);
     font-size:12px;
 }
+blockquote {
+    background: lightgrey;
+    padding: 10px;
+    border-radius: 5px;
+    color: #4e4e4e;
+    border: 1px solid grey;
+}
 table {
     margin: 0 auto;
     min-width: 80%;
