@@ -18,7 +18,7 @@ And that's only the tip of the iceberg! But not to worry; CSIDE is designed from
 
 CSIDE's user interface has been designed with today's widescreen monitors in mind. However, for smaller screens, you can hide the Scenes and Projects (leftmost panel) and Tab Topics (rightmost panel) via sliders. Just use the <-> buttons above the respective top corners of the Code Editor window.
 
-Desktop Versions Only: Double-clicking the CSIDE main header bar toggles between your normal window size and position, and full screen (Mac) or maximised (Windows) mode. For extended periods of intensive work, you may find it more comfortable to resize the CSIDE window and position it in the middle of your screen.
+**Desktop Versions Only**: Double-clicking the CSIDE main header bar toggles between your normal window size and position, and full screen (Mac) or maximised (Windows) mode. For extended periods of intensive work, you may find it more comfortable to resize the CSIDE window and position it in the middle of your screen.
 
 You can hide the Tabs panel, the Scenes and Projects panel, or both while you're focusing on the editor window. Then, when you're ready to run a play-test game or you need to switch scenes or access another tab, you can easily toggle back to full screen / maximised mode and slide open the relevant panel. You can also press Escape to toggle back and forth from the panel view and a Code Editor window only view.
 
