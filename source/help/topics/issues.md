@@ -1,33 +1,34 @@
 ## Issues
 
-### What is an Issue?
+An 'Issue' is a logged error within your game, usually triggered by a scripting error. Issues are created if there is a bug when you are play-testing your project within CSIDE. In addition to logging the error, Issues provides information on the location and type of bug.
 
-In CSIDE the word "Issue" refers to a logged error about your game. More often than not an Issue is a scripting error that has occurred during play-testing a Project within CSIDE, but Issues can be anything which might otherwise be thought of as a "problem" with your game and therefore in need of addressing before final publication.
-
-Most of the time, however, an Issue will take the form of an "interpreter error" thrown by ChoiceScript itself while play-testing your game within CSIDE, meaning there's a problem with your actual scripting on a specific line, in a particular file, which is causing the game to crash at that exact point.
-
-Issues are logged in the Issues Tab on a per-project basis and are NOT persistent between CSIDE sessions.
+Issues are logged in the Issues Tab on a per-project basis. They are not persistent between CSIDE sessions. All issues (i.e., bugs) must be fixed before final publication of your game. 
 
 
 ### How are Issues Organised?
 
-Each issue is associated with a Project. Many issues will also be associated with a specific Scene, if for example, the error was caused by code within that scene. As it unnecessary for all of a Project's scene files to be open in order to run a Project within CSIDE, if a scene file which isn't open is associated with an error (or issue), CSIDE will automatically attempt to load the scene and log the error.
+Each issue is associated with a specific project. Many are also associated with a single scene.
 
-Note that issues are not session persistent, if you close a scene while it has outstanding Issues, any related log entries will disappear from the Issues Tab.
+If an error occurs in a scene file not currently listed under your project header, CSIDE will log the error and attempt to automatically load that scene. Note that issues are not persistent between CSIDE sessions; also, when closing a scene with outstanding issues, any related log entries will disappear from the Issues Tab.
 
 
 ### The Issue Tracker
 
-The Issue Tracker isn't really a separate tool as such but is rather the term used to describe some of CSIDE's native Issues-related behaviour. For example, if a scripting error is encountered during the running of a project, CSIDE will log that error as an Issue and as part of the 'tracking' functionality it will - where possible - automatically focus on and highlight, within the Code Editor, the actual line of code which caused the error. In short: the instant an error is detected it forcefully swaps your Editor window to the suspect line and scene file so you can attempt an immediate fix.
+The Issue Tracker is a term we use to describe some of CSIDE's native Issues-related behaviour. For example, if a scripting error occurs when a project is running then CSIDE logs that error as an Issue. The Issue is listed on the Issues log, and can be accessed by clicking the triangle and exclamation mark icon above.
 
-It should be noted that the Issue Tracker will highlight / point to the line which ChoiceScript itself says is at fault, but in certain cases the error actually occurs somewhere above the indicated line number but cannot be detected before then. For example, if you are missing a simple *goto command for one #Option and thereby illegally 'fall out' of a *choice statement, the error is not detected until it hits a line containing something other than the expected *goto. In essence, if you cannot spot any obvious error on the indicated line itself, look in the section of code above that line for where something more (like a *goto) perhaps needs inserting. Pay particular attention to the actual error message in this sort of situation as it will likely help guide you to the correct solution.
+The log entry includes the project name, the scene and line number when applicable, and the date and time when the error was encountered. As part of the 'tracking' functionality, the Editor Window switches to the scene and line number containing the error, which is automatically highlighted for you.
 
-If you decide to come back to the Issue later (but within the same session) you can use the 'Find Issue' button on the Issues Tab for any listed Issues with known line numbers, to have the Code Editor jump to & highlight it once again.
+In some cases, a scripting error can occur above the indicated line number where the game has crashed. For example, if you are missing a simple *goto command for one #option and receive an 'illegally fall out of a choice' statement, that error is only detected when the code hits a line containing something other than the expected *goto.
 
+In essence, if you cannot find an obvious error on the indicated line, check the section above that line (or below too, if the code is part of a loop section!) for errors such as a missing \*goto, incorrect indentation, etc.. The specific error messages will help you determine what kind of error you are looking for, and where it is likely to occur.
 
-### What do I do with Issues?
+To return to an issue line later (but within the same session), use the 'Find Issue' button on the Issues Tab to review any listed issues with known line numbers. Then select the issue, and the Code Editor will automatically display that section of code and the highlighted line.
 
-Why, you fix them of course! OK, so sometimes it might not be quite that simple, but the Issues Tab does give more details about each Issue to help you identify and resolve the cause of each individual problem, while the Code Editor will simultaneously focus on and highlight the actual line where the error was first detected. Once you feel that you've fixed an Issue, you can dismiss it under the Issues Tab by clicking its 'dismiss' (tick / check mark) icon. Doing so will also clear the Code Editor of the error highlighting on that Issue's line number.
+### How Should I Handle Issues?
+
+CSIDE provides several tools to help you locate and correct issues. The Issues Tab gives details about the error to help you locate and resolve the problem. The Code Editor focuses on the line where the crash occurs. If you are still having trouble locating the issue, you can try the advanced CSIDE debugging features, Stepping and the Console.
+
+Once an issue is resolved, dismiss it under the Issues Tab by clicking the 'Dismiss' icon (the tick/check mark). This will also clear any error highlighting related to that issue. To clear all issues at once, click the 'Dismiss All' button on the top right of the Issues Tab.
 
 
 **Related Topics**:
@@ -37,4 +38,4 @@ Why, you fix them of course! OK, so sometimes it might not be quite that simple,
 
 - [Stepping](topics/stepping.md "Stepping")
 
-- [QuickTest & RandomTest](topics/quicktest-and-randomtest.md "QuickTest & RandomTest")
+- [Quicktest & Randomtest](topics/quicktest-and-randomtest.md "Quicktest & Randomtest")
