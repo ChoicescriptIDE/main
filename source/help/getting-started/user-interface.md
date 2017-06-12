@@ -1,24 +1,26 @@
 ## User Interface Overview
 
-CSIDE provides a clean and intuitive interface, without clutter, and with every feature and function no more than a few clicks away.
+CSIDE provides a clean and intuitive user interface; every feature and function is just a few clicks away. The main display has three panels: Scenes and Projects, the Editor Window, and the Tabs Panel.
 
-On the left, one or more Game Projects each comprise a group of named Scene files related to that project. New projects can either be created from scratch or imported from your existing game files. Individual files can be moved or copied between different projects simply by dragging & dropping them, and the order of listing for projects - and for scene files within a Project - can be sorted by the same means.
+In the leftmost panel are one or more Game Projects, each with its own group of named scene files. New projects can be created from scratch, or imported from existing game files.
 
-Selecting a particular file displays its contents in the Code Editor to the right of the Projects listing. The Code Editor is a fully-functional text editor and also supports functionality such as automatic spell-checking (US or UK, plus a User Dictionary), handy code highlighting, multiple Hotkeys for ease of use, and a powerful 'Smart Indentation' function to streamline your game scripting.
+The individual scene files can be moved or copied between different projects by dragging and dropping them. The list order for scenes or projects can be rearranged in the same way.
 
-On the right, a number of Tab panels enable one-click access to different features of the program, including Help documentation, various User Settings, Example Projects, and the all-important Game Tab panel for running, testing and fine-tuning a selected game Project during development.
+Selecting a scene file displays its contents in the Code Editor, which is in the centre panel. The Code Editor is a fully functional text editor; it features automatic spell checking (US or UK, plus a User Dictionary), handy code highlighting, multiple hotkeys for ease of use, and a powerful Smart Indentation function to streamline your game scripting.
 
-Lurking in wait below the Code Editor is the CSIDE Console (click the >_ icon to open / close), a versatile monitoring and debugging tool which, among other things, works closely with the Game Tab panel to help you track down elusive bugs in your code.
+The tabs in the rightmost panel give you one-click access to various program features. The first is the all-important Game Tab, for running, testing, and fine-tuning a selected project during game development. Then there are Issues, for de-bugging your User Settings; Help and Information; the User Dictionary; and Example Projects and Templates, which includes tutorials in ChoiceScript.
 
-...and that's just the tip of the iceberg! But don't worry about that too much, if anythings sounds daunting, ignore it, stick to the code editor and game tab for your first game. CSIDE has been designed from the ground up to be as equally helpful and unobtrusive as you need it to be, use what you feel comfortable with, and feel free to come back and try out other features at a later date. They won't get in your way!
+Beneath the Code Editor is the CSIDE Console (click the >_ icon to open / close), a versatile monitoring and debugging tool with a variety of uses. It works closely with the Game Tab panel to help you track down elusive bugs or test and balance your code.
 
+And that's only the tip of the iceberg! But not to worry; CSIDE is designed from the ground up to be exactly as helpful and unobtrusive as you need it to be. If anything sounds daunting, you can ignore it and stick to the Code Editor and Game Tab for your first game. Use what is comfortable for you, and feel free to come back and try out other features at a later date.
 
 ### Usability Tips
 
-CSIDE's user interface has been designed with todays widescreen monitors mind mind. However, for smaller screens, you can hide the Scenes and Projects (left) and Tab Topics (right) via their sliding panels. Just use the <-> buttons above the respective (top) corners of the Code Editor.
+CSIDE's user interface has been designed with today's widescreen monitors in mind. However, for smaller screens, you can hide the Scenes and Projects (leftmost panel) and Tab Topics (rightmost panel) via sliders. Just use the <-> buttons above the respective top corners of the Code Editor window.
 
-[**Desktop versions only**] Double-clicking the CSIDE main header bar toggles between your normal 
-window size / position and Full Screen (Mac) or maximized (Windows) mode. For extended periods of intensive work, you may find it more comfortable to resize the CSIDE window and position it in the middle of your screen. You can hide the Tabs panel, the Scenes and Projects panel, or both while you're focusing on the editor window. Then, when you're ready to run a play-test game, or if you need to switch scenes or access the Help files, you can easily toggle back to Full Screen/maximized mode and slide open the relevant panel.
+Desktop Versions Only: Double-clicking the CSIDE main header bar toggles between your normal window size and position, and full screen (Mac) or maximised (Windows) mode. For extended periods of intensive work, you may find it more comfortable to resize the CSIDE window and position it in the middle of your screen.
+
+You can hide the Tabs panel, the Scenes and Projects panel, or both while you're focusing on the editor window. Then, when you're ready to run a play-test game or you need to switch scenes or access another tab, you can easily toggle back to full screen / maximised mode and slide open the relevant panel. You can also press Escape to toggle back and forth from the panel view and a Code Editor window only view.
 
 
 **Next Topic**: [Setting Up](getting-started/setting-up.md "Setting Up")
