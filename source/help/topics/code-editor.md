@@ -25,7 +25,7 @@ Many of the <a href="#" rel="cside" title="settings" onclick="CSIDE(parent.cside
 	It is not possible to change the highlighting colours used, but they do vary according to the Dark, Light, or Dichromatic Code Editor themes (selectable in <a href="#" rel="cside" title="settings" onclick="CSIDE(parent.cside.selectTab.bind(null, 'settings'));">Settings</a>).
 
 
-- **Command Help**: When enabled under settings, double-clicking a legitimate ChoiceScript command typed in the Code Editor (for instance, *choice) opens your default browser and automatically navigates to the Help page for that command on the [ChoiceScriptDev Wikia](http://www.choicescriptdev.wikia.com/ "ChoiceScriptDev Wikia")]. If your default browser is already running in the background, the Help page will load in a new tab.
+- **Command Help**: When enabled under settings, double-clicking a legitimate ChoiceScript command typed in the Code Editor (for instance, *choice) opens your default browser and automatically navigates to the Help page for that command on the [ChoiceScriptDev Wikia](http://www.choicescriptdev.wikia.com/ "ChoiceScriptDev Wikia"). If your default browser is already running in the background, the Help page will load in a new tab.
 
 - **Text Formatting**: ChoiceScript supports both bold and italic formatting, using start and end tags in the game files to mark formatted words or phrases. The CTRL-I and CTRL-B hotkeys (CMD-I and CMD-B) will wrap selected text with the formatting tags for italics and bold, respectively. If no text is currently selected, the hotkeys place the start and end tags on either side of the cursor. You can also quickly remove matching tags, by repeating the same process.
 
