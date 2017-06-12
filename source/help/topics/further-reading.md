@@ -34,7 +34,7 @@ A very comprehensive and easy-to-use web application that provides information a
 
 A community resource site, and home of the annual CSComp, that provides links to various articles, threads, and resources any aspiring ChoiceScript developer might find useful. 
 
-**[RETowers' Basic ChoiceScript Guide](https://dl.dropboxusercontent.com/u/45314691/CSGuide.html "RETowers' ChoiceScript Guide")**
+**[RETowers' Basic ChoiceScript Guide](https://retowers.neocities.org/CSGuide/CSGuide.html "RETowers' ChoiceScript Guide")**
 
 A basic ChoiceScript guide actually written in ChoiceScript. This is a great starting point for newcomers to either the scripting language or the world of interactive fiction in general.
 
@@ -44,7 +44,7 @@ A basic ChoiceScript guide actually written in ChoiceScript. This is a great sta
 
 CSIDE's website containing articles, announcements, links and other useful CSIDE information. 
 
-**CSIDE on [Github](github.com/ChoicescriptIDE "Github organisation for CSIDE")**
+**[CSIDE on Github](https://github.com/ChoicescriptIDE "Github organisation for CSIDE")**
 
 CSIDE's Github organisation and code repositories, for those with a technical interest.
 
