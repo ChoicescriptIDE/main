@@ -1,180 +1,146 @@
 ## The Console
 
-The CSIDE Console is a versatile monitoring, play-testing and debugging tool, primarily intended to help hunt down 'logic errors' (see below) in your code. It mainly accomplishes this by automatically tracking, logging and displaying - in real-time - the changes of variable values as you play-test through your game within CSIDE. 
+The CSIDE Console is a versatile monitoring, play-testing, and debugging tool, primarily designed to help hunt down 'logic errors' (see below) in your code. The Console, available through clicking the >_ symbol below the Editor Window, will track, log, and display the changing value of your variables in real time, as you play-test through your game within CSIDE.
 
-In addition to its various tracking commands, the Console also supports a range of additional commands to easily obtain, or even change, the current data of the play-test game running in the Game Tab panel. Think of it as a textual way to directly interact with your game "behind the scenes" in real-time, as you play through it a page at a time.
+In addition to tracking commands and variables, the Console also supports a range of additional features. You can obtain variable values, change them either directly or by using operators, and even jump to a different scene or label. Think of the Console as a textual way to directly interact with your game 'behind the scenes' in real-time, as you play through it a page at a time.
 
-For instance, simply typing a variable name into the Console will return the current value of that variable at this precise point - the actual current page - in the game (including the values of 'hidden' variables not displayed on the Stats screen). If desired, you can also use \*set to immediately overwrite or modify that value in memory before continuing with your play-test - potentially avoiding some painful restarts. You can even use \*goto or \*goto_scene in the Console to 'jump' your running play-test game to a specific future point for easier testing of the most recently-added section, while perhaps also using the \*set command via the Console to adjust certain Stats to better suit the stage of the game about to be tested.
+If you type a variable name into the Console, it returns the current value of that variable at this precise point in your play-test. This includes the values of 'hidden' variables not displayed on the stat screen. You can even use \*set to overwrite or modify that value in your active game before continuing with your play-test, allowing you to avoid inconvenient restarts or experiment with variable values. The Console also supports \*goto and \*goto_scene to 'jump' your running play-test game to a specific point for easy, quick testing.
 
-Rest assured, nothing you input directly into the Console command line will alter in any way the actual scripting in your scene files. Commands input into the Console - including those such as \*set, \*temp, \*goto and \*rand - will affect only the data presently held in memory for the current running game, purely for easier play-testing / bug-hunting purposes.
+Anything you put into the Console command line will not affect the actual scripting in your scene files. Using \*set, \*temp, \*goto, and \*rand will only change the temporary data being held in memory for the current running game, purely for play-testing and bug-hunting purposes.
+
+### What Is a Logic Error?
+
+A ChoiceScript interpretor error—that's to say, the standard 'scripting bug'—is a bug that always causes a game to crash at a particular point. Usually locating and identify scripting bugs is a fairly straightforward task.
+
+The 'logic error' or 'game design bug' can be more elusive. Logic errors cause a game to behave strangely in a certain location, often only under particular circumstances, but they do not result in an actual game crash. This can make it much harder to isolate and understand the cause of the error, never mind fix it.
+
+Logic errors can be caused by a typo or oversight in otherwise valid syntax, such as using a 'greater than' operator instead of a 'lesser than', or using 'and' instead of 'or' between two conditions. Logic errors are often related to the current value of a variable referenced at the exact point in the game where the bug occurs.
+
+The basic idea behind the CSIDE Console tracking system is to allow you to monitor changes of specific variable values as you progress through your game. If you do find a 'game design bug', you can closely investigate what's happening to the variables behind the scenes up to that point, monitoring their changes at every step of the way and helping you to find the faulty logic that led to the error.
 
 
 ### General Functionality
 
-The Console window is opened (and closed) by clicking the >_ button below the bottom-left corner of the Code Editor. While closed, a small red indicator will appear beside this icon whenever new log entries are added to the Console display.
+The Console panel is opened or closed via the >_ button in the bottom left corner of the Code Editor. When the Console is closed, a small red indicator appears beside the icon as new entries are logged in the Console's display.
 
-As you progress through your play-test game, the Console will populate itself with log entries relating to the creation of variables and any changes to their values, according to your specific requirements. You control *exactly* what you want logged in the Console by entering appropriate instructions directly into the command line at the bottom of the Console window.
+As you play-test your game, the Console logs entries relating to variable creation and changes in variable values. You control exactly what you want the Console to log by entering appropriate instructions directly into the command line at the bottom of the Console window.
 
-Within the displayed Console logs, 'stats' prefixed variables are those originally created in the startup file with the \*create command, while 'temps' prefixed variables are those generally created within ordinary scene files using the \*temp command. The name of the scene in - and the line at - which each change occurred is also logged for ease of reference.
+> Note: If you make any changes to your game files, you must run the game again before those changes are reflected in the Console, even if the changes have been saved.
 
-Generally speaking, commands entered into the Console will either be accepted as entered (i.e. a command appearing in the log as typed is its own verification) or - in the event something is not quite correct - will return an error message. The Console command line buffers recent entries, so if the error was caused by mistyping something, it's a simple matter to fix: press the Up arrow key, make the necessary correction, and hit Enter again. The command line buffer and Up / Down arrow keys also enables you to quickly cycle through any recent commands made in that session, thereby allowing easy re-entering of those that are most commonly used.
+**Reading the Logs**: All variables created in the startup file are prefixed with 'stats'. Temp variables are prefixed with 'temps'. The name and line number of each value change is also logged for ease of reference.
 
-For purposes of thorough repeat testing, you can also insert certain \*console_ commands directly into your game code / scene files if required - just as you do with ordinary ChoiceScript commands - to automatically output to the Console display as you play-test through your game, effectively reducing the need to manually enter those commands into the Console each time you run the game for yet another play-test.
+**General Console Commands**: The Console will accept and log any correct command; an invalid command will return an error message. The command line buffers recent entries, so mistyped commands can be quickly corrected by pressing UP, making the necessary correction, and then pressing ENTER. Recent commands can be quickly cycled through by using UP/DOWN, allowing easy re-entry of common commands.
 
-Once a Project is actually running in the Game Tab panel, any or all of the following commands may be entered into the Console command line as required, at any point during the play-test. Note however that commands entered into the Console will directly impact only the main game instance running in the Game Tab panel, not the Popout instance.
+**Using the *console_ Command in Game Files**: For purposes of thorough repeat testing, you can also insert certain *console_ commands directly into your game's scene files. See below under 'Console Commands in Scene Files' for details.
+
+> Note: Commands entered into the Console only impact the main game running in the Game Tab Panel. The Console does not affect a game running in Popout. This can be useful for comparing your current game's output against a version where you have input different variables, or made other changes via Console.
 
 
 ### Supported ChoiceScript Commands
 
-The range of supported ChoiceScript commands is as follows:
+**Variable**: Type any valid variable name into the Console to see the current value of the variable in the play-test game. This will also work with 'hidden' variables not displayed on the stats screen.
 
-**variable**
+**Expression**: Enter any valid ChoiceScript expression to see its current value. For example, (var1 and {var2}): If both var1 and {var2} are true, the Console would print back 'true'; if var1, {var2}, or both are false, the Console would print back 'false'. The same applies to strings: Entering firstname&(" "&lastname) would print out "John Doe" (assuming these variables existed, and were set to those values), and numbers: Entering 5+5 would print '10' back to the console.
 
-Simply typing any valid variable name into the Console will return the current value of that variable at this precise point in the game, including any 'hidden' variables not displayed on the Stats screen.
+**\*set [variable] [value]**: All \*set commands valid in ChoiceScript will also work in the Console. Using \*set will overwrite or otherwise modify any variable value in memory at this precise point in the play-test game.
 
-**expression**
+**\*temp [variable] [value]**: Creates a temporary variable 'on the fly' while running a play-test game. Useful for tracking and testing new values without directly modifying the game's current state. Any \*temp variables created in this way will be removed when the current play-test game is refreshed, the scene is changed, or the game is otherwise ended.
 
-Enter a valid ChoiceScript expression (e.g. with a copy / paste directly from your scene files) to see what it would evaluate to - e.g. whether currently 'true' or false' - at this precise point in the game. An expression is essentially any single line of ChoiceScript that evaluates to a value, an example would be any valid \*if or \*set line, excluding the if/set part itself. E.g: (var_1 and {var_2}).
+**\*goto [label]**: Jumps to a specified \*label within the current scene.
 
-**\*set** [variable] [value]
+**\*goto_scene [scene] [label]**: Jumps to the specified scene and label.
 
-The above basic example syntax notwithstanding, anything you can do with *set in ChoiceScript you can also do via the Console to overwrite or otherwise modify any variable value in memory at this precise point in the test game.
+> Caution When Using \*goto**: Using \*goto commands from the Console can lead to errors that could not exist in a standard play-through of the game. For instance, if you were to \*goto a section using a specific variable before visiting the section where that variable is created or defined, the game would then crash. Use \*goto and \*goto_scene with caution.
 
-**\*temp** [variable] [value]
+**\*rand [variable] [value1] [value2]**: Generates a new random value within a specific range and assigns it to the named variable.
 
-You can use the Console to create new temporary variables 'on the fly' while running a play-test game. Useful when wishing to store and test on new values without directly modifying the game's current state.
+**\*achieve [codename]**: Activates the named achievement as if that achievement had been earned/awarded in-game.
 
-**\*goto** [label]
+**Curly brackets**: Using the syntax \*set {var} will indirectly refer to one variable via the value of a second variable. For instance, if the value of 'var' is "strength", \*set {var} 5 will set the value of the variable 'strength' to 5; the value of 'var' would remain as "strength".
 
-Allows you to jump the main instance of the running play-test game to any (e.g. a later) stage of the current scene, without having to click your way through the game as normal.
-
-**\*goto_scene** [scene] [label]
-
-Allows you to jump the main instance of the play-test to any label section of any scene in the game, e.g. the latest section recently added to the game and now in need of testing.
-
-
-> **WARNING** using the \*goto commands from the console can cause errors that wouldn't normally exist. For e.g. if you were to \*goto to a section that uses a variable before visiting the section where it is defined. Use them with caution.
-
-
-**\*rand** [variable] [value1] [value2]
-
-Generate a new random value between a specific range and assign it to the named variable.
-
-**\*print** [variable]
-
-Display the current value of a named variable on the actual current page of the main instance in-game, rather than as a Console log. You can also *print "anything else you like, really" like so.
-
-**\*achieve** [codename]
-
-Activate the named achievement as if that achievement has been earned / awarded in-game.
-
-**\*setref**
-
-A legacy command used to indirectly refer to a variable via the value of another variable. The same effect can now be achieved with the syntax *set {my_var}. For example, if the value of **my_var** was "strength" *setref my_var 5 or *set {my_var} 5 would actually attempt to set the value of the variable called **strength** to 5, not the value of my_var itself, which would remain "strength".
-
-**\*restart**
-
-Restart main instance of the play-test game running in the Game Tab panel, using the game data currently held in memory (any changes to scene files will not be acknowledged). All current Console tracking settings will be maintained.
+**\*restart**: Restarts the main instance of the play-test game running in the Game Tab panel, using the game version currently held in memory. Any changes to scene files will not be acknowledged, but all current Console tracking settings will be preserved.
 
 
 ### Console Tracking Commands
 
-The following range of commands enables you to dictate the variable values you want to have automatically logged and displayed in the Console as you play-test through the main instance game currently running in the Game Tab panel.
+You can use the following commands to choose which variable values the Console will log and display during play-testing.
 
-**\*help**
+\*help**: Displays useful reminders for interacting with the Console.
 
-Displays helpful reminder information pertaining to using the Console
+\*help [command name]**: Provides information about the named command. For instance, '\*help track_all' would return information about the \*track_all function.
 
-**\*help** [command name]
+\*clear**: Wipes all current logs, clearing the Console panel.
 
-Returns help info specific to the named command e.g. *help track_all, *console_help console_track_all - or any combination thereof, with or without the console_ prefix.
+\*track [var1] [var2] [var3] [etc]**: Tracks the individually named variable(s), e.g. \*track strength wisdom charity
 
-**\*clear**
+\*untrack [var1] [var2] [var3] [etc]**: Stops tracking the individually named variable(s), e.g. \*untrack strength wisdom charity
 
-Wipes all current logs, clearing the Console display ready for a fresh Run or Restart
+\*untrack**: Stops tracking all variables which the Console is currently set to individually track.
 
-**\*track** var1 [var2] [var3] [etc.]
+\*track_list**: Lists the names and current values of all variables being individually tracked. Returns 'Empty' if no variables are currently individually tracked.
 
-Start tracking the named individual variable(s) e.g. *track strength wisdom charity
+\*track_list [optional filter]**: As above, but lists only those variables containing the filter text, e.g. stats, temps, or any combination of characters precisely matching any part of the variable name. For instance, typing '*track enemy1 enemy2 friend1' and then using '*track_list enemy' would return 'enemy1' and 'enemy2' but not 'friend1'.
 
-**\*untrack** var1 [var2] [var3] [etc.]
+\*track_all**: Overrides but does not remove the individual track variable list and logs all variable changes.
 
-Stop tracking the named individual variable(s) e.g. *untrack strength charity
+\*untrack_all**: Turns off track_all. Individually-tracked variables will continue to be logged in the Console panel.
 
-**\*untrack**
+\*run**: Loads and runs the currently-selected project as if you had refreshed the game using the 'Run project' icon on the project header bar.
 
-Stop tracking ALL variables currently being individually tracked
+Note that a fresh 'run' (for instance, after making and saving changes in one or more scene files) will deactivate the current Console tracking settings, meaning the required tracking commands must be entered again. Conversely, when restarting, either by using the *restart command in Console or clicking the 'restart' button in the Game Tab panel, the game repeats from the start using the default data already held in memory. This preserves both the most recently run version of the game and the current Console tracking settings.
 
-**\*track_list**
-
-List the names and current values of all variables being individually tracked. Returns Empty if the list is empty.
-
-**\*track_list** [optional filter]
-
-As above, but list only those variables containing the filter text (e.g. stats, temps, or any combination of characters precisely matching any part of the variable name) e.g. *track_list stats
-
-**\*track_all**
-
-Overrides (but does not remove) the individual variables track list and logs ALL variable changes
-
-**\*untrack_all**
-
-Turns off track_all. Individually-tracked variables will continue to be logged.
-
-**\*run**
-
-Loads and runs the currently-selected Project anew, as if you had clicked the 'Run this project' button on the Project header bar
-
-Note that a fresh "Run" (e.g. after making some changes in one or more scene files) will deactivate the current Console tracking settings, meaning that the required commands must be entered again. Conversely, a "Restart" (i.e. clicking that button in the Game Tab panel, or entering *restart directly into the Console) simply repeats the game from the start using the default data already held in memory, so will also continue to use the current Console tracking settings.
+It is also possible to make a list of variables you would like the Console to track, and include them in the text of your game. This can save considerable time and streamline repeat testing. For more information, see the section below on using Console commands in scene files.
 
 
 ### Using Console Commands in Scene Files
 
-You can also insert certain *console_ commands directly into your game code / scene files to help streamline your testing, thereby avoiding having to manually enter the above commands into the Console each time you run the game for yet another play-test. This is also useful when you to log (or start logging) data or expressions at a very specific points in your game, inside a loop for example. The following commands are possible, and the specific details of each are identical to the manual version described above:
+You can also insert certain \*console commands directly into the code of your scene files to help streamline your testing. This avoids having to manually enter the above commands into the Console each time you run the game for a new play-test. It is also useful when logging data or expressions only in a specific section of your game, such as inside a loop.
 
-- \*console_clear
-- \*console_track var1 [var2] [etc.]
-- \*console_untrack  var1 [var2] [etc.]
-- \*console_track_list [optional filter]
-- \*console_track_all
-- \*console_untrack_all
+The following commands may be used in the game code, and function as described above:
 
-**\*console_log** [output]
+	\*console_clear
+	\*console_track [var1] [var2] [etc.]
+	\*console_untrack [var1] [var2] [etc.]
+	\*console_track_list [optional filter]
+	\*console_track_all
+	\*console_untrack_all
+	\*console_log [output]
 
-In addition, you can use *console_log within your game code to output to the Console display - at any desired point in your game - particular current variable values or even the result of ChoiceScript expressions. This is perhaps best illustrated by example:
+In addition, \*console_log can print the value of a variable (or other valid expression) into the Console at a particular point in your game. For example:
 
-> \*console_log strength
+	\*console_log strength
 
-The above will output to the Console display the current value - at this precise point in the test game - of the variable called 'strength'.
+This command will display the current in-game value of the variable 'strength' in the Console panel.
 
-> \*console_log (((var1 > 50) and (var2 < 50)) and (var3 < 50)) or (var4 != "Unknown")
+If you type:
 
-The above example will output to the Console display either 'true' or 'false' dependent on how that expression evaluates based on the current values of those four variables at this precise point in the game. For instance, you may insert that \*console_log line just before a \*choice containing that exact \*if expression within the first #option body, so when you reach that page in your test game you already know (via the Console display) how the game should proceed when you select that first option.
+	\*console_log (((var1 > 50) and (var2 < 50)) and (var3 < 50)) or (var4 != "Unknown")
 
-You can also use \*console_log to clarify / remind yourself of the information being displayed in the Console, by outputting a specific comment using "quotation marks". For example:
+The Console will display either 'true' or 'false depending on the current evaluation of the expression.
 
-> \*console_log "The following line is the evaluation for Option 1"
+You could use this to insert a \*console_log line just before a \*choice where the option text contains that same \*if expression. Then, when you reach that point in your play-test, you already know what should happen if you select the relevant #option.
+
+\*console_log is also useful to note or comment on the information currently displayed in the Console. For instance, with the current example, if that expression affects the text beneath option one, you could place this command on the line above the variable check:
+
+	\*console_log "The following line is the evaluation for Option 1"
+
+Then the text 'The following line is the evaluation for Option 1' would display in the Console before the value output for the variable expression.
 
 
-### Important Notes - \*console_ Commands:
+### Important Notes: \*console_ Commands:
 
-It's possible to make use of \*console\_ commands in your scene files for your own CSIDE testing purposes even while also running a Public Beta Test of your game - without having to actually remove any of those commands from the public version. This can be achieved simply by making all \*console\_ commands conditional on a boolean variable being "true". While this value is "false" (the default setting for your Public Beta Test version, of course), those lines will simply be ignored by ChoiceScript when running in a play-tester's own browser, and their presence will not therefore generate any errors. This applies whether your Public Beta Test version uses a single compiled HTML file or a full set of scene files.
+It is possible to use \*console_commands in your scene files for testing purposes within CSIDE without having to remove any of those commands from your public beta test version. This can be done by making all \*console_commands conditional on a boolean variable being 'true'. When this value is 'false'—the default setting for the beta test version—those lines will be ignored by ChoiceScript and their presence will generate no errors.
 
-Conversely, at the present time the use of CSIDE \*console\_ commands in scene files does however fall foul of the automated Quicktest and Randomtest routines currently provided by Choice of Games LLC and incorporated within CSIDE for your convenience. We are working on addressing this incompatibility issue and will endeavour to keep users informed of progress. In the meantime, it will unfortunately be necessary to remove \*console_ commands from your scene files prior to testing your game with either of the automated tests.
+However, in order to run Quicktest or Randomtest, the \*console commands must be removed, or hidden by using Find-Replace All and the \*comment function. Otherwise, the automated tests will pick up \*console commands as errors.
 
-
-### What is a 'Logic Error'?
-
-A ChoiceScript interpretor error - the standard 'scripting bug' - is one that always causes a game to crash at a particular point, thereby usually making it fairly easy to locate and identify. Conversely, its far more perfidious and elusive cousin - the 'logic error' or 'game design bug' - is an error that causes the game to behave strangely in a specific situation, and often only under particular circumstances, but does not result in an actual game crash. This can make it much harder to isolate and understand the cause of the problem, never mind actually fix it.
-
-Although logic errors may be caused by something as simple as incorrect but otherwise entirely valid syntax (e.g. a 'greater than' operator where you actually need to use 'less than'; or using 'and' between two \*if conditions where it should in fact be an 'or'), most logic errors tend to be related to the current value of a variable being referenced at the exact point where the bug is manifest in the game's output. In this sort of situation the game is often acting on data incorrectly \*set at an earlier stage, or is perhaps not properly allowing for the possibility of that particular earlier change, or in some cases may even be referencing entirely the wrong variable!
-
-The basic idea behind the CSIDE Console tracking system is that you can have it monitoring changes to specific (or even all) variable values as you progress through your game. When you do spot an odd 'game design bug' you can then more closely investigate what's actually been happening behind the scenes up to that point, every step of the way, and thereby more easily identify the faulty logic leading up to it.
+We are working to address this incompatibility issue and will endeavour to keep users informed of our progress. Meanwhile, to hide \*console commands you can use 'Find-Replace All' to replace '\*console' with '\*comment console'. When you are ready to use the Console commands again, use 'Find-Replace All' to change all instances of '\*comment console' back to '\*console'.
 
 
 ### Still can't find that annoying bug?
 
-For those rare situations where even the standard Console logs aren't sufficient to help you resolve a particular problem, you can also activate the complementary Stepping function. This toggle (turn on and off at will) function  enables you to 'step through' any part of your play-test run literally one line of code at a time, and thereby more closely analyse and double-check everything your code is doing while the game is actually running. The Stepping function is covered in a separate Help topic.
+For those rare situations when even the standard Console log doesn't uncover the problem, you can also use the complementary Stepping function. This toggle can be turned off and on by clicking the 'Start Stepping' button on the main page of your play-test game.
+
+The Stepping function lets you 'step through' any part of your play test, one line at a time. This will enable you to more closely analyse and double-check exactly what your code is doing while the play-test game is running. Please see the Stepping topic for more details.
 
 
 **Related Topics**:
@@ -182,6 +148,6 @@ For those rare situations where even the standard Console logs aren't sufficient
 
 - [Stepping](topics/stepping.md "Stepping")
 
-- [QuickTest & RandomTest](topics/quicktest-and-randomtest.md "QuickTest & RandomTest")
+- [QuickTest & RandomTest](topics/quicktest-and-randomtest.md "Quicktest & Randomtest")
 
 - [Testing & Debugging](topics/testing-and-debugging.md "Testing & Debugging")
