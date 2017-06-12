@@ -1,23 +1,28 @@
 ## Scene Options
 
-CSIDE enables you to easily and directly manipulate individual Scene files in various ways and means. This page briefly describes those ways and means. For more information on what Scenes are, and how they're represented and used by CSIDE, please see [Scenes](topics/scenes.md "Scenes").
+CSIDE is designed to let you easily edit and organise your project's scenes. You can create, reorder, move, copy, or even colour-code your scene files, and more!
 
 
-### General Functionality
+### Scene Interaction
 
-- Selecting a particular scene file with a left-click will display its contents in the Code Editor to the right of the Scenes & Projects listing.
+- To select a particular scene, left-click its name in the Scenes & Projects tab. This will load its contents into the code editor.
 
-- New scene files can be added to a Project by clicking the 'Add new scene' button on the project's header bar, thereby creating an 'Untitled' scene.
+- A scene can be renamed at any time by double-clicking its name (or single-clicking, if it is already selected). You cannot rename the project's two compulsory ChoiceScript files, 'startup' and 'choicescript_stats'.
 
-- An ordinary scene file can be renamed at any time by double-clicking it. If already selected, a single click will suffice. You cannot however rename either of a project's two compulsory ChoiceScript files ('startup' and 'choicescript_stats').
-
-- Scene files can be reordered within their Project listing by dragging & dropping a particular file above or below other scenes in the list. The new order of listing will persist between sessions.
+- The order of scene files' can be ammended by dragging and dropping a scene to a new location within the scene list. The new scene order will persist between sessions.
 
 - Scene files can also be copied to or moved between projects by dragging & dropping a scene from one Project listing to another. You will be prompted to clarify (or cancel) the action being taken.
 
-- Scenes can be colour-coded as a personal visual reference / reminder by clicking the icon to the left of a particular scene name (e.g. you may decide that green means 'scene finished' while red means 'unresolved issues', or similar).
+- Scene files can be moved or copied between projects by dragging and dropping the scene into the other project's scene list.
 
-- A red floppy disk icon for a particular scene file indicates unsaved content. Clicking the icon will save that file, at which point it will turn grey. If AutoSave is enabled under Settings, all unsaved files will be saved every few minutes (and as notification, any red disk icons will all turn grey).
+- Scenes can be colour-coded for easy reference or organisation. Click the colour bubble to the left of a particular scene name to change that scene's colour code. These changes will also persist across sessions.
+
+### Scene State
+A scene's current state can be determined by its status icon (usually a grey floppy disk). Other states include:
+
+- **A Red Floppy Disk**: This indicates that the scene has unsaved changes. Clicking the icon, or pressing CTRL-S/CMD-S while it is selected, will save the file, and turn the icon grey.
+
+- **A Red Error Icon**: This will usually indicate that the scene failed to load. Hovering over the icon will give an error message via its tooltip. Clicking the icon will close the scene, and clicking its name will attempt to reload it.
 
 
 ### Scene Context Menu
