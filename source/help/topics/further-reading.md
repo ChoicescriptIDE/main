@@ -1,8 +1,6 @@
 ## Further Reading
 
-The CSIDE help docs give you a general overview of the features of the application and basics of ChoiceScript, but before long you'll no doubt want answers to even more questions, questions which we unfortunately don't have the time nor expertise to answer here. This page is a
-modest collection of some incredibly useful and informative links we've compiled that should help you on your way to finding the answers to those questions.
-
+The CSIDE help docs provide a general overview of this application and also cover some of the basics of ChoiceScript. No doubt at some point, you'll find you have more questions than we can answer here. The list below is a modest collection of some incredibly useful and informative links to sites created by Choice of Games LLC or the ChoiceScript community. They should help you on your way to finding the answers.
 
 ### Official Resources
 
@@ -16,34 +14,43 @@ Contains lots of useful articles on game structure and design.
 
 **[ChoiceScript Repository](https://www.github.com/dfabulich/choicescript "Github - Choicescript")**
 
-The Github Repository for the ChoiceScript code. You can download the latest standalone version of ChoiceScript on this page by clicking 'Clone or download' -> 'Download zip'.
+The Github Repository for the ChoiceScript code. You can download the latest standalone version of ChoiceScript on this page by clicking 'Clone or Download-Download Zip'.
 
 **[Game Outlines - Pitching Guide](https://docs.google.com/document/d/1D0tAZeLkjTz54a54KxI1EYNO96IpduYE9coLgPkxs98/edit?pref=2&pli=1 "Writing for Choice of Games - Game Outlines")**
 
-An official document from Choice of Games advising on their desired outline structure for official COG label game pitches. 
+An official document from Choice of Games with guidance on their recommended outline structure for official CoG house label game pitches.
 
 ### Community Resources
 
 **[ChoiceScript Wikia](http://choicescriptdev.wikia.com/wiki/ChoiceScript_Wiki "ChoiceScriptDev Wikia")**
 
-A good collection of various topics about ChoiceScript development, written entirely by other ChoiceScript developers. It contains things from extended descriptions of each command through to explanations of different coding and
-testing practices. As it's volunteer driven some pages can often become out of date, so be wary of that, but the vast majority will still prove invaluable.
+A good collection of topics concerning ChoiceScript development, written entirely by other ChoiceScript users. The Wikia includes extended descriptions of each command, coding samples, testing procedures, and more. As it's volunteer-run, do be aware that some pages can become out of date. The vast majority of the information is, however, invaluable.
 
 **[Lglasser's Interactive ChoiceScript Tutorial](http://www.maderealstories.com/games/ChoiceScriptTutorial.html "Lglasser's Choicescript Tutorial")**
 
-A very comprehensive and easy-to-use web-application that provides information on all kinds of things ChoiceScript.
+A very comprehensive and easy-to-use web application that provides information and samples on all kinds of things ChoiceScript-related.
 
 **[Choice of Box](http://choiceofbox.com "Choice of Box")**
 
-A community resource site that in turn, provides more links to various articles, threads and resources any aspiring ChoiceScript developer might find useful.
+A community resource site, and home of the annual CSComp, that provides links to various articles, threads, and resources any aspiring ChoiceScript developer might find useful. 
 
 **[RETowers' Basic ChoiceScript Guide](https://dl.dropboxusercontent.com/u/45314691/CSGuide.html "RETowers' ChoiceScript Guide")**
 
-A basic guide to ChoiceScript (that is itself written in the same language). A great starting point for newcomers to both the language and/or world of interactive fiction.
+A basic ChoiceScript guide actually written in ChoiceScript. This is a great starting point for newcomers to either the scripting language or the world of interactive fiction in general.
+
+### CSIDE Resources
+
+**[CSIDE Website](https://choicescriptide.github.io "Website for the ChoiceScript IDE")**
+
+CSIDE's website containing articles, announcements, links and other useful CSIDE information. 
+
+**CSIDE on [Github](github.com/ChoicescriptIDE "Github organisation for CSIDE")**
+
+CSIDE's Github organisation and code repositories, for those with a technical interest.
 
 ### Farewell & Good Luck
 
-With that, we hope you feel you're off to a sound start in the world of ChoiceScript and the ChoiceScript IDE! If you feel like we've missed anything vital out of the documentation here, or perhaps have a suggestion for the 'Further Reading' list, then please don't hesitate to contact us via cside@mazdrak.com. We'd love to hear from you!
+With that, we hope you feel you're off to a sound start in the world of ChoiceScript and of CSIDE! If you feel we've missed anything vital out of the documentation, or if you have a suggestion for the 'Further Reading' list, then please don't hesitate to contact us at cside@mazdrak.com. We'd love to hear from you!
 
 All the best,
 
