@@ -3185,6 +3185,7 @@ function IDEViewModel() {
         if (selection.length === 1 && selection[0] === "") {
           return;
         }
+		$(this).val("");
         __openScenes(selection, true);
       });
       chooser.trigger("click");
