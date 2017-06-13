@@ -8,7 +8,7 @@ CSIDE can create a new, blank project or import a previous project from your exi
 
 To create a new project, click the button with a '+' icon alongside the 'Scenes & Projects' header near the top left of the window. You will be prompted to enter a name for the new project. You are free to name it whatever you like, but it's probably a good idea to use something similar to what you intend to call your game. The folder in which your project is stored, will also take the name given here.
 
-If the name is valid, CSIDE will create a new folder for you. A confirmation message will pop up, displaying the full director path of your project. The default path looks something like this:
+If the name is valid, CSIDE will create a new folder for you. A confirmation message will pop up, displaying the full directory path of your project. The default path looks something like this:
 
 > Windows - C:\Users\Username\Documents\ChoiceScript Projects\My Project Name
 
