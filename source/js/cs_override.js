@@ -31,6 +31,11 @@ window.onerror = function(msg, file, line, stack) {
     var e = {};
     e.message = msg;
     if (msg) {
+		// scene doesn't exist - don't bother trying to open it
+		if (/file/i.test(msg) && /exist/i.test(msg)) {
+			thisProject.logIssue(e);
+			return;
+		}
         //window.onerror(e.message, e.fileName, e.lineNumber, e.stack); avoid pop-ups if we can
         var scene = findScene(stats.sceneName);
         e.message.match(/line [0-9]+/) ? e.lineNumber = parseInt(e.message.match(/line ([0-9]+)/)[1]) : e.lineNumber = "undefined"; //attempt to source a line number (!e.lineNumber && e.message.match(/[0-9]+/))
