@@ -16,7 +16,7 @@ var csideHelp = {
     }
   ],
   "busy": false,
-  "extern": /^https?:\/\/.+$/
+  "extern": /^(https?|mailto):.+$/
 }
 
 String.prototype.capitalizeFirstLetter = function() {
