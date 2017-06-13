@@ -13,8 +13,6 @@ CSIDE is designed to let you easily edit and organise your project's scenes. You
 
 - Scene files can also be copied to or moved between projects by dragging & dropping a scene from one Project listing to another. You will be prompted to clarify (or cancel) the action being taken.
 
-- Scene files can be moved or copied between projects by dragging and dropping the scene into the other project's scene list.
-
 - Scenes can be colour-coded for easy reference or organisation. Click the colour bubble to the left of a particular scene name to change that scene's colour code. These changes will also persist across sessions.
 
 ### Scene State
