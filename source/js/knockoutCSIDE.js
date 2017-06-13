@@ -3824,7 +3824,10 @@ function IDEViewModel() {
   function __closeProject(project, ask) {
     if (!project.isDirty()) {
       if (project === selectedProject()) {
-        selectedScene("")
+        if (selectedProject() == activeProject()) {
+          activeProject(null);
+        }
+        selectedScene("");
         editor.setValue("");
         self.tabs()[0].href("");
       }
@@ -3834,7 +3837,10 @@ function IDEViewModel() {
       bootbox.confirm("This project has unsaved scenes, are you sure you wish to close it?", function(result) {
         if (result) {
           if (project === selectedProject()) {
-            selectedScene("")
+            if (selectedProject() == activeProject()) {
+              activeProject(null);
+            }
+            selectedScene("");
             editor.setValue("");
             self.tabs()[0].href("");
           }
