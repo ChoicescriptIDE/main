@@ -39,7 +39,7 @@ Additional scene options are available via a context menu, either by right-click
 
 - **Delete File**: this option permanently removes the selected text file from your hard drive, as well as from CSIDE itself. You will be prompted to confirm your intention.
 
-- **Export - Copy file to folder**: saves a copy of the scene file to a different, specified folder (either new or existing). Useful for saving a separate backup copy at periodic intervals, and also for tweaking and updating ongoing public play-test games utilising the Dropbox 'Public' folder.
+- **Export - Copy file to folder**: saves a copy of the scene file to a different, specified folder (either new or existing). Useful for saving a separate backup copy at periodic intervals, and also for tweaking and updating ongoing public play-test games (see [Publishing and Exporting](topics/publishing-and-exporting.md "Publishing and Exporting").
 
 - **Export - Print**: enables you to produce a paper copy of the file content for reviewing at your leisure.
 
