@@ -305,7 +305,7 @@ function IDEViewModel() {
               timeout: 2000
             });
             activeProject(self);
-            __reloadTab(cside.tabs()[0], 'run_index.html?restart=true');
+            __reloadTab(__getTab("game"), 'run_index.html?restart=true');
             cside.tabPanel("open");
             __selectTab("game");
           }
@@ -2484,13 +2484,15 @@ function IDEViewModel() {
   }
 
   function __getTab(id) {
-    for (var i = 0; i < self.tabs.length; i++) {
-      if (id == self.tabs()[i].id) {
-        return self.tabs()[i];
+    var tabs = self.tabs();
+    for (var i = 0; i < tabs.length; i++) {
+      if (id === tabs[i].id) {
+        return tabs[i];
       }
     }
     return null;
   }
+
   var settings = {
     'editor': ko.observableArray([
       new CSIDESetting({
@@ -3836,7 +3838,7 @@ function IDEViewModel() {
         }
         selectedScene("");
         editor.setValue("");
-        self.tabs()[0].href("");
+        __getTab("game").href("");
       }
       projects.remove(project);
       __updatePersistenceList();
@@ -3849,7 +3851,7 @@ function IDEViewModel() {
             }
             selectedScene("");
             editor.setValue("");
-            self.tabs()[0].href("");
+            __getTab("game").href("");
           }
           projects.remove(project);
           __updatePersistenceList();
