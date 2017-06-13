@@ -1,6 +1,3 @@
-// disallow menu button - if only because of window.location.href usage
-function showMenu() {};
-
 nav = new SceneNavigator(["startup"]);
 stats = {};
 isHeadless = true;
