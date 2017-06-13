@@ -2817,7 +2817,7 @@ function IDEViewModel() {
                 //frames[1].csideHelp.breadcrumbs = [{ 'url' : 'home.html', 'title': 'Home' }, { 'url' : $(this).attr('href'), 'title' : commandName }];
                 //frames[1].csideHelp.history = ['home.html', $(this).attr('href')];
                 //frames[1].csideHelp.drawPage('commands/' + commandName + '.html'); //CJW needs to not be a magic number?
-                __selectTab("help");
+                //__selectTab("help");
                 var url = "http://www.choicescriptdev.wikia.com/" + commandName;
                 if (usingNode) {
                   gui.Shell.openExternal(url); //Link to wiki command page directly
