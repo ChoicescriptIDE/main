@@ -1527,6 +1527,7 @@ function IDEViewModel() {
         "project-path": "default" //COME BACK TO ME CJW
       }
     },
+	"justUpdated": false,
     "openProjects": [],
     "userDictionary": {}
   };
@@ -3336,11 +3337,17 @@ function IDEViewModel() {
       scope[i].setValue(val);
     }
 
-    //load userDictionary
+    // load userDictionary
     userDictionary.load();
 
-    //ensure the tab panel starts open and on the 'help' tab
+    // ensure the tab panel starts open and on the 'help' tab
     __selectTab("help");
+	
+    // hook post-update behaviour here
+    if (config.justUpdated) {
+      config.justUpdated = false;
+      __updateConfig();
+	}
   }
 
   //animations
@@ -4150,6 +4157,8 @@ function IDEViewModel() {
         notification("Update Failed", err.message, { type: "error", timeout: 10000 });
         __rollbackUpdate();
       } else {
+        config.justUpdated = true;
+        __updateConfig();
         notification("Update Complete", "Please restart the application.", { closeWith: false, timeout: false, type: "success" });
       }
     });
