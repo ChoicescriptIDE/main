@@ -16,9 +16,13 @@ Contains lots of useful articles on game structure and design.
 
 The Github Repository for the ChoiceScript code. You can download the latest standalone version of ChoiceScript on this page by clicking 'Clone or Download-Download Zip'.
 
-**[Game Outlines - Pitching Guide](https://docs.google.com/document/d/1D0tAZeLkjTz54a54KxI1EYNO96IpduYE9coLgPkxs98/edit?pref=2&pli=1 "Writing for Choice of Games - Game Outlines")**
+**[Writing for Choice of Games: Games](https://docs.google.com/document/d/17MxymBbcIal4vh_k2w7A1vbd-H6dAorQ9O-Q5zLjCsc/edit "Writing for Choice of Games: Games")**
 
-An official document from Choice of Games with guidance on their recommended outline structure for official CoG house label game pitches.
+An official document from Choice of Games with guidance and advice on their recommended organisation, structure, balance, mechanics and more.
+
+**[Choice of Games Style Guide](https://docs.google.com/document/d/1Uo3kXWi_v8PG6dZeeUFKAUq50-tBDqYVmKMz5fM2fmo/edit "Choice of Games Style Guide")**
+
+An official document from Choice of Games with guidance on the expected writing style, for published games.
 
 ### Community Resources
 
