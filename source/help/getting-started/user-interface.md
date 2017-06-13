@@ -8,7 +8,7 @@ The individual scene files can be moved or copied between different projects by 
 
 Selecting a scene file displays its contents in the Code Editor, which is in the centre panel. The Code Editor is a fully functional text editor; it features automatic spell checking (US or UK, plus a User Dictionary), handy code highlighting, multiple hotkeys for ease of use, and a powerful Smart Indentation function to streamline your game scripting.
 
-The tabs in the rightmost panel give you one-click access to various program features. The first is the all-important Game Tab, for running, testing, and fine-tuning a selected project during game development. Then there are Issues, for de-bugging your User Settings; Help and Information; the User Dictionary; and Example Projects and Templates, which includes tutorials in ChoiceScript.
+The tabs in the rightmost panel give you one-click access to various program features. The first is the all-important Game Tab, for running, testing, and fine-tuning your project during game development. Then there are Issues, for debugging your game; User Settings, for personalising CSIDE for your use; Help and Information; the User Dictionary; and Example Projects and Templates, including templates with tutorials in ChoiceScript.
 
 Beneath the Code Editor is the CSIDE Console (click the >_ icon to open / close), a versatile monitoring and debugging tool with a variety of uses. It works closely with the Game Tab panel to help you track down elusive bugs or test and balance your code.
 
