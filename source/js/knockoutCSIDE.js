@@ -3047,7 +3047,7 @@ function IDEViewModel() {
   var consoleCmdBufPtr = 0;
   var consoleIndicator = ko.observable(0);
   self.consoleInput = function(data, evt) {
-    var consoleCommands = /^\*(console_)?(clear|track|untrack|untrack_all|track_all|track_list|help)/
+    var consoleCommands = /^\*(console_)?(clear|track|untrack|track_all_off|track_all_on|track_list|help)/
     var validCSCommands = /^\*(?:set|temp|rand|achieve|restart|goto|goto_scene)/
     if (!evt) {
       return;

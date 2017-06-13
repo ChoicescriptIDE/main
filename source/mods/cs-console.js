@@ -76,21 +76,21 @@ Scene.prototype.console_help = function (line) {
                             \n-- *console_track_list stats (all stats/global variables)",
                         options: {}
                     },
-                    console_track_all: {
+                    console_track_all_on: {
                         text:
                             "Override the track list and log ALL changes to ALL variables.",
                         options: {}
                     },
-                    console_untrack_all: {
+                    console_track_all_off: {
                         text:
-                            "Disable the track_all override. Changes to variables set by *console_track will still be logged.",
+                            "Disable the track_all_on override. Changes to variables set by *console_track will still be logged.",
                         options: {}
                     }
                 },
                 text: "The console supports a subset of Choicescript commands: 'set', 'setref', 'temp', 'achieve', 'rand', 'print', 'goto**' and 'goto_scene'.\
                       All of which function exactly the same as they do within the Choicescript language.\
                       In addition, the console also provides some of its own commands: \
-                      'console_log', 'console_clear', 'console_track', 'console_untrack', 'console_track_all', 'console_untrack_all'\
+                      'console_log', 'console_clear', 'console_track', 'console_untrack', 'console_track_all_on', 'console_track_all_off'\
                       and 'console_track_list'. To find out more about each of the console commands, you can type *console_help [command].\
                       \n\n**Note: the *goto command will cause the current screen to be completely cleared when it is used from the console."
             },
@@ -178,12 +178,12 @@ Scene.prototype.console_untrack = function(line) {
     return true;
 }
 
-Scene.prototype.console_track_all = function() {
+Scene.prototype.console_track_all_on = function() {
     this.CSIDEConsole_tracking.track_all = true;
     return true;
 }
 
-Scene.prototype.console_untrack_all = function() {
+Scene.prototype.console_track_all_off = function() {
     this.CSIDEConsole_tracking.track_all = false;
     return true;
 }
@@ -310,6 +310,6 @@ Scene.prototype.CSIDEConsole_forceStoreVarUpdate = function(type, variable) {
  Scene.validCommands.console_clear = 1;
  Scene.validCommands.console_track = 1;
  Scene.validCommands.console_untrack = 1;
- Scene.validCommands.console_track_all = 1;
- Scene.validCommands.console_untrack_all = 1;
+ Scene.validCommands.console_track_all_on = 1;
+ Scene.validCommands.console_track_all_off = 1;
  Scene.validCommands.console_track_list = 1;

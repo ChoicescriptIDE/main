@@ -67,7 +67,7 @@ You can use the following commands to choose which variable values the Console w
 
 **\*help**: Displays useful reminders for interacting with the Console.
 
-**\*help [command name]**: Provides information about the named command. For instance, '\*help track_all' would return information about the \*track_all function.
+**\*help [command name]**: Provides information about the named command. For instance, '\*help track_all_on' would return information about the \*track_all_on function.
 
 **\*clear**: Wipes all current logs, clearing the Console panel.
 
@@ -81,9 +81,9 @@ You can use the following commands to choose which variable values the Console w
 
 **\*track_list [optional filter]**: As above, but lists only those variables containing the filter text, e.g. stats, temps, or any combination of characters precisely matching any part of the variable name. For instance, typing '*track enemy1 enemy2 friend1' and then using '*track_list enemy' would return 'enemy1' and 'enemy2' but not 'friend1'.
 
-**\*track_all**: Overrides but does not remove the individual track variable list and logs all variable changes.
+**\*track_all_on**: Overrides but does not remove the individual track variable list and logs all variable changes.
 
-**\*untrack_all**: Turns off track_all. Individually-tracked variables will continue to be logged in the Console panel.
+**\*track_all_off**: Turns off track_all. Individually-tracked variables will continue to be logged in the Console panel.
 
 **\*run**: Loads and runs the currently-selected project as if you had refreshed the game using the 'Run project' icon on the project header bar.
 
@@ -106,9 +106,9 @@ The following commands may be used in the game code, and function as described a
 
 \*console_track_list [optional filter]
 
-\*console_track_all
+\*console_track_all_on
 
-\*console_untrack_all
+\*console_track_all_off
 
 \*console_log [output]
 
