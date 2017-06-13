@@ -90,8 +90,8 @@ a.show::after {
     list-style: none;
     margin: 0px;
 }
-.nav li {
-    height: 40px;
+.nav li > h3 {
+    font-weight: bold;
 }
 .nav li:nth-child(odd) > a {
      background-color: rgb(247, 247, 252);
