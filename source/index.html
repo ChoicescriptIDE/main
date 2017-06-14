@@ -119,7 +119,7 @@
             <!-- /ko -->
           </div>
           <!-- lack of whitespace (line breaks) around scenes <li> is deliberate to avoid a jQuery + knockout bug -->
-          <ul class="project" data-bind="fadeAndSlideVisible: isExpanded, css: { 'project-collapsed': isExpanded() != true }, sortable: { data: getScenes, beforeMove: cside.dragSceneEvent, afterMove: cside.updatePersistenceList, options: { axis: 'y', cancel: 'input:not([readonly]), button', items: '.scene', connectWith: '#main-project-wrap > .project-wrapper > .project', placeholder: 'project-hover', containment: $('#main-project-wrap')} }"><li class="scene" data-bind="click: getErrState() ? load : select, css: { 'scene-selected': $data === $root.getSelectedScene() }">
+          <ul class="project" data-bind="fadeAndSlideVisible: isExpanded, css: { 'project-collapsed': isExpanded() != true }, sortable: { data: getScenes, beforeMove: cside.dragSceneEvent, afterMove: cside.updatePersistenceList, options: { axis: 'y', cancel: 'input:not([readonly]), button', items: '.scene', connectWith: '#main-project-wrap > .project-wrapper > .project', placeholder: 'project-hover', containment: $('#main-project-wrap')} }"><li class="scene" role="button" data-bind="click: getErrState() ? load : select, css: { 'scene-selected': $data === $root.getSelectedScene() }">
               <button class="save-scene" data-bind="click: getErrState() ? close : save, clickBubble: false, attr: { title: getErrState() ? getErrStateMsg : isReadOnly() ? 'Read-only' : 'Save ' + getName() + '.txt' }"><i data-bind="css: getState"></i></button>
               <button class="color-marker handle"  data-bind="attr: { title: 'Click to colour project ' + getName() }, click: recolour, clickBubble: false, style: { backgroundColor: getMarkColour }"></button>
               <!-- <span data-bind="text: getName(), event: { dblclick: rename }, attr: { title: getName }, fadeVisible: beingEdited() ? false : true"></span> -->
@@ -128,7 +128,7 @@
                 <span data-bind="text: getNameErrorMsg"></span>
               </div>
               <ul class="colour-picker" id="colour-picker" data-bind="fadeVisible: beingColoured, event: { mouseleave: recolour }, foreach: $root.getValidSceneColours">
-                <li class="colour-selector" data-bind="style: { backgroundColor: $data }, click: $parent.recolour, clickBubble: false"></li>
+                <li class="colour-selector" role="button" data-bind="style: { backgroundColor: $data }, click: $parent.recolour, clickBubble: false"></li>
               </ul>
             </li></ul>
         </li></ul>
