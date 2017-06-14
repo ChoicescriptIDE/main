@@ -2,7 +2,7 @@
 
 First and foremost, we would like to thank Choice of Games LLC, consisting of Jason Stevan Hill, Adam Morse, ChoiceScript's creator Dan Fabulich, and the rest of their ever-growing team. Thank you for providing us with a fresh, growing, and ever-improving selection of high-quality multiple choice games. Thank you for being champions of equality. And finally, thank you for creating ChoiceScript and supporting the growth of such a very special community.
 
-We would also like to thank that very same community: the forum-goers, writers, editors, beta testers, and game-players, and even those of you who haven't joined us quite yet. Without you, the fans, there would be no games—there would be no ChoiceScript. There would be no CSIDE. Thank you to all, past, present, and future supporters, pioneers of all that we do and stand for. It has, and will continue to be, our pleasure to be a part of it all.
+We would also like to thank that same community: the forum-goers, writers, editors, beta testers, and game-players, and even those of you who haven't joined us quite yet. Without you, the fans, there would be no games—there would be no ChoiceScript. There would be no CSIDE. Thank you to all, past, present, and future supporters, pioneers of all that we do and stand for. It has been, and will continue to be, our pleasure to be a part of it all.
 
 Of course, no thank you list could ever be complete without mentioning 'The CSIDE Team'—the only fitting name. Four years is a very long time to work alone on a side project of this magnitude, without pay, without a clear goal, and with no finish line in sight. Between life, work, and my studies, it would have been very easy to give up on this project, way back before it had barely even begun. It would have been simpler to leave it as that simple textbox on a website that you could paste some ChoiceScript code into.
 
@@ -23,6 +23,7 @@ There really isn't a single person, organisation, resource, or entity listed on 
 We hope you enjoy using CSIDE just as much as we did creating it.
 
 Happy scripting,
+
 The CSIDE Team!
 
 <h3>Resources, Images, Code Libraries etc.</h3>

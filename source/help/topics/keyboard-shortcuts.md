@@ -23,21 +23,20 @@
 
 | Action                              | Windows             | Mac                 |
 | ----------------                    | --------            | --------            |
+| Add new scene to project            | CTRL + N            | CMD + N             |
 | Close scene                         | CTRL + W            | CMD + W             |
 | Close project (all scenes)          | SHIFT + CTRL + W    | SHIFT + CMD + W     |
-| Add new scene to project            | CTRL + N            | CMD + N             |
 | Save scene                          | CTRL + S            | CMD + S             |
 | Save project (all scenes)           | SHIFT + CTRL + S    | SHIFT + CMD + S     |
 | Open scenes                         | CTRL + O            | CMD + O             |
 | Open all scenes of project          | SHIFT + CTRL + O    | SHIFT + CMD + O     |
 | Run Quicktest on project            | CTRL + T            | CMD + T             |
 | Run Randomtest on project           | SHIFT + CTRL + T    | SHIFT + CMD + T     |
-| Quit application                    | SHIFT + CTRL + Q    | CMD + Q             |
 | Toggle panel section                | SHIFT + CTRL + .    | SHIFT + CMD + .     |
 | Toggle scene section                | SHIFT + CTRL + ,    | SHIFT + CMD + ,     |
 | Toggle full-window editor           | ESC / F11           | ESC / F11           |
 | Toggle console                      | SHIFT + CTRL + C    | SHIFT + CMD + C     |
-
+| Quit application                    | SHIFT + CTRL + Q    | CMD + Q             |
 
 ### Find/Search/Replace Shortcuts
 
