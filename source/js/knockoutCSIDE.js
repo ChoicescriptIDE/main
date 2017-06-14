@@ -2492,6 +2492,14 @@ function IDEViewModel() {
     }
     return null;
   }
+  
+  // obtain CSIDEHelp object for interacting with help and information tab
+  function __getCSIDEHelp() {
+    for (var i = 0; i < frames.length; i++)
+      if (frames[i].csideHelp)
+        return frames[i].csideHelp;
+    return null;
+  }
 
   var settings = {
     'editor': ko.observableArray([
@@ -3349,6 +3357,21 @@ function IDEViewModel() {
     if (config.justUpdated) {
       config.justUpdated = false;
       __updateConfig();
+	  var n = notification("Updated to v" + CSIDE_version, "A full list of changes can be found under 'Changelog' in the help and information tab.", { 
+		buttons: [{ addClass: 'btn btn-default', text: 'Show Changelog', 
+			onClick: function(note) {
+				var csideHelp = __getCSIDEHelp();
+				if (csideHelp) {
+					csideHelp.breadcrumbs = [{ 'url' : 'home.html', 'title': 'Home' }, { 'url' : 'changelog.md', 'title' : 'Changelog' }];
+					csideHelp.history = ['home.html', 'changelog.md'];
+					csideHelp.drawPage('changelog.md');
+				}
+				note.close();
+			} 
+		}]
+	  });
+	  n.setTimeout(5000);
+	  __getCSIDEHelp();
 	}
   }
 
