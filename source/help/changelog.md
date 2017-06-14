@@ -1,0 +1,47 @@
+## v1.0.1 - 14/06/17
+
+Pre-release update. Fixes a number of minor bugs, and makes some stylistic changes. 
+Introduces an in-app changelog, autoformat setting, support for ChoiceScript's new accessibility options and a cross-scene selected text wordcount.
+An updated version of the Interactive CSIDE Tutorial is also included.
+
+Read on for full details.
+
+### Additions
+- In-app accessible Changelog (under help & information tab)
+- Notification on first post-update launch, prompting user to view the changelog
+- Via ChoiceScript's in-game menu, changing text size and background colour are now supported
+- New Autoformat option in Settings - automatically converts -- to emdash and ... to an ellpisis
+- Support for selected word count across all scenes (Project -> Selected Word Count)
+- Added a help topic on Image Scenes
+  
+### Removals
+- \*print is no longer supported in the console
+- \*setref is no longer supported in the console (use {var} notation)
+
+### Fixes
+- Fixed an obscure bug that prevented the same scene being opened, then closed, then opened again
+- Fixed a bug that left the name of a previously running project on the game tab after it was closed
+- Fixed a bug that caused the help tab to be selected on double-clicking a command for help
+- Fixed a bug preventing the Project/Scene (context) menu buttons appearing in Windows
+- Hiding/showing panels and clicking/typing afterwards should no longer cause 'magic cursor' jumps
+- CSIDE 'Update Available' prompts will no longer stack if left unattended
+- Fixed an issue preventing the selection of non-root level folders in the Web version
+
+### Changes
+- Minor changes to the layout of the word count prompt
+- The "Update Channel" setting will no longer appear on the Web version
+- Added a slight tolerance to the file conflict check
+- Updated Vendetta's CSIDE Tutorial to v1.01
+- All newly created scene names will now be forced to lowercase
+- Console commands \*untrack_all and \*track_all have been renamed \*track_all_on and \*track_all_off
+- HEAVILY revised documentation + proofing
+  - Removed references to "OS X"
+  - Renamed Mac's ALT to OPT
+  - Reworded most topics
+  - Fixed a number of spelling mistakes
+  - Reorganised home index (into basic + advanced topics)
+  - Added 'next topic' links to some topics
+  - Added additional hotlinks throughout various topics
+  - Removed mentions to Dropbox
+  - Added mentions about Dashingdon Hosting
+- ChoiceScript's in-game menu is now functional (minus link/email options)
