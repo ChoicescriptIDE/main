@@ -4,6 +4,8 @@ Pre-release update. Fixes a number of minor bugs, and makes some stylistic chang
 Introduces an in-app changelog, autoformat setting, support for ChoiceScript's new accessibility options and a cross-scene selected text wordcount.
 An updated version of the Interactive CSIDE Tutorial is also included.
 
+Due to an APPNAME change, you may also need to port your persistent data.
+
 Read on for full details.
 
 ### Additions
@@ -28,6 +30,8 @@ Read on for full details.
 - Fixed an issue preventing the selection of non-root level folders in the Web version
 
 ### Changes
+- APPNAME changed to CSIDE (from ChoiceScript IDE)
+ - This is likely to invalidate previous session data (settings/scene list etc.)
 - Minor changes to the layout of the word count prompt
 - The "Update Channel" setting will no longer appear on the Web version
 - Added a slight tolerance to the file conflict check
