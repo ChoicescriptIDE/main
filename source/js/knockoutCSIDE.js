@@ -3354,7 +3354,7 @@ function IDEViewModel() {
     __selectTab("help");
 	
     // hook post-update behaviour here
-    if (config.justUpdated) {
+    if (config.justUpdated || typeof config.justUpdated === "undefined") {
       config.justUpdated = false;
       __updateConfig();
 	  var n = notification("Updated to v" + CSIDE_version, "A full list of changes can be found under 'Changelog' in the help and information tab.", { 
