@@ -93,7 +93,7 @@ csideHelp.handleLink = function(e) {
 csideHelp.drawPage = function(url) {
   scrollTo(0, 0);
   csideHelp.redrawBreadcrumbs();
-  $('#content').animate({opacity: 0}, 750, function() {
+  $('#content').animate({opacity: 0}, 250, function() {
     $.get(url)
       .done(function(data) {
         var extension = url.substring(url.lastIndexOf("."), url.length);
@@ -111,14 +111,14 @@ csideHelp.drawPage = function(url) {
       })
       .fail(function() {
         $("#content").load( "404.html", function( response, status, xhr ) {
-          $('#content').animate({opacity: 1}, 1000);
+          $('#content').animate({opacity: 1}, 250);
         });
         return;
       })
       .always(function() {
         csideHelp.busy = false;
         csideHelp.current = url;
-        $('#content').animate({opacity: 1}, 1000);
+        $('#content').animate({opacity: 1}, 250);
       })
   });
 }
