@@ -84,7 +84,7 @@ function printLink(target, href, anchorText, onclick) {
 
 //make sound sourced from the project directory
 Scene.prototype.sound = function sound(source) {
-	source = "file://" + thisProject.path() + source;
+	source = "file://" + thisProject.getPath() + source;
     if (typeof playSound == "function") playSound(source);
     if (this.verifyImage) this.verifyImage(source);
 };
