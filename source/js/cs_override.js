@@ -85,6 +85,15 @@ function printLink(target, href, anchorText, onclick) {
 //make sound sourced from the project directory
 Scene.prototype.sound = function sound(source) {
 	source = "file://" + thisProject.getPath() + source;
+    if (source.substring(source.length - 4, source.length) === ".mp3") {
+      var scene = findScene(stats.sceneName);
+      if (scene) {
+        var e = {};
+        e.lineNumber = (stats.scene.lineNum + 1);
+        e.message = "Unable to play proprietary format.\nPlease export game to test .mp3 audio.";
+        thisProject.logIssue(e, scene);
+      }
+    }
     if (typeof playSound == "function") playSound(source);
     if (this.verifyImage) this.verifyImage(source);
 };
