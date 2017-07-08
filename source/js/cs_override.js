@@ -104,7 +104,7 @@ if (scope.cside.getPlatform() != 'web-dropbox') {
 	 	window.$('body').on('click', 'a', function(e) {
 			e.preventDefault();
 			if ($(this).hasClass('alertify-button')) return false;
-			scope.gui.Shell.openExternal(this.href);
+			scope.nw.Shell.openExternal(this.href);
 			return false;
 		});
 	}, 1000); //needs a timeout or it seems to fire before the body is created.
@@ -123,7 +123,7 @@ $(document).ready(function() {
             thisProject.window.focus();
         }
         else { //create new
-          parent.gui.Window.open('run_index.html?persistence=CSIDE', {focus: true, width: 500, height: 500, title: ""}, function(new_win) {
+          parent.nw.Window.open('run_index.html?persistence=CSIDE', {focus: true, width: 500, height: 500, title: ""}, function(new_win) {
             thisProject.window = new_win;
             // don't allow the popout window to overwrite the persistent store (allows popout testing of multiple choices etc)
             new_win.on("loaded", function() {
