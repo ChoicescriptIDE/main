@@ -283,7 +283,7 @@ The most ${handsome} ${val_man} stands before you. "Hello, I'm ${Valentine}," ${
 	"It's been a pleasure, I'm sure. Unfortunately business calls," ${valentine} smiles, warmly, before walking off.
 	
 *if (rel_val >=70)
-	${valentine}'s fingers lightly brush your arm. "As much as I'd love to continue this conversation, I must be going. I'm sure we'll meet again." And off ${he} walks, casting one final, lingering, glance back at you.
+	${valentine}'s fingers lightly brush your arm. "As much as I'd love to continue this conversation, I must be going. I'm sure we'll meet again." And off ${val_he} walks, casting one final, lingering, glance back at you.
 
 *comment ==================================================================
 *comment   And this concludes the tutorial for now. 
