@@ -113,11 +113,6 @@ if (scope.cside.getPlatform() != 'web-dropbox') {
 //inject buttons:
 $(document).ready(function() {
 	if (scope === window.parent) {
-		function moveButtonsInline() {
-			var header = document.getElementById("header");
-			var tags = header.getElementsByTagName("p");
-			return tags[1];
-		}
 		var button = document.createElement("button");
 		button.innerHTML = "Popout";
 		button.setAttribute("title", "Pop out window");
@@ -149,7 +144,6 @@ $(document).ready(function() {
                 //window.location = "about:blank";
 			}
 		};
-		var p = moveButtonsInline();
-		p.appendChild(button);
+    document.getElementById("buttons").appendChild(button);
 	}
 });
