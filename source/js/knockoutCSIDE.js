@@ -1177,12 +1177,18 @@ function IDEViewModel() {
       if (typeof newVal == "boolean")
         visible(newVal);
 	}
+    value.subscribe(function(option) {
+      setting.apply(value());
+      config.settings[cat][id] = value(); //store
+      __updateConfig(); //then write new settings object to localStorage
+    });
 
     setting.extAPI = {
       getName: setting.getName,
       getType: setting.getType,
       getDesc: setting.getDesc,
       getValue: setting.getValue,
+      value: value,
       toggle: setting.toggle,
       getOptions: setting.getOptions,
 	  isVisible: setting.isVisible

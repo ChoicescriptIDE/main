@@ -246,11 +246,17 @@
     												<span class="setting-name" data-bind="text: getName()"></span>
                             <br>
                             <span class="desc" data-bind="text: getDesc()"></span>
+            										<!-- ko if: getType() == "dropdown" -->
+                                                    <br>
+            										    <select data-bind="options: getOptions(), optionsText: 'desc', optionsValue: 'value', value: value"></select>
+            										<!-- /ko -->
+            										<!-- ko if: getType() == "variable" -->
     												<ul data-bind="foreach: getOptions()">
     													<li class="setting-option" data-bind="css: { 'setting-option-selected': $parent.getValue() == value }, click: $parent.toggle">
     														<div data-bind="html: desc"></div>
     													</li>
     												</ul>
+            										<!-- /ko -->
     											</li>
     										<!-- /ko -->
     									</script>
