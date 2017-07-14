@@ -2733,18 +2733,19 @@ function IDEViewModel() {
         "id": "theme",
         "name": "Editor Theme",
         "value": "cs-light",
-        "type": "variable",
+        "type": "dropdown",
         "cat": "editor",
-        "options": [{
-          "desc": "Dark",
-          "value": "cs-dark"
-        }, {
-          "desc": "Light",
-          "value": "cs-light"
-        }, {
-          "desc": "Dichromatic",
-          "value": "cs-dichromatic"
-        }],
+        "options": [
+          { "desc": "Dark", "value": "cs-dark"},
+          { "desc": "Dichromatic", "value": "cs-dichromatic"},
+          { "desc": "Light", "value": "cs-light"},
+          { "desc": "Abcdef", "value": "abcdef"},
+          { "desc": "Ambiance", "value": "ambiance"},
+          { "desc": "Blackboard", "value": "blackboard"},
+          { "desc": "Dracula", "value": "dracula"},
+          { "desc": "Icecoder", "value": "icecoder"},
+          { "desc": "Solarized", "value": "solarized"}
+        ],
         "desc": "Sets the colour and style of the editor window and its text",
         "apply": function(val) {
           //conditional is handled in choicescript.js CodeMirror mode
