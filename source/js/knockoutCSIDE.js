@@ -1516,6 +1516,7 @@ function IDEViewModel() {
         "tabsize": "4",
         "linewrap": true,
         "fontsize": "12px",
+        "fontfamily": "'Courier New', Courier, monospace",
         "spell_dic": "en_US",
         "theme": "cs-dark",
         "spellcheck": true,
@@ -2726,6 +2727,31 @@ function IDEViewModel() {
         "desc": "The size of the font in the editor window",
         "apply": function(val) {
           $('#editor-wrap').css("font-size", val);
+          editor.refresh();
+        }
+      }),
+      new CSIDESetting({
+        "id": "fontfamily",
+        "name": "Font Family",
+        "value": "'Century Gothic', AppleGothic, Arial, Helvetica, sans-serif",
+        "type": "dropdown",
+        "cat": "editor",
+        "options": [{
+          "desc": "Mono",
+          "value": "'Courier New', Courier, monospace"
+        }, {
+          "desc": "Serif",
+          "value": "Arial, Helvetica, sans-serif"
+        }, {
+          "desc": "Sans-Serif",
+          "value": "'Times New Roman', Times, serif"
+        }, {
+          "desc": "Gothic",
+          "value": "'Century Gothic', AppleGothic, Arial, Helvetica, sans-serif"
+        }],
+        "desc": "The font family used in the editor window",
+        "apply": function(val) {
+          $('#editor-wrap').css("font-family", val);
           editor.refresh();
         }
       }),
