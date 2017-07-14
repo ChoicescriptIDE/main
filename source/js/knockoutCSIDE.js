@@ -1487,7 +1487,7 @@ function IDEViewModel() {
     }
   }
 
-  var autoFormatMap = { 
+  var autoFormatMap = {
     "...": "…", // ellipsis
     "--": "—" 	// emdash
   };
@@ -2209,7 +2209,7 @@ function IDEViewModel() {
   }
 
   var speller = function() {
-    var word = new RegExp(/\b([A-Za-z]+'[A-Za-z]+|[A-Za-z]{2,}|[AaI]'?)\b/g);
+    var word = new RegExp(/([A-Za-z\u00C0-\u00FF\u0100-\u017F]+'[A-Za-z\u00C0-\u00FF\u0100-\u017F]+|[A-Za-z\u00C0-\u00FF\u0100-\u017F]{2,}|[AaI]'?)(?=$|[\s\.,])/g);
     var cmd = new RegExp(/^\s*\*[A-Za-z_]+\b/);
     var variable = new RegExp(/\{.*\}/g); //new RegExp(/\{[A-Za-z0-9_\[\]]+\}/g);
 
@@ -2297,7 +2297,7 @@ function IDEViewModel() {
 
   editor.on("inputRead", function(cm, change) {
 	if (change.text.length == 1) {
-		
+
 	  if (editor.getOption("autoformat")) { // auto-replace em-dash etc.
 	    var tok = cm.getTokenAt(change.from); // try ?precise option if there are future issues
 	    if (tok.type == "formattable") {
@@ -2308,7 +2308,7 @@ function IDEViewModel() {
 	      }
 	    }
 	  }
-	  
+
 	  if (editor.getOption("autosuggest")) {
 	    if (change.text[0].match(/\w$/)) { //only fire on word characters
 		  if (autoSuggestFn) {
@@ -2492,7 +2492,7 @@ function IDEViewModel() {
     }
     return null;
   }
-  
+
   // obtain CSIDEHelp object for interacting with help and information tab
   function __getCSIDEHelp() {
     for (var i = 0; i < frames.length; i++)
@@ -3301,7 +3301,7 @@ function IDEViewModel() {
   self.dictWord = ko.observable("");
   self.addToDictionary = function(obj, e) {
     if (e.type == "click" || e.type == "keyup" && e.keyCode == 13) {
-      if (!self.dictWord().match(/^[\w\u00C0-\u017F\u0027]+$/)) { //word chars, accented chars, apostrophes
+      if (!self.dictWord().match(/^([A-Za-z\u00C0-\u00FF\u0100-\u017F]+'[A-Za-z\u00C0-\u00FF\u0100-\u017F]+|[A-Za-z\u00C0-\u00FF\u0100-\u017F]{2,}|[AaI]'?)$/)) { //word chars, accented chars, apostrophes
         bootbox.alert("<h3>Error</h3>Unable to add to user dictionary: not a word!");
         return;
       }
@@ -3352,13 +3352,13 @@ function IDEViewModel() {
 
     // ensure the tab panel starts open and on the 'help' tab
     __selectTab("help");
-	
+
     // hook post-update behaviour here
     if (config.justUpdated || typeof config.justUpdated === "undefined") {
       config.justUpdated = false;
       __updateConfig();
-	  var n = notification("Updated to v" + CSIDE_version, "A full list of changes can be found under 'Changelog' in the help and information tab.", { 
-		buttons: [{ addClass: 'btn btn-default', text: 'Show Changelog', 
+	  var n = notification("Updated to v" + CSIDE_version, "A full list of changes can be found under 'Changelog' in the help and information tab.", {
+		buttons: [{ addClass: 'btn btn-default', text: 'Show Changelog',
 			onClick: function(note) {
 				var csideHelp = __getCSIDEHelp();
 				if (csideHelp) {
@@ -3367,7 +3367,7 @@ function IDEViewModel() {
 					csideHelp.drawPage('changelog.md');
 				}
 				note.close();
-			} 
+			}
 		}]
 	  });
 	  n.setTimeout(5000);
