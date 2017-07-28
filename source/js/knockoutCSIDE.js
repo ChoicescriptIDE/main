@@ -1102,6 +1102,7 @@ function IDEViewModel() {
   function CSIDESetting(settingData) {
     var setting = this;
     var value = ko.observable(settingData.value);
+    value.extend({ notify: 'always' });
     var id = settingData.id;
     var name = settingData.name;
     var selectedOption = 0;
@@ -1163,15 +1164,9 @@ function IDEViewModel() {
         selectedOption += 1;
         value(options[selectedOption].value);
       }
-      setting.apply(value());
-      config.settings[cat][id] = value(); //store
-      __updateConfig(); //then write new settings object to localStorage
     }
     setting.setValue = function(newVal) {
-      for (var i = 0; i < options.length; i++) {
-        //if (newVal == options[i].value) //CJW
-        value(newVal);
-      }
+      value(newVal);
     }
 	setting.setVisibility = function(newVal) {
       if (typeof newVal == "boolean")
@@ -3370,13 +3365,11 @@ function IDEViewModel() {
     var scope = settings.editor();
     for (var i = 0; i < scope.length; i++) {
       var val = typeof config.settings.editor[scope[i].getId()] != 'undefined' ? config.settings.editor[scope[i].getId()] : defaultConfig.settings.editor[scope[i].getId()];
-      scope[i].apply(val);
       scope[i].setValue(val);
     }
     scope = settings.app();
     for (var i = 0; i < scope.length; i++) {
       var val = typeof config.settings.app[scope[i].getId()] != 'undefined' ? config.settings.app[scope[i].getId()] : defaultConfig.settings.app[scope[i].getId()];
-      scope[i].apply(val);
       scope[i].setValue(val);
     }
 
