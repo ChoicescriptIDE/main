@@ -2925,6 +2925,9 @@ function IDEViewModel() {
           "desc": "Latest",
           "value": "latest"
         }, {
+         "desc": "Development",
+         "value": "development"
+        }, {
           "desc": "None",
           "value": "none"
         }],
@@ -2957,6 +2960,9 @@ function IDEViewModel() {
             }
             autoUpdateCheckFn = setInterval(autoUpdate, 1000 * 60 * 60);
             autoUpdate();
+            if (channel === "development") {
+              notification("Warning - Development Updates", "Application updates from this channel have not been pre-tested, and have a high chance of being unstable.", { type: "warning" });
+            }
           }
           else {}
         }
