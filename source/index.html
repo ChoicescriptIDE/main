@@ -250,7 +250,7 @@
                                                     <br>
             										    <select data-bind="options: getOptions(), optionsText: 'desc', optionsValue: 'value', value: value"></select>
             										<!-- /ko -->
-            										<!-- ko if: getType() == "variable" -->
+            										<!-- ko if: getType() == "variable" || getType() == "custom" -->
     												<ul data-bind="foreach: getOptions()">
     													<li class="setting-option" data-bind="css: { 'setting-option-selected': $parent.getValue() == value }, click: $parent.toggle">
     														<div data-bind="html: desc"></div>
