@@ -98,6 +98,35 @@ Scene.prototype.sound = function sound(source) {
     if (this.verifyImage) this.verifyImage(source);
 };
 
+// create popout instance of game (at same state as original)
+function popOutWindow() {
+  if (scope.cside.getPlatform() != 'web-dropbox') { //focus
+    if (thisProject.window) {
+        thisProject.window.focus();
+    }
+    else { //create new
+      parent.nw.Window.open('run_index.html?persistence=CSIDE', {focus: true, width: 500, height: 500, title: ""}, function(new_win) {
+        thisProject.window = new_win;
+        // don't allow the popout window to overwrite the persistent store (allows popout testing of multiple choices etc)
+        new_win.on("loaded", function() {
+          new_win.window.storeName = null;
+        });
+        new_win.on("closed", function() {
+          thisProject.window.leaveFullscreen();
+          thisProject.window.hide();
+          thisProject.window.close(true);
+          thisProject.window = null;
+        });
+        });
+        //window.location = "about:blank";
+    }
+  }
+  else {
+    thisProject.window = window.open("run_index.html?persistence=CSIDE", thisProject.getName(), "height=500,width=500,scrollbars=1");
+            //window.location = "about:blank";
+  }
+};
+
 //prevent links from opening *inside* desktop version
 if (scope.cside.getPlatform() != 'web-dropbox') {
 	setTimeout(function() {
@@ -117,33 +146,7 @@ $(document).ready(function() {
 		button.innerHTML = "Popout";
 		button.setAttribute("title", "Pop out window");
 		button.setAttribute("class", "spacedLink");
-		button.onclick = function popOutWindow() {
-			if (scope.cside.getPlatform() != 'web-dropbox') { //focus
-        if (thisProject.window) {
-            thisProject.window.focus();
-        }
-        else { //create new
-          parent.nw.Window.open('run_index.html?persistence=CSIDE', {focus: true, width: 500, height: 500, title: ""}, function(new_win) {
-            thisProject.window = new_win;
-            // don't allow the popout window to overwrite the persistent store (allows popout testing of multiple choices etc)
-            new_win.on("loaded", function() {
-              new_win.window.storeName = null;
-            });
-            new_win.on("closed", function() {
-              thisProject.window.leaveFullscreen();
-              thisProject.window.hide();
-              thisProject.window.close(true);
-              thisProject.window = null;
-            });
-            });
-            //window.location = "about:blank";
-        }
-			}
-			else {
-				thisProject.window = window.open("run_index.html?persistence=CSIDE", thisProject.getName(), "height=500,width=500,scrollbars=1");
-                //window.location = "about:blank";
-			}
-		};
+    button.setAttribute('onclick', "popOutWindow();");
     document.getElementById("buttons").appendChild(button);
 	}
 });
