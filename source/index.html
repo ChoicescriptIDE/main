@@ -108,7 +108,7 @@
         <button title="Open new scene files" class="open-scenes-btn col-anim" data-bind="click: openFileBrowser, style: { backgroundColor: getUIColour(-12) }"><i class="fa fa-folder-open col-anim"></i></button>
       </div>
       <ul id="main-project-wrap" data-bind="sortable: { data: getProjects, allowDrop: false, connectClass: 'null', afterMove: cside.updatePersistenceList, options: { axis: 'y', cancel: 'input:not([readonly]), button, .scene', items: '.project-wrapper', containment: $('#main-project-wrap') } }"><li class="project-wrapper">
-          <div class="project-header" data-bind="css: { 'project-header-selected': $data == $root.getSelectedProject(), 'collapsed': isExpanded() === false }, style: { backgroundColor: $root.getUIColour(-5), color: $root.getUIColour(100) }" class="col-anim">
+          <div class="project-header" data-bind="css: { 'project-header-selected': $data == $root.getSelectedProject(), 'collapsed': isExpanded() === false }, style: { backgroundColor: $root.getUIColour(-15), color: $root.getUIColour(100) }" class="col-anim">
             <button data-bind="attr: { title: 'Toggle visibility of project ' + getName() }, click: setExpand, css: isExpanded() ? 'fa fa-eye' : 'fa fa-eye-slash'" class="col-anim"></button>
             <!-- <span data-bind="fadeVisible: beingEdited() ? false : true, event: { dblclick: rename }, text: getName, attr: { title: getPath }"></span> -->
             <input data-bind="enableTextInput: beingEdited, textInput: nameInterface, event: { dblclick: rename, blur: rename, keyup: rename }, attr: { title: getPath }, style: { backgroundColor: beingEdited() ? $root.getUIColour(-15) : 'transparent' }, css: { 'name-error': nameInvalid }" class="col-anim"></input>
