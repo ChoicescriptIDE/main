@@ -31,8 +31,11 @@ body {
 	border: none;
 	margin: 0px;
 	padding: 0px;
-	font-family: "Century Gothic", "AppleGothic", "Arial", "Helvetica", "sans-serif";
 	background-color: #EEE;
+}
+
+body, #code-footer>span {
+  font-family: "Century Gothic", "AppleGothic", "Arial", "Helvetica", "sans-serif";
 }
 
 a, button, div, span {
