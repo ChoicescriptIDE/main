@@ -1616,6 +1616,10 @@ span.cm-spell-error::after {
     color: white;
 }
 
+.cside_noty.noty_container_type_warning {
+  background-color: #ffee6a;
+}
+
 .cside_noty.noty_container_type_success {
     background-color: #b2f3ae;
 }
