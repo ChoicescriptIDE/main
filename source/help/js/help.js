@@ -9,6 +9,7 @@ marked.setOptions({
 var csideHelp = {
   "current" : "home.html",
   "history" : ["home.html"],
+  "document" : document,
   "breadcrumbs" : [
     {
       "title": "Home",

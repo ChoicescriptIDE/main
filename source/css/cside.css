@@ -39,6 +39,12 @@ a, button, div, span {
     cursor: default;
 }
 
+body.night input {
+  background-color: #3e3e3e;
+  border: 1px solid #2b2b2b;
+  color: white;
+}
+
 #editor-wrap * {
     cursor: text;
 }
@@ -102,6 +108,9 @@ a, button, div, span {
     position: relative;
 	background-color: #EEE;
     border-color: inherit;
+}
+body.night .left-wrap {
+  background-color: #262626;
 }
 .right-wrap {
 	position:absolute;
@@ -588,6 +597,11 @@ a, button, div, span {
 	font-weight: normal;
 }
 
+.panel.settings select {
+  margin: 5px;
+  background-color: transparent;
+}
+
 .setting-option {
     border: solid;
     border-color: rgb(177, 177, 177);
@@ -606,6 +620,10 @@ a, button, div, span {
     display: inline-block;
     opacity: .25;
     text-align: center;
+}
+
+body.night .setting-option {
+  border-color: #505050;
 }
 
 .setting-colour-swatch {
@@ -634,8 +652,11 @@ a, button, div, span {
 .setting-option-selected {
     border: 1px solid rgb(188, 188, 188);
     background-color: rgb(216, 216, 219);
-    color: rgb(89, 89, 89);
     opacity: 1;
+}
+
+body.night .setting-option-selected {
+  border-color: #505050;
 }
 
 .panel.settings>ul>li>ul {
@@ -739,6 +760,11 @@ a, button, div, span {
     border-color: inherit;
 }
 
+body.night .panel {
+  background-color: #2b2b2b;
+  color: rgb(194, 204, 221);
+}
+
 .panel > ul > li {
     font-size: 14px;
     color: rgb(97, 97, 97);
@@ -746,12 +772,25 @@ a, button, div, span {
     border-bottom: 1px solid rgb(205, 205, 205);
 }
 
+body.night .panel > ul > li {
+  border-bottom-color: #292929;
+  color: #b9b9b9;
+}
+
 .panel li:nth-child(odd) {
     background-color: rgb(247, 247, 252);
 }
 
+body.night .panel li:nth-child(odd) {
+  background-color: #353535;
+}
+
 .panel li:nth-child(even) {
     background-color: rgb(242, 241, 247);
+}
+
+body.night .panel li:nth-child(even) {
+  background-color: #2b2b2b;
 }
 
 .save-name {
@@ -772,16 +811,28 @@ a, button, div, span {
 	position: relative;
     width: 230px;
     float: left;
-    background-color: rgb(242, 241, 247);
     height: 100%;
     left: -230px;
     z-index: 7;
     border-color: inherit;
 }
 
+.main-wrap #sidebar {
+  background-color: rgb(242, 241, 247);
+}
+
+body.night #sidebar {
+  background-color: #2b2b2b;
+}
+
 .scene:hover {
     background-color: rgb(255, 255, 255);
 	box-shadow: inset -2px 0px 4px 0px #E6E6E6;
+}
+
+body.night .scene:hover {
+  background-color: #3e3e3e;
+  box-shadow: inset -2px 0 4px 0 #464646;
 }
 
 /* .scene:active {
@@ -799,10 +850,20 @@ a, button, div, span {
 	height: 30px;
 }
 
+body.night .scene {
+  border-color: #292929;
+  background-color: #353535;
+  color: #b9b9b9;
+}
+
 .scene-selected {
 	font-weight: bold;
 	background-color: #FFFFFF;
 	border-width: 0px 0px 1px 0px;
+}
+
+body.night .scene.scene-selected {
+  background-color: #3e3e3e;
 }
 
 .scene > span {
@@ -883,6 +944,11 @@ a, button, div, span {
 	z-index: 9;
 }
 
+body.night .scene-error {
+  background-color: #3e3e3e;
+  border-top: 1px solid #262626;
+}
+
 .scene-error span {
 	font-weight: normal;
 	color: salmon;
@@ -912,6 +978,12 @@ a, button, div, span {
 	box-shadow: -3px 1px 1px 0px rgb(202, 202, 202);
 	width: 230px;
 	padding: 2px;
+}
+
+body.night .colour-picker {
+  border-top: 1px #4c4c4c solid;
+  background-color: #4c4c4c;
+  box-shadow: none;
 }
 
 .colour-selector {
@@ -1649,8 +1721,30 @@ span.cm-spell-error::after {
 	background-color: #ECECEC;
 	border-radius: 0px;
 }
+body.night .modal-content {
+  background-color: #353535;
+}
+body.night .modal-header {
+  border-bottom-color: #292929;
+}
+body.night .modal-title {
+  color: white;
+}
+body.night .modal-footer {
+  border-top-color: #292929;
+}
 .bootbox-body {
 	word-wrap: break-word;
+}
+body.night .bootbox-body, body.night .form-control, body.night output {
+  color: white;
+}
+body.night .bootbox-close-button {
+  text-shadow: none;
+  opacity: 1;
+}
+body.night .close:focus, body.night .close:hover {
+  color: #ca7070;
 }
 .dropdown-menu {
 	-webkit-border-radius: 0px;
@@ -1729,4 +1823,19 @@ span.cm-spell-error::after {
 }
 .CodeMirror-dialog input {
     font-family: inherit;
+}
+
+body.night .btn-default {
+  color: #d8d6d6;
+  background-color: #494a49;
+  border-color: #2f2f2f;
+}
+
+/* allows smooth night / day mode transition */
+#sidebar, .scene, .panel>ul>li {
+  -webkit-transition: all .5s ease;
+  -moz-transition: all .5s ease;
+  -o-transition: all .5s ease;
+  -ms-transition: all .5s ease;
+  transition: all .5s ease;
 }

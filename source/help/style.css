@@ -14,12 +14,21 @@ body {
     color:rgb(105, 105, 105);
     font-size:12px;
 }
+body.night {
+  background-color: #2b2b2b;
+  color: #b9b9b9;
+}
 blockquote {
     background: lightgrey;
     padding: 10px;
     border-radius: 5px;
     color: #4e4e4e;
     border: 1px solid grey;
+}
+body.night blockquote, body.night pre {
+  background: #3e3e3e;
+  color: #b7b7b7;
+  border-color: black;
 }
 table {
     margin: 0 auto;
@@ -65,6 +74,10 @@ h1, h2, h3 {
     user-select: none;
     cursor: default;
 }
+body.night h1, body.night h2, body.night h3 {
+  border-bottom-color: #232323;
+  color: rgb(216, 214, 214);
+}
 p {
     -webkit-margin-before: .5em;
     -webkit-margin-after: .5em;
@@ -98,6 +111,12 @@ a.show::after {
 }
 .nav li:nth-child(even) > a {
      background-color: rgb(242, 241, 247);
+}
+body.night .nav li:nth-child(odd) > a {
+  background-color: #353535;
+}
+body.night .nav li:nth-child(even) > a {
+  background-color: #2b2b2b;
 }
 .feed li {
   padding: 10px;
@@ -204,6 +223,11 @@ ul li:hover {
     text-decoration:none;
 }
 
+body.night .nav li a {
+  border-bottom: 1px solid #292929;
+  color: #cccbcb;
+}
+
 .nav li a[rel=external] {
 	cursor: pointer;
 }
@@ -213,6 +237,11 @@ ul li:hover {
     padding-left: 20px;
     background-color: rgba(232, 232, 232, 0.53);
     box-shadow: inset 4px 0px 0px 0px #A5A4A4;
+}
+body.night .nav li a:hover {
+  color: #fbfbfb;
+  background-color: rgb(62, 62, 62);
+  box-shadow: inset 4px 0px 0px 0px #A5A4A4;
 }
 .nav li span {
   margin: 1px;

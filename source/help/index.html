@@ -27,6 +27,10 @@
           .fail(function() {
             $("#content").html("<h3>Error: Failed to load help document</h3>");
           })
+        // hacky way of getting night-mode on init
+        if (parent.document.getElementsByClassName("night")[0]) {
+          $('body').addClass("night");
+        }
       });
       $('body').on('click', 'a', csideHelp.handleLink);
       //prevent middle mouse click scroll as it bugs out

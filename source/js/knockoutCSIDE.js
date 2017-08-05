@@ -1514,6 +1514,7 @@ function IDEViewModel() {
         "fontfamily": "'Courier New', Courier, monospace",
         "spell_dic": "en_US",
         "theme": "cs-dark",
+        "night-mode": false,
         "spellcheck": true,
         "autosuggest": false,
         "autoformat": true,
@@ -2866,6 +2867,26 @@ function IDEViewModel() {
               });
           } else {
             $(".CodeMirror").off();
+          }
+        }
+      }),
+      new CSIDESetting({
+        "id": "night-mode",
+        "name": "Night Mode",
+        "value": false,
+        "type": "binary",
+        "desc": "Toggle between a light and dark application interface",
+        "apply": function(val) {
+          var help = __getCSIDEHelp();
+          if (val) {
+            $("body").addClass("night");
+            if (help)
+              $(help.document.body).addClass("night");
+          }
+          else {
+            $("body").removeClass("night");
+            if (help)
+              $(help.document.body).removeClass("night");
           }
         }
       }),
