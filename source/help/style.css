@@ -12,7 +12,7 @@ body {
     width:100%;
     font-family: "Century Gothic", "CenturyGothic", "AppleGothic", "arial";
     color:rgb(105, 105, 105);
-    font-size:12px;
+    font-size:14px;
 }
 body.night {
   background-color: #2b2b2b;
@@ -246,7 +246,6 @@ body.night .nav li a:hover {
 .nav li span {
   margin: 1px;
 }
-
 hr {
     border-color: rgba(195, 195, 195, 0.36);
     background-color: #FFF;
