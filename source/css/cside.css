@@ -993,6 +993,19 @@ body.night .colour-picker {
   width: 12px;
   margin: 6px 4px;
   border-radius: 6px;
+
+  -webkit-transition: all 200ms ease-in;
+  -moz-transition: all 200ms ease-in;
+  -ms-transition: all 200ms ease-in;
+  transition: all 200ms ease-in;
+}
+
+
+.colour-selector:hover {
+  -webkit-transform: scale(1.35);
+  -moz-transform: scale(1.35);
+  -ms-transform: scale(1.35);
+  transform: scale(1.35);
 }
 
 .scene-issues {
