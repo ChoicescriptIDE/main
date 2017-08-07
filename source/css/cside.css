@@ -865,6 +865,10 @@ body.night .scene {
 	border-width: 0px 0px 1px 0px;
 }
 
+body.night .scene-selected {
+  color: white;
+}
+
 body.night .scene.scene-selected {
   background-color: #3e3e3e;
 }
