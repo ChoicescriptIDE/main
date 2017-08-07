@@ -1173,8 +1173,8 @@ function IDEViewModel() {
         visible(newVal);
 	}
     value.subscribe(function(option) {
-      setting.apply(value());
       config.settings[cat][id] = value(); //store
+      setting.apply(value());
       __updateConfig(); //then write new settings object to localStorage
     });
 
