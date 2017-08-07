@@ -279,7 +279,7 @@ pre {
 .breadcrumbs > *:not(:first-child):before {
     content: '> '
 }
-#content p, img {
+#content p, img, ul {
     margin: 10px;
 }
 .example {
