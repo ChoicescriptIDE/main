@@ -280,7 +280,7 @@ pre {
     content: '> '
 }
 #content p, img, ul {
-    margin: 10px;
+    margin: 20px;
 }
 .example {
     padding: 5px;
