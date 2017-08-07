@@ -42,7 +42,7 @@ a, button, div, span {
     cursor: default;
 }
 
-body.night input {
+body.night input:not([readonly]) {
   background-color: #3e3e3e;
   border: 1px solid #2b2b2b;
   color: white;
