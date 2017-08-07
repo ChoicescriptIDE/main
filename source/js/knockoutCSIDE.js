@@ -1497,7 +1497,8 @@ function IDEViewModel() {
     "rgb(237, 216, 161)", "rgb(161, 165, 237)", "rgb(224, 161, 237)", "rgb(163, 163, 163)", "rgb(230, 230, 230)"
   ]);
   validSceneColours = ko.observableArray(["rgb(114, 195, 116)", "rgb(119, 151, 236)", "rgb(217, 83, 79)", "rgb(165, 147, 122)", "rgb(255, 141, 43)", "rgb(224, 121, 245)", "rgb(0, 168, 195)", "rgb(119, 119, 119)"]);
-  var uiColour = ko.observable("90,90,90");
+  var uiColour = ko.observable().extend({ notify: 'always' });
+  uiColour("90,90,90");
   var consoleOpen = ko.observable(false);
   var activeProject = ko.observable("");
   var projects = ko.observableArray([]);
@@ -1892,6 +1893,9 @@ function IDEViewModel() {
   });
   self.getUIColour = function(delta) {
     delta = delta || 0;
+    if (config.settings.app["night-mode"]) {
+      delta -= 25;  // darken night-mode colours even further
+    }
     var rgb = uiColour().split(",");
     var val;
     for (var i = 0; i < rgb.length; i++) {
@@ -2888,6 +2892,7 @@ function IDEViewModel() {
             if (help)
               $(help.document.body).removeClass("night");
           }
+          uiColour(uiColour()); // refresh night/day shade
         }
       }),
       new CSIDESetting({
