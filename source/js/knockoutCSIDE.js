@@ -1894,7 +1894,7 @@ function IDEViewModel() {
   self.getUIColour = function(delta) {
     delta = delta || 0;
     if (config.settings.app["night-mode"]) {
-      delta -= 25;  // darken night-mode colours even further
+      delta -= 30;  // darken night-mode colours even further
     }
     var rgb = uiColour().split(",");
     var val;
