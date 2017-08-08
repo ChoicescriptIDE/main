@@ -2740,10 +2740,10 @@ function IDEViewModel() {
           "desc": "Mono",
           "value": "'Courier New', Courier, monospace"
         }, {
-          "desc": "Serif",
+          "desc": "Sans-Serif",
           "value": "Arial, Helvetica, sans-serif"
         }, {
-          "desc": "Sans-Serif",
+          "desc": "Serif",
           "value": "'Times New Roman', Times, serif"
         }, {
           "desc": "Gothic",
