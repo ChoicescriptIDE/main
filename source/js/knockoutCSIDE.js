@@ -1533,8 +1533,18 @@ function IDEViewModel() {
     },
 	"justUpdated": false,
     "openProjects": [],
-    "userDictionary": {}
+    "userDictionary": {},
+    "tabs": [
+      "game",
+      "issues",
+      "settings",
+      "help",
+      "dictionary"
+    ]
   };
+  if (usingNode) {
+    defaultConfig.tabs.push("examples");
+  }
   config = defaultConfig;
   try {
     storedConfig = JSON.parse(localStorage.getItem("CSIDE_appConfig"));
@@ -2382,64 +2392,62 @@ function IDEViewModel() {
     }
   }
 
-  self.tabs = ko.observableArray(
-    [{
-        "id": "game",
-        "title": "Game",
-        "showTitle": true,
-        "iconClass": "fa fa-cube",
-        "href": ko.observable(""),
-        "content": "",
-        "visible": ko.observable(true),
-        "getHeaderTitle": ko.computed(function() {
-          return (activeProject() ? activeProject().getName() : "Run a Project");
-        }, this)
-      }, {
-        "id": "issues",
-        "title": "Issues",
-        "showTitle": true,
-        "iconClass": "fa fa-exclamation-triangle",
-        "href": "",
-        "content": "",
-        "visible": ko.observable(true),
-        "getHeaderTitle": ko.computed(function() {
-          return (selectedProject() ? ("Issues with " + selectedProject().getName()) : "Select a Project");
-        }, this)
-      }, {
-        "id": "settings",
-        "title": "Settings",
-        "showTitle": false,
-        "iconClass": "fa fa-cog",
-        "href": "",
-        "content": "",
-        "visible": ko.observable(true),
-        "getHeaderTitle": ""
-      }, {
-        "id": "help",
-        "title": "Help & Information",
-        "showTitle": true,
-        "iconClass": "fa fa-question-circle",
-        "href": "help/index.html",
-        "content": "",
-        "visible": ko.observable(true),
-        "getHeaderTitle": "Help & Information"
-      }, {
-        "id": "dictionary",
-        "title": "User Dictionary",
-        "showTitle": true,
-        "iconClass": "fa fa-book",
-        "href": "",
-        "content": "",
-        "visible": ko.observable(true),
-        "getHeaderTitle": "User Dictionary"
-      }
-      /*{"id" : "snippets", "title" : "Code Snippets", "showTitle": false, "iconClass" : "fa fa-scissors", "href" : "", "content" : "", "visible": ko.observable(false)},
-			{"id" : "notes", "title" : "Notes/Memos", "showTitle": false, "iconClass" : "img/ui/notes.png", "href" : "", "content" : "", "visible": ko.observable(false)}*/
-    ]
-  );
-
-  if (usingNode) {
-    self.tabs.push({
+  var __csideTabs = {
+    "game": {
+      "id": "game",
+      "title": "Game",
+      "showTitle": true,
+      "iconClass": "fa fa-cube",
+      "href": ko.observable(""),
+      "content": "",
+      "visible": ko.observable(true),
+      "getHeaderTitle": ko.computed(function() {
+        return (activeProject() ? activeProject().getName() : "Run a Project");
+      }, this)
+    },
+    "issues": {
+      "id": "issues",
+      "title": "Issues",
+      "showTitle": true,
+      "iconClass": "fa fa-exclamation-triangle",
+      "href": "",
+      "content": "",
+      "visible": ko.observable(true),
+      "getHeaderTitle": ko.computed(function() {
+        return (selectedProject() ? ("Issues with " + selectedProject().getName()) : "Select a Project");
+      }, this)
+    },
+    "settings": {
+      "id": "settings",
+      "title": "Settings",
+      "showTitle": false,
+      "iconClass": "fa fa-cog",
+      "href": "",
+      "content": "",
+      "visible": ko.observable(true),
+      "getHeaderTitle": ""
+    },
+    "help": {
+      "id": "help",
+      "title": "Help & Information",
+      "showTitle": true,
+      "iconClass": "fa fa-question-circle",
+      "href": "help/index.html",
+      "content": "",
+      "visible": ko.observable(true),
+      "getHeaderTitle": "Help & Information"
+    },
+    "dictionary": {
+      "id": "dictionary",
+      "title": "User Dictionary",
+      "showTitle": true,
+      "iconClass": "fa fa-book",
+      "href": "",
+      "content": "",
+      "visible": ko.observable(true),
+      "getHeaderTitle": "User Dictionary"
+    },
+    "examples": {
       "id": "examples",
       "title": "Example Projects & Templates",
       "showTitle": true,
@@ -2448,7 +2456,11 @@ function IDEViewModel() {
       "content": "",
       "visible": ko.observable(true),
       "getHeaderTitle": "Example Projects & Templates"
-    });
+    }
+  }
+  self.tabs = ko.observableArray([]);
+
+  if (usingNode) {
 
     self.cs_examples = [
       {
@@ -3149,7 +3161,8 @@ function IDEViewModel() {
     consoleCmdBufPtr = consoleCmdBuf.length;
     selectedProject().logToConsole("> " + input, "null");
     // Must have a running game
-    if (typeof frames === 'undefined' || typeof frames[0] === 'undefined' || typeof frames[0].window.stats === 'undefined') {
+    var gameFrame = document.getElementById("game-tab-frame").contentWindow || document.getElementById("#game-tab-frame");
+    if (typeof gameFrame === 'undefined' || typeof gameFrame === 'undefined' || typeof gameFrame.stats === 'undefined') {
       selectedProject().logToConsole("Error: no choicescript game running", "error");
       element.value = "";
       return;
@@ -3172,20 +3185,20 @@ function IDEViewModel() {
           if (input.match(/^\*goto/)) {
             if (input.match(/^\*goto\s+/)) {
               input = input.replace(/^\*goto\s+/, ""); //convert *goto label into (*goto_scene) current_scene label
-              frames[0].window.stats.scene.CSIDEConsole_goto(input);
+              gameFrame.stats.scene.CSIDEConsole_goto(input);
             } else {
               input = input.replace(/^\*goto_scene\s+/, "");
-              frames[0].window.stats.scene.CSIDEConsole_goto_scene(input);
+              gameFrame.stats.scene.CSIDEConsole_goto_scene(input);
             }
-          } else if (!frames[0].window.stats.scene.runCommand(input)) {
+          } else if (!gameFrame.stats.scene.runCommand(input)) {
             selectedProject().logToConsole("Error: an unknown error occured whilst attempting to execute that command", "error");
           }
         } else {
           selectedProject().logToConsole("Error: invalid console command", "error");
         }
       } else { //assume expression:
-        var stack = frames[0].window.stats.scene.tokenizeExpr(input);
-        var result = frames[0].window.stats.scene.evaluateExpr(stack);
+        var stack = gameFrame.stats.scene.tokenizeExpr(input);
+        var result = gameFrame.stats.scene.evaluateExpr(stack);
         if (typeof result === "string") {
           result = '"' + result + '"';
         } else if (!result) {
@@ -3394,6 +3407,9 @@ function IDEViewModel() {
           project.addScene(scene);
           scene.load();
         }
+      }
+      for (var e = 0; e < config.tabs.length; e++) {
+        self.tabs.push(__csideTabs[config.tabs[e]]);
       }
     }
     var scope = settings.editor();
@@ -4275,6 +4291,7 @@ function IDEViewModel() {
 
   function __updatePersistenceList() {
     config.openProjects = [];
+    config.tabs = [];
     var thisProject;
     for (var i = 0; i < projects().length; i++) {
       thisProject = {
@@ -4295,6 +4312,9 @@ function IDEViewModel() {
         thisProject.openScenes.push(thisScene);
       }
       config.openProjects.unshift(thisProject);
+    }
+    for (var e = 0; e < self.tabs().length; e++) {
+      config.tabs[e] = self.tabs()[e].id;
     }
     __updateConfig();
   }

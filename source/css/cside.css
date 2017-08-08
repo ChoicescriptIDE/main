@@ -143,14 +143,11 @@ body.night .left-wrap {
 
 /* icon styling */
 #tabs > ul > li > a {
-	color: rgb(56, 56, 56);
-	background-color: rgb(79, 79, 79);
-	font-size: 20px;
-	height: 100%;
-	padding: 4.5px 16px;
-	border: solid;
-    border-color: inherit;
-	border-width: 0px 1px 0px 0px;
+  color: #383838;
+  font-size: 20px;
+  height: 100%;
+  padding: 5px;
+  width: 100%;
 	outline: none; /* fix ugly black border on MAC OS */
 }
 
@@ -165,7 +162,6 @@ body.night .left-wrap {
 	/* background: #f6f6f6 50% 50% repeat-x; */
 	outline-color: transparent;
 	color: whitesmoke !important;
-	background-color: #5A5A5A;
 	cursor: default;
 }
 
@@ -236,6 +232,10 @@ body.night .left-wrap {
 /* overrides jQuery UI? */
 .ui-tabs .ui-tabs-nav li {
 	height: 100%;
+  width: 50px;
+  border: solid;
+  border-width: 0 1px 0 0;
+  text-align: center;
   border-color: inherit;
 }
 

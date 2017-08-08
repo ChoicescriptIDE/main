@@ -174,12 +174,10 @@
 						<i class="fa fa-arrows-h fa-lg"></i>
 					</button>
 					<div id="tabs" data-bind="tabs: { refreshOn: tabs }">
-						<ul data-bind="style: { backgroundColor: getUIColour(-10) }" class="col-anim">
-							<!-- ko foreach: tabs -->
-								<li data-bind="attr: { 'aria-controls': id, title: title }, visible: visible">
-									<a draggable="false" data-bind="attr: { title: title, href: '#' + id, class: 'col-anim ui-tabs-anchor ' + iconClass }, style: { backgroundColor: $root.getUIColour(-15), color: $root.getUIColour(-65) }"></a>
-								</li>
-							<!-- /ko -->
+						<ul data-bind="style: { backgroundColor: getUIColour(-10) }, sortable: { data: tabs, allowDrop: false, connectClass: 'null', afterMove: cside.updatePersistenceList, options: { axis: 'x', items: 'li', containment: 'parent' } }" class="col-anim">
+							<li data-bind="attr: { 'aria-controls': id, title: title }, visible: visible, style: { backgroundColor: $root.getUIColour(-15) }">
+								<a draggable="false" data-bind="attr: { title: title, href: '#' + id, class: 'ui-tabs-anchor ' + iconClass }, style: { color: $root.getUIColour(-65) }"></a>
+							</li>
 						</ul>
 						<!-- ko foreach: tabs -->
 							<div class='tab-wrap' data-bind="attr: { id: id }, visible: visible">
@@ -187,7 +185,7 @@
                   <div class="no-select panel-header col-anim" data-bind="visible: showTitle, text: getHeaderTitle, style: { backgroundColor: $root.getUIColour(-8) }"></div>
     								<!-- ko if: href != '' -->
                       <div class="iframe-wrap">
-  									    <iframe data-bind="attr { src: href, title: title, name: title, visible: href }"></iframe>
+  									    <iframe data-bind="attr { src: href, title: title, name: title, visible: href, id: id + '-tab-frame' }"></iframe>
                       </div>
     								<!-- /ko -->
                     <!-- ko if: id == 'issues' -->
