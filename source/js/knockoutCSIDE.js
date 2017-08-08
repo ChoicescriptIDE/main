@@ -1535,8 +1535,10 @@ function IDEViewModel() {
     "openProjects": [],
     "userDictionary": {}
   };
+  config = defaultConfig;
   try {
-    config = JSON.parse(localStorage.getItem("CSIDE_appConfig")) || defaultConfig;
+    storedConfig = JSON.parse(localStorage.getItem("CSIDE_appConfig"));
+    for (var item in storedConfig) { config[item] = storedConfig[item]; }
   } catch (err) {
     bootbox.alert("Sorry, there was a problem parsing your configuration settings.<br> \
 		They have been repaired and reset to the defaults.<br><br> \
