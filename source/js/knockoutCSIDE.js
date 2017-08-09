@@ -199,7 +199,7 @@ function IDEViewModel() {
           console.log(typeof meta.scene, typeof meta.line);
           console_logs.push({
             value: "Error: attempt to log bad meta data logged to project console!",
-            type: "error"
+            type: "cm-error"
           });
         }
       } else {
@@ -2793,6 +2793,7 @@ function IDEViewModel() {
             val = "cs-light";
           } //handle any old config values
           editor.setOption("theme", val);
+          $("#code-footer, #cs-console").removeClass().addClass("CodeMirror cm-s-" + val);
         }
       })
     ]),
@@ -3159,17 +3160,17 @@ function IDEViewModel() {
     }
     consoleCmdBuf.push(input);
     consoleCmdBufPtr = consoleCmdBuf.length;
-    selectedProject().logToConsole("> " + input, "null");
+    selectedProject().logToConsole(input, input.substring(0,1) == "*" ? "cm-builtin" : "cm-variable");
     // Must have a running game
     var gameFrame = document.getElementById("game-tab-frame").contentWindow || document.getElementById("#game-tab-frame");
     if (typeof gameFrame === 'undefined' || typeof gameFrame === 'undefined' || typeof gameFrame.stats === 'undefined') {
-      selectedProject().logToConsole("Error: no choicescript game running", "error");
+      selectedProject().logToConsole("Error: no choicescript game running", "cm-error");
       element.value = "";
       return;
     }
     // Prevent the confusing use of commands through non active project consoles
     if (selectedProject() != activeProject()) {
-      selectedProject().logToConsole("Error: this project is not the one running", "error");
+      selectedProject().logToConsole("Error: this project is not the one running", "cm-error");
       element.value = "";
       return;
     }
@@ -3191,10 +3192,10 @@ function IDEViewModel() {
               gameFrame.stats.scene.CSIDEConsole_goto_scene(input);
             }
           } else if (!gameFrame.stats.scene.runCommand(input)) {
-            selectedProject().logToConsole("Error: an unknown error occured whilst attempting to execute that command", "error");
+            selectedProject().logToConsole("Error: an unknown error occured whilst attempting to execute that command", "cm-error");
           }
         } else {
-          selectedProject().logToConsole("Error: invalid console command", "error");
+          selectedProject().logToConsole("Error: invalid console command", "cm-error");
         }
       } else { //assume expression:
         var stack = gameFrame.stats.scene.tokenizeExpr(input);
@@ -3209,7 +3210,7 @@ function IDEViewModel() {
     } catch (e) {
       //strip error scene & line num - as the information is irrelevant
       e.message = e.message.replace(/line [0-9]+ of\s\w+: /, "");
-      selectedProject().logToConsole("Error: " + e.message, "error");
+      selectedProject().logToConsole("Error: " + e.message, "cm-error");
     }
     element.value = "";
   }

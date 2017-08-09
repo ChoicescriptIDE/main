@@ -156,17 +156,15 @@
 							<span data-bind="fadeVisible: wordCountOn()">Char Count: <span data-bind="text: getSelectedScene().getCharCountString()"></span></span>
 							<span data-bind="fadeVisible: wordCountOn()">Word Count: <span data-bind="text: getSelectedScene().getWordCountString()"></span></span>
 						</div>
-            <!-- ko if: getSelectedProject() -->
-    					<div data-bind="style: { flex: getSelectedProject().consoleOpen() ? 1 : 0 }" id="cs-console">
-                <ul data-bind="foreach: getSelectedProject().getLogs">
-                  <li>
-                    <span data-bind="text: $data.value, css: $data.type"></span>
-                    <span class="meta" data-bind="visible: ($data.scene && $data.line), text: $data.scene + $data.line"></span>
-                  </li>
-                </ul>
-                <input data-bind="event: { 'keyup': consoleInput }">
-              </div>
-            <!-- /ko -->
+  					<div data-bind="if: getSelectedProject, style: { flex: getSelectedProject() && getSelectedProject().consoleOpen() ? 1 : 0 }" id="cs-console">
+              <ul data-bind="foreach: getSelectedProject().getLogs">
+                <li>
+                  <span data-bind="text: $data.value, css: $data.type"></span>
+                  <span class="meta" data-bind="visible: ($data.scene && $data.line), text: $data.scene + $data.line"></span>
+                </li>
+              </ul>
+              <input data-bind="event: { 'keyup': consoleInput }">
+            </div>
 					</div>
 				</div>
 				<div class="right-wrap">

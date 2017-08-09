@@ -498,6 +498,7 @@ body.night .left-wrap {
     border: none;
     border-top: 1px solid;
     border-color: inherit;
+    color: inherit;
 }
 
 #cs-console > ul {
@@ -510,6 +511,10 @@ body.night .left-wrap {
     bottom: 20px;
     overflow-x: hidden;
     overflow-y: scroll;
+}
+
+#cs-console > ul > li::before {
+    content: '>';
 }
 
 #cs-console > ul > li {
