@@ -1860,6 +1860,16 @@ body.night .btn-default {
   border-color: #2f2f2f;
 }
 
+body.night ::-webkit-scrollbar-thumb {
+    border: 1px solid #292929;
+    background-color: rgb(62, 62, 62);
+}
+
+body.night ::-webkit-scrollbar-track {
+    background-color: #2b2b2b;
+    border-left: 1px solid #000;
+}
+
 /* allows smooth night / day mode transition */
 #sidebar, .scene, .panel>ul>li {
   -webkit-transition: all .5s ease;
