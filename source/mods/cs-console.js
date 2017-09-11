@@ -282,28 +282,32 @@ Scene.prototype.CSIDEConsole_forceStoreVarUpdate = function(type, variable) {
     });
 }
 
- Scene.prototype.setVar = function setVar(variable, value) {
-     variable = variable.toLowerCase();
-     if (this.debugMode) println(variable +"="+ value);
-     if ("undefined" === typeof this.temps[variable]) {
-         if ("undefined" === typeof this.stats[variable]) {
-             throw new Error(this.lineMsg() + "Non-existent variable '"+variable+"'");
-         }
-         if (this.CSIDEConsole_tracking.track_all || this.CSIDEConsole_tracking.stats[variable]) {
-             var log = "value of stats." + variable + " changed from " + this.CSIDEConsole_quoteStringVal(this.stats[variable]) + " to " + this.CSIDEConsole_quoteStringVal(value);
-             thisProject.logToConsole(log, "null", {scene: stats.sceneName + ".txt: ", line: (stats.scene.lineNum + 1)});
-         }
-         this.stats[variable] = value;
-         this.CSIDEConsole_forceStoreVarUpdate("stats", variable);
-     } else {
-         if (this.CSIDEConsole_tracking.track_all || this.CSIDEConsole_tracking.temps[variable]) {
-             var log = "value of temps." + variable + " changed from " + this.CSIDEConsole_quoteStringVal(this.temps[variable]) + " to " + this.CSIDEConsole_quoteStringVal(value);
-             thisProject.logToConsole(log, "null", {scene: stats.sceneName + ".txt: ", line: (stats.scene.lineNum + 1)});
-         }
-         this.temps[variable] = value;
-         this.CSIDEConsole_forceStoreVarUpdate("temps", variable);
-     }
- };
+Scene.prototype.setVar = function setVar(variable, value) {
+    variable = variable.toLowerCase();
+    if (this.debugMode) println(variable +"="+ value);
+    if ("undefined" === typeof this.temps[variable]) {
+        if ("undefined" === typeof this.stats[variable]) {
+            throw new Error(this.lineMsg() + "Non-existent variable '"+variable+"'");
+        }
+        if (this.CSIDEConsole_tracking.track_all || this.CSIDEConsole_tracking.stats[variable]) {
+            var log = "value of stats." + variable + " changed from " + this.CSIDEConsole_quoteStringVal(this.stats[variable]) + " to " + this.CSIDEConsole_quoteStringVal(value);
+            thisProject.logToConsole(log, "null", {scene: stats.sceneName + ".txt: ", line: (stats.scene.lineNum + 1)});
+        }
+        this.stats[variable] = value;
+        if (this.saveSlot == "temp") tempStatWrites[variable] = value;
+        // Implicit control flow flag is ideally set just once in startup.
+        // Removing these lines makes this not possible with quicktest.
+        if (variable == "implicit_control_flow" && this.nav) {
+            this.nav.startingStats["implicit_control_flow"] = value;
+        }
+    } else {
+       if (this.CSIDEConsole_tracking.track_all || this.CSIDEConsole_tracking.temps[variable]) {
+           var log = "value of temps." + variable + " changed from " + this.CSIDEConsole_quoteStringVal(this.temps[variable]) + " to " + this.CSIDEConsole_quoteStringVal(value);
+           thisProject.logToConsole(log, "null", {scene: stats.sceneName + ".txt: ", line: (stats.scene.lineNum + 1)});
+       }
+        this.temps[variable] = value;
+    }
+};
 
  Scene.validCommands.console_log = 1;
  Scene.validCommands.console_help = 1;
