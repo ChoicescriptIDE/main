@@ -11,6 +11,7 @@ Scene.prototype.lineMsg = function lineMsg() {
 }
 
 function findScene(sceneName) {
+	if (!sceneName) return false;
 	var projectSceneList = thisProject.getScenes(); //if pop-out window
 	for (var i = 0; i < projectSceneList.length; i++) {
 		if (projectSceneList[i].getName().toLowerCase() === sceneName.toLowerCase()) {
