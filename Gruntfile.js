@@ -209,6 +209,15 @@ module.exports = function(grunt) {
 		  zip: false
         },
         src: ['./build/**/*']
+      },
+      linux: {
+        options: {
+          platforms: ['linux64'],
+          buildDir: '.nwjsBuild',
+          cacheDir: '.nwjsCache',
+          version: '0.21.4',
+        },
+        src: ['./build/**/*']
       }
     }
   });
@@ -217,4 +226,5 @@ module.exports = function(grunt) {
   grunt.registerTask("build-with-nwjs", tasks.concat("nwjs"));
   grunt.registerTask("build-with-windows", tasks.concat("nwjs:windows"));
   grunt.registerTask("build-with-mac", tasks.concat("nwjs:mac"));
+  grunt.registerTask("build-with-linux", tasks.concat("nwjs:linux"));
 };
