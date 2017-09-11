@@ -213,8 +213,8 @@ module.exports = function(grunt) {
       linux: {
         options: {
           platforms: ['linux64'],
-          buildDir: '.nwjsBuild',
-          cacheDir: '.nwjsCache',
+          buildDir: 'nwjsBuild',
+          cacheDir: 'nwjsCache',
           version: '0.21.4',
         },
         src: ['./build/**/*']
