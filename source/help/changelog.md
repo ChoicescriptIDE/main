@@ -4,6 +4,7 @@ ChoiceScript update, additional aesthetic options and a variety of additional tw
 
 ### Additions
 - 'Night Mode' setting (allows selection of a dark UI theme)
+- Tab order is now both sortable and persistent across sessions
 - Additional (temporary) editor window themes
 - Option to select font-family used by the editor window
 - New level of update channel which allows quick access to future (untested) updates
@@ -16,15 +17,21 @@ ChoiceScript update, additional aesthetic options and a variety of additional tw
 - Incorrect variable referenced in FG's Basic's Tutorial
 - Fixed \*sound command
 - Find/Replace button text is now visible in dark themes
+- Spell-checking will now work on words with a variety of trailing punctuation (!?:; etc.)
 - \*disable_reuse should now be highlighted correctly when used inline
+- Fixed a bug in setVar override that allowed for rerunning of \*set via showStats, in certain circumstances
 
 ### Changes
-- Updated internal copy of ChoiceScript to [Github commit](https://github.com/dfabulich/choicescript/commit/e79cf280243f5920ee7e7fea22a268243695318f "ChoiceScript Github commit")
+- Updated internal copy of ChoiceScript to [Github commit](https://github.com/dfabulich/choicescript/commit/8d368b135125d7a25f8880d8e50656eaa447e60e "ChoiceScript Github commit")
+  - *gosub_scene *params
+  - Ability to disable control flow (i.e. no forced *goto in choices)
 - Heavily reduced help docs page load animation time
 - Help docs body font size increased by 2px (to 14px)
+- Modified some help docs margin values to further aid legibility
 - Project header bars are now slightly darker than the top UI bar  
 - CSIDE will now warn users about its inability to play .mp3 files (due to legal reasons)
 - Replace some references to deprecated NWJS APIs
+- The CS console will now 'inherit' styling/colour theme from the code editor
 - Simplified injection of Popout button to ChoiceScript index.html
 
 ## v1.0.1 - 14/06/17
