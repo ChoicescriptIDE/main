@@ -2,7 +2,7 @@
   "name": "CSIDE",
   "main": "index.html",
   "description": "The ChoiceScript IDE",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "keywords": [
     "choicescript",
     "IDE"
