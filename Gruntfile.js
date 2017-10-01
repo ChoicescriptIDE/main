@@ -187,7 +187,7 @@ module.exports = function(grunt) {
           archive: 'release/package.nw'
         },
         files: [
-          {src: ['build/**']}, // includes files in path and its subdirs
+          {cwd:'build', src: ['**'], expand:true}, // includes files in path and its subdirs
         ]
       }
     },
