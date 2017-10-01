@@ -1,3 +1,13 @@
+## v1.1.1 - 01/10/2017
+
+ChoiceScript update, package (update) size reduction.
+
+### Changes
+- Updated internal copy of ChoiceScript to [Github commit](https://github.com/dfabulich/choicescript/commit/9f27853f6e57c9e378d9bd4bd51fcccb491156b8 "ChoiceScript Github commit")
+- Fixed issues with the build process that caused updates to be unnecessarily large
+ - Updates will be smaller
+ - App should now also open more quickly on Windows
+
 ## v1.1.0 - 08/07/17
 
 ChoiceScript update, additional aesthetic options and a variety of additional tweaks and bug-fixes.
