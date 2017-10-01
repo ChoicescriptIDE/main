@@ -19,7 +19,7 @@ module.exports = function(grunt) {
           stdout: true,
           stderr: true,
           failOnError: true,
-          npm: '--production',
+          npm: 'trash username',
           bower: false
         }
       },
@@ -36,7 +36,7 @@ module.exports = function(grunt) {
      },
     "clean": {
       files: ['build/*.', 'release/*.'],
-      folders: ['build/*/', '!build/node_modules/']
+      folders: ['build/*/']
     },
     "copy": {
       main: {
@@ -76,6 +76,15 @@ module.exports = function(grunt) {
           }
         ]
       },
+      choicescript: {
+        files: [
+          {
+            expand:true, cwd: '',
+            src: ['node_modules/cside-choicescript/**'],
+            dest: 'build'
+          }
+        ]
+      }
     },
     "concat": {
       options: {
@@ -103,10 +112,10 @@ module.exports = function(grunt) {
 
           "node_modules/dropbox/dist/Dropbox-sdk.min.js",
 
-          "source/lib/mousetrap/mousetrap.min.js",
+          "node_modules/mousetrap/mousetrap.min.js",
           "source/lib/typo/typo.js",
 
-          "source/lib/knockout/knockout-3.2.0.js",
+		  "node_modules/knockout/build/output/knockout-latest.js",
           "source/lib/knockout/knockout-jqueryui.min.js",
           "source/lib/knockout/knockout-sortable.min.js",
           "source/js/knockoutCSIDE.js",
@@ -117,8 +126,6 @@ module.exports = function(grunt) {
           "source/lib/bootstrap/bootstrap.min.js",
           "source/lib/bootstrap/bootstrap-contextmenu.js",
 
-          "source/lib/mousetrap/mousetrap.min.js",
-
           "node_modules/cside-choicescript/web/scene.js",
           "node_modules/cside-choicescript/web/navigator.js",
           "node_modules/cside-choicescript/web/util.js",
@@ -127,6 +134,7 @@ module.exports = function(grunt) {
 
         ],
         dest: 'build/js/all.min.js',
+        nonull: true,
       },
     },
     "uglify": {
