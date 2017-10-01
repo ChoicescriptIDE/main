@@ -22,8 +22,8 @@
     "marked": "^0.3.6",
     "trash": "^2.0.0",
     "username": "^1.0.1",
-    "choicescript": "git://github.com/ChoicescriptIDE/choicescript.git",
-    "codemirror": "ChoicescriptIDE/CodeMirror.git"
+    "cside-choicescript": "github:ChoicescriptIDE/choicescript",
+    "cside-codemirror": "github:ChoicescriptIDE/codemirror"
   },
   "window": {
     "show": true,
