@@ -1,12 +1,15 @@
 ## v1.1.1 - 01/10/2017
 
-ChoiceScript update, package (update) size reduction.
+ChoiceScript update, package (update) size reduction and an aesthetic bug fix.
+
+### Fixes
+- Fixed out of sync scenes/projects panel animation
 
 ### Changes
 - Updated internal copy of ChoiceScript to [Github commit](https://github.com/dfabulich/choicescript/commit/9f27853f6e57c9e378d9bd4bd51fcccb491156b8 "ChoiceScript Github commit")
 - Fixed issues with the build process that caused updates to be unnecessarily large
  - Updates will be smaller
- - App should now also open more quickly on Windows
+ - Application should also open more quickly
 
 ## v1.1.0 - 08/07/17
 
