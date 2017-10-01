@@ -1,3 +1,4 @@
+[![Build Status](https://semaphoreci.com/api/v1/choicescriptide/main/branches/latest/badge.svg)](https://semaphoreci.com/choicescriptide/main)
 # ChoiceScript IDE
 This repository contains the main source code for the ChoiceScript IDE.
 
