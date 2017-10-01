@@ -1872,9 +1872,9 @@ body.night ::-webkit-scrollbar-track {
 
 /* allows smooth night / day mode transition */
 #sidebar, .scene, .panel>ul>li {
-  -webkit-transition: all .5s ease;
-  -moz-transition: all .5s ease;
-  -o-transition: all .5s ease;
-  -ms-transition: all .5s ease;
-  transition: all .5s ease;
+  -webkit-transition: background-color .5s ease;
+  -moz-transition: background-color .5s ease;
+  -o-transition: background-color .5s ease;
+  -ms-transition: background-color .5s ease;
+  transition: background-color .5s ease;
 }
