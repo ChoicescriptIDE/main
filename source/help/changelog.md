@@ -1,3 +1,16 @@
+## v1.1.2 - 7/10/2017
+
+Includes a permission issue fix (from v1.1.1), some changes to support updates on Linux, and the latest copy of ChoiceScript.
+
+### Additions
+- Basic support for updates on Linux(esque) machines
+
+### Fixes
+- Fixes deleting (moving files to Trash) on MAC
+
+### Changes
+- Updated internal copy of ChoiceScript to [Github commit](https://github.com/dfabulich/choicescript/commit/65fb2ded8f67a29dcf5815abfbcf6625d44be15c "ChoiceScript Github commit")
+
 ## v1.1.1 - 01/10/2017
 
 ChoiceScript update, package (update) size reduction and an aesthetic bug fix.

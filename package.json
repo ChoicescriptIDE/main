@@ -1,7 +1,7 @@
 {
   "name": "CSIDE",
   "main": "index.html",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "devDependencies": {
     "grunt": "^1.0.1",
     "grunt-auto-install": "^0.3.1",
