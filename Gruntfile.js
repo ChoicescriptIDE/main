@@ -10,6 +10,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-auto-install');
   grunt.loadNpmTasks('grunt-nw-builder');
   grunt.loadNpmTasks('grunt-execute');
+  grunt.loadNpmTasks('grunt-string-replace');
   grunt.initConfig({
     "auto_install": {
       local: {},
@@ -180,6 +181,21 @@ module.exports = function(grunt) {
         }
       }
     },
+    'string-replace': {
+      trashPatch: {
+        files: {
+          'build/node_modules/trash/node_modules/osx-trash/index.js': 'build/node_modules/trash/node_modules/osx-trash/index.js',
+        },
+        options: {
+          replacements: [
+            {
+              pattern: 'var olderThanMountainLion = ',
+              replacement: 'var olderThanMountainLion = true; //'
+            }
+          ]
+        }
+      }
+    },
     "compress": {
       main: {
         options: {
@@ -229,7 +245,7 @@ module.exports = function(grunt) {
       }
     }
   });
-  var tasks = ["clean", "auto_install:codemirror", "copy", "concat", "uglify", "cssmin", "auto_install:build", "execute", "compress"];
+  var tasks = ["clean", "auto_install:codemirror", "copy", "concat", "uglify", "cssmin", "auto_install:build", "string-replace", "execute", "compress"];
   grunt.registerTask("default", tasks);
   grunt.registerTask("build-with-nwjs", tasks.concat("nwjs"));
   grunt.registerTask("build-with-windows", tasks.concat("nwjs:windows"));
