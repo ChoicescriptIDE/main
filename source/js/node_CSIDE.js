@@ -3,14 +3,14 @@
 
 if (usingNode) {
 	gui.App.on('open', function(path) {
-		if (path.substring(path.lastIndexOf("."), path.length) == ".txt") cside.openScene(path);
+		if (path.substring(path.lastIndexOf("."), path.length) == ".txt") cside.openScene(path.replace("file://", ""));
 	});
 
 	if (gui.App.argv) {
 		var path = "";
 		for (var i = 0; i < gui.App.argv.length; i++) {
 			path = gui.App.argv[i];
-			if (path.substring(path.lastIndexOf("."), path.length) == ".txt") cside.openScene(path);
+			if (path.substring(path.lastIndexOf("."), path.length) == ".txt") cside.openScene(path.replace("file://", ""));
 		}
 	}
 
