@@ -65,7 +65,6 @@ module.exports = function(grunt) {
               'lib/typo/wordprocessor.js',       // used by typo.js
               'lib/jquery/jquery-1.11.3.min.js', // for help tab page
               'lib/marked/marked.min.js',        // ...
-              'node_modules/**',
               'css/font/century_gothic.ttf',     // 'Century Gothic' font
             ],
             dest: 'build'
@@ -85,6 +84,15 @@ module.exports = function(grunt) {
             dest: 'build'
           }
         ]
+      },
+      updater: {
+        files: [
+          {
+            expand: true, cwd: 'source',          
+            src: [ 'node_modules/cside-updater/**'],
+            dest: 'build'
+          }
+        ]    
       }
     },
     "concat": {
@@ -99,6 +107,7 @@ module.exports = function(grunt) {
 
           "node_modules/cside-codemirror/lib/codemirror.js",
           "node_modules/cside-codemirror/mode/choicescript/choicescript-new.js",
+
             //plugins
             "node_modules/cside-codemirror/addon/dialog/dialog.js",
             "node_modules/cside-codemirror/addon/hint/show-hint.js",
@@ -116,7 +125,7 @@ module.exports = function(grunt) {
           "node_modules/mousetrap/mousetrap.min.js",
           "source/lib/typo/typo.js",
 
-		  "node_modules/knockout/build/output/knockout-latest.js",
+		      "node_modules/knockout/build/output/knockout-latest.js",
           "source/lib/knockout/knockout-jqueryui.min.js",
           "source/lib/knockout/knockout-sortable.min.js",
           "source/js/knockoutCSIDE.js",
@@ -245,7 +254,7 @@ module.exports = function(grunt) {
       }
     }
   });
-  var tasks = ["clean", "auto_install:codemirror", "copy", "concat", "uglify", "cssmin", "auto_install:build", "string-replace", "execute", "compress"];
+  var tasks = ["clean", "auto_install:codemirror", "copy:main", "concat", "uglify", "cssmin", "auto_install:build", "copy:choicescript", "copy:updater", "string-replace", "execute", "compress"];
   grunt.registerTask("default", tasks);
   grunt.registerTask("build-with-nwjs", tasks.concat("nwjs"));
   grunt.registerTask("build-with-windows", tasks.concat("nwjs:windows"));
