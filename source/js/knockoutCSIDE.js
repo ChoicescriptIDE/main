@@ -495,7 +495,7 @@ function IDEViewModel() {
     var name = ko.observable("").extend({
       lowerCase: ""
     });
-	name(getSceneName(path()));
+	  name(getSceneName(path()));
     var isImportant = name().toUpperCase().match(reservedSceneNames);
     var source = sceneData.source || platform; //won't change - so doesn't need to be an observable?
     var loaded = ko.observable(false);
@@ -565,6 +565,9 @@ function IDEViewModel() {
     self.getText = function() {
       return cmDoc.getValue();
     };
+    self.getSceneStateMsg = ko.computed(function() {
+      return inErrState() ? self.getErrStateMsg() : readOnly() ? 'Read-only' : 'Save ' + name() + '.txt'
+    }, this);
     self.getMarkColour = ko.computed(function() {
       return markColour();
     }, this);
@@ -635,24 +638,28 @@ function IDEViewModel() {
       if (typeof value != "string") return;
       cmDoc.setValue(value);
     }
-    var renameSceneFile = function(newName) {
-      if (invalidName())
+    var renameSceneFile = function(newName, cb) {
+      if (invalidName()) {
+        cb("Invalid Name");
         return;
+      }
       saving(true);
       var newPath = self.getProject().getPath() + newName + '.txt';
       fh.renameFile(path(), newPath, function(err) {
-        executeRename(err);
+        executeRename(err, cb);
       });
 
-      function executeRename(err) {
+      function executeRename(err, cb) {
         saving(false);
         if (err) {
+          cb(err.message);
           bootbox.alert(err);
         } else {
           fileStats.mtime ? fileStats.mtime = new Date() : fileStats.modifiedAt = new Date();
           path(newPath);
           name(newName);
           __updatePersistenceList();
+          cb(null);
         }
       }
     }
@@ -715,6 +722,27 @@ function IDEViewModel() {
           $(event.target).focus().select();
         }, 10);
       }
+    }
+    self.setName = function(newName) {
+      if (newName && (newName != name())) {
+        sceneExists(newName, self.getProject(), function(exists) {
+          if (!exists) {
+            renameSceneFile(newName, function(err) {
+              if (err) {
+                return false;
+              }
+              return true;
+            });
+          } else {
+            notification("Failed to Rename Scene", "Scene '" + event.target.value.toLowerCase() + "' already exists in this Project", {
+              type: "error"
+            });
+            return false;
+            event.target.value = name();
+          }
+        });
+      }
+      return false;
     }
     self.recolour = function(data, event) {
       // only ever called from events...?
@@ -1109,7 +1137,7 @@ function IDEViewModel() {
     var type = settingData.type || "binary";
     var cat = settingData.cat || "app";
     var desc = ko.observable(settingData.desc || "");
-	var visible = ko.observable(true);
+	  var visible = ko.observable(true);
 
     if (type === "binary") {
       var options = [{
@@ -1120,7 +1148,7 @@ function IDEViewModel() {
         "value": false
       }]
     } else {
-      var options = settingData.options;
+      var options = settingData.options || null;
     }
 
     //ACCESSOR METHODS
@@ -1145,9 +1173,9 @@ function IDEViewModel() {
     setting.getDesc = ko.computed(function() {
       return desc();
     }, this);
-	setting.isVisible = ko.computed(function() {
+	  setting.isVisible = ko.computed(function() {
       return visible();
-	}, this);
+	  }, this);
 
     //MUTATOR METHODS
     setting.setDesc = function(val) {
@@ -1168,11 +1196,12 @@ function IDEViewModel() {
     setting.setValue = function(newVal) {
       value(newVal);
     }
-	setting.setVisibility = function(newVal) {
+	  setting.setVisibility = function(newVal) {
       if (typeof newVal == "boolean")
         visible(newVal);
-	}
+	  }
     value.subscribe(function(option) {
+      console.log(option);
       config.settings[cat][id] = value(); //store
       setting.apply(value());
       __updateConfig(); //then write new settings object to localStorage
@@ -1183,10 +1212,15 @@ function IDEViewModel() {
       getType: setting.getType,
       getDesc: setting.getDesc,
       getValue: setting.getValue,
+      getId: setting.getId,
       value: value,
       toggle: setting.toggle,
       getOptions: setting.getOptions,
-	  isVisible: setting.isVisible
+      isVisible: setting.isVisible,
+      // range:
+      max: settingData.max || null,
+      min: settingData.min || null,
+      step: settingData.step || null
     }
   }
 
@@ -1511,7 +1545,7 @@ function IDEViewModel() {
         "smartindent": true,
         "tabsize": "4",
         "linewrap": true,
-        "fontsize": "12px",
+        "fontsize": 12,
         "fontfamily": "'Courier New', Courier, monospace",
         "spell_dic": "en_US",
         "theme": "cs-dark",
@@ -2045,6 +2079,16 @@ function IDEViewModel() {
       "Shift-Cmd-T": function(ed) {
         selectedProject().test("random");
       },
+      "Cmd-R": function(ed) {
+        if (selectedScene()) {
+          self.renameViaPrompt(selectedScene(), "Rename scene: " + selectedScene().getName());
+        }
+      },
+      "Shift-Cmd-R": function(ed) {
+        if (selectedProject()) {
+          self.renameViaPrompt(selectedProject(), "Rename project: " + selectedProject().getName());
+        }
+      },
       "Shift-Cmd-Enter": function(ed) {
         selectedProject().run();
       },
@@ -2167,6 +2211,7 @@ function IDEViewModel() {
     indentWithTabs: true,
     matchBrackets: true,
     extraKeys: keymap,
+    inputStyle: "contenteditable",
     gutters: ["arrow-gutter", "CodeMirror-linenumbers"],
   });
 
@@ -2640,7 +2685,7 @@ function IDEViewModel() {
         "id": "word-count",
         "name": "Word Count",
         "value": 2,
-        "type": "variable",
+        "type": "dropdown",
         "cat": "editor",
         "desc": "Display the current scene's word and character counts at the bottom of the editor window",
         "options": [{
@@ -2697,7 +2742,7 @@ function IDEViewModel() {
         "id": "tabsize",
         "name": "Tab/Indent Block Size",
         "value": "4",
-        "type": "variable",
+        "type": "dropdown",
         "cat": "editor",
         "options": [{
           "desc": "2",
@@ -2721,27 +2766,20 @@ function IDEViewModel() {
       }),
       new CSIDESetting({
         "id": "fontsize",
-        "name": "Font Size (px)",
-        "value": "12px",
-        "type": "variable",
+        "name": "Font Size",
+        "value": "12",
+        "type": "range",
         "cat": "editor",
-        "options": [{
-          "desc": "10",
-          "value": "10px"
-        }, {
-          "desc": "12",
-          "value": "12px"
-        }, {
-          "desc": "14",
-          "value": "14px"
-        }, {
-          "desc": "16",
-          "value": "16px"
-        }],
+        "min": 8,
+        "max": 16,
+        "step": 1,
         "desc": "The size of the font in the editor window",
         "apply": function(val) {
-          $('#editor-wrap').css("font-size", val);
-          editor.refresh();
+            console.log(val);
+            //if (((val % this.step) == 0) && ((val >= this.min) && (val <= this.max))) {
+            $('#editor-wrap').css("font-size", parseInt(val));
+            editor.refresh();
+            //}
         }
       }),
       new CSIDESetting({
@@ -2958,7 +2996,8 @@ function IDEViewModel() {
         "id": "update-channel",
         "name": "Update Channel",
         "value": "stable",
-        "type": "variable",
+        "type": "dropdown",
+        "desc": "Speed and reliability of the updates CSIDE will receive",
         "options": [{
           "desc": "Stable",
           "value": "stable"
@@ -2972,7 +3011,6 @@ function IDEViewModel() {
           "desc": "None",
           "value": "none"
         }],
-        "desc": "",
         "apply": function(channel) {
           var self = this;
           if (platform == "web-dropbox") {  // no update-channel on web version
@@ -3258,6 +3296,15 @@ function IDEViewModel() {
     } else {
       return isOpen;
     }
+  }
+
+  //
+  self.renameViaPrompt = function(sceneOrProject, title) {
+    __promptForString(function(str) {
+      if (!sceneOrProject.setName(str)) {
+        bootbox.alert("Error: failed to rename");
+      }
+    }, title || "Rename", sceneOrProject.getName());
   }
 
   // used by nodeCSIDE.js drag/drop file opening

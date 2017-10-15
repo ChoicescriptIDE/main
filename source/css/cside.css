@@ -596,6 +596,11 @@ body.night .left-wrap {
     color: rgb(255, 255, 255);
 }
 
+.panel.settings .hidden-input {
+	position: absolute;
+	opacity: 0;
+}
+
 .panel.settings>input {
 	margin-left: 10px;
 	height: 24px;
@@ -603,6 +608,14 @@ body.night .left-wrap {
 
 .panel.settings>label {
 	font-weight: normal;
+}
+
+.panel.settings input[type=checkbox] {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	background: none;
+	border: none;
+	font: normal normal normal 14px/1 FontAwesome; /* override jQuery ui */	
 }
 
 .panel.settings select {
@@ -635,11 +648,10 @@ body.night .setting-option {
 }
 
 .setting-colour-swatch {
-    /* ^ matches option dimensions ^ */
-    width: 50px;
-    height: 32px;
-    margin: -5px;
-    border-radius: 4px;
+    width: 25px;
+    height: 10px;
+    margin: -5px 5px;
+    border-radius: 2px;
 }
 
 .setting-option:hover {
@@ -683,12 +695,12 @@ body.night .setting-option-selected {
     color: rgb(204, 205, 215);
 }
 
-.setting-on {
+.panel.settings .setting-on {
     color: rgb(125, 186, 125);
     opacity: 1;
 }
 
-.setting-off {
+.panel.settings .setting-off {
     color: grey;
     opacity: 0.5;
 }
