@@ -2167,7 +2167,8 @@ function IDEViewModel() {
     indentWithTabs: true,
     matchBrackets: true,
     extraKeys: keymap,
-    gutters: ["arrow-gutter", "CodeMirror-linenumbers"],
+    foldGutter: true,
+    gutters: ["arrow-gutter", "CodeMirror-linenumbers", "CodeMirror-foldgutter"],
   });
 
   self.moveSelection = function(direction) {

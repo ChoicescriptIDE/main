@@ -48,7 +48,7 @@ body.night input:not([readonly]) {
   color: white;
 }
 
-#editor-wrap * {
+#editor-wrap *:not(.CodeMirror-foldgutter-folded):not(.CodeMirror-foldgutter-open):not(.CodeMirror-foldmarker) {
     cursor: text;
 }
 

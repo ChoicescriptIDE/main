@@ -119,6 +119,9 @@ module.exports = function(grunt) {
             "node_modules/cside-codemirror/addon/search/search.js",
             "node_modules/cside-codemirror/addon/search/searchcursor.js",
             "node_modules/cside-codemirror/addon/search/jump-to-line.js",
+            "node_modules/cside-codemirror/addon/fold/foldcode.js",
+            "node_modules/cside-codemirror/addon/fold/foldgutter.js",
+            "node_modules/cside-codemirror/addon/fold/indent-fold.js",                        
 
           "node_modules/dropbox/dist/Dropbox-sdk.min.js",
 
@@ -171,7 +174,8 @@ module.exports = function(grunt) {
           	"node_modules/cside-codemirror/lib/codemirror.css",
           	"node_modules/cside-codemirror/addon/display/fullscreen.css",
           	"node_modules/cside-codemirror/addon/dialog/dialog.css",
-          	"node_modules/cside-codemirror/addon/hint/show-hint.css",
+            "node_modules/cside-codemirror/addon/hint/show-hint.css",
+            "node_modules/cside-codemirror/addon/fold/foldgutter.css",                        
           	"node_modules/cside-codemirror/theme/cs-light.css",
           	"node_modules/cside-codemirror/theme/cs-dark.css",
           	"node_modules/cside-codemirror/theme/cs-dichromatic.css",
