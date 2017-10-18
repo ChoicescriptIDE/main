@@ -3002,9 +3002,6 @@ function IDEViewModel() {
             }
             autoUpdateCheckFn = setInterval(autoUpdate, 1000 * 60 * 60);
             autoUpdate();
-            if (channel === "development") {
-              notification("Warning - Development Updates", "Application updates from this channel have not been pre-tested, and have a high chance of being unstable.", { type: "warning" });
-            }
           }
           else {}
         }
@@ -4283,7 +4280,7 @@ function IDEViewModel() {
         note.close();
       }
     }];
-    return notification("Update Available", update.desc, { closeWith: false, timeout: false, buttons: buttons });
+    return notification("Update Available on " + (channel.charAt(0).toUpperCase() + channel.slice(1)), update.desc, { closeWith: false, timeout: false, buttons: buttons, type: (channel === "development") ? "warning" : "default" });
   }
 
   function __updateConfig() {
