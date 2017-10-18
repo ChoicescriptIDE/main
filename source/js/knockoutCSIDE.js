@@ -2973,7 +2973,7 @@ function IDEViewModel() {
           "desc": "None",
           "value": "none"
         }],
-        "desc": "",
+        "desc": "Speed and stability of the updates CSIDE will receive",
         "apply": function(channel) {
           var self = this;
           if (platform == "web-dropbox") {  // no update-channel on web version
