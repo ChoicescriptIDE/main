@@ -292,36 +292,18 @@ function IDEViewModel() {
     }
       //MISC METHODS
     self.run = function() {
-      function execRun() {
-        if (locked()) return;
-        locked(true); //prevent run spam
-        __shortCompile(self, function(err, allScenes) {
-          if (err) {
-            bootbox.alert("<h3>Compilation Error</h3>" + err.message);
-            console.log(err);
-          } else {
-            cside.allScenes = allScenes;
-            notification("Running", name(), {
-              timeout: 2000
-            });
-            activeProject(self);
-            __reloadTab(__getTab("game"), 'run_index.html?restart=true');
-            cside.tabPanel("open");
-            __selectTab("game");
-          }
-          setTimeout(function() {
-            locked(false);
-          }, 5000);
-        });
-      }
+      if (locked()) return;
+      locked(true); //prevent run spam
       if (self.isDirty()) {
         bootbox.confirm("This project has unsaved changes, these will not appear in the test run, do you wish to continue?", function(result) {
           if (result) {
-            execRun();
+            setTimeout(function() { locked(false); }, 5000);
+            __runProject(self);
           }
         });
       } else {
-        execRun();
+        setTimeout(function() { locked(false); }, 5000);
+        __runProject(self);
       }
     }
     self.openFolder = function() {
@@ -4085,6 +4067,26 @@ function IDEViewModel() {
   function __selectTab(id) {
     $("#tabs").tabs("option", "active", $("#" + id).index() - 1);
   }
+
+  function __runProject(project) {
+    setTimeout(function() { locked(false); }, 5000);
+    __shortCompile(self, function(err, allScenes) {
+      if (err) {
+        bootbox.alert("<h3>Compilation Error</h3>" + err.message);
+        console.log(err);
+      } else {
+        cside.allScenes = allScenes;
+        notification("Running", project.getName(), {
+          timeout: 2000
+        });
+        activeProject(self);
+        __reloadTab(__getTab("game"), 'run_index.html?restart=true');
+        cside.tabPanel("open");
+        __selectTab("game");
+      }
+    });
+  }
+
   var loadedSceneJS = false;
 
   function __shortCompile(project, cb, transpile) {
