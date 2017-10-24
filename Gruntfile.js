@@ -121,7 +121,10 @@ module.exports = function(grunt) {
             "node_modules/cside-codemirror/addon/search/jump-to-line.js",
             "node_modules/cside-codemirror/addon/fold/foldcode.js",
             "node_modules/cside-codemirror/addon/fold/foldgutter.js",
-            "node_modules/cside-codemirror/addon/fold/indent-fold.js",                        
+            "node_modules/cside-codemirror/addon/fold/indent-fold.js",             
+            "source/lib/bootstrap/bootbox.min.js",
+            "source/lib/bootstrap/bootstrap.min.js",
+            "source/lib/bootstrap/bootstrap-contextmenu.js",
 
           "node_modules/dropbox/dist/Dropbox-sdk.min.js",
 
@@ -134,10 +137,6 @@ module.exports = function(grunt) {
           "source/js/knockoutCSIDE.js",
 
           "source/lib/encoding/encoding.js",
-
-          "source/lib/bootstrap/bootbox.min.js",
-          "source/lib/bootstrap/bootstrap.min.js",
-          "source/lib/bootstrap/bootstrap-contextmenu.js",
 
           "node_modules/cside-choicescript/web/scene.js",
           "node_modules/cside-choicescript/web/navigator.js",
