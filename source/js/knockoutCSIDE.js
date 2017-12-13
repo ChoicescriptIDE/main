@@ -297,14 +297,13 @@ function IDEViewModel() {
       if (self.isDirty()) {
         bootbox.confirm("This project has unsaved changes, these will not appear in the test run, do you wish to continue?", function(result) {
           if (result) {
-            setTimeout(function() { locked(false); }, 5000);
             __runProject(self);
           }
         });
       } else {
-        setTimeout(function() { locked(false); }, 5000);
         __runProject(self);
       }
+      setTimeout(function() { locked(false); }, 5000);
     }
     self.openFolder = function() {
       __openFolder(path());
