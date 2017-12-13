@@ -2470,6 +2470,11 @@ function IDEViewModel() {
         title: "Pronouns with Gender-Neutral Options Template",
         desc: "A template for including gender neutral pronouns in your game (they/them), created by Lynnea Glasser. This includes a variable system to make sure your verbs and pronouns will match (\"They go on ahead\"/\"She goes on ahead\").",
         path: "cs_examples/GNO Pronoun Template/"
+      },
+      {
+        title: "Editor Theme Configuration Template",
+        desc: "An example script that customizes the custom editor theme.",
+        path: "cs_examples/Theme Template/"
       }
     ];
 
@@ -2793,7 +2798,8 @@ function IDEViewModel() {
           { "desc": "Blackboard", "value": "blackboard"},
           { "desc": "Dracula", "value": "dracula"},
           { "desc": "Icecoder", "value": "icecoder"},
-          { "desc": "Solarized", "value": "solarized"}
+          { "desc": "Solarized", "value": "solarized"},
+          { "desc": "Custom", "value": "cs-custom"}
         ],
         "desc": "Sets the colour and style of the editor window and its text",
         "apply": function(val) {

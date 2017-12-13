@@ -1,0 +1,77 @@
+*comment	##  CUSTOM CSIDE EDITOR THEMING TEMPLATE ##
+*comment ________________________________________________________
+
+*comment ## USAGE:
+*comment   -> *cside_theme_set { TOKEN } { ATTRIBUTE } { VALUE }
+*comment   -> *cside_theme_set ...
+*comment   -> *cside_theme_set ...
+*comment   -> *cside_theme_apply
+
+*comment ## VALID TOKENS:
+*comment 	1. labels 			   ( and related: *gosubs, *gotos - etc. )
+*comment 	2. comments
+*comment 	3. variables
+*comment 	4. options			   ( #Option lines )
+*comment 	5. csplus 			   ( CSIDE specific commands )
+*comment 	6. commands
+*comment 	7. page 			   ( editor background and the standard text )
+
+*comment ## VALID ATTRIBUTES + VALUES:
+*comment	1. color			   ( rgb(x,x,x), colorname, #HEXCODE )
+*comment	2. background	       ( rgb(x,x,x), colorname, #HEXCODE )
+*comment 	3. weight			   ( normal, bold )
+*comment 	4. style			   ( normal, italic )
+
+*comment ------------------------------------------
+*comment 		TEMPLATE / EXAMPLE:
+*comment ------------------------------------------
+
+*comment RUN this project to build the theme.
+*comment Select 'custom' from the Editor Theme setting in the settings panel to APPLY it.
+*comment The theme will then persist under 'custom', even across sessions
+*comment ( until a another set of *cside_theme commands are run ).
+
+*comment NOTE: YOU **WILL** NEED TO RE-RUN CUSTOM THEME APPLICATIONS AFTER ANY CSIDE UPDATES
+
+*comment style page background and general text
+*cside_theme_set page background #FFE
+*cside_theme_set page color black
+
+*comment style comments
+*cside_theme_set comments color darkgreen
+
+*comment style options
+*cside_theme_set options color red
+*cside_theme_set options style italic
+
+*comment style standard commands
+*cside_theme_set commands color darkorange
+
+*comment style CSIDE commands
+*cside_theme_set csplus color purple
+
+*comment style variables
+*cside_theme_set variables background #F0E68C
+*cside_theme_set variables weight bold
+
+*comment style labels and gotos
+*cside_theme_set labels color rgb(9,139,220)
+*cside_theme_set labels weight bold
+
+*comment apply the built theme
+*cside_theme_apply
+
+*comment ------------------------------------------
+*comment 		   VISUAL EXAMPLES:
+*comment ------------------------------------------
+*line_break
+*temp var_1 "Hello Themes!"
+*choice
+	#Hello Custom Themes
+		… ${var_1}
+		*goto lost_label
+	#Goodbye Old Boring Themes!
+		*goto lost_label
+
+*label lost_label
+All done!
