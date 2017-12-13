@@ -60,6 +60,8 @@ module.exports = function(grunt) {
               'img/*',
               'help/**',
               'cs_examples/**',
+              'css/user.css',
+              'css/startup.txt',
               'lib/font-awesome/**',
               'lib/typo/dictionaries/**',
               'lib/typo/wordprocessor.js',       // used by typo.js
@@ -88,11 +90,11 @@ module.exports = function(grunt) {
       updater: {
         files: [
           {
-            expand: true, cwd: 'source',          
+            expand: true, cwd: 'source',
             src: [ 'node_modules/cside-updater/**'],
             dest: 'build'
           }
-        ]    
+        ]
       }
     },
     "concat": {
@@ -118,10 +120,15 @@ module.exports = function(grunt) {
             "node_modules/cside-codemirror/addon/mode/overlay.js",
             "node_modules/cside-codemirror/addon/search/search.js",
             "node_modules/cside-codemirror/addon/search/searchcursor.js",
+            "node_modules/cside-codemirror/addon/scroll/annotatescrollbar.js",
+            "node_modules/cside-codemirror/addon/search/matchesonscrollbar.js",
             "node_modules/cside-codemirror/addon/search/jump-to-line.js",
+            "node_modules/cside-codemirror/addon/search/match-highlighter.js",
+
             "node_modules/cside-codemirror/addon/fold/foldcode.js",
             "node_modules/cside-codemirror/addon/fold/foldgutter.js",
-            "node_modules/cside-codemirror/addon/fold/indent-fold.js",             
+            "node_modules/cside-codemirror/addon/fold/indent-fold.js",
+
             "source/lib/bootstrap/bootbox.min.js",
             "source/lib/bootstrap/bootstrap.min.js",
             "source/lib/bootstrap/bootstrap-contextmenu.js",
@@ -174,7 +181,7 @@ module.exports = function(grunt) {
           	"node_modules/cside-codemirror/addon/display/fullscreen.css",
           	"node_modules/cside-codemirror/addon/dialog/dialog.css",
             "node_modules/cside-codemirror/addon/hint/show-hint.css",
-            "node_modules/cside-codemirror/addon/fold/foldgutter.css",                        
+            "node_modules/cside-codemirror/addon/fold/foldgutter.css",
           	"node_modules/cside-codemirror/theme/cs-light.css",
           	"node_modules/cside-codemirror/theme/cs-dark.css",
           	"node_modules/cside-codemirror/theme/cs-dichromatic.css",

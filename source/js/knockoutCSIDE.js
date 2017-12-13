@@ -1502,7 +1502,8 @@ function IDEViewModel() {
         "autosuggest": false,
         "autoformat": true,
         "word-count": 2,
-        "visible-tabs": false
+        "visible-tabs": false,
+        "selection-match": false,
       },
       "app": {
         "persist": true,
@@ -2151,6 +2152,15 @@ function IDEViewModel() {
     extraKeys: keymap,
     foldGutter: true,
     gutters: ["arrow-gutter", "CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+    highlightSelectionMatches: {
+      style: "matchhighlight",
+      minChars: 2,
+      delay: 200,
+      wordsOnly: false,
+      annotateScrollbar: false,
+      showToken: false,
+      trim: true
+    }
   });
 
   self.moveSelection = function(direction) {
@@ -2580,6 +2590,18 @@ function IDEViewModel() {
         "apply": function(val) {
           //conditional is handled in choicescript.js CodeMirror mode
           editor.setOption("spellcheck", val);
+          editor.forceSyntaxRedraw();
+        }
+      }),
+      new CSIDESetting({
+        "id": "selection-match",
+        "name": "Selection Match",
+        "value": true,
+        "type": "binary",
+        "cat": "editor",
+        "desc": "Highlight matching instances of selected text",
+        "apply": function(val) {
+          editor.setOption("highlightSelectionMatches", val);
           editor.forceSyntaxRedraw();
         }
       }),
