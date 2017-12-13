@@ -3591,7 +3591,7 @@ function IDEViewModel() {
 
   function addNewScene(project, name) {
     if (typeof project !== "object") return;
-    var sceneName = name || "Untitled";
+    var sceneName = name || "untitled";
     generateName(sceneName);
 
     function generateName(newName) {
@@ -3603,7 +3603,7 @@ function IDEViewModel() {
           } else {
             n = (parseInt(n) + 1)
           };
-          generateName("Untitled_" + n);
+          generateName("untitled_" + n);
         } else {
           var scenePath = project.getPath() + newName + '.txt';
           var newScene = new CSIDEScene({
