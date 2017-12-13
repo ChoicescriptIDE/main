@@ -2473,6 +2473,10 @@ function IDEViewModel() {
       }
     ];
 
+    self.runExample = function(data) {
+     __runProject(new CSIDEProject({ "path": data.path }));
+    }
+
     self.cloneExample = function(data) {
       self.createProject("", function(err, project) {
         if (err) {
@@ -4091,8 +4095,7 @@ function IDEViewModel() {
   }
 
   function __runProject(project) {
-    setTimeout(function() { locked(false); }, 5000);
-    __shortCompile(self, function(err, allScenes) {
+    __shortCompile(project, function(err, allScenes) {
       if (err) {
         bootbox.alert("<h3>Compilation Error</h3>" + err.message);
         console.log(err);
@@ -4101,7 +4104,7 @@ function IDEViewModel() {
         notification("Running", project.getName(), {
           timeout: 2000
         });
-        activeProject(self);
+        activeProject(project);
         __reloadTab(__getTab("game"), 'run_index.html?restart=true');
         cside.tabPanel("open");
         __selectTab("game");
