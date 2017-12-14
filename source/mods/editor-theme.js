@@ -1,4 +1,5 @@
 var cside = window.opener ? window.opener.parent.cside : parent.window.cside;
+var parent = window.opener ? window.opener.parent : window.parent;
 
 var ETmod = {};
 ETmod.TOKENS = {
