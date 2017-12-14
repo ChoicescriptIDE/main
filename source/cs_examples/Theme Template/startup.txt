@@ -1,4 +1,5 @@
-*comment	##  CUSTOM CSIDE EDITOR THEMING TEMPLATE ##
+*title Theme Template
+*author CJW
 *comment ________________________________________________________
 
 *comment ## USAGE:
