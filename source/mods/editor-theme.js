@@ -16,14 +16,16 @@ ETmod.ATTRIBUTES = {
   "color" : "color",
   "background" : "background",
   "weight": "font-weight",
-  "style": "font-style"
+  "style": "font-style",
+  "decoration" : "text-decoration"
 }
 
 ETmod.VALUES = {
   "color": __validColour,
   "background": __validColour,
   "font-weight": ["bold", "normal"],
-  "font-style": ["italic", "normal"]
+  "font-style": ["italic", "normal"],
+  "text-decoration" : ["overline", "underline", "line-through"],
 }
 
 ETmod.store = {};
