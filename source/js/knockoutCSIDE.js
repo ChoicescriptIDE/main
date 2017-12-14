@@ -2150,6 +2150,7 @@ function IDEViewModel() {
     matchBrackets: true,
     extraKeys: keymap,
     foldGutter: true,
+    historyEventDelay: 500,
     gutters: ["arrow-gutter", "CodeMirror-linenumbers", "CodeMirror-foldgutter"],
     highlightSelectionMatches: {
       style: "matchhighlight",
