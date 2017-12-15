@@ -2228,6 +2228,11 @@ function IDEViewModel() {
     return {
       token: function(stream) {
         if (stream.pos === 0) {
+          var indentation = /^( +|\t+)/.exec(stream.string);
+          if (indentation) {
+            stream.pos += indentation[0].length;
+            return("indentation");
+          }
           var cmd_match = cmd.exec(stream.string);
           if (cmd_match) {
             if (editor.options.spellcheck === 2) { // EXCLUDE CMD LINES FROM SPELL CHECK
@@ -2648,7 +2653,7 @@ function IDEViewModel() {
         "value": false,
         "type": "binary",
         "cat": "editor",
-        "desc": "Provides visible indentation levels when using Tabs as the indentation unit",
+        "desc": "Provides a visible representation of the indentation level in the editor window",
         "apply": function(val) {
           if (val) {
             document.getElementById("editor-wrap").classList.add("visible-tabs");

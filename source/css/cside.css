@@ -1821,10 +1821,11 @@ body.night .close:focus, body.night .close:hover {
 }
 
 /* cm-extras */
-#editor-wrap.visible-tabs .cm-tab {
-	border-left: 1px dashed;
+#editor-wrap.visible-tabs .cm-indentation {
+	border-bottom: 1px dashed;
 	color: #BDBDBD;
 }
+
 .arrow-gutter {
     margin-left: 5px;
     width: 5px;
