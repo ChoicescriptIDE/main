@@ -1497,7 +1497,7 @@ function IDEViewModel() {
         "spell_dic": "en_US",
         "theme": "cs-dark",
         "night-mode": false,
-        "spellcheck": true,
+        "spellcheck": 1,
         "autosuggest": false,
         "autoformat": true,
         "word-count": 2,
@@ -2230,17 +2230,14 @@ function IDEViewModel() {
         if (stream.pos === 0) {
           var cmd_match = cmd.exec(stream.string);
           if (cmd_match) {
-            stream.pos += cmd_match[0].length || 1;
+            if (editor.options.spellcheck === 2) { // EXCLUDE CMD LINES FROM SPELL CHECK
+              stream.skipToEnd();
+            }
+            else {
+              stream.pos += cmd_match[0].length || 1;
+            }
           }
         }
-        /* UNCOMMENT TO EXCLUDE {VARIABLES} FROM SPELL CHECK
-        variable.lastIndex = stream.pos;
-        var var_match = variable.exec(stream.string);
-        if (var_match && var_match.index == stream.pos) {
-            if (var_match) {
-                stream.pos += var_match[0].length || 1;
-            }
-        }*/
         word.lastIndex = stream.pos;
         var word_match = word.exec(stream.string);
         if (word_match && word_match.index == stream.pos) {
@@ -2592,10 +2589,20 @@ function IDEViewModel() {
       new CSIDESetting({
         "id": "spellcheck",
         "name": "Spell Check",
-        "value": true,
-        "type": "binary",
+        "value": 2,
+        "type": "variable",
         "cat": "editor",
-        "desc": "Spell checks words as you type - excluding those on command and option lines",
+        "options": [{
+          "desc": "Exclude cmd lines",
+          "value": 2
+        }, {
+          "desc": "Include cmd lines",
+          "value": 1
+        }, {
+          "desc": "Off",
+          "value": 0
+        }],
+        "desc": "Underline any mispelt words in the active scene text",
         "apply": function(val) {
           //conditional is handled in choicescript.js CodeMirror mode
           editor.setOption("spellcheck", val);
