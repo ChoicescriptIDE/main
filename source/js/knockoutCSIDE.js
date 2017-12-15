@@ -2587,6 +2587,18 @@ function IDEViewModel() {
         }
       }),
       new CSIDESetting({
+        "id": "selection-match",
+        "name": "Selection Match",
+        "value": true,
+        "type": "binary",
+        "cat": "editor",
+        "desc": "Highlight matching instances of selected text",
+        "apply": function(val) {
+          editor.setOption("highlightSelectionMatches", val);
+          editor.forceSyntaxRedraw();
+        }
+      }),
+      new CSIDESetting({
         "id": "spellcheck",
         "name": "Spell Check",
         "value": 2,
@@ -2606,18 +2618,6 @@ function IDEViewModel() {
         "apply": function(val) {
           //conditional is handled in choicescript.js CodeMirror mode
           editor.setOption("spellcheck", val);
-          editor.forceSyntaxRedraw();
-        }
-      }),
-      new CSIDESetting({
-        "id": "selection-match",
-        "name": "Selection Match",
-        "value": true,
-        "type": "binary",
-        "cat": "editor",
-        "desc": "Highlight matching instances of selected text",
-        "apply": function(val) {
-          editor.setOption("highlightSelectionMatches", val);
           editor.forceSyntaxRedraw();
         }
       }),
