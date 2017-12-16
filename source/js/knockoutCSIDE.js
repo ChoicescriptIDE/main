@@ -2233,14 +2233,14 @@ function IDEViewModel() {
             stream.pos += indentation[0].length;
             return("indentation");
           }
-          var cmd_match = cmd.exec(stream.string);
-          if (cmd_match) {
-            if (editor.options.spellcheck === 2) { // EXCLUDE CMD LINES FROM SPELL CHECK
-              stream.skipToEnd();
-            }
-            else {
-              stream.pos += cmd_match[0].length || 1;
-            }
+        }
+        var cmd_match = cmd.exec(stream.string);
+        if (cmd_match) {
+          if (editor.options.spellcheck === 2) { // EXCLUDE CMD LINES FROM SPELL CHECK
+            stream.skipToEnd();
+          }
+          else {
+            stream.pos += cmd_match[0].length || 1;
           }
         }
         word.lastIndex = stream.pos;
@@ -2604,6 +2604,21 @@ function IDEViewModel() {
         }
       }),
       new CSIDESetting({
+        "id": "visible-tabs",
+        "name": "Visible Tabs",
+        "value": false,
+        "type": "binary",
+        "cat": "editor",
+        "desc": "Provides a visible representation of the indentation level in the editor window",
+        "apply": function(val) {
+          if (val) {
+            document.getElementById("editor-wrap").classList.add("visible-tabs");
+          } else {
+            document.getElementById("editor-wrap").classList.remove("visible-tabs");
+          }
+        }
+      }),
+      new CSIDESetting({
         "id": "spellcheck",
         "name": "Spell Check",
         "value": 2,
@@ -2645,21 +2660,6 @@ function IDEViewModel() {
             platform: 'any'
           });
           editor.forceSyntaxRedraw();
-        }
-      }),
-      new CSIDESetting({
-        "id": "visible-tabs",
-        "name": "Visible Tabs",
-        "value": false,
-        "type": "binary",
-        "cat": "editor",
-        "desc": "Provides a visible representation of the indentation level in the editor window",
-        "apply": function(val) {
-          if (val) {
-            document.getElementById("editor-wrap").classList.add("visible-tabs");
-          } else {
-            document.getElementById("editor-wrap").classList.remove("visible-tabs");
-          }
         }
       }),
       new CSIDESetting({
