@@ -9,19 +9,19 @@
 *comment   -> *cside_theme_apply
 
 *comment ## VALID TOKENS:
-*comment 	1. labels 			   ( and related: *gosubs, *gotos - etc. )
+*comment  1. labels          ( and related: *gosubs, *gotos - etc. )
 *comment 	2. comments
 *comment 	3. variables
-*comment 	4. options			   ( #Option lines )
-*comment 	5. csplus 			   ( CSIDE specific commands )
+*comment 	4. options         ( #Option lines )
+*comment 	5. csplus          ( CSIDE specific commands )
 *comment 	6. commands
-*comment 	7. page 			   ( editor background and the standard text )
+*comment 	7. page            ( editor background and the standard text )
 
 *comment ## VALID ATTRIBUTES + VALUES:
-*comment	1. color			   ( rgb(x,x,x), colorname, #HEXCODE )
-*comment	2. background	       ( rgb(x,x,x), colorname, #HEXCODE )
-*comment 	3. weight			   ( normal, bold )
-*comment 	4. style			   ( normal, italic )
+*comment  1. color         ( rgb(x,x,x), colorname, #HEXCODE )
+*comment  2. background    ( rgb(x,x,x), colorname, #HEXCODE )
+*comment 	3. weight        ( normal, bold )
+*comment 	4. style         ( normal, italic )
 
 *comment ------------------------------------------
 *comment 		TEMPLATE / EXAMPLE:
@@ -68,11 +68,11 @@
 *line_break
 *temp var_1 "Hello Themes!"
 *choice
-	#Hello Custom Themes
-		… ${var_1}
-		*goto lost_label
-	#Goodbye Old Boring Themes!
-		*goto lost_label
+  #Hello Custom Themes
+    ${var_1}
+    *goto lost_label
+  #Goodbye Old Boring Themes!
+    *goto lost_label
 
 *label lost_label
 All done!

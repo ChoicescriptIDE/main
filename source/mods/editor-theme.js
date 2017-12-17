@@ -9,7 +9,7 @@ ETmod.TOKENS = {
   "options" : " span.cm-operator",
   "csplus" : " span.cm-cs-plus",
   "commands" : " span.cm-builtin",
-  "page" : ".CodeMirror.CodeMirror-wrap"
+  "page" : ".CodeMirror"
 }
 
 ETmod.ATTRIBUTES = {
