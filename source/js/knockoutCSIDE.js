@@ -4966,7 +4966,16 @@ function IDEViewModel() {
             dblLinebreak = new nw.MenuItem({
               label: "Insert double line break",
               click: function() {
-                editor.replaceSelection("\n*line_break\n*line_break\n", "end");
+                var cur = editor.getCursor();
+                if (cur) {
+                  var line = editor.getLine(cur.line), whitespace;
+                  if (line && (whitespace = line.match(/^\s+/))) {
+                    editor.replaceSelection("\n" + whitespace + "*line_break\n" + whitespace + "*line_break\n" + whitespace, "end");
+                  }
+                  else {
+                    editor.replaceSelection("\n*line_break\n*line_break\n", "end");
+                  }
+                }
                 editor.focus();
               }
             });
