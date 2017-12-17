@@ -2021,6 +2021,9 @@ function IDEViewModel() {
       "Cmd-I": function(ed) {
         insertTextTags("[i]", "[/i]");
       },
+      "Cmd-/": function(ed) {
+        insertTextTags("*comment ", "", true);
+      },
       "Cmd-T": function(ed) {
         selectedProject().test("quick");
       },
@@ -2039,6 +2042,12 @@ function IDEViewModel() {
       },
       "Cmd-Alt-Up": function(ed) {
         self.moveSelection("up");
+      },
+      "Shift-Cmd-K": function(ed) {
+        ed.execCommand("deleteLine");
+      },
+      "Shift-Cmd-D": function(ed) {
+        ed.execCommand("duplicateLine");
       },
       "F11": function(ed) {
         ed.setOption("fullScreen", !ed.getOption("fullScreen"));
@@ -2106,6 +2115,9 @@ function IDEViewModel() {
       "Ctrl-I": function(ed) {
         insertTextTags("[i]", "[/i]");
       },
+      "Ctrl-/": function(ed) {
+        insertTextTags("*comment ", "", true);
+      },
       "Ctrl-T": function(ed) {
         selectedProject().test("quick");
       },
@@ -2124,6 +2136,12 @@ function IDEViewModel() {
       },
       "Shift-Ctrl-Up": function(ed) {
         self.moveSelection("up");
+      },
+      "Shift-Ctrl-K": function(ed) {
+        ed.execCommand("deleteLine");
+      },
+      "Shift-Ctrl-D": function(ed) {
+        ed.execCommand("duplicateLine");
       },
       "F11": function(ed) {
         ed.setOption("fullScreen", !ed.getOption("fullScreen"));
@@ -2350,6 +2368,16 @@ function IDEViewModel() {
   editor["forceSyntaxRedraw"] = function() { //ALIAS METHOD
       editor.setOption("mode", "choicescript");
     }
+
+  CodeMirror.commands.duplicateLine = function(cm) {
+    var cur = cm.getCursor();
+    var line = cm.getLine(cur.line).trim(); // remove preceding spaces
+    line = line.replace(/^\t+/, ""); // remove tabs
+    CodeMirror.commands.goLineEnd(cm);
+    CodeMirror.commands.newlineAndIndent(cm); // auto-indent
+    cm.replaceSelection(line);
+  }
+
     //$('.CodeMirror, cm-s-choicescript').hide();
 
   //cside.noteEditor.refresh();

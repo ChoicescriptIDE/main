@@ -14,8 +14,11 @@
 | Wrap or insert italic tags     | CTRL + I            | CMD + I             |
 | Wrap or insert bold tags       | CTRL + B            | CMD + B             |
 | Wrap or insert variable tags   | CTRL + D            | CMD + D             |
-| Move selected text up a line   | SHIFT + CTRL + UP   | CMD + OPT + UP   |
-| Move selected text down a line | SHIFT + CTRL + DOWN | CMD + OPT + DOWN |
+| Move selected text up a line   | SHIFT + CTRL + UP   | CMD + OPT + UP      |
+| Move selected text down a line | SHIFT + CTRL + DOWN | CMD + OPT + DOWN    |
+| Duplicate line                 | SHIFT + CTRL + D    | SHIFT + CMD + D     |
+| Delete line                    | SHIFT + CTRL + K    | SHIFT + CMD + K     |
+| Toggle block comment           | CTRL + /            | CMD + /             |
 | Toggle full-window editor      | ESC / F11           | ESC / F11           |
 | Toggle console                 | SHIFT + CTRL + C    | SHIFT + CMD + C     |
 
