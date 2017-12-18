@@ -2840,6 +2840,20 @@ function IDEViewModel() {
           if (!["cs-dark", "cs-light", "cs-dichromatic", "cs-custom"].includes(val)) {
             val = "cs-light"; // handle any old theme config values
           }
+          if (val == "cs-custom") {
+            var storedCSS = localStorage.getItem("CSIDE_userCSS");
+            fh.writeFile("css/user.css", storedCSS, function(err) {
+              if (err) {
+                notification("Error", "Unable to write custom user styling to file.", {
+                  type: "error"
+                });
+                return;
+              }
+              // force reloading of CSS
+              document.getElementById("user-theme").href = "";
+              document.getElementById("user-theme").href = "css/user.css";
+            });
+          }
           editor.setOption("theme", val);
           $("#code-footer, #cs-console").removeClass().addClass("CodeMirror cm-s-" + val);
         }

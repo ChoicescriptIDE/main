@@ -78,6 +78,7 @@ Scene.prototype.cside_theme_apply = function(data) {
     ETmod.curRule += "}";
     ETmod.css += ETmod.curRule;
   }
+  localStorage.setItem("CSIDE_userCSS", ETmod.css);
   parent.fs.writeFile("css/user.css", ETmod.css, {
     encoding: 'utf8'
   }, function(err) {
