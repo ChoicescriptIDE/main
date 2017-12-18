@@ -2635,7 +2635,7 @@ function IDEViewModel() {
       }),
       new CSIDESetting({
         "id": "visible-tabs",
-        "name": "Visible Tabs",
+        "name": "Visible Indentation",
         "value": false,
         "type": "binary",
         "cat": "editor",
