@@ -186,13 +186,6 @@ module.exports = function(grunt) {
           	"node_modules/cside-codemirror/theme/cs-dark.css",
           	"node_modules/cside-codemirror/theme/cs-dichromatic.css",
 
-          	"node_modules/cside-codemirror/theme/abcdef.css",
-          	"node_modules/cside-codemirror/theme/blackboard.css",
-          	"node_modules/cside-codemirror/theme/dracula.css",
-          	"node_modules/cside-codemirror/theme/ambiance.css",
-          	"node_modules/cside-codemirror/theme/icecoder.css",
-          	"node_modules/cside-codemirror/theme/solarized.css",
-
           	"source/lib/bootstrap/bootstrap.min.css",
 
           	"source/css/cside.css"
