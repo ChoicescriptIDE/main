@@ -2832,20 +2832,14 @@ function IDEViewModel() {
           { "desc": "Dark", "value": "cs-dark"},
           { "desc": "Dichromatic", "value": "cs-dichromatic"},
           { "desc": "Light", "value": "cs-light"},
-          { "desc": "Abcdef", "value": "abcdef"},
-          { "desc": "Ambiance", "value": "ambiance"},
-          { "desc": "Blackboard", "value": "blackboard"},
-          { "desc": "Dracula", "value": "dracula"},
-          { "desc": "Icecoder", "value": "icecoder"},
-          { "desc": "Solarized", "value": "solarized"},
           { "desc": "Custom", "value": "cs-custom"}
         ],
         "desc": "Sets the colour and style of the editor window and its text",
         "apply": function(val) {
           //conditional is handled in choicescript.js CodeMirror mode
-          if (val == "lesser-dark" || val == "choicescript" || val == "erlang-dark") {
-            val = "cs-light";
-          } //handle any old config values
+          if (!["cs-dark", "cs-light", "cs-dichromatic", "cs-custom"].includes(val)) {
+            val = "cs-light"; // handle any old theme config values
+          }
           editor.setOption("theme", val);
           $("#code-footer, #cs-console").removeClass().addClass("CodeMirror cm-s-" + val);
         }
