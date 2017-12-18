@@ -2239,7 +2239,7 @@ function IDEViewModel() {
   }
 
   var speller = function() {
-    var word = new RegExp(/([A-Za-z\u00C0-\u00FF\u0100-\u017F]+'[A-Za-z\u00C0-\u00FF\u0100-\u017F]+|[A-Za-z\u00C0-\u00FF\u0100-\u017F]{2,}|[AaI]'?)(?=$|[\s\.,:;\?'\-\!—…])/g);
+    var word = new RegExp(/([\"A-Za-z\u00C0-\u00FF\u0100-\u017F]+'[A-Za-z\u00C0-\u00FF\u0100-\u017F]+|[A-Za-z\u00C0-\u00FF\u0100-\u017F]{2,}|[AaI]'?)(?=$|[\s\.,:;\?'\-\!—…\"])/g);
     var cmd = new RegExp(/\*[A-Za-z_]+\b/);
     var variable = new RegExp(/\{.*\}/g); //new RegExp(/\{[A-Za-z0-9_\[\]]+\}/g);
 
