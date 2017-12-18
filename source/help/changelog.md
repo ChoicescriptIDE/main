@@ -1,3 +1,42 @@
+## v1.2.0 - 18/12/2017
+
+Feature release including custom themes, code folding and selection matching, a handful of bug fixes and some minor behaviour tweaks.
+
+### Additions
+- Code folding/collapsing
+- Example projects are now runnable
+- Selection matching (highlights other instances of selected text)
+- Custom theme scripting (and matching example project)
+- Spellcheck now supports including/excluding of command lines
+- Visible indentation support for spaces
+- New shortcut combos for
+  - Delete line
+  - Duplicate line
+  - Toggle block comment
+
+### Fixes
+- 'Insert double line break' menu option now respects indentation
+- Fixed a file path issue on attempts to open a project folder
+- Made some changes to mitigate a possible ui/locking bug with project controls
+- Misspelled words next to speech marks are now detected correctly
+
+### Changes
+- Updated internal copy of ChoiceScript to [Github commit](https://github.com/dfabulich/choicescript/commit/7c0a4a68ad6b6c780eb41249c6627b8dd7b42524 "ChoiceScript Github commit")
+- 'Untitled_X' scenes are now generated with fully lowercase names
+- Numerous changes to spellcheck and indentation syntax implementation
+- Editor history delay has been drastically reduced which should result in smaller/more precise undo steps
+- Updates:
+  - Development channel warning removed
+  - Name of update channel now appears in the update title
+  - Development updates are now coloured in yellow
+  - Update channel setting now has a description
+
+### Removals
+- The mixed scene indentation test performed on newly opened files has been disabled
+- The additional temporary editor themes have been removed (in light of custom theme support)
+  - Only the Light, Dark and Dichromatic themes will be supported going forward
+  - Users who's config points to removed themes will be set back to the Light theme
+
 ## v1.1.2 - 7/10/2017
 
 Includes a permission issue fix (from v1.1.1), some changes to support updates on Linux, and the latest copy of ChoiceScript.
