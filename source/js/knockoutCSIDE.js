@@ -2240,7 +2240,7 @@ function IDEViewModel() {
 
   var speller = function() {
     var word = new RegExp(/([A-Za-z\u00C0-\u00FF\u0100-\u017F]+'[A-Za-z\u00C0-\u00FF\u0100-\u017F]+|[A-Za-z\u00C0-\u00FF\u0100-\u017F]{2,}|[AaI]'?)(?=$|[\s\.,:;\?'\-\!—…])/g);
-    var cmd = new RegExp(/^\s*\*[A-Za-z_]+\b/);
+    var cmd = new RegExp(/\*[A-Za-z_]+\b/);
     var variable = new RegExp(/\{.*\}/g); //new RegExp(/\{[A-Za-z0-9_\[\]]+\}/g);
 
     return {
@@ -2252,13 +2252,15 @@ function IDEViewModel() {
             return("indentation");
           }
         }
+        cmd.lastIndex = stream.pos;
         var cmd_match = cmd.exec(stream.string);
-        if (cmd_match) {
+        if (cmd_match && cmd_match.index == stream.pos) {
           if (editor.options.spellcheck === 2) { // EXCLUDE CMD LINES FROM SPELL CHECK
             stream.skipToEnd();
           }
           else {
             stream.pos += cmd_match[0].length || 1;
+            return("cmd");
           }
         }
         word.lastIndex = stream.pos;
