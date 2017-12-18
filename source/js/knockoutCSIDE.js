@@ -785,7 +785,7 @@ function IDEViewModel() {
           dirty(false);
           __updatePersistenceList();
           //check tab/space collsion:
-          __testSceneIndentation(self);
+          //__testSceneIndentation(self);
         }
         loaded(true);
         saving(false);
