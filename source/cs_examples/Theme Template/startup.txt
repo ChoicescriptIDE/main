@@ -9,19 +9,22 @@
 *comment   -> *cside_theme_apply
 
 *comment ## VALID TOKENS:
-*comment  1. labels          ( and related: *gosubs, *gotos - etc. )
-*comment 	2. comments
-*comment 	3. variables
-*comment 	4. options         ( #Option lines )
-*comment 	5. csplus          ( CSIDE specific commands )
-*comment 	6. commands
-*comment 	7. page            ( editor background and the standard text )
+*comment 1. labels          ( and related: *gosubs, *gotos - etc. )
+*comment 2. comments
+*comment 3. variables
+*comment 4. options         ( #Option lines )
+*comment 5. csplus          ( CSIDE specific commands )
+*comment 6. commands
+*comment 7. page            ( editor background and the standard text )
+*comment 8. spell-errors    ( any words that are tagged as incorrect by spell-check )
+*comment 9. indentation     ( a line's preceding whitespace )
 
 *comment ## VALID ATTRIBUTES + VALUES:
-*comment  1. color         ( rgb(x,x,x), colorname, #HEXCODE )
-*comment  2. background    ( rgb(x,x,x), colorname, #HEXCODE )
-*comment 	3. weight        ( normal, bold )
-*comment 	4. style         ( normal, italic )
+*comment 1. color           ( rgb(x,x,x), colorname, #HEXCODE )
+*comment 2. background      ( rgb(x,x,x), colorname, #HEXCODE )
+*comment 3. weight          ( normal, bold )
+*comment 4. style           ( normal, italic )
+*comment 5. bottom-border   ( dotted/dashed/solid | color (as above) | 1-5px )
 
 *comment ------------------------------------------
 *comment 		TEMPLATE / EXAMPLE:
@@ -39,11 +42,12 @@
 *cside_theme_set page color black
 
 *comment style comments
-*cside_theme_set comments color darkgreen
+*cside_theme_set comments color green
 
 *comment style options
-*cside_theme_set options color red
+*cside_theme_set options color blue
 *cside_theme_set options style italic
+*cside_theme_set options decoration underline
 
 *comment style standard commands
 *cside_theme_set commands color darkorange
@@ -59,6 +63,13 @@
 *cside_theme_set labels color rgb(9,139,220)
 *cside_theme_set labels weight bold
 
+*comment spelling errors
+*cside_theme_set spell-errors background red
+*cside_theme_set spell-errors color white
+
+*comment indentation markers
+*cside_theme_set indentation bottom-border dotted gray 1px
+
 *comment apply the built theme
 *cside_theme_apply
 
@@ -72,6 +83,7 @@
     ${var_1}
     *goto lost_label
   #Goodbye Old Boring Themes!
+    Here be bad speeling, argh!
     *goto lost_label
 
 *label lost_label

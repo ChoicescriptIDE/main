@@ -2249,7 +2249,7 @@ function IDEViewModel() {
           var indentation = /^( +|\t+)/.exec(stream.string);
           if (indentation) {
             stream.pos += indentation[0].length;
-            return("indentation");
+            return(editor.options.visibleTabs ? "visible-indentation" : "null");
           }
         }
         cmd.lastIndex = stream.pos;
@@ -2641,11 +2641,8 @@ function IDEViewModel() {
         "cat": "editor",
         "desc": "Provides a visible representation of the indentation level in the editor window",
         "apply": function(val) {
-          if (val) {
-            document.getElementById("editor-wrap").classList.add("visible-tabs");
-          } else {
-            document.getElementById("editor-wrap").classList.remove("visible-tabs");
-          }
+          editor.setOption("visibleTabs", val);
+          editor.forceSyntaxRedraw();
         }
       }),
       new CSIDESetting({

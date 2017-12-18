@@ -9,6 +9,8 @@ ETmod.TOKENS = {
   "options" : " span.cm-operator",
   "csplus" : " span.cm-cs-plus",
   "commands" : " span.cm-builtin",
+  "spell-errors" : " span.cm-spell-error",
+  "indentation" : " span.cm-visible-indentation",
   "page" : ".CodeMirror"
 }
 
@@ -17,7 +19,8 @@ ETmod.ATTRIBUTES = {
   "background" : "background",
   "weight": "font-weight",
   "style": "font-style",
-  "decoration" : "text-decoration"
+  "decoration" : "text-decoration",
+  "bottom-border" : "border-bottom"
 }
 
 ETmod.VALUES = {
@@ -26,6 +29,7 @@ ETmod.VALUES = {
   "font-weight": ["bold", "normal"],
   "font-style": ["italic", "normal"],
   "text-decoration" : ["overline", "underline", "line-through"],
+  "border-bottom" : __validBorder,
 }
 
 ETmod.store = {};
@@ -39,17 +43,18 @@ Scene.prototype.cside_theme_set = function(args) {
   }
   if (ETmod.TOKENS[args[0]]) {
     if (ETmod.ATTRIBUTES[args[1]]) {
-      if (args[2]  && ( (typeof ETmod.VALUES[ETmod.ATTRIBUTES[args[1]]] == "function" && ETmod.VALUES[ETmod.ATTRIBUTES[args[1]]](args[2]))
-          || (Array.isArray(ETmod.VALUES[ETmod.ATTRIBUTES[args[1]]]) && ETmod.VALUES[ETmod.ATTRIBUTES[args[1]]].includes(args[2])) ) ) {
+      var valueList;
+      if ((valueList = args.slice(2).join(" ")) && ( (typeof ETmod.VALUES[ETmod.ATTRIBUTES[args[1]]] == "function" && ETmod.VALUES[ETmod.ATTRIBUTES[args[1]]](valueList))
+          || (Array.isArray(ETmod.VALUES[ETmod.ATTRIBUTES[args[1]]]) && ETmod.VALUES[ETmod.ATTRIBUTES[args[1]]].includes(valueList)) ) ) {
         if (!ETmod.store[args[0]])
           ETmod.store[args[0]] = {};
         if (!ETmod.store[args[0][args[1]]])
           ETmod.store[args[0]][args[1]] = null;
-        var classString = ((ETmod.CSS_PREFIX + ETmod.TOKENS[args[0]]) + (" -> " + ETmod.TOKENS[args[1]])) + ( " = " + args[2]);
-        ETmod.store[args[0]][args[1]] = args[2];
+        var classString = ((ETmod.CSS_PREFIX + ETmod.TOKENS[args[0]]) + (" -> " + ETmod.TOKENS[args[1]])) + ( " = " + valueList);
+        ETmod.store[args[0]][args[1]] = valueList;
       }
       else {
-        throw new Error("'" + args[2] + "' is not a valid syntax property, " + this.lineMsg());
+        throw new Error("'" + valueList + "' is not a valid syntax property, " + this.lineMsg()); // improve this msg
       }
     }
     else {
@@ -96,6 +101,21 @@ function __validColour(stringToTest) {
   image.style.color = "rgb(255, 255, 255)";
   image.style.color = stringToTest;
   return image.style.color !== "rgb(255, 255, 255)";
+}
+
+function __validBorder(args) {
+  var BORDER_TYPES = ["dotted", "dashed", "solid"];
+  args = args.split(" ");
+  if (args.length != 3) // expect: 1. dotted,solid,dashed 2. __validColour, 3. 1-5px
+    return false;
+  var color, width = args[2].replace("px", "");
+  if (!BORDER_TYPES.includes(args[0]))
+    return false;
+  if (!(colour = __validColour(args[1])))
+    return false;
+  if (isNaN(width) || (width > 5 || width < 1))
+    return false;
+  return true;
 }
 
  Scene.validCommands.cside_theme_set = 1;

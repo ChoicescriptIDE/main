@@ -1591,15 +1591,10 @@ body.night .colour-picker {
 
 span.cm-spell-error {
     position: relative;
+    border-bottom-style: dashed;
+    border-bottom-width: 1px;
+    border-bottom-color: red;
     /* white-space: pre; */
-}
-
-span.cm-spell-error::after {
-  position: absolute;
-  content: " ";
-  left: 0px;
-  top: 0px;
-  width: 100%;
 }
 
 /* span.cm-spell-error::before {
@@ -1821,9 +1816,10 @@ body.night .close:focus, body.night .close:hover {
 }
 
 /* cm-extras */
-#editor-wrap.visible-tabs .cm-indentation {
-	border-bottom: 1px dashed;
-	color: #BDBDBD;
+.cm-visible-indentation {
+	border-bottom-style: dashed;
+  border-bottom-width: 1px;
+	border-bottom-color: #BDBDBD;
 }
 
 .arrow-gutter {
