@@ -3472,6 +3472,11 @@ function IDEViewModel() {
         self.tabs.push(__csideTabs[config.tabs[e]]);
       }
     }
+    else {
+      for (var tab in __csideTabs) {
+        self.tabs.push(__csideTabs[tab]);
+      }
+    }
     var scope = settings.editor();
     for (var i = 0; i < scope.length; i++) {
       var val = typeof config.settings.editor[scope[i].getId()] != 'undefined' ? config.settings.editor[scope[i].getId()] : defaultConfig.settings.editor[scope[i].getId()];

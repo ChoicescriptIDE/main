@@ -1,3 +1,10 @@
+## v1.2.1 - 27/12/2017
+
+Fixes a critical bug caused by turning persistent session 'off' when persistent tabs are supported.
+
+### Fixes
+- default tab order is now initialized correctly when the persistent session setting is disabled
+
 ## v1.2.0 - 18/12/2017
 
 Feature release including custom themes, code folding and selection matching, a handful of bug fixes and some minor behaviour tweaks.
