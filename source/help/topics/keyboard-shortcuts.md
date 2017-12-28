@@ -35,6 +35,7 @@
 | Open all scenes of project          | SHIFT + CTRL + O    | SHIFT + CMD + O     |
 | Run Quicktest on project            | CTRL + T            | CMD + T             |
 | Run Randomtest on project           | SHIFT + CTRL + T    | SHIFT + CMD + T     |
+| Run active project                  | SHIFT + CTRL + ENTER| SHIFT + CMD + ENTER |
 | Toggle panel section                | SHIFT + CTRL + .    | SHIFT + CMD + .     |
 | Toggle scene section                | SHIFT + CTRL + ,    | SHIFT + CMD + ,     |
 | Toggle full-window editor           | ESC / F11           | ESC / F11           |
