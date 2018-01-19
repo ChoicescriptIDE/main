@@ -1560,7 +1560,7 @@ function IDEViewModel() {
         "persist": true,
         "autosave": true,
         "cmdhelp": false,
-        "update-channel": "stable",
+        "update-channel": "accessible",
         "ui-colour": "90,90,90",
         "project-path": "default" //COME BACK TO ME CJW
       }
@@ -2999,6 +2999,9 @@ function IDEViewModel() {
         "type": "dropdown",
         "desc": "Speed and reliability of the updates CSIDE will receive",
         "options": [{
+          "desc": "Accesibility",
+          "value": "accessible"
+        }, {
           "desc": "Stable",
           "value": "stable"
         }, {
