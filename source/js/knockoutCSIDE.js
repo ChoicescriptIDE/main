@@ -12,6 +12,7 @@ if (typeof nw === "object") {
   var trash = require('trash');
   var getDirName = require('path').dirname;
   var gui = require('nw.gui');
+  var childProcess = require('child_process');
   //var http = require('http');
   //var stream = require('stream');
   var updater = require('cside-updater');
@@ -876,6 +877,24 @@ function IDEViewModel() {
           fileStats.mtime ? fileStats.mtime = new Date() : fileStats.modifiedAt = new Date();
         }
         saving(false);
+        var cp = childProcess.fork('autotest.js', [getProjectPath(path()), name()], {cwd:"node_modules/cside-choicescript", silent: true});
+
+        cp.stdout.on('data', function (data) {
+          console.log(data.toString());
+        });
+
+        cp.stderr.on('data', function (data) {
+          console.log("Error: " + data.toString());
+        });
+
+        cp.on('close', function(code) {
+          console.log("child process exited with code " + code);
+          if (code != 0) {
+            notification("QuicktTest Failed", name() + "failed", {
+              type: "error"
+            });
+          }
+        });
         if (typeof callback == 'function') callback(err);
       }
     }
@@ -4102,6 +4121,22 @@ function IDEViewModel() {
         project.test_win = null;
         __testProject(project, test);
       } else {
+
+        var cp = childProcess.fork('autotest.js', [project.getPath()], {cwd:"node_modules/cside-choicescript", silent: true});
+
+        cp.stdout.on('data', function (data) {
+          console.log(data.toString());
+        });
+
+        cp.stderr.on('data', function (data) {
+          console.log("Error: " + data.toString());
+        });
+
+        cp.on('close', function(code) {
+          console.log("child process exited with code " + code);
+        });
+
+        return;
         nw.Window.open(path, {
           focus: true,
           width: 500,
