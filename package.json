@@ -25,6 +25,7 @@
     "dropbox": "^2.5.2",
     "knockout": "3.2.0",
     "mousetrap": "^1.6.0",
+    "noty": "^3.2.0-beta",
     "trash": "^2.0.0",
     "username": "^1.0.1"
   },
