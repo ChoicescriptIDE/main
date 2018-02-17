@@ -1623,37 +1623,54 @@ span.cm-spell-error {
 }
 /* NOTY OVERRIDE */
 
-.cside_noty {
+.noty_bar {
     box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.2);
     color: #525252;
 }
 
-.cside_noty.noty_container_type_default {
-    background-color: white;}
+.noty_type__alert {
+    background-color: white;
+}
 
-.cside_noty.noty_container_type_error {
+.noty_type__error {
     background-color: #e64848;
     color: white;
 }
 
-.cside_noty.noty_container_type_warning {
+.noty_type__warning {
   background-color: #ffee6a;
 }
 
-.cside_noty.noty_container_type_success {
+.noty_type__success {
     background-color: #b2f3ae;
 }
 
-.cside_noty > .noty_bar {
-    padding: 5px 15px;
-}
-
-.cside_noty > .noty_bar > .noty_buttons {
+.noty_bar > .noty_buttons {
     text-align: right;
 }
 
+.noty_bar > .noty_buttons > button:hover {
+    opacity: 0.5;
+}
 
-.cside_noty > .noty_bar > .noty_buttons > button {
+.noty_bar .noty_message > .noty_text > .fa { /* icons */
+    float: left;
+    margin-top: 2px;
+    margin-right: 4px;
+}
+
+.noty_bar > .noty_message > .noty_text >  span, p {
+    font-size: 12px;
+    /* margin-left: 5px; */
+    /* width: 90%; */
+}
+
+.noty_bar > .noty_body > progress {
+    width: 100%;
+}
+
+
+.noty_bar > .noty_buttons > button {
     background-color: transparent;
     color: inherit;
     border: none;
@@ -1664,29 +1681,8 @@ span.cm-spell-error {
     transition: all .5s ease;
 }
 
-.cside_noty > .noty_bar > .noty_buttons > button:hover {
+.noty_bar > .noty_buttons > button:hover {
     opacity: 0.5;
-}
-
-.cside_noty > .noty_bar .noty_message > .noty_text > .fa { /* icons */
-    float: left;
-    margin-top: 2px;
-    margin-right: 4px;
-}
-
-.cside_noty > .noty_bar > .noty_message > .noty_text >  span, p {
-    font-size: 12px;
-    /* margin-left: 5px; */
-    /* width: 90%; */
-}
-
-.cside_noty > .noty_bar > .noty_message > .noty_text > h5 {
-    font-size: 16px;
-    text-align: left;
-}
-
-.cside_noty > .noty_bar > .noty_message > .noty_text >  progress {
-    width: 100%;
 }
 
 #noty_bottomRight_layout_container li {

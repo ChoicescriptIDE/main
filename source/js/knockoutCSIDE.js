@@ -387,7 +387,7 @@ function IDEViewModel() {
                     return;
                   }
                   var buttons = [{
-                    addClass: 'btn btn-default',
+                    addClass: 'btn',
                     text: 'Show Folder',
                     onClick: function(note) {
                       __openFolder(newPath);
@@ -1291,7 +1291,7 @@ function IDEViewModel() {
                       } else {
                         var note;
                         var buttons = [{
-                          addClass: 'btn btn-default',
+                          addClass: 'btn',
                           text: 'Show Folder',
                           onClick: function(note) {
                             __openFolder(newPath);
@@ -1800,21 +1800,19 @@ function IDEViewModel() {
 
   var notification = function(title, message, options) {
     var options = options || {};
-    options.theme = "cside_noty";
+    options.theme = "bootstrap-v3";
     options.layout = options.layout || "bottomRight";
-    options.type = options.type || "default";
+    options.type = options.type || "alert";
     options.timeout = options.timeout === false ? false : options.timeout || 5000;
     options.closeWith = options.closeWith === false ? false : options.closeWith || ["click"];
     options.buttons = options.buttons || null;
-    options.animation = {
-      open: {
-        opacity: 'toggle'
-      }, // jQuery animate function property object
-      close: {
-        opacity: 'toggle'
-      }, // jQuery animate function property object
-      easing: 'swing', // easing
-      speed: 250 // opening & closing animation speed
+    if (options.buttons) {
+      options.buttons = options.buttons.map(function(btn) {
+        return Noty.button(btn.text, btn.addClass, function(note) {
+            btn.onClick(note);
+          }
+        );
+      });
     }
 
     function wrapMessage(title, msg) {
@@ -1825,12 +1823,13 @@ function IDEViewModel() {
     if (options.progress) {
       options.text += "<progress value='0' max='100'></progress>";
     }
-    var n = noty(options);
+    var n = new Noty(options);
     if (options.progress) {
       n.setProgress = function(val) {
-        n.$message.find(".noty_text").find("progress").val(val);
+        $(n.barDom).find(".noty_body").find("progress").val(val);
       }
     }
+    n.show();
     return n;
   }
   self.notification = function(title, message, options) {
@@ -3048,7 +3047,7 @@ function IDEViewModel() {
             var autoUpdate = function() {
               if (self.prompt && !self.prompt.closed) // prevent notification stacking
                 return;
-              var n = notification("", "<i class='fa fa-refresh fa-spin'></i> Checking for updates...", { closeWith: false, timeout: false });
+              var n = notification("", "<i aria-hidden=true class='fa fa-refresh fa-spin'></i> Checking for updates...", { closeWith: false, timeout: false });
               updater.checkForUpdates({
                 cside: CSIDE_version,
                 nw: nw_version
@@ -3498,22 +3497,23 @@ function IDEViewModel() {
     if (config.justUpdated || typeof config.justUpdated === "undefined") {
       config.justUpdated = false;
       __updateConfig();
-	  var n = notification("Updated to v" + CSIDE_version, "A full list of changes can be found under 'Changelog' in the help and information tab.", {
-		buttons: [{ addClass: 'btn btn-default', text: 'Show Changelog',
-			onClick: function(note) {
-				var csideHelp = __getCSIDEHelp();
-				if (csideHelp) {
-					csideHelp.breadcrumbs = [{ 'url' : 'home.html', 'title': 'Home' }, { 'url' : 'changelog.md', 'title' : 'Changelog' }];
-					csideHelp.history = ['home.html', 'changelog.md'];
-					csideHelp.drawPage('changelog.md');
-				}
-				note.close();
-			}
-		}]
-	  });
-	  n.setTimeout(5000);
-	  __getCSIDEHelp();
-	}
+      setTimeout(function() {
+        var n = notification("Updated to v" + CSIDE_version, "A full list of changes can be found under 'Changelog' in the help and information tab.", {
+          buttons: [{ addClass: 'btn', text: 'Show Changelog',
+            onClick: function(note) {
+              var csideHelp = __getCSIDEHelp();
+              if (csideHelp) {
+                csideHelp.breadcrumbs = [{ 'url' : 'home.html', 'title': 'Home' }, { 'url' : 'changelog.md', 'title' : 'Changelog' }];
+                csideHelp.history = ['home.html', 'changelog.md'];
+                csideHelp.drawPage('changelog.md');
+              }
+              note.close();
+            }
+          }]
+        });
+        n.setTimeout(5000);
+      }, 10000);
+    }
   }
 
   //animations
@@ -4290,7 +4290,7 @@ function IDEViewModel() {
               throw new Error("Export failed!");
             } else {
               var buttons = [{
-                addClass: 'btn btn-default',
+                addClass: 'btn',
                 text: 'Show Folder',
                 onClick: function(note) {
                   __openFolder(path);
@@ -4351,7 +4351,7 @@ function IDEViewModel() {
 
   function __showUpdatePrompt(channel, update) {
     var buttons = [{
-      addClass: 'btn btn-default',
+      addClass: 'btn',
       text: 'Download',
       onClick: function(note) {
         note.close();
@@ -4359,13 +4359,13 @@ function IDEViewModel() {
       }
     },
     {
-      addClass: 'btn btn-default',
+      addClass: 'btn',
       text: 'Cancel',
       onClick: function(note) {
         note.close();
       }
     }];
-    return notification("Update Available on " + (channel.charAt(0).toUpperCase() + channel.slice(1)), update.desc, { closeWith: false, timeout: false, buttons: buttons, type: (channel === "development") ? "warning" : "default" });
+    return notification("Update Available on " + (channel.charAt(0).toUpperCase() + channel.slice(1)), update.desc, { closeWith: false, timeout: false, buttons: buttons, type: (channel === "development") ? "warning" : "alert" });
   }
 
   function __updateConfig() {

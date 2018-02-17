@@ -105,7 +105,7 @@ module.exports = function(grunt) {
         src: [
           "source/lib/jquery/jquery-1.11.3.min.js",
           "source/lib/jquery/jquery-ui.min.js",
-          "source/lib/jquery/jquery.noty.packaged.min.js",
+          "node_modules/noty/lib/noty.min.js",
 
           "node_modules/cside-codemirror/lib/codemirror.js",
           "node_modules/cside-codemirror/mode/choicescript/choicescript-new.js",
@@ -185,6 +185,9 @@ module.exports = function(grunt) {
           	"node_modules/cside-codemirror/theme/cs-light.css",
           	"node_modules/cside-codemirror/theme/cs-dark.css",
           	"node_modules/cside-codemirror/theme/cs-dichromatic.css",
+
+            "node_modules/noty/lib/noty.css",
+            "node_modules/noty/lib/themes/bootstrap-v3.css",
 
           	"source/lib/bootstrap/bootstrap.min.css",
 
