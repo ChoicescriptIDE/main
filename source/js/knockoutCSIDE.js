@@ -1016,10 +1016,10 @@ function IDEViewModel() {
       if (!saving())
         cmDoc.isClean() ? dirty(false) : dirty(true);
       history = cmDoc.getHistory();
-      //if (editor.getOption("word_count")) { // CJW re-add this condition in at some point for performance
       charCount((charCount() - change.removed.join('\n').length) + change.text.join('\n').length);
-      wordCount(__wordCount(cmDoc.getValue(), editor.getOption("exclude_cmd_lines")));
-      //}
+      if (editor.getOption("word_count")) {
+        wordCount(__wordCount(cmDoc.getValue(), editor.getOption("exclude_cmd_lines")));
+      }
     });
     CodeMirror.on(cmDoc, "cursorActivity", function(cm) {
       cursor(cmDoc.getCursor());
