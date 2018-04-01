@@ -154,6 +154,7 @@
 								<span class="fa fa-terminal"></span>
 								<span class="console-indicator" data-bind="fadeVisible: getSelectedProject().getUnreadLogCount(), text: getSelectedProject().getUnreadLogCount()" ></span>
 							</button>
+              <span data-bind="fadeVisible: wordCountOn()"><span data-bind="text: getSelectedScene().getCursorString()"></span></span>
 							<span data-bind="fadeVisible: wordCountOn()">Char Count: <span data-bind="text: getSelectedScene().getCharCountString()"></span></span>
 							<span data-bind="fadeVisible: wordCountOn()">Word Count: <span data-bind="text: getSelectedScene().getWordCountString()"></span></span>
 						</div>

@@ -491,6 +491,7 @@ function IDEViewModel() {
     var cmDoc = CodeMirror.Doc(sceneData.contents || "", "choicescript"); //won't change - so doesn't need to be an observable?
     var charCount = ko.observable(sceneData.contents ? sceneData.contents.length : 0); //prepopulate otherwise .load() text replacement results in '0' on new startup.txts
     var wordCount = ko.observable(0);
+    var cursor = ko.observable({line:0,ch:0});
     var selectedChars = ko.observable(0);
     var history = cmDoc.getHistory();
     var fileStats = sceneData.stats || {
@@ -589,6 +590,9 @@ function IDEViewModel() {
       } else {
         return charCount();
       }
+    };
+    self.getCursorString = function() {
+      return "Ln " + cursor().line + ", Col " + cursor().ch;
     };
     self.getWordCountString = function() {
       var suffix = editor.getOption("exclude_cmd_lines") ? " [excl. cmds]" : " [inc. cmds]";
@@ -1018,6 +1022,7 @@ function IDEViewModel() {
       //}
     });
     CodeMirror.on(cmDoc, "cursorActivity", function(cm) {
+      cursor(cmDoc.getCursor());
       selectedChars(cmDoc.getSelection().length);
     });
   }
