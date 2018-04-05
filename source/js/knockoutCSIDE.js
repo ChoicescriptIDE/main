@@ -1785,10 +1785,12 @@ function IDEViewModel() {
     if (typeof err.code == 'undefined') {
       err.code = err.status || "Unknown Error Code";
     }
-    // New Dropbox SDK errors (409 = General, 429 = API Rate Limit or similar)
-    if (err.code == 409 || err.code == 429) {
-      try { err.error = JSON.parse(err.error); err.code = err.error.error[err.error.error[".tag"]][".tag"]; err.message = "Dropbox: " + err.error.error_summary; }
-      catch(e) {};
+    // Dropbox's new API format is rather strange, so we do what we can here.
+    // With luck we'll migrate to dashingdon in the near future.
+    if (typeof err.code != "undefined" && err.code == 409) {
+      if (err.error.error[err.error.error[".tag"]][".tag"] == "not_found")
+        err.code = 404;
+      err.message = "Dropbox: " + err.error.error_summary;
     }
     switch (err.code) {
       case "not_found":
