@@ -21,6 +21,8 @@
 | Toggle block comment           | CTRL + /            | CMD + /             |
 | Toggle full-window editor      | ESC / F11           | ESC / F11           |
 | Toggle console                 | SHIFT + CTRL + C    | SHIFT + CMD + C     |
+| Increase font size             | SHIFT + CTRL + =    | SHIFT + CMD + =     |
+| Decrease font size             | SHIFT + CTRL + -    | SHIFT + CMD + -     |
 
 ### Global Shortcuts
 
