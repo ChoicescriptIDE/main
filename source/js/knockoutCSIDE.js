@@ -1128,6 +1128,12 @@ function IDEViewModel() {
     setting.getOptions = function() {
       return options;
     }
+    setting.getSelectedOptionId = function () {
+      for (var i = 0; i < options.length; i++)
+        if (value() == options[i].value)
+          return i;
+      return null;
+    }
     setting.getDesc = ko.computed(function() {
       return desc();
     }, this);
@@ -2007,6 +2013,18 @@ function IDEViewModel() {
       "Shift-Cmd-.": function(ed) {
         self.tabPanel();
       },
+      "Shift-Cmd-=": function(ed) {
+        var fontSizeSetting = settings.byId("editor", "fontsize");
+        var optionId = fontSizeSetting.getSelectedOptionId();
+        if (typeof optionId == "number" && optionId < (fontSizeSetting.getOptions().length - 1))
+          fontSizeSetting.toggle(fontSizeSetting.getOptions()[optionId + 1]);
+      },
+      "Shift-Cmd--": function(ed) {
+        var fontSizeSetting = settings.byId("editor", "fontsize");
+        var optionId = fontSizeSetting.getSelectedOptionId();
+        if (typeof optionId == "number" && optionId > 0)
+          fontSizeSetting.toggle(fontSizeSetting.getOptions()[optionId - 1]);
+      },
       "Shift-Cmd-O": function(ed) {
         selectedProject().openAllScenes();
       },
@@ -2101,6 +2119,18 @@ function IDEViewModel() {
       },
       "Shift-Ctrl-.": function(ed) {
         self.tabPanel();
+      },
+      "Shift-Ctrl-=": function(ed) {
+        var fontSizeSetting = settings.byId("editor", "fontsize");
+        var optionId = fontSizeSetting.getSelectedOptionId();
+        if (typeof optionId == "number" && optionId < (fontSizeSetting.getOptions().length - 1))
+          fontSizeSetting.toggle(fontSizeSetting.getOptions()[optionId + 1]);
+      },
+      "Shift-Ctrl--": function(ed) {
+        var fontSizeSetting = settings.byId("editor", "fontsize");
+        var optionId = fontSizeSetting.getSelectedOptionId();
+        if (typeof optionId == "number" && optionId > 0)
+          fontSizeSetting.toggle(fontSizeSetting.getOptions()[optionId - 1]);
       },
       "Shift-Ctrl-Q": function(ed) {
         if (usingNode) {
@@ -3136,6 +3166,15 @@ function IDEViewModel() {
         }
       })
     ]),
+    "byId": function(settingType, id) {
+      if (typeof settings[settingType] != 'undefined') {
+        for (var i = 0; i < settings[settingType]().length; i++) {
+          if (settings[settingType]()[i].getId() == id)
+            return settings[settingType]()[i];
+        }
+      }
+      return null;
+    },
     "asObject": function(settingType) {
       if (typeof settings[settingType] != 'undefined') {
         var arr = settings[settingType]();
