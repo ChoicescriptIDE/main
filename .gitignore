@@ -5,3 +5,5 @@ nwjsCache/*
 /node_modules/*
 inno/*
 !inno/*.iss
+compile_head.txt
+compile_tail.txt
