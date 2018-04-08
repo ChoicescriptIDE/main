@@ -58,10 +58,15 @@ window.onerror = function(msg, file, line, stack) {
 }
 
 //make image's sourced from the project directory
-function printImage(source, alignment) {
+function printImage(source, alignment, alt, invert) {
   var img = document.createElement("img");
   img.src = source.match("data:image") ? source : "file://" + thisProject.getPath() + source; //interal image, don't add directory
-  setClass(img, "align"+alignment);
+  if (alt !== null && String(alt).length > 0) img.setAttribute("alt", alt);
+  if (invert) {
+    setClass(img, "invert align"+alignment);
+  } else {
+    setClass(img, "align"+alignment);
+  }
   document.getElementById("text").appendChild(img);
 }
 
