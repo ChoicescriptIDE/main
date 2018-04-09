@@ -9,15 +9,20 @@
 *comment   -> *cside_theme_apply
 
 *comment ## VALID TOKENS:
-*comment 1. labels          ( and related: *gosubs, *gotos - etc. )
-*comment 2. comments
-*comment 3. variables
-*comment 4. options         ( #Option lines )
-*comment 5. csplus          ( CSIDE specific commands )
-*comment 6. commands
-*comment 7. page            ( editor background and the standard text )
-*comment 8. spell-errors    ( any words that are tagged as incorrect by spell-check )
-*comment 9. indentation     ( a line's preceding whitespace )
+*comment  1. labels          ( and related: *gosubs, *gotos - etc. )
+*comment  2. comments
+*comment  3. variables
+*comment  4. options         ( #Option lines )
+*comment  5. csplus          ( CSIDE specific commands )
+*comment  6. commands
+*comment  7. page            ( editor background and the standard text )
+*comment  8. spell-errors    ( any words that are tagged as incorrect by spell-check )
+*comment  9. indentation     ( a line's preceding whitespace )
+*comment 10. gutter          ( editor sidebar )
+*comment 11. gutter-numbers  ( line numbers )
+*comment 12. error-lines     ( lines that have caused an issue to be logged )
+*comment 12. cursor
+*comment 13. matches         ( word that match the currently selected word )
 
 *comment ## VALID ATTRIBUTES + VALUES:
 *comment 1. color           ( rgb(x,x,x), colorname, #HEXCODE )
@@ -25,6 +30,7 @@
 *comment 3. weight          ( normal, bold )
 *comment 4. style           ( normal, italic )
 *comment 5. bottom-border   ( dotted/dashed/solid | color (as above) | 1-5px )
+*comment 5. left-border     ( dotted/dashed/solid | color (as above) | 1-5px )
 
 *comment ------------------------------------------
 *comment 		TEMPLATE / EXAMPLE:
@@ -40,6 +46,14 @@
 *comment style page background and general text
 *cside_theme_set page background #FFE
 *cside_theme_set page color black
+
+*comment style cursor
+*cside_theme_set cursor left-border dashed orange 2px
+
+*comment style the gutter and gutter numbers
+*cside_theme_set gutter background black
+*cside_theme_set gutter-numbers weight bold
+*cside_theme_set gutter-numbers color white
 
 *comment style comments
 *cside_theme_set comments color green
@@ -63,12 +77,21 @@
 *cside_theme_set labels color rgb(9,139,220)
 *cside_theme_set labels weight bold
 
-*comment spelling errors
+*comment style spelling errors
 *cside_theme_set spell-errors background red
 *cside_theme_set spell-errors color white
 
-*comment indentation markers
+*comment style indentation markers
 *cside_theme_set indentation bottom-border dotted gray 1px
+
+*comment style highlighted error lines
+*cside_theme_set error-lines background pink
+
+*comment style matching words
+*comment sometimes the !important tag or its !override alias
+*comment can allow you to override hierarchial attributes
+*cside_theme_set matches background blue
+*cside_theme_set matches color white !override
 
 *comment apply the built theme
 *cside_theme_apply

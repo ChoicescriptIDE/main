@@ -11,6 +11,11 @@ ETmod.TOKENS = {
   "commands" : " span.cm-builtin",
   "spell-errors" : " span.cm-spell-error",
   "indentation" : " span.cm-visible-indentation",
+  "error-lines" :  " .CodeMirror-error-background",
+  "gutter": " .CodeMirror-gutters",
+  "gutter-numbers": " .CodeMirror-linenumber",
+  "matches" : " .cm-matchhighlight",
+  "cursor": " .CodeMirror-cursor",
   "page" : ".CodeMirror"
 }
 
@@ -20,7 +25,8 @@ ETmod.ATTRIBUTES = {
   "weight": "font-weight",
   "style": "font-style",
   "decoration" : "text-decoration",
-  "bottom-border" : "border-bottom"
+  "bottom-border" : "border-bottom",
+  "left-border" : "border-left"
 }
 
 ETmod.VALUES = {
@@ -30,6 +36,7 @@ ETmod.VALUES = {
   "font-style": ["italic", "normal"],
   "text-decoration" : ["overline", "underline", "line-through"],
   "border-bottom" : __validBorder,
+  "border-left" : __validBorder,
 }
 
 ETmod.store = {};
@@ -38,8 +45,10 @@ ETmod.CSS_PREFIX = ".cm-s-cs-custom";
 
 Scene.prototype.cside_theme_set = function(args) {
   args = args.split(" ");
-  if (args.length < 0) {
-    throw new Error("Expected zero or one arguments");
+  if (args.length < 3) {
+    throw new Error("Expected three or more arguments: TOKEN ATTRIBUTE VALUE");
+  } else if (args[args.length-1] == "!override" || args[args.length-1] == "!important") {
+    var important = args.pop();
   }
   if (ETmod.TOKENS[args[0]]) {
     if (ETmod.ATTRIBUTES[args[1]]) {
@@ -51,10 +60,13 @@ Scene.prototype.cside_theme_set = function(args) {
         if (!ETmod.store[args[0][args[1]]])
           ETmod.store[args[0]][args[1]] = null;
         var classString = ((ETmod.CSS_PREFIX + ETmod.TOKENS[args[0]]) + (" -> " + ETmod.TOKENS[args[1]])) + ( " = " + valueList);
+        if (typeof important != "undefined") {
+          valueList += " !important";
+        }
         ETmod.store[args[0]][args[1]] = valueList;
       }
       else {
-        throw new Error("'" + valueList + "' is not a valid syntax property, " + this.lineMsg()); // improve this msg
+        throw new Error("'" + valueList + "' is not a valid value, " + this.lineMsg()); // improve this msg
       }
     }
     else {
