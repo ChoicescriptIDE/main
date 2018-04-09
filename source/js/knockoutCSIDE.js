@@ -2878,17 +2878,7 @@ function IDEViewModel() {
           }
           if (val == "cs-custom") {
             var storedCSS = localStorage.getItem("CSIDE_userCSS");
-            fh.writeFile("css/user.css", storedCSS, function(err) {
-              if (err) {
-                notification("Error", "Unable to write custom user styling to file.", {
-                  type: "error"
-                });
-                return;
-              }
-              // force reloading of CSS
-              document.getElementById("user-theme").href = "";
-              document.getElementById("user-theme").href = "css/user.css";
-            });
+            document.getElementById("user-theme").innerHTML = storedCSS;
           }
           editor.setOption("theme", val);
           $("#code-footer, #cs-console").removeClass().addClass("CodeMirror cm-s-" + val);

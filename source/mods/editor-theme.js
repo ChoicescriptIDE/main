@@ -91,14 +91,7 @@ Scene.prototype.cside_theme_apply = function(data) {
     ETmod.css += ETmod.curRule;
   }
   localStorage.setItem("CSIDE_userCSS", ETmod.css);
-  parent.fs.writeFile("css/user.css", ETmod.css, {
-    encoding: 'utf8'
-  }, function(err) {
-    if (!err) {
-      parent.document.getElementById("user-theme").href = "";
-      parent.document.getElementById("user-theme").href = "css/user.css";
-    }
-  });
+  parent.document.getElementById("user-theme").innerHTML = ETmod.css;
 }
 
 function __validColour(stringToTest) {
