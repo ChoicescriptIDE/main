@@ -24,6 +24,16 @@ module.exports = function(grunt) {
           bower: false
         }
       },
+      codemirror_npm: {
+        options: {
+          cwd: '',
+          stdout: true,
+          stderr: true,
+          failOnError: true,
+          npm: 'cside-codemirror',
+          bower: false
+        }
+      },
       codemirror: {
         options: {
           cwd: 'node_modules/cside-codemirror',
@@ -33,11 +43,19 @@ module.exports = function(grunt) {
           npm: '',
           bower: false
         }
+      },
+      choicescript_npm: {
+        options: {
+          cwd: '',
+          failOnError: true,
+          npm: 'cside-choicescript',
+          bower: false
+        }
       }
      },
     "clean": {
-      files: ['build/*.', 'release/*.'],
-      folders: ['build/*/']
+      files: ['build/*', 'release/*'],
+      folders: ['build/*/', 'node_modules/cside-choicescript', 'node_modules/cside-codemirror']
     },
     "copy": {
       main: {
@@ -153,6 +171,14 @@ module.exports = function(grunt) {
 
         ],
         dest: 'build/js/all.min.js',
+        // Fail on missing files
+        filter: function (filepath) {
+          if (!grunt.file.exists(filepath)) {
+            grunt.fail.warn('Could not find: ' + filepath);
+          } else {
+            return true;
+          }
+        },
         nonull: true,
       },
     },
@@ -260,7 +286,7 @@ module.exports = function(grunt) {
       }
     }
   });
-  var tasks = ["clean", "auto_install:codemirror", "copy:main", "concat", "uglify", "cssmin", "auto_install:build", "copy:choicescript", "copy:updater", "string-replace", "execute", "compress"];
+  var tasks = ["clean", "auto_install:codemirror_npm", "auto_install:codemirror", "auto_install:choicescript_npm", "copy:main", "concat", "uglify", "cssmin", "auto_install:build", "copy:choicescript", "copy:updater", "string-replace", "execute", "compress"];
   grunt.registerTask("default", tasks);
   grunt.registerTask("build-with-nwjs", tasks.concat("nwjs"));
   grunt.registerTask("build-with-windows", tasks.concat("nwjs:windows"));
