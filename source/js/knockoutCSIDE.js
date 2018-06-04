@@ -3358,6 +3358,11 @@ function IDEViewModel() {
   self.openScene = function(path, callback) {
     __openScene(path, callback);
   }
+  self.openLogFile = function(path, callback) {
+    if (getFileExtension(path)) {
+      __openLogFile(path, callback);
+    }
+  }
   self.openFileBrowser = function() {
     if (usingNode) {
       var chooser = $("#getFilePaths");
@@ -3366,8 +3371,8 @@ function IDEViewModel() {
         if (selection.length === 1 && selection[0] === "") {
           return;
         }
-		$(this).val("");
-        __openScenes(selection, true);
+        $(this).val("");
+        __openFiles(selection, true);
       });
       chooser.trigger("click");
     } else {
@@ -3381,22 +3386,42 @@ function IDEViewModel() {
           .map(function(file) {
             return file.path;
           });
-        __openScenes(selection, true);
+          __openFiles(selection, true);
       });
     }
   }
 
-  function __openScenes(paths, selectLast) {
-      var lastIndex = selectLast ? (paths.length - 1) : paths.length;
-      for (var i = 0; i < lastIndex; i++) {
-        __openScene(paths[i], function() {});
-      }
-      if (selectLast) {
-        __openScene(paths[lastIndex], function(err, scene) {
-          if (!err) scene.select();
-        });
+  function __openFiles(paths, selectLast) {
+    var lastIndex = selectLast ? (paths.length - 1) : paths.length;
+    for (var i = 0; i < lastIndex; i++) {
+      switch (getFileExtension(paths[i])) {
+        case ".txt":
+          __openScene(paths[i], function() {});
+          break;
+        case ".log":
+          __openLogFile(paths[i], function() {});
+          break;
+        default:
+          bootbox.alert("<h3>Error</h3>Attempting to open an unsupported file type: " + ext + ". Please report this.");
+          return;
       }
     }
+    if (selectLast) {
+      switch (getFileExtension(paths[lastIndex])) {
+        case ".txt":
+          __openScene(paths[lastIndex], function(err, scene) {
+            if (!err) scene.select();
+          });
+          break;
+        case ".log":
+          __openLogFile(paths[lastIndex], function() {});
+          break;
+        default:
+          bootbox.alert("<h3>Error</h3>Attempting to open an unsupported file type: " + ext + ". Please report this.");
+        return;
+      }
+    }
+  }
     /* 	self.pinScene = function(scene) {
     		var x = scene.document.linkedDoc();
     		self.noteEditor.swapDoc(x);
@@ -3834,6 +3859,13 @@ function IDEViewModel() {
     }, 200);
   }
 
+  function __openLogFile(path, callback) {
+    nw.Window.open("file://" + path, {
+      focus: true,
+      width: 800,
+      height: 600
+    }, callback);
+  }
   function __openScene(sceneDataOrPath, callback) {
     if (typeof sceneDataOrPath === "string") {
       var newScene = new CSIDEScene({
@@ -4000,7 +4032,7 @@ function IDEViewModel() {
           .map(function(file) {
             return file.path;
           });
-        __openScenes(selection, true);
+          __openFiles(selection, true);
       });
     }
   }
@@ -4167,7 +4199,7 @@ function IDEViewModel() {
       if (err) {
         console.log(err);
       } else {
-        __openScenes(filepaths.filter(function(filepath) {
+        __openFiles(filepaths.filter(function(filepath) {
             return (getFileExtension(filepath) === ".txt" && !filepath.match(CONST_IMG_PREFIX)); //only .txt files, ignore img scenes
           }, false)
           .map(function(filepath) {
