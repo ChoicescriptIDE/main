@@ -5,9 +5,10 @@ This repository contains the main source code for the ChoiceScript IDE.
 ## Building
 To build:
 
-  1. Clone repo
-  2. npm install
-  3. grunt
+  1. Using NodeJS 6.2.2
+  2. Clone repo
+  3. npm install
+  4. grunt
 
 Optionally you can do "grunt" + build-with-mac, or, build-with-windows, or, build-with-nwjs (both).
 Otherwise the /build folder will contain the build and the /release folder will contain an nwjs .nw file.
