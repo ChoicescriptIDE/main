@@ -3,10 +3,19 @@
 This repository contains the main source code for the ChoiceScript IDE.
 
 ## Building
-To build:
 
-  1. Using NodeJS 6.2.2
-  2. Clone repo
+### Prerequisites
+You'll want at least the following installed in order to build CSIDE:
+
+- NodeJS v8.11.2
+- Latest NPM (6.1.0+)
+- Global install of latest grunt-cli (npm install grunt-cli -g)
+
+This is what the CLI runs with. Other versions/combinations *may* work but please try this combination before reporting a build bug.
+
+### Process
+  1. Clone this repo
+  2. cd main
   3. npm install
   4. grunt
 
