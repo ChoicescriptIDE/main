@@ -592,7 +592,7 @@ function IDEViewModel() {
       }
     };
     self.getCursorString = function() {
-      return "Ln " + cursor().line + ", Col " + cursor().ch;
+      return "Ln " + (cursor().line + 1) + ", Col " + cursor().ch;
     };
     self.getWordCountString = function() {
       var suffix = editor.getOption("exclude_cmd_lines") ? " [excl. cmds]" : " [inc. cmds]";
