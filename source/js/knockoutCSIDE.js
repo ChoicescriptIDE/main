@@ -15,6 +15,7 @@ if (typeof nw === "object") {
   var gui = require('nw.gui');
   //var http = require('http');
   //var stream = require('stream');
+  var child_process = require('child_process');
   var updater = require('cside-updater');
   var win = gui.Window.get();
   win.show();
@@ -4155,6 +4156,7 @@ function IDEViewModel() {
   }
 
   function __testProject(project, test) {
+    var stdio_ipc = ['pipe', 'pipe', 'pipe', 'ipc'];
     if (test != "random" && test != "quick") {
       alert("Error: no such test as " + test + "test!");
       return;
@@ -4174,7 +4176,53 @@ function IDEViewModel() {
         project.test_win.title = test.toUpperCase() + "TEST - " + project.getName();
       }, 200);
     } else {
-      if (project.test_win) {
+      if (test == "quick") {
+        var cp = child_process.fork('autotest.js', [project.getPath()], {cwd:"node_modules/cside-choicescript", silent: true});
+      } else {
+        var cp = child_process.fork('randomtest.js', ["project="+project.getPath(), "num=500"], {cwd:"node_modules/cside-choicescript", silent: true, stdio: stdio_ipc});
+      }
+      var statusBox = notification("Running " + test + "test", project.getName(), {
+        closeWith: false,
+        timeout: false,
+        progress: (test == "random") ? true : false,
+        buttons: [{
+          addClass: 'btn',
+          text: 'Cancel',
+          onClick: function(note) {
+            statusBox.close();
+            cp.kill('SIGINT');
+          }
+        }]
+      });
+      cp.on('message', function(message) {
+        statusBox.setProgress(message);
+        // console.log('message from child:', message);
+        //child.send('Hi');
+      });
+      var logFilePath = project.getPath() + test + 'test.log';
+      var wstream = fs.createWriteStream(logFilePath);
+      cp.stdout.on('data', function (data) {
+        wstream.write(data.toString());
+      });
+      cp.stderr.on('data', function (data) {
+        wstream.write("Error: " + data.toString());
+      });
+      cp.on('close', function(code) {
+        statusBox.close();
+        var buttons = [{
+          addClass: 'btn',
+          text: 'Show Log',
+          onClick: function(note) {
+            __openLogFile(logFilePath);
+            note.close();
+          }
+        }];
+        notification(((code == 0) ? "Passed " : "Failed ") + test + "test", project.getName(), {
+          type: (code == 0) ? "success" : "error",
+          buttons: buttons
+        });
+      });
+      /*if (project.test_win) {
         //re-run (open)
         project.test_win.close();
         project.test_win = null;
@@ -4194,7 +4242,7 @@ function IDEViewModel() {
             project.test_win = null;
           });
         });
-      }
+      }*/
     }
     //__reloadTab(self.tabs()[0], "lib/choicescript/" + test + "test.html");
   }
