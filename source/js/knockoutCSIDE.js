@@ -4255,6 +4255,29 @@ function IDEViewModel() {
       closeWith: false,
       timeout: false
     });
+
+    if (platform != "web-dropbox") {
+      var cp = child_process.fork('shortcompile.js', [project.getPath() + project.getName()+".html", project.getPath()], {cwd:"node_modules/cside-choicescript", silent: true});
+      var jsonString = "";
+      cp.stdout.on('data', function (data) {
+        jsonString += data.toString();
+      });
+      cp.stderr.on('data', function (data) {
+        cb(new Error(data.toString()));
+      });
+      cp.on('close', function(code) {
+        if (code == 0) {
+          try {
+            cb(null, JSON.parse(jsonString));
+          } catch(e) {
+            cb(e);
+          }
+        }
+        statusBox.close();
+      });
+      return;
+    }
+
     var allScenes = {};
     var failed = false;
     var projectPath = project.getPath();
