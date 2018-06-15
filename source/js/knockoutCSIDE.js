@@ -11,6 +11,7 @@ if (typeof nw === "object") {
   var mkdirp = require('mkdirp');
   var trash = require('trash');
   var getDirName = require('path').dirname;
+  var resolvePath = require('path').resolve;
   var gui = require('nw.gui');
   //var http = require('http');
   //var stream = require('stream');
@@ -56,6 +57,14 @@ function IDEViewModel() {
     });
     return target;
   };
+  ko.extenders.resolvePaths = function(target, option) {
+    if (platform === "web-dropbox")
+      return target;
+    target.subscribe(function(path) {
+      target(resolvePath(path) + "/");
+    });
+    return target;
+  };
   ko.extenders.lowerCase = function(target, option) {
     target.subscribe(function(val) {
       target(val.toLowerCase());
@@ -85,7 +94,8 @@ function IDEViewModel() {
     //INSTANCE VARIABLES
     var name = ko.observable(projectData.name ? projectData.name : (getLastDirName(projectData.path) ? getLastDirName(projectData.path) : "Untitled")); //take the folder name if no name is stored
     var path = ko.observable().extend({
-      normalizePaths: ""
+      normalizePaths: "",
+      resolvePaths: ""
     }); //convert relative paths to direct paths and normalize slashes
     path(projectData.path);
     var scenes = ko.observableArray([]);
