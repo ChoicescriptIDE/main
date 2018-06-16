@@ -2,186 +2,93 @@ var CSIDE_loopCodeStore;
 var CSIDE_stepping = false;
 var CSIDE_steppingAllowSwapBack = false;
 
-Scene.prototype.printLoopBackup = function printLoopStepThrough() {
-    var line;
-    var self = this;
-	if (this.finished) {
-		CSIDE_steppingAllowSwapBack = true;
-		return;
-	}
+Scene.prototype.printLoopBackup = function printLoopStep() {
+  var line, self = this;
 
-	 if (this.lineNum >= this.lines.length)	{
-		if (!this.finished) {
-			this.autofinish();
-			return;
-		}
-	 }
+  if (this.finished) {
+    CSIDE_steppingAllowSwapBack = true;
+    return;
+  }
 
-	line = this.lines[this.lineNum];
-
-        var scene = findScene(stats.sceneName);
-        if (scene && CSIDE_stepping) {
-            scene.focusLine(this.lineNum);
-        }
-        else if (CSIDE_stepping) {
-            scope.cside.openScene(thisProject.getPath() + stats.sceneName + '.txt', function(err, scene) {
-                if (err) {
-                    //I think we may as fail silently
-                }
-                else {
-                    scene.focusLine(self.lineNum);
-                }
-            });
-        }
-        if (!trim(line)) { //skip blank lines
-            this.paragraph();
-			this.lineNum++;
-			this.printLoop();
-            return;
-        }
-
-		if (/\s*\*comment\b/.test(line) || line === "") { //skip comments
-			this.lineNum++;
-			this.printLoop();
-			return;
-		}
-
-		//cside.console.log(line);
-
-        var indent = this.getIndent(line);
-
-        if (indent > this.indent) {
-            // ignore indentation level of *comments#
-            if (/\s*\*comment\b/.test(line)) {
-				this.lineNum++;
-				return;
-			}
-            throw new Error(this.lineMsg() + "increasing indent not allowed, expected " + this.indent + " was " + indent);
-        } else if (indent < this.indent) {
-            this.dedent(indent);
-        }
-        if (this.temps.fakeChoiceLines && this.temps.fakeChoiceLines[this.lineNum]) {
-          this.rollbackLineCoverage();
-          this.lineNum = this.temps.fakeChoiceEnd;
-          this.rollbackLineCoverage();
-          delete this.temps.fakeChoiceEnd;
-          delete this.temps.fakeChoiceLines;
-		  this.lineNum++;
-          return;
-        }
-        this.indent = indent;
-        if (!this.runCommand(line)) {
-            if (/^\s*#/.test(line)) {
-                if (this.temps.fakeChoiceEnd) {
-                    this.rollbackLineCoverage();
-                    this.lineNum = this.temps.fakeChoiceEnd;
-                    this.rollbackLineCoverage();
-                    delete this.temps.fakeChoiceEnd;
-                    delete this.temps.fakeChoiceLines;
-					this.lineNum++;
-                    return;
-                } else {
-                    throw new Error(this.lineMsg() + "It is illegal to fall out of a *choice statement; you must *goto or *finish before the end of the indented block.");
-                }
-            }
-            this.prevLine = "text";
-            this.screenEmpty = false;
-            this.printLine(trim(line));
-            printx(' ', this.target);
-        }
-			this.lineNum++;
-
-		this.save(null, "temp");
-		if (this.skipFooter) {
-			this.skipFooter = false;
-		} else {
-			printFooter();
-		}
-
-};
-
-Scene.prototype.printLoopBackup2 = function printLoop() {
-    var line;
-    var self = this;
-	if (this.finished) {
-		CSIDE_steppingAllowSwapBack = true;
-		return;
-	}
-	if (this.lineNum >= this.lines.length) {
-        self.rollbackLineCoverage();
-        if (!self.finished) {
-            CSIDE_steppingAllowSwapBack = true;
-            self.autofinish();
-        }
+  // emulate the interpreter 'loop'
+  if (this.lineNum >= this.lines.length) {
+    if (!this.finished) {
+      this.autofinish();
+      return;
     }
-    if (!this.finished && this.lineNum < this.lines.length) {
-        line = this.lines[this.lineNum];
-        var scene = findScene(stats.sceneName);
-        if (scene) {
-            scene.select();
-            scene.focusLine(this.lineNum);
-        }
-        if (!trim(line)) {
-            this.paragraph();
-            this.lineNum++;
-            endOfStep();
-            return;
-        }
-        var indent = this.getIndent(line);
-        if (indent > this.indent) {
-            // ignore indentation level of *comments
-            if (/\s*\*comment\b/.test(line)) {
-              this.lineNum++;
-              endOfStep();
-              return;
-            }
-            throw new Error(this.lineMsg() + "increasing indent not allowed, expected " + this.indent + " was " + indent);
-        } else if (indent < this.indent) {
-            this.dedent(indent);
-        }
-        if (this.temps.fakeChoiceLines && this.temps.fakeChoiceLines[this.lineNum]) {
-          this.rollbackLineCoverage();
-          this.lineNum = this.temps.fakeChoiceEnd;
-          this.rollbackLineCoverage();
-          delete this.temps.fakeChoiceEnd;
-          delete this.temps.fakeChoiceLines;
-		      this.lineNum++;
-          endOfStep();
-          return;
-        }
-        this.indent = indent;
-        if (!this.runCommand(line)) {
-            if (/^\s*#/.test(line)) {
-                if (this.temps.fakeChoiceEnd) {
-                    this.rollbackLineCoverage();
-                    this.lineNum = this.temps.fakeChoiceEnd;
-                    this.rollbackLineCoverage();
-                    delete this.temps.fakeChoiceEnd;
-                    delete this.temps.fakeChoiceLines;
-			              this.lineNum++;
-                    endOfStep();
-                    return;
-                } else {
-                    throw new Error(this.lineMsg() + "It is illegal to fall out of a *choice statement; you must *goto or *finish before the end of the indented block.");
-                }
-            }
-            this.prevLine = "text";
-            this.screenEmpty = false;
-            this.printLine(trim(line));
-            printx(' ', this.target);
-        }
-        this.lineNum++
-        endOfStep();
-    }
+  }
 
-    function endOfStep() {
-        //self.save("");
-        if (self.skipFooter) {
-            self.skipFooter = false;
-        } else {
-            printFooter();
-        }
-    }
+  line = this.lines[this.lineNum];
+
+  // track the current line in the CSIDE editor whenever possible
+  var scene = findScene(stats.sceneName);
+  if (scene && CSIDE_stepping) {
+    scene.focusLine(this.lineNum);
+  }
+  else if (CSIDE_stepping) {
+    scope.cside.openScene(thisProject.getPath() + stats.sceneName + '.txt', function(err, scene) {
+      if (err) {
+        // Can't open the scene. I think we may as fail silently.
+      }
+      else {
+        scene.focusLine(self.lineNum);
+      }
+    });
+  }
+
+  // skip black lines
+  if (!trim(line)) {
+    this.paragraph();
+    this.lineNum++;
+    return this.printLoop();
+  }
+
+  // skip comments
+  if (/\s*\*comment\b/.test(line) || line === "") {
+    this.lineNum++;
+    return this.printLoop();
+  }
+
+  var indent = this.getIndent(line);
+  if (indent > this.indent) {
+    throw new Error(this.lineMsg() + "increasing indent not allowed, expected " + this.indent + " was " + indent);
+  } else if (indent < this.indent) {
+    this.dedent(indent);
+  }
+
+  if (this.temps._choiceEnds[this.lineNum] &&
+          (this.stats["implicit_control_flow"] || this.temps._fakeChoiceDepth > 0)) {
+      // Skip to the end of the choice if we hit the end of an #option
+      this.rollbackLineCoverage();
+      this.lineNum = this.temps._choiceEnds[this.lineNum];
+      this.rollbackLineCoverage();
+      if (this.temps._fakeChoiceDepth > 0) {
+          this.temps._fakeChoiceDepth--;
+      }
+      this.lineNum++;
+      return this.printLoop();
+  }
+
+  this.indent = indent;
+  if (/^\s*#/.test(line)) {
+      throw new Error(this.lineMsg() + "It is illegal to fall out of a *choice statement; you must *goto or *finish before the end of the indented block.");
+  }
+  if (!this.runCommand(line)) {
+      this.prevLine = "text";
+      this.screenEmpty = false;
+      this.printLine(line);
+  }
+  // end of loop emulation
+
+  this.lineNum++;
+
+  this.save(null, "temp");
+  if (this.skipFooter) {
+    this.skipFooter = false;
+  } else {
+    printFooter();
+  }
+
 };
 
 function swapLoop(button) {
