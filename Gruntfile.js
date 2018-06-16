@@ -85,12 +85,30 @@ module.exports = function(grunt) {
               'lib/marked/marked.min.js',        // ...
               'css/font/century_gothic.ttf',     // 'Century Gothic' font
             ],
-            dest: 'build'
+            dest: 'build',
+            // Fail on missing files
+            filter: function (filepath) {
+              if (!grunt.file.exists(filepath)) {
+                grunt.fail.warn('Could not find: ' + filepath);
+              } else {
+                return true;
+              }
+            },
+            nonull: true,
           },
           {
             flatten: true,
             src: ['source/lib/font-awesome/css/font-awesome.min.css'],
-            dest: 'build/css/font-awesome.min.css'
+            dest: 'build/css/font-awesome.min.css',
+            // Fail on missing files
+            filter: function (filepath) {
+              if (!grunt.file.exists(filepath)) {
+                grunt.fail.warn('Could not find: ' + filepath);
+              } else {
+                return true;
+              }
+            },
+            nonull: true,
           }
         ]
       },
@@ -196,28 +214,35 @@ module.exports = function(grunt) {
     },
     "cssmin": {
       target: {
-        files: {
-        "build/css/all.min.css":
-          [
-            "source/lib/jquery/jqueryui-theme/jquery-ui.theme.css",
+        dest: "build/css/all.min.css",
+        src : [
+          "source/lib/jquery/jqueryui-theme/jquery-ui.theme.css",
 
-          	"node_modules/cside-codemirror/lib/codemirror.css",
-          	"node_modules/cside-codemirror/addon/display/fullscreen.css",
-          	"node_modules/cside-codemirror/addon/dialog/dialog.css",
-            "node_modules/cside-codemirror/addon/hint/show-hint.css",
-            "node_modules/cside-codemirror/addon/fold/foldgutter.css",
-          	"node_modules/cside-codemirror/theme/cs-light.css",
-          	"node_modules/cside-codemirror/theme/cs-dark.css",
-          	"node_modules/cside-codemirror/theme/cs-dichromatic.css",
+          "node_modules/cside-codemirror/lib/codemirror.css",
+          "node_modules/cside-codemirror/addon/display/fullscreen.css",
+          "node_modules/cside-codemirror/addon/dialog/dialog.css",
+          "node_modules/cside-codemirror/addon/hint/show-hint.css",
+          "node_modules/cside-codemirror/addon/fold/foldgutter.css",
+          "node_modules/cside-codemirror/theme/cs-light.css",
+          "node_modules/cside-codemirror/theme/cs-dark.css",
+          "node_modules/cside-codemirror/theme/cs-dichromatic.css",
 
-            "node_modules/noty/lib/noty.css",
-            "node_modules/noty/lib/themes/bootstrap-v3.css",
+          "node_modules/noty/lib/noty.css",
+          "node_modules/noty/lib/themes/bootstrap-v3.css",
 
-          	"source/lib/bootstrap/bootstrap.min.css",
+          "source/lib/bootstrap/bootstrap.min.css",
 
-          	"source/css/cside.css"
-          ],
-        }
+          "source/css/cside.css"
+        ],
+        // Fail on missing files
+        nonull: true,
+        filter: function (filepath) {
+          if (!grunt.file.exists(filepath)) {
+            grunt.fail.warn('Could not find: ' + filepath);
+          } else {
+            return true;
+          }
+        },
       }
     },
     'string-replace': {
