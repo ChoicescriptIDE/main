@@ -91,11 +91,12 @@ body.night input:not([readonly]) {
 }
 
 #page-content-wrapper {
-    position: absolute;
-    height: 100%;
-    left: 230px;
-    right: 0px;
-    border-color: inherit;
+  position: absolute;
+  top: 30px;
+  bottom: 0px;
+  left: 230px;
+  right: 0px;
+  border-color: inherit;
 }
 
 #second-wrap {
@@ -116,12 +117,12 @@ body.night .left-wrap {
   background-color: #262626;
 }
 .right-wrap {
-	position:absolute;
-    width: 50%;
-	right: -50%;
-	bottom: 30px;
-	top:0px;
-    border-color: inherit;
+  position:absolute;
+  width: 50%;
+  right: -50%;
+  bottom: 0px;
+  top: 0px;
+  border-color: inherit;
 }
 
 #tabs {
@@ -177,18 +178,11 @@ body.night .left-wrap {
     background-color: #f8f6fb;
 }
 
-#tabs .iframe-wrap {
-    position: absolute;
-    top: 43px;
-    bottom: 0px;
-    right: 0px;
-    left: 0px;
-}
-
 #tabs iframe {
-	width: 100%;
-	height: 100%;
-	border: none;
+  width: 100%;
+  height: 100%;
+  border: none;
+  position: absolute;
 }
 
 #tabs > #issues > div > ul > .dismiss-all{
@@ -455,7 +449,7 @@ body.night .left-wrap {
 	flex-direction: column;
 	position: absolute;
 	top: 30px;
-	bottom: 30px;
+	bottom: 0px;
 	width: 100%;
 	background-color: #EEE;
 }
@@ -816,13 +810,14 @@ body.night .tab-panel li:nth-child(even) {
 }
 
 #sidebar {
-	position: relative;
-    width: 230px;
-    float: left;
-    height: 100%;
-    left: -230px;
-    z-index: 7;
-    border-color: inherit;
+  position: absolute;
+  top: 30px;
+  bottom: 0px;
+  width: 230px;
+  float: left;
+  left: -230px;
+  z-index: 7;
+  border-color: inherit;
 }
 
 .main-wrap #sidebar {
@@ -1295,7 +1290,7 @@ body.night .project-hover {
 	margin: 0px;
 	position: absolute;
 	top: 30px;
-	bottom: 30px;
+	bottom: 0px;
 	overflow: auto;
 	border: solid;
 	border-width: 0px 1px 0px 0px;
