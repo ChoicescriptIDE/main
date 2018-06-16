@@ -78,8 +78,6 @@ module.exports = function(grunt) {
               'img/*',
               'help/**',
               'cs_examples/**',
-              'css/user.css',
-              'css/startup.txt',
               'lib/font-awesome/**',
               'lib/typo/dictionaries/**',
               'lib/typo/wordprocessor.js',       // used by typo.js
