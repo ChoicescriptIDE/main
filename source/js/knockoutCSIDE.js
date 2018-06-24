@@ -1770,7 +1770,37 @@ function IDEViewModel() {
             chooser.trigger("click");
           }, 200);
       }
-    }
+    },
+    "selectFiles": function(callback, options) {
+      options = options || {};
+      if (usingNode) {
+        var extensions = options.extensions || [".txt", ".log"];
+        var chooser = $("#getFilePaths");
+        chooser.attr("accept", extensions.join(","));
+        chooser.off().change(function(evt) {
+          var selection = $(this).val().split(";");
+          if (selection.length === 1 && selection[0] === "") {
+            callback(null);
+          }
+          $(this).val("");
+          callback(selection);
+        });
+        chooser.trigger("click");
+      } else {
+        fileBrowser.open(function(selection) {
+          if (selection.length < 1) {
+            callback(null);
+          }
+          selection = selection.filter(function(file) {
+              return !file.isFolder();
+            })
+            .map(function(file) {
+              return file.path;
+            });
+            callback(selection);
+        }, options);
+      }
+    },
   }
 
   var normalizeError = function(err) {
@@ -3364,37 +3394,17 @@ function IDEViewModel() {
     }
   }
   self.openFileBrowser = function() {
-    if (usingNode) {
-      var chooser = $("#getFilePaths");
-      chooser.off().change(function(evt) {
-        var selection = $(this).val().split(";");
-        if (selection.length === 1 && selection[0] === "") {
-          return;
-        }
-        $(this).val("");
-        __openFiles(selection, true);
-      });
-      chooser.trigger("click");
-    } else {
-      fileBrowser.open(function(selection) {
-        if (selection.length < 1) {
-          return;
-        }
-        selection = selection.filter(function(file) {
-            return !file.isFolder();
-          })
-          .map(function(file) {
-            return file.path;
-          });
-          __openFiles(selection, true);
-      });
-    }
+    fh.selectFiles(function(selection) {
+      if (selection && selection.length > 1)
+        __openScenes(selection, true);
+    });
   }
 
-  function __openFiles(paths, selectLast) {
+  function __openScenes(paths, selectLast) {
     var lastIndex = selectLast ? (paths.length - 1) : paths.length;
     for (var i = 0; i < lastIndex; i++) {
-      switch (getFileExtension(paths[i])) {
+      var ext = getFileExtension(paths[i]);
+      switch (ext) {
         case ".txt":
           __openScene(paths[i], function() {});
           break;
@@ -4032,7 +4042,7 @@ function IDEViewModel() {
           .map(function(file) {
             return file.path;
           });
-          __openFiles(selection, true);
+          __openScenes(selection, true);
       });
     }
   }
@@ -4199,7 +4209,7 @@ function IDEViewModel() {
       if (err) {
         console.log(err);
       } else {
-        __openFiles(filepaths.filter(function(filepath) {
+        __openScenes(filepaths.filter(function(filepath) {
             return (getFileExtension(filepath) === ".txt" && !filepath.match(CONST_IMG_PREFIX)); //only .txt files, ignore img scenes
           }, false)
           .map(function(filepath) {
@@ -4830,10 +4840,14 @@ function IDEViewModel() {
         self.selection([]);
         self.callback = null;
         self.selectingFolder = false;
+        self.extensions = [".txt", ".log"];
         visible(false);
       }
-      this.open = function(path, callback) {
+      this.open = function(path, callback, options) {
+        // bad way to do optional 'path' parameter
+        // should really make it the last argument
         if (typeof path == "function") {
+          options = callback;
           callback = path;
           path = "";
         }
@@ -4841,8 +4855,15 @@ function IDEViewModel() {
           buttonText("Select");
           browserTitle("Select a Folder");
         } else {
-          buttonText("Open");
-          browserTitle("Open scenes");
+          if (options && options.extensions) {
+            self.extensions = options.extensions;
+            buttonText("Open");
+            browserTitle("Select " + self.extensions.join(", "));
+          } else {
+            self.extensions = [".txt", ".log"];
+            buttonText("Open");
+            browserTitle("Open scenes");
+          }
         }
         self.callback = callback;
         path = path || curPath();
@@ -4877,7 +4898,8 @@ function IDEViewModel() {
               position++;
             }
             for (var i = 0; i < listStats.length; i++) {
-              if (!listStats[i].isFolder && getFileExtension(listStats[i].path) != '.txt') continue; //ignore anything but folders and .txt files
+              // ignore anything but folders and allowed extensions
+              if (!listStats[i].isFolder && self.extensions.indexOf(getFileExtension(listStats[i].path)) < 0) continue;
               listStats[i].listIndex = position;
               if (!self.selectingFolder || listStats[i].isFolder) { //don't list files when mode is set to selecting a folder
                 position++;
