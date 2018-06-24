@@ -3475,6 +3475,10 @@ function IDEViewModel() {
       userDictionary.update(list);
       userDictionary.persistentListArray.remove(word);
     },
+    "removeAll": function() {
+      userDictionary.persistentList = {};
+      userDictionary.persistentListArray.removeAll();
+    },
     "check": function(word) {
       var pList = this.persistentList;
       var sList = this.sessionList;
@@ -3488,8 +3492,8 @@ function IDEViewModel() {
       try {
         userDictionary.persistentList = JSON.parse(localStorage.getItem("userDictionary")) || {};
         for (var i in userDictionary.persistentList) {
-          if (userDictionary.persistentList.hasOwnProperty(i)) {
-            userDictionary.persistentListArray.push(i);
+          if (userDictionary.persistentList.hasOwnProperty(i.toLowerCase())) {
+            userDictionary.persistentListArray.push(i.toLowerCase());
           }
         }
       } catch (err) {
@@ -3507,7 +3511,108 @@ function IDEViewModel() {
         localStorage.setItem("userDictionary", newDictionary);
       }
       editor.forceSyntaxRedraw();
+    },
+    "sanitize": function() {
+      var arr = Object.keys(userDictionary.persistentList);
+      for (var i = 0; i < arr.length; i++)
+        if (arr[i] !== arr[i].toLowerCase())
+          throw new Error("Error: Entry should be lowercase: " + arr[i]);
+        else if (!userDictionary.validateWord(arr[i]))
+          throw new Error("Error: Invalid entry (not a word): " + arr[i]);
+        else if (userDictionary.persistentList[arr[i]] !== true)
+          throw new Error("Error: Entry value should be 'true' for: " + arr[i])
+    },
+    "import": function() {
+      var path;
+      fh.selectFiles(function(selection) {
+        if (!selection || selection.length < 1) {
+          return;
+        }
+        path = selection[0];
+        if (selection.length > 1 || getFileExtension(path) != ".json") {
+          bootbox.alert("<h3>Error</h3>Please select a single valid JSON file.");
+          return;
+        }
+        bootbox.confirm("Are you sure you wish to import this dictionary?<br>All words from the current dictionary will be lost.", function(result) {
+          if (result) {
+            fh.readFile(path, function(err, data) {
+              if (err) {
+                notification("Failed to Read Dictionary", path, {
+                  type: 'error'
+                });
+              }
+              else {
+                try {
+                  userDictionary.persistentList = JSON.parse(data);
+                  userDictionary.sanitize();
+                  userDictionary.update();
+                  userDictionary.removeAll();
+                  userDictionary.load();
+                  notification("Dictionary Import Succesful", path, {
+                    type: 'success'
+                  });
+                } catch(e) {
+                  notification("Dictionary Import Failed", path, {
+                    type: 'error'
+                  });
+                  throw e;
+                }
+              }
+            });
+          }
+        });
+      }, { extensions: [".json"]});
+    },
+    "export": function() {
+      var path;
+      fh.selectFolder(function(url) {
+        if (!url) return;
+        __promptForString(function(filename) {
+          if (filename) {
+            validName(filename, false, function(valid, err) {
+              if (valid) {
+                path = url + filename + ".json";
+                fh.stat(path, function(err, stats) {
+                  if (err && err.code === 404) {
+                    fh.writeFile(path, localStorage.userDictionary, function(err) {
+                      if (err)
+                        return;
+                      else {
+                        notification("Dictionary Export Successful", path, {
+                          type: 'success',
+                          buttons: [{
+                            addClass: 'btn',
+                            text: 'Show Folder',
+                            onClick: function(note) {
+                              __openFolder(getDirName(path));
+                              note.close();
+                            }
+                          }]
+                        });
+                      }
+                    });
+                  } else {
+                    notification("Export Failed: File already exists", path, { type: "error" });
+                  }
+                });
+              } else {
+                notification("Export Failed: Naming error", err, { type: "error" });
+              }
+            });
+          }
+        }, "Filename for Exported Dictionary", "CSIDE_Dictionary");
+      });
     }
+  }
+  self.importDictionary = userDictionary.import;
+  self.exportDictionary = userDictionary.export;
+  self.clearDictionary = function() {
+    bootbox.confirm("Are you sure you wish to remove all words from the user dictionary?", function(result) {
+      if (result) {
+        userDictionary.removeAll();
+        userDictionary.update();
+      }
+    });
   }
   self.dictWord = ko.observable("");
   self.addToDictionary = function(obj, e) {
@@ -3562,7 +3667,13 @@ function IDEViewModel() {
     }
 
     // load userDictionary
-    userDictionary.load();
+    try {
+      userDictionary.sanitize();
+      userDictionary.load();
+    }
+    catch(err) {
+      bootbox.alert("Sorry, there was a problem loading or parsing your user dictionary data.<br>" + "If you're seeing this message frequently please file a bug report.");
+    }
 
     // ensure the tab panel starts open and on the 'help' tab
     __selectTab("help");

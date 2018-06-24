@@ -268,7 +268,12 @@
 											<li>
 												<input spellcheck="false" type="text" data-bind="textInput: $root.dictWord, event: { 'keyup': $root.addToDictionary }"></input>
 												<button class="btn btn-default" data-bind="click: $root.addToDictionary">Add Word</button>
-											</li>
+												<div>
+													<button id="dict-btn-import" data-bind="click: $root.importDictionary" title="Import dictionary" class="btn btn-default fa fa-upload"></button>
+													<button id="dict-btn-export" data-bind="click: $root.exportDictionary" title="Export dictionary" class="btn btn-default fa fa-download"></button>
+													<button id="dict-btn-clear" data-bind="click: $root.clearDictionary" title="Clear dictionary" class="btn btn-default fa fa-trash"></button>
+												</div>
+												</li>
 										</ul>
 										<ul data-bind="foreach: $root.getDictionaryArray">
 											<li>

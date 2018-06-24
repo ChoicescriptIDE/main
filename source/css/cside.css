@@ -689,7 +689,8 @@ body.night .setting-option-selected {
 
 .tab-panel.dictionary input {
 	margin: 10px;
-	width: 50%;
+	width: 60%;
+	padding: 5px;
 }
 
 .tab-panel.dictionary i {
@@ -711,6 +712,14 @@ body.night .setting-option-selected {
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
+}
+
+.tab-panel.dictionary .btn.fa {
+  font: normal normal normal 14px/1 FontAwesome;
+}
+
+#dict-btn-clear {
+  float: right;
 }
 
 .tab-panel-content {
