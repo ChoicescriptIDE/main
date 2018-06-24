@@ -3452,9 +3452,11 @@ function IDEViewModel() {
     "sessionList": {
       //for this session only
     },
+    "validateWord": function(word) {
+      return word.match(/^([A-Za-z\u00C0-\u00FF\u0100-\u017F]+'[A-Za-z\u00C0-\u00FF\u0100-\u017F]+|[A-Za-z\u00C0-\u00FF\u0100-\u017F]{2,}|[AaI]'?)$/); //word chars, accented chars, apostrophes
+    },
     "add": function(word, list) {
-      if (!word.match(/^([A-Za-z\u00C0-\u00FF\u0100-\u017F]+'[A-Za-z\u00C0-\u00FF\u0100-\u017F]+|[A-Za-z\u00C0-\u00FF\u0100-\u017F]{2,}|[AaI]'?)$/)) { //word chars, accented chars, apostrophes
-        bootbox.alert("<h3>Error</h3>Unable to add to user dictionary: not a word!");
+      if (!userDictionary.validateWord(word)) {
         return false;
       }
       word = word.toLowerCase();
@@ -3510,8 +3512,9 @@ function IDEViewModel() {
   self.dictWord = ko.observable("");
   self.addToDictionary = function(obj, e) {
     if (e.type == "click" || e.type == "keyup" && e.keyCode == 13) {
-      if (userDictionary.add(self.dictWord(), "persistent"))
-        self.dictWord("");
+      if (!userDictionary.add(self.dictWord(), "persistent")) {
+        bootbox.alert("<h3>Error</h3>Unable to add to user dictionary: not a word!");
+      }
     }
   };
   self.removeFromDictionary = function(word) {
