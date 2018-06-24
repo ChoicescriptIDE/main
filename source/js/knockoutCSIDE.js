@@ -3457,8 +3457,13 @@ function IDEViewModel() {
         bootbox.alert("<h3>Error</h3>Unable to add to user dictionary: not a word!");
         return false;
       }
-      userDictionary[list + "List"][word.toLowerCase()] = true;
+      word = word.toLowerCase();
+      if (userDictionary[list + "List"][word])
+        return true;
+      userDictionary[list + "List"][word] = true;
       userDictionary.update(list);
+      if (list == "persistent")
+        userDictionary.persistentListArray.push(word);
       return true;
     },
     "remove": function(word, list) {
@@ -3466,6 +3471,7 @@ function IDEViewModel() {
         delete userDictionary[list + "List"][word];
       }
       userDictionary.update(list);
+      userDictionary.persistentListArray.remove(word);
     },
     "check": function(word) {
       var pList = this.persistentList;
@@ -3497,12 +3503,6 @@ function IDEViewModel() {
       if (typeof list == 'undefined' || list == "persistent") {
         var newDictionary = JSON.stringify(userDictionary.persistentList, null, "\t");
         localStorage.setItem("userDictionary", newDictionary);
-        userDictionary.persistentListArray.removeAll();
-        for (var i in userDictionary.persistentList) {
-          if (userDictionary.persistentList.hasOwnProperty(i)) {
-            userDictionary.persistentListArray.push(i);
-          }
-        }
       }
       editor.forceSyntaxRedraw();
     }
