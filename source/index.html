@@ -266,7 +266,7 @@
     								<!-- ko if: id == 'dictionary' -->
 										<ul>
 											<li>
-												<input spellcheck="false" type="text" data-bind="textInput: $root.dictWord, event: { 'keyup': $root.addToDictionary }"></input>
+												<input spellcheck="false" type="text" data-bind="textInput: $root.dictWord, event: { 'keyup': $root.addToDictionary }" placeholder="Type to search or add..."></input>
 												<button class="btn btn-default" data-bind="click: $root.addToDictionary">Add Word</button>
 												<div>
 													<button id="dict-btn-import" data-bind="click: $root.importDictionary" title="Import dictionary" class="btn btn-default fa fa-upload"></button>
@@ -274,6 +274,9 @@
 													<button id="dict-btn-clear" data-bind="click: $root.clearDictionary" title="Clear dictionary" class="btn btn-default fa fa-trash"></button>
 												</div>
 												</li>
+											<li data-bind="visible: $root.getDictionaryArray().length == 0">
+												<span>Words escape me.</span>
+											</li>
 										</ul>
 										<ul data-bind="foreach: $root.getDictionaryArray">
 											<li>

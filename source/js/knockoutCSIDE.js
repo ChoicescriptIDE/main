@@ -3628,7 +3628,10 @@ function IDEViewModel() {
     }
   };
   self.getDictionaryArray = ko.computed(function() {
-    return userDictionary.persistentListArray().sort();
+    var query = self.dictWord().toLowerCase();
+    if (query == "")
+      return userDictionary.persistentListArray().sort();
+    return userDictionary.persistentListArray().filter(function(word) { return word.startsWith(query); } ).sort();
   }, this);
   self.init = function() {
     if (!usingNode) {
