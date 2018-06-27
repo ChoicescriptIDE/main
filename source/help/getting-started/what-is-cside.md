@@ -22,6 +22,8 @@ Absolutely not! Most ChoiceScript authors have little or no programming experien
 
 If you're still uncertain, or if you aren't sure what ChoiceScript is, check out the website of its creators: [Choice of Games LLC](https://www.choiceofgames.com "Choice of Games LLC"). Try playing some of the free games or trial chapters, developed by people just like you using ChoiceScript. Once you've seen what ChoiceScript is, and what interactive fiction authors can use it to do, we're confident this will all make a lot more sense!
 
+If you have any questions or comments, feel free to visit [CSIDE's thread](https://forum.choiceofgames.com/t/cside-the-choicescript-ide/27622 "CSIDE's Choice of Games Forum thread") on the Choice of Games forums and chat with CSIDE's team. We'd love to hear from you!
+
 Happy scripting! 
 
 — The CSIDE Team
