@@ -178,6 +178,13 @@ body.night .left-wrap {
     background-color: #f8f6fb;
 }
 
+.iframe-wrap {
+  position: absolute;
+  top: 42px;
+  bottom: 0px;
+  width: 100%;
+}
+
 #tabs iframe {
   width: 100%;
   height: 100%;
