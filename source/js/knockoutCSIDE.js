@@ -34,6 +34,7 @@ if (typeof nw === "object") {
   });
 } else {
   window.usingNode = false;
+  var getDirName = function(path) { return path.substring(0, path.lastIndexOf("/") + 1); }
   window.onbeforeunload = function(evt) {
     if (!cside.session.isDirty() || cside.getProjects().length === 0)
       return null;
