@@ -1385,6 +1385,10 @@ body.night .project-hover {
 	text-overflow: ellipsis;
 }
 
+#code-footer span.fa.fa-terminal {
+  font-size: 12px;
+}
+
 #code-footer > button.console-btn {
     padding: 0px;
     width: 32px;
