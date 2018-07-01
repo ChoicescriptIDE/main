@@ -4194,18 +4194,14 @@ function IDEViewModel() {
           }
         }]
       });
-      cp.on('message', function(message) {
-        statusBox.setProgress(message);
-        // console.log('message from child:', message);
-        //child.send('Hi');
-      });
       var logFilePath = project.getPath() + test + 'test.log';
       var wstream = fs.createWriteStream(logFilePath);
-      cp.stdout.on('data', function (data) {
-        wstream.write(data.toString());
-      });
-      cp.stderr.on('data', function (data) {
-        wstream.write("Error: " + data.toString());
+      cp.on('message', function(message) {
+        statusBox.setProgress(message);
+        if (message.type == "progress")
+          statusBox.setProgress(message.value);
+        else
+          wstream.write(message.value + "\n");
       });
       cp.on('close', function(code) {
         statusBox.close();
