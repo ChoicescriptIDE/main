@@ -24,26 +24,6 @@ module.exports = function(grunt) {
           bower: false
         }
       },
-      codemirror_npm: {
-        options: {
-          cwd: '',
-          stdout: true,
-          stderr: true,
-          failOnError: true,
-          npm: 'cside-codemirror',
-          bower: false
-        }
-      },
-      codemirror: {
-        options: {
-          cwd: 'node_modules/cside-codemirror',
-          stdout: true,
-          stderr: true,
-          failOnError: true,
-          npm: '',
-          bower: false
-        }
-      },
       choicescript_npm: {
         options: {
           cwd: '',
@@ -55,7 +35,7 @@ module.exports = function(grunt) {
      },
     "clean": {
       files: ['build/*', 'release/*'],
-      folders: ['build/*/', 'node_modules/cside-choicescript', 'node_modules/cside-codemirror']
+      folders: ['build/*/', 'node_modules/cside-choicescript']
     },
     "copy": {
       main: {
@@ -129,7 +109,16 @@ module.exports = function(grunt) {
             dest: 'build'
           }
         ]
-      }
+      },
+      monaco: {
+        files: [
+          {
+            expand: true, cwd: '',
+            src: [ 'node_modules/monaco-editor/release/min/**'],
+            dest: 'build'
+          }
+        ]
+      },
     },
     "concat": {
       options: {
@@ -141,40 +130,20 @@ module.exports = function(grunt) {
           "source/lib/jquery/jquery-ui.min.js",
           "node_modules/noty/lib/noty.min.js",
 
-          "node_modules/cside-codemirror/lib/codemirror.js",
-          "node_modules/cside-codemirror/mode/choicescript/choicescript-new.js",
-
-            //plugins
-            "node_modules/cside-codemirror/addon/dialog/dialog.js",
-            "node_modules/cside-codemirror/addon/hint/show-hint.js",
-            "node_modules/cside-codemirror/addon/hint/anyword-hint.js",
-            "node_modules/cside-codemirror/addon/display/fullscreen.js",
-            "node_modules/cside-codemirror/addon/edit/matchbrackets.js",
-            "node_modules/cside-codemirror/addon/mode/simple.js",
-            "node_modules/cside-codemirror/addon/mode/overlay.js",
-            "node_modules/cside-codemirror/addon/search/search.js",
-            "node_modules/cside-codemirror/addon/search/searchcursor.js",
-            "node_modules/cside-codemirror/addon/scroll/annotatescrollbar.js",
-            "node_modules/cside-codemirror/addon/search/matchesonscrollbar.js",
-            "node_modules/cside-codemirror/addon/search/jump-to-line.js",
-            "node_modules/cside-codemirror/addon/search/match-highlighter.js",
-
-            "node_modules/cside-codemirror/addon/fold/foldcode.js",
-            "node_modules/cside-codemirror/addon/fold/foldgutter.js",
-            "node_modules/cside-codemirror/addon/fold/indent-fold.js",
-
-            "source/lib/bootstrap/bootbox.min.js",
-            "source/lib/bootstrap/bootstrap.min.js",
-            "source/lib/bootstrap/bootstrap-contextmenu.js",
+          "source/lib/bootstrap/bootbox.min.js",
+          "source/lib/bootstrap/bootstrap.min.js",
+          "source/lib/bootstrap/bootstrap-contextmenu.js",
 
           "node_modules/dropbox/dist/Dropbox-sdk.min.js",
 
           "node_modules/mousetrap/mousetrap.min.js",
           "source/lib/typo/typo.js",
-
-		      "node_modules/knockout/build/output/knockout-latest.js",
+          "node_modules/knockout/build/output/knockout-latest.js",
           "source/lib/knockout/knockout-jqueryui.min.js",
           "source/lib/knockout/knockout-sortable.min.js",
+
+          "node_modules/monaco-editor/release/min/vs/loader.js",
+
           "source/js/knockoutCSIDE.js",
 
           "source/lib/encoding/encoding.js",
@@ -217,15 +186,6 @@ module.exports = function(grunt) {
         dest: "build/css/all.min.css",
         src : [
           "source/lib/jquery/jqueryui-theme/jquery-ui.theme.css",
-
-          "node_modules/cside-codemirror/lib/codemirror.css",
-          "node_modules/cside-codemirror/addon/display/fullscreen.css",
-          "node_modules/cside-codemirror/addon/dialog/dialog.css",
-          "node_modules/cside-codemirror/addon/hint/show-hint.css",
-          "node_modules/cside-codemirror/addon/fold/foldgutter.css",
-          "node_modules/cside-codemirror/theme/cs-light.css",
-          "node_modules/cside-codemirror/theme/cs-dark.css",
-          "node_modules/cside-codemirror/theme/cs-dichromatic.css",
 
           "node_modules/noty/lib/noty.css",
           "node_modules/noty/lib/themes/bootstrap-v3.css",
@@ -283,7 +243,7 @@ module.exports = function(grunt) {
           macIcns: './source/img/cside.icns',
           buildDir: './nwjsBuild',
           cacheDir: './nwjsCache',
-          version: '0.21.4'
+          version: '0.49.0'
         },
         src: ['./build/**/*']
       },
@@ -293,7 +253,7 @@ module.exports = function(grunt) {
           winIco: './source/img/cside.ico',
           buildDir: './nwjsBuild',
           cacheDir: './nwjsCache',
-          version: '0.21.4',
+          version: '0.49.0',
 		  zip: false
         },
         src: ['./build/**/*']
@@ -303,13 +263,13 @@ module.exports = function(grunt) {
           platforms: ['linux64'],
           buildDir: 'nwjsBuild',
           cacheDir: 'nwjsCache',
-          version: '0.21.4',
+          version: '0.49.0',
         },
         src: ['./build/**/*']
       }
     }
   });
-  var tasks = ["clean", "auto_install:codemirror_npm", "auto_install:codemirror", "auto_install:choicescript_npm", "copy:main", "concat", "uglify", "cssmin", "auto_install:build", "copy:choicescript", "copy:updater", "string-replace", "execute", "compress"];
+  var tasks = ["clean", "auto_install:choicescript_npm", "copy:main", "concat", "uglify", "cssmin", "auto_install:build", "copy:choicescript", "copy:updater", "copy:monaco", "string-replace", "execute", "compress"];
   grunt.registerTask("default", tasks);
   grunt.registerTask("build-with-nwjs", tasks.concat("nwjs"));
   grunt.registerTask("build-with-windows", tasks.concat("nwjs:windows"));
