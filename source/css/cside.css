@@ -84,16 +84,24 @@ body.night input:not([readonly]) {
 	box-sizing: border-box;
 	border: none;
 	width: 100%;
-	display:inline;
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
 	position: absolute;
 	top: 0px;
 	bottom: 0px;
 }
 
+#inner-wrap {
+	border-color: inherit;
+	width: 100%;
+	flex-grow: 10;
+}
+
 #page-content-wrapper {
   position: absolute;
   top: 30px;
-  bottom: 0px;
+  bottom: 20px;
   left: 230px;
   right: 0px;
   border-color: inherit;
@@ -332,6 +340,10 @@ body.night .left-wrap {
 	background-size: 5% auto;
 }
 
+#context-menu {
+	position: absolute;
+}
+
 #toolbar { /* ul */
 	font-size: 14px;
 	margin: 0px;
@@ -466,14 +478,27 @@ body.night .left-wrap {
 }
 
 #cs-console {
-    position: relative;
-    overflow: hidden;
-    -webkit-touch-callout: all;
+	width: 100%;
+	bottom: 0px;
+	flex-basis: 0px;
+	flex-grow: 5;
+	flex-direction: column;
+	flex-wrap: wrap;
+	z-index: 999;
+	overflow: hidden;
+	-webkit-touch-callout: all;
 	-webkit-user-select: all;
 	-khtml-user-select: all;
 	-moz-user-select: all;
 	-ms-user-select: all;
 	user-select: all;
+}
+
+#console-header {
+    width: 100%;
+    background: grey;
+    flex-basis: 15px;
+    flex-grow: 1;
 }
 
 /* CONSOLE THEMING */
@@ -496,30 +521,21 @@ body.night .left-wrap {
 
 #cs-console input {
     width: 100%;
-    position: absolute;
-    bottom: 0px;
-    height: 19px; /* +1 border */
-    background: none;
-    border: none;
-    border-top: 1px solid;
-    border-color: inherit;
-    color: inherit;
+    flex-grow: 1;
 }
 
 #cs-console > ul {
     width: 100%;
-    position: absolute;
     list-style: none;
-    margin: 0px;
-    padding: 0px;
-    top: 0px;
-    bottom: 20px;
+    margin: 0;
+    padding: 0;
+    height: 100%;
     overflow-x: hidden;
     overflow-y: scroll;
-}
-
-#cs-console > ul > li::before {
-    content: '>';
+    z-index: 9999999;
+    flex-basis: 100px;
+    flex-grow: 9;
+    position: relative;
 }
 
 #cs-console > ul > li {
@@ -1310,7 +1326,7 @@ body.night .project-hover {
 	margin: 0px;
 	position: absolute;
 	top: 30px;
-	bottom: 0px;
+	bottom: 20px;
 	overflow: auto;
 	border: solid;
 	border-width: 0px 1px 0px 0px;
@@ -1380,14 +1396,19 @@ body.night .project-hover {
 
 #code-footer {
     cursor: default;
-	width: 100%;
-	height: 20px;
-	max-height: 20px;
-	border: 1px solid #989898;
-	border-width: 1px 0px 0px 0px;
-	overflow: hidden;
-	text-overflow: ellipsis;
+    width: 100%;
+    height: 20px;
+    max-height: 20px;
+    border: 1px solid #989898;
+    border-width: 1px 0 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #FFF;
+    flex-basis: 20px;
+    z-index: 9999;
+    flex-grow: 1;
 }
+
 
 #code-footer span.fa.fa-terminal {
   font-size: 12px;
@@ -1426,10 +1447,9 @@ body.night .project-hover {
 }
 
 #code-footer > span {
-	padding-left: 3px;
+	padding-left: 10px;
 	font-size: 12px;
 	vertical-align: baseline;
-	border-left: 1px solid lightgrey;
 	cursor: default;
 }
 
@@ -1842,9 +1862,14 @@ body.night .close:focus, body.night .close:hover {
 }
 
 .arrow-gutter {
-    margin-left: 5px;
-    width: 5px;
+	margin-left: 5px;
+	width: 5px;
 }
+
+.arrow-gutter::before {
+	content: "→";
+}
+
 /* override CodeMirror */
 .CodeMirror {
 	-webkit-flex: 2;

@@ -2,9 +2,16 @@
 
 //var BootstrapMenu = require('bootstrap-menu');
 
+var amdRequire = require;
+amdRequire.config({
+  baseUrl: 'node_modules/monaco-editor/release/min'
+});
 
 //are we using node?
 if (typeof nw === "object") {
+  require = nodeRequire;
+  require.nodeRequire = require;
+
   window.usingNode = true;
   //load our modules:
   var fs = require('fs');
@@ -183,34 +190,36 @@ function IDEViewModel() {
       if (typeof log !== "boolean" && typeof log !== "number" && typeof log !== "string") {
         return;
       }
-      if (typeof type != "string")
-        type = "";
-      if (console_logs().length > 999) {
-        console_logs.shift(); //limit entries
-      }
-      if (meta) {
-        if (typeof meta.scene === "string" && typeof meta.line === "number") {
-          console_logs.push({
-            value: log,
-            type: type || "null",
-            scene: meta.scene || "",
-            line: meta.line || ""
-          });
+      monaco.editor.colorize(log, "choicescript").then(function(formatString) {
+        if (typeof type != "string")
+          type = "";
+        if (console_logs().length > 999) {
+          console_logs.shift(); //limit entries
+        }
+        if (meta) {
+          if (typeof meta.scene === "string" && typeof meta.line === "number") {
+            console_logs.push({
+              value: formatString,
+              type: type || "null",
+              scene: meta.scene || "",
+              line: meta.line || ""
+            });
+          } else {
+            console.log(typeof meta.scene, typeof meta.line);
+            console_logs.push({
+              value: "Error: attempt to log bad meta data logged to project console!",
+              type: "cm-error"
+            });
+          }
         } else {
-          console.log(typeof meta.scene, typeof meta.line);
           console_logs.push({
-            value: "Error: attempt to log bad meta data logged to project console!",
-            type: "cm-error"
+            value: formatString,
+            type: type || "null"
           });
         }
-      } else {
-        console_logs.push({
-          value: log,
-          type: type || "null"
-        });
-      }
-      if (!consoleOpen() && type != "system")
-        unreadLogs(unreadLogs() < 8 ? unreadLogs() + 1 : "9+"); //unsafe type mix...?
+        if (!consoleOpen() && type != "system")
+          unreadLogs(unreadLogs() < 8 ? unreadLogs() + 1 : "9+"); //unsafe type mix...?
+      });
     }
     self.toggleConsole = function(force) {
       if (typeof force === "boolean") {
@@ -312,6 +321,11 @@ function IDEViewModel() {
     self.close = function() {
       __closeProject(self);
     }
+    self.dispose = function() {
+      scenes().forEach(function(scene) {
+        scene.dispose(); // clean up the monaco models
+      });
+    }
     self.select = function() {
       /* select first possible scene */
       for (var i = 0; i < scenes().length; i++) {
@@ -356,10 +370,10 @@ function IDEViewModel() {
         function closeScene() {
           if (selectedScene() == scene) {
             selectedScene(null);
-            editor.setValue("");
           }
           self.removeScene(scene);
           __updatePersistenceList();
+          scene.dispose();
           if (typeof callback === 'function') callback(true);
         }
         if (scene.isDirty()) {
@@ -433,12 +447,11 @@ function IDEViewModel() {
         scenes()[i].load();
     }
     self.logIssue = function(err, scene) {
-      var lineNum = (typeof err.lineNumber === "number") ? (err.lineNumber - 1) : null;
       var issue = new csideIssue({
         project: self,
         scene: scene,
         desc: err.message,
-        lineNum: lineNum
+        lineNum: err.lineNumber
       });
       issues.push(issue);
       //visually notify
@@ -485,24 +498,33 @@ function IDEViewModel() {
     var loaded = ko.observable(false);
     var locked = ko.observable(false);
     var readOnly = ko.observable(sceneData.readOnly || false); //app relative files are always read-only
-    var dirty = ko.observable(false);
     var editing = ko.observable(false);
     var colouring = ko.observable(false);
     var saving = ko.observable(false);
     var inErrState = ko.observable(false);
     var errStateMsg = ko.observable("");
-    var cmDoc = CodeMirror.Doc(sceneData.contents || "", "choicescript"); //won't change - so doesn't need to be an observable?
+    var edModel = monaco.editor.createModel(sceneData.contents || "", "choicescript", monaco.Uri.file(sceneData.path));
+    self.dispose = function() { edModel.dispose(); };
+    edModel.csideScene = self;
+
+    // used for dirtyness
+    var lastVersionId = edModel.getAlternativeVersionId();
+    var dirty = ko.observable(false);
+    var editorViewState = null;
+    //won't change - so doesn't need to be an observable?
     var charCount = ko.observable(sceneData.contents ? sceneData.contents.length : 0); //prepopulate otherwise .load() text replacement results in '0' on new startup.txts
     var wordCount = ko.observable(0);
-    var cursor = ko.observable({line:0,ch:0});
-    var selectedChars = ko.observable(0);
-    var history = cmDoc.getHistory();
     var fileStats = sceneData.stats || {
       "mtime": new Date()
     }; //won't change - so doesn't need to be an observable?
     var markColour = ko.observable(sceneData.color ? sceneData.color : isImportant ? "rgb(119, 151, 236)" : "rgb(119, 119, 119)");
     //var sceneListPosition = ko.observable(self.project().scenes().length);
     var issues = ko.observableArray([]);
+    issues.subscribe(function(val) {
+      if (self == selectedScene()) {
+        __updateEditorDecorations(self);
+      }
+    });
     var invalidName = ko.observable(false);
     var nameErrMsg = ko.observable();
     self.isLocked = ko.computed(function() {
@@ -514,6 +536,7 @@ function IDEViewModel() {
     }, this);
 
     //GETTER METHODS
+    self.decorations = [];
     self.getName = ko.computed(function() {
       return name();
     }, this);
@@ -548,17 +571,11 @@ function IDEViewModel() {
       return getProject(getProjectPath(path()));
     };
     self.getText = function() {
-      return cmDoc.getValue();
+      return edModel.getValue();
     };
     self.getMarkColour = ko.computed(function() {
       return markColour();
     }, this);
-    self.getLineHandle = function(lineNum) {
-      return cmDoc.getLineHandle(lineNum);
-    }
-    self.getLineNumber = function(lineHandle) {
-      return cmDoc.getLineNumber(lineHandle);
-    }
     self.nameInvalid = ko.computed(function() {
       return invalidName();
     }, this);
@@ -572,7 +589,7 @@ function IDEViewModel() {
       return issues();
     }, this);
     self.getContents = function() {
-      return cmDoc.getValue();
+      return edModel.getValue();
     }
     self.getErrStateMsg = ko.computed(function() {
       return errStateMsg() + ' - click here to close';
@@ -582,7 +599,7 @@ function IDEViewModel() {
     }, this);
     self.getCharCountString = function() {
       if (selectedChars() > 0) {
-        return selectedChars() + " (" + charCount() + ")";
+        return charCount() + " (" + selectedChars() + ")";
       } else {
         return charCount();
       }
@@ -594,20 +611,17 @@ function IDEViewModel() {
         return charCount();
       }
     };
-    self.getCursorString = function() {
-      return "Ln " + (cursor().line + 1) + ", Col " + cursor().ch;
-    };
     self.getWordCountString = function() {
-      var suffix = editor.getOption("exclude_cmd_lines") ? " [excl. cmds]" : " [inc. cmds]";
+      var suffix = (wordCountOn() > 1) ? " [excl. cmds]" : " [inc. cmds]";
       if (selectedChars() > 0) {
-        var selectedWords = __wordCount(cmDoc.getSelection(), editor.getOption("exclude_cmd_lines"));
-        return (selectedWords + (" (" + wordCount() + ") " + suffix));
+        var selectedWords = __wordCount(vseditor.getModel().getValueInRange(vseditor.getSelection()), wordCountOn() > 1);
+        return (wordCount() + (" (" + selectedWords + ") " + suffix));
       } else {
         return wordCount() + suffix;
       }
     };
     self.getWordCount = function(exclCommandLines, selected) {
-      return selected ?  __wordCount(cmDoc.getSelection(), exclCommandLines) : __wordCount(cmDoc.getValue(), exclCommandLines);
+      return selected ?  __wordCount(vseditor.getModel().getValueInRange(vseditor.getSelection()), exclCommandLines) : __wordCount(edModel.getValue(), exclCommandLines);
     };
     self.getState = ko.computed(function() {
       if (saving())
@@ -616,12 +630,27 @@ function IDEViewModel() {
         return "fa fa-ban"
       return inErrState() ? "fa fa-exclamation-triangle scene-unsaved" : readOnly() ? "fa fa-lock" : dirty() ? "fa fa-save scene-unsaved" : "fa fa-save scene-saved"
     });
+    // FIXME: See tabtype setting for explanation
+    self.updateTabSize = function(val) {
+      if (typeof val === "undefined")
+        val = settings.asObject("editor")["tabsize"];
+      edModel.updateOptions({tabSize: val});
+    }
+    self.updateTabType = function(val) {
+      if (typeof val === "undefined")
+        val = settings.asObject("editor")["tabtype"];
+      edModel.updateOptions({insertSpaces: val});
+    }
+    self.refreshIndentationSettings = function() {
+      self.updateTabSize();
+      self.updateTabType();
+    }
 
     //SETTER METHODS
     self.setText = function(value) {
       if (readOnly()) return;
       if (typeof value != "string") return;
-      cmDoc.setValue(value);
+      edModel.setValue(value);
     }
     var renameSceneFile = function(newName) {
       if (invalidName())
@@ -720,36 +749,36 @@ function IDEViewModel() {
       colouring(!colouring());
     }
     self.focusLine = function(lineNum, noArrow) {
-      if (self !== selectedScene()) self.select();
-      if (!noArrow) {
-        editor.clearGutter("arrow-gutter");
-        editor.setGutterMarker(lineNum, "arrow-gutter", document.createTextNode("→"));
-      }
-      editor.scrollIntoView({
-        line: lineNum,
-        ch: 0
-      }, 20);
+      lineNum += 1;
+      self.select(function(selected) {
+        if (!selected) return;
+        if (!noArrow) {
+          __updateEditorDecorations(self, [
+            {
+              range: new monaco.Range(lineNum,1,lineNum,1),
+              options: {
+                isWholeLine: false,
+                className: '',
+                glyphMarginClassName: 'arrow-gutter'
+              }
+            }
+          ]);
+        }
+        vseditor.revealLineInCenter(lineNum, monaco.editor.ScrollType.Immediate);
+      });
+      // fail silently
     }
     self.addIssue = function(issue) {
       issues.push(issue);
-      if (typeof issue.getLineNum() === "number") {
-        var lh = cmDoc.getLineHandle(issue.getLineNum()); //-1 for 0 based
-        if (lh) {
-          cmDoc.addLineClass(lh, 'background', 'CodeMirror-error-background');
-          CodeMirror.on(lh, "delete", function(lineHandle, change) {
-            issues.remove(issue);
-          });
-          return lh;
-        }
-        return null;
-      }
     }
     self.removeIssue = function(issue) {
-        if (typeof issue.getLineNum() === "number") {
-          cmDoc.removeLineClass(issue.getLineNum(), 'background', 'CodeMirror-error-background');
-        }
-        issues.remove(issue);
-      }
+      issues.remove(issue);
+    }
+    self.updateViewState = function() {
+      if (self === selectedScene())
+        return (editorViewState = vseditor.saveViewState());
+      return null;
+    }
       //MISC METHODS
     self.load = function(callback) {
       if (saving()) return;
@@ -786,9 +815,7 @@ function IDEViewModel() {
           callback(err);
         } else {
           inErrState(false);
-          cmDoc.setValue(data);
-          cmDoc.markClean();
-          cmDoc.clearHistory();
+          edModel.setValue(data);
           dirty(false);
           __updatePersistenceList();
           //check tab/space collsion:
@@ -869,7 +896,7 @@ function IDEViewModel() {
     }
 
     function saveScene(callback) {
-      var data = cmDoc.getValue();
+      var data = edModel.getValue();
       fh.writeFile(path(), data, function(err) {
         finalizeSave(err);
       });
@@ -879,29 +906,41 @@ function IDEViewModel() {
           console.log(err);
         } else {
           dirty(false);
-          cmDoc.markClean();
+          lastVersionId = edModel.getAlternativeVersionId();
           fileStats.mtime ? fileStats.mtime = new Date() : fileStats.modifiedAt = new Date();
         }
         saving(false);
         if (typeof callback == 'function') callback(err);
       }
     }
-    self.select = function() {
+    self.select = function(callback) {
+      if (typeof callback !== "function") callback = function(){};
       if (selectedScene() === self) {
+        callback(true);
         return;
       }
-      if (inErrState() || !loaded() || saving() || self.isLocked()) {
-        return false;
-      }
       //ensure we're not already editing the name of another scene:
-      editor.clearGutter("arrow-gutter");
+      if (inErrState() || !loaded() || saving() || self.isLocked()) {
+        callback(false);
+        return;
+      }
+      if (selectedScene())
+        selectedScene().updateViewState();
       selectedScene(self);
-      editor.swapDoc(cmDoc);
+
+      self.refreshIndentationSettings();
+
+      vseditor.setModel(edModel);
+      cursorPos(vseditor.getPosition());
+      __updateEditorDecorations(self);
+      if (editorViewState) {
+        vseditor.restoreViewState(editorViewState);
+      }
       if (!self.getProject().isExpanded()) {
         self.getProject().setExpand(true);
       }
-      editor.setOption("readOnly", readOnly());
-      return true;
+      vseditor.focus();
+      callback(true);
     }
     self.close = function() {
       self.getProject().closeScene(self);
@@ -929,7 +968,7 @@ function IDEViewModel() {
           var newScene = new CSIDEScene({
             "path": newPath,
             "source": source,
-            "contents": cmDoc.getValue()
+            "contents": edModel.getValue()
           });
           targetProject.addScene(newScene);
           newScene.load(); //contains _updatePersistenceList()
@@ -1006,27 +1045,14 @@ function IDEViewModel() {
           });
         }
       }
-    //Prevent editing while saving (basically fakes a read-only document)
-    CodeMirror.on(cmDoc, "beforeChange", function(cm, change) {
-      if (saving() && loaded()) {
-        change.cancel();
-        if (change.origin == "undo" || change.origin == "redo")
-          cmDoc.setHistory(history); //prevent history butchering
-      }
-    });
+
     //Update dirty status, char count etc - on change
-    CodeMirror.on(cmDoc, "change", function(cm, change) {
+    edModel.onDidChangeContent(function(e) {
       if (!saving())
-        cmDoc.isClean() ? dirty(false) : dirty(true);
-      history = cmDoc.getHistory();
-      charCount((charCount() - change.removed.join('\n').length) + change.text.join('\n').length);
-      if (editor.getOption("word_count")) {
-        wordCount(__wordCount(cmDoc.getValue(), editor.getOption("exclude_cmd_lines")));
-      }
-    });
-    CodeMirror.on(cmDoc, "cursorActivity", function(cm) {
-      cursor(cmDoc.getCursor());
-      selectedChars(cmDoc.getSelection().length);
+        lastVersionId !== edModel.getAlternativeVersionId() ? dirty(true) : dirty(false);
+      charCount(edModel.getValueLength());
+      if (wordCountOn() > 0)
+        wordCount(__wordCount(edModel.getValue(), (wordCountOn() > 1)));
     });
   }
 
@@ -1081,10 +1107,7 @@ function IDEViewModel() {
     }
 
     if (scene) {
-      var lh = scene.addIssue(self); //register issue with scene
-      if (lh) {
-        lineHandle = lh;
-      }
+      scene.addIssue(self); //register issue with scene
     }
   }
 
@@ -1098,18 +1121,18 @@ function IDEViewModel() {
     var type = settingData.type || "binary";
     var cat = settingData.cat || "app";
     var desc = ko.observable(settingData.desc || "");
-	var visible = ko.observable(true);
+    var visible = ko.observable(true);
 
     if (type === "binary") {
-      var options = [{
+      var options = ko.observableArray([{
         "desc": "on",
         "value": true
       }, {
         "desc": "off",
         "value": false
-      }]
+      }]);
     } else {
-      var options = settingData.options;
+      var options = ko.observableArray(settingData.options);
     }
 
     //ACCESSOR METHODS
@@ -1128,12 +1151,12 @@ function IDEViewModel() {
     setting.getCat = function() {
       return cat;
     }
-    setting.getOptions = function() {
-      return options;
-    }
+    setting.getOptions = ko.computed(function() {
+      return options();
+    }, this);
     setting.getSelectedOptionId = function () {
-      for (var i = 0; i < options.length; i++)
-        if (value() == options[i].value)
+      for (var i = 0; i < options().length; i++)
+        if (value() == options()[i].value)
           return i;
       return null;
     }
@@ -1148,25 +1171,28 @@ function IDEViewModel() {
     setting.setDesc = function(val) {
       desc(val);
     }
-    setting.apply = settingData.apply; //unique apply method for each setting
+    setting.apply = settingData.apply; // unique apply method for each setting
     setting.toggle = function(option, evt) {
       if (type != "binary") {
         value(option.value);
-      } else if ((selectedOption + 1) == options.length) {
+      } else if ((selectedOption + 1) == options().length) {
         selectedOption = 0;
-        value(options[selectedOption].value);
+        value(options()[selectedOption].value);
       } else {
         selectedOption += 1;
-        value(options[selectedOption].value);
+        value(options()[selectedOption].value);
       }
+    }
+    setting.setOptions = function(optionList) {
+      options(optionList);
     }
     setting.setValue = function(newVal) {
       value(newVal);
     }
-	setting.setVisibility = function(newVal) {
-      if (typeof newVal == "boolean")
-        visible(newVal);
-	}
+    setting.setVisibility = function(newVal) {
+        if (typeof newVal == "boolean")
+          visible(newVal);
+    }
     value.subscribe(function(option) {
       config.settings[cat][id] = value(); //store
       setting.apply(value());
@@ -1181,7 +1207,7 @@ function IDEViewModel() {
       value: value,
       toggle: setting.toggle,
       getOptions: setting.getOptions,
-	  isVisible: setting.isVisible
+      isVisible: setting.isVisible
     }
   }
 
@@ -1376,8 +1402,11 @@ function IDEViewModel() {
     );
   }
 
+  var vseditor = null;
   var projects = ko.observableArray([]);
-  var selectedScene = ko.observable(null)
+  var cursorPos = ko.observable({lineNumber: 0, column: 0});
+  var selectedChars = ko.observable(0);
+  var selectedScene = ko.observable(null);
   var selectedProject = ko.computed(function() {
     return selectedScene() ? selectedScene().getProject() : null;
   });
@@ -1483,10 +1512,6 @@ function IDEViewModel() {
     }
   }
 
-  var autoFormatMap = {
-    "...": "…", // ellipsis
-    "--": "—" 	// emdash
-  };
   var reservedSceneNames = "(STARTUP|CHOICESCRIPT_STATS)"; //Should be in upper case
   var validSceneColours = ko.observableArray(["rgb(125, 186, 125)", "rgb(172, 209, 240)", "rgb(228, 144, 150)",
     "rgb(237, 216, 161)", "rgb(161, 165, 237)", "rgb(224, 161, 237)", "rgb(163, 163, 163)", "rgb(230, 230, 230)"
@@ -1502,7 +1527,7 @@ function IDEViewModel() {
   var defaultConfig = {
     "settings": {
       "editor": {
-        "tabtype": "spaces",
+        "tabtype": true,
         "smartindent": true,
         "tabsize": "4",
         "linewrap": true,
@@ -1511,7 +1536,7 @@ function IDEViewModel() {
         "spell_dic": "en_US",
         "theme": "cs-dark",
         "night-mode": false,
-        "spellcheck": 1,
+        "spellcheck": true,
         "autosuggest": false,
         "autoformat": true,
         "word-count": 2,
@@ -2017,470 +2042,333 @@ function IDEViewModel() {
     }
   }();
 
-  if ((platform == "mac_os") || ((platform == "web-dropbox") && (window.navigator.platform == "MacIntel"))) {
-    var keymap = {
-      "Cmd-S": function(ed) {
-        selectedScene().save();
-      },
-      "Cmd-W": function(ed) {
-        selectedScene().close();
-      },
-      "Cmd-N": function(ed) {
-        selectedProject().addNewScene();
-      },
-      "Cmd-Q": function(ed) {
-        if (usingNode) {
-          win.close();
-        }
-      },
-      "Shift-Cmd-S": function(ed) {
-        selectedProject().save();
-      },
-      "Shift-Cmd-W": function(ed) {
-        selectedProject().close();
-      },
-      "Shift-Cmd-N": function(ed) {
-        self.createProject();
-      },
-      "Shift-Cmd-,": function(ed) {
-        self.scenePanel();
-      },
-      "Shift-Cmd-.": function(ed) {
-        self.tabPanel();
-      },
-      "Shift-Cmd-=": function(ed) {
+  function registerEditorActions(editor) {
+
+    editor.addAction({
+      id: 'save-selected-scene',
+      label: 'Save Selected Scene',
+      keybindings: [
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
+        cside.getSelectedScene().save();
+        return null;
+      }
+    });
+
+    editor.addAction({
+      id: 'select-previous-scene',
+      label: 'Select Previous Scene',
+      keybindings: [
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.PageUp,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
+        __cycleSceneSelection(true);
+      }
+    });
+
+    editor.addAction({
+      id: 'select-next-scene',
+      label: 'Select Next Scene',
+      keybindings: [
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.PageDown,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
+        __cycleSceneSelection(false);
+      }
+    });
+
+    editor.addAction({
+      id: 'close-selected-scene',
+      label: 'Close Selected Scene',
+      keybindings: [
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_W,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
+        cside.getSelectedScene().close();
+        return null;
+      }
+    });
+
+    editor.addAction({
+      id: 'add-new-scene',
+      label: 'Add New Scene',
+      keybindings: [
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_N,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
+        cside.getSelectedProject().addNewScene();
+        return null;
+      }
+    });
+
+    editor.addAction({
+      id: 'save-selected-project',
+      label: 'Save Selected Project',
+      keybindings: [
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
+        cside.getSelectedProject().save();
+        return null;
+      }
+    });
+
+    editor.addAction({
+      id: 'close-selected-project',
+      label: 'Close Selected Project',
+      keybindings: [
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_W,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
+        cside.getSelectedProject().close();
+        return null;
+      }
+    });
+
+    editor.addAction({
+      id: 'create-project',
+      label: 'Create Project',
+      keybindings: [
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_N,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
+        cside.createProject();
+        return null;
+      }
+    });
+
+    editor.addAction({
+      id: 'toggle-scene-panel-project',
+      label: 'Toggle Scene Panel',
+      keybindings: [
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.US_COMMA,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
+        cside.scenePanel();
+        return null;
+      }
+    });
+
+    editor.addAction({
+      id: 'toggle-tab-panel',
+      label: 'Toggle Tab Panel',
+      keybindings: [
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.US_DOT,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
+        cside.tabPanel();
+        return null;
+      }
+    });
+
+    editor.addAction({
+      id: 'increase-font-size',
+      label: 'Increase Editor Font Size',
+      keybindings: [
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.US_EQUAL
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
         var fontSizeSetting = settings.byId("editor", "fontsize");
         var optionId = fontSizeSetting.getSelectedOptionId();
         if (typeof optionId == "number" && optionId < (fontSizeSetting.getOptions().length - 1))
           fontSizeSetting.toggle(fontSizeSetting.getOptions()[optionId + 1]);
-      },
-      "Shift-Cmd--": function(ed) {
+        return null;
+      }
+    });
+
+    editor.addAction({
+      id: 'decrease-font-size',
+      label: 'Decrease Editor Font Size',
+      keybindings: [
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.US_MINUS
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
         var fontSizeSetting = settings.byId("editor", "fontsize");
         var optionId = fontSizeSetting.getSelectedOptionId();
         if (typeof optionId == "number" && optionId > 0)
           fontSizeSetting.toggle(fontSizeSetting.getOptions()[optionId - 1]);
-      },
-      "Shift-Cmd-O": function(ed) {
-        selectedProject().openAllScenes();
-      },
-      "Shift-Tab": function(ed) {
-        ed.indentSelection("subtract");
-      },
-      "Cmd-O": function(ed) {
-        self.openFileBrowser();
-      },
-      "Cmd-D": function(ed) {
-        insertTextTags("${", "}");
-      },
-      "Cmd-B": function(ed) {
+        return null;
+      }
+    });
+
+    editor.addAction({
+      id: 'open-all-scenes',
+      label: 'Open All Scenes',
+      keybindings: [
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_O,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
+        cside.getSelectedProject().openAllScenes();
+        return null;
+      }
+    });
+
+    editor.addAction({
+      id: 'open-file-browser',
+      label: 'Open File Browser',
+      keybindings: [
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_O,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
+        cside.openFileBrowser();
+        return null;
+      }
+    });
+
+    editor.addAction({
+      id: 'toggle-bold',
+      label: 'Toggle Bold',
+      keybindings: [
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_B,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
         insertTextTags("[b]", "[/b]");
-      },
-      "Cmd-I": function(ed) {
-        insertTextTags("[i]", "[/i]");
-      },
-      "Cmd-/": function(ed) {
-        insertTextTags("*comment ", "", true);
-      },
-      "Cmd-T": function(ed) {
-        selectedProject().test("quick");
-      },
-      "Shift-Cmd-T": function(ed) {
-        selectedProject().test("random");
-      },
-      "Shift-Cmd-Enter": function(ed) {
-        selectedProject().run();
-      },
-      "Shift-Cmd-C": function(ed) {
-        var open = selectedProject().toggleConsole();
-        if (open) $("#cs-console > input").focus();
-      },
-      "Cmd-Alt-Down": function(ed) {
-        self.moveSelection("down");
-      },
-      "Cmd-Alt-Up": function(ed) {
-        self.moveSelection("up");
-      },
-      "Shift-Cmd-K": function(ed) {
-        ed.execCommand("deleteLine");
-      },
-      "Shift-Cmd-D": function(ed) {
-        ed.execCommand("duplicateLine");
-      },
-      "F11": function(ed) {
-        ed.setOption("fullScreen", !ed.getOption("fullScreen"));
-      },
-      "Esc": function(ed) {
-        ed.setOption("fullScreen", !ed.getOption("fullScreen"));
-      },
-      "Cmd-Alt-PageUp": function(ed) {
-        // Select previous scene
-        __cycleSceneSelection(/* up */ true);
-      },
-      "Cmd-Alt-PageDown": function(ed) {
-        // Select next scene
-        __cycleSceneSelection(/* up */ false);
       }
-      //Mac cut, copy and paste don't work by default? MIGHT be a node-webkit thing.
-      /*	"Cmd-X": function(ed) {
-				document.execCommand("cut");
-			},
-			"Cmd-C": function(ed) {
-				document.execCommand("copy");
-			},
-			"Cmd-V": function(ed) {
-				document.execCommand("paste");
-			} */
-    }
-  } else {
-    var keymap = {
-      "Ctrl-S": function(ed) {
-        selectedScene().save();
-      },
-      "Ctrl-W": function(ed) {
-        selectedScene().close();
-      },
-      "Ctrl-N": function(ed) {
-        selectedProject().addNewScene();
-      },
-      "Ctrl-O": function(ed) {
-        self.openFileBrowser();
-      },
-      "Shift-Ctrl-O": function(ed) {
-        selectedProject().openAllScenes();
-      },
-      "Shift-Ctrl-S": function(ed) {
-        selectedProject().save();
-      },
-      "Shift-Ctrl-W": function(ed) {
-        selectedProject().close();
-      },
-      "Shift-Ctrl-N": function(ed) {
-        self.createProject();
-      },
-      "Shift-Ctrl-,": function(ed) {
-        self.scenePanel();
-      },
-      "Shift-Ctrl-.": function(ed) {
-        self.tabPanel();
-      },
-      "Shift-Ctrl-=": function(ed) {
-        var fontSizeSetting = settings.byId("editor", "fontsize");
-        var optionId = fontSizeSetting.getSelectedOptionId();
-        if (typeof optionId == "number" && optionId < (fontSizeSetting.getOptions().length - 1))
-          fontSizeSetting.toggle(fontSizeSetting.getOptions()[optionId + 1]);
-      },
-      "Shift-Ctrl--": function(ed) {
-        var fontSizeSetting = settings.byId("editor", "fontsize");
-        var optionId = fontSizeSetting.getSelectedOptionId();
-        if (typeof optionId == "number" && optionId > 0)
-          fontSizeSetting.toggle(fontSizeSetting.getOptions()[optionId - 1]);
-      },
-      "Shift-Ctrl-Q": function(ed) {
-        if (usingNode) {
-          win.close();
-        }
-      },
-      "Shift-Tab": function(ed) {
-        ed.indentSelection("subtract");
-      },
-      "Ctrl-D": function(ed) {
+    });
+
+    editor.addAction({
+      id: 'wrap-variable',
+      label: 'Wrap Variable',
+      keybindings: [
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_D,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
         insertTextTags("${", "}");
-      },
-      "Ctrl-B": function(ed) {
-        insertTextTags("[b]", "[/b]");
-      },
-      "Ctrl-I": function(ed) {
+      }
+    });
+
+    editor.addAction({
+      id: 'toggle-italics',
+      label: 'Toggle Italics',
+      keybindings: [
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_I,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
         insertTextTags("[i]", "[/i]");
-      },
-      "Ctrl-/": function(ed) {
+      }
+    });
+
+    editor.addAction({
+      id: 'toggle-comment',
+      label: 'Toggle Comment',
+      keybindings: [
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.US_SLASH,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
         insertTextTags("*comment ", "", true);
-      },
-      "Ctrl-T": function(ed) {
-        selectedProject().test("quick");
-      },
-      "Shift-Ctrl-T": function(ed) {
-        selectedProject().test("random");
-      },
-      "Shift-Ctrl-Enter": function(ed) {
-        selectedProject().run();
-      },
-      "Shift-Ctrl-C": function(ed) {
-        var open = selectedProject().toggleConsole();
+      }
+    });
+
+    editor.addAction({
+      id: 'quicktest',
+      label: 'Quicktest Project',
+      keybindings: [
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_T,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
+        cside.getSelectedProject().test("quick");
+        return null;
+      }
+    });
+
+    editor.addAction({
+      id: 'randomtest-project',
+      label: 'Randomtest Project',
+      keybindings: [
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_T,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
+        cside.getSelectedProject().test("random");
+        return null;
+      }
+    });
+
+    editor.addAction({
+      id: 'run-project',
+      label: 'Run Project',
+      keybindings: [
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
+        cside.getSelectedProject().run();
+        return null;
+      }
+    });
+
+    editor.addAction({
+      id: 'toggle-console',
+      label: 'Toggle ChoiceScript Console',
+      keybindings: [
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_C,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
+        var open = cside.getSelectedProject().toggleConsole();
         if (open) $("#cs-console > input").focus();
-      },
-      "Shift-Ctrl-Down": function(ed) {
-        self.moveSelection("down");
-      },
-      "Shift-Ctrl-Up": function(ed) {
-        self.moveSelection("up");
-      },
-      "Shift-Ctrl-K": function(ed) {
-        ed.execCommand("deleteLine");
-      },
-      "Shift-Ctrl-D": function(ed) {
-        ed.execCommand("duplicateLine");
-      },
-      "F11": function(ed) {
-        ed.setOption("fullScreen", !ed.getOption("fullScreen"));
-      },
-      "Esc": function(ed) {
-        ed.setOption("fullScreen", !ed.getOption("fullScreen"));
-      },
-      "Ctrl-PageUp": function(ed) {
-        // Select previous scene
-        __cycleSceneSelection(/* up */ true);
-      },
-      "Ctrl-PageDown": function(ed) {
-        // Select next scene
-        __cycleSceneSelection(/* up */ false);
       }
-    }
+    });
+
   }
-
-  //define the editor instances and apply behaviour tweaks
-  var editor = CodeMirror.fromTextArea(document.getElementById("code-textarea"), {
-    //inputStyle: "contenteditable", accessibility
-    mode: {
-      name: "choicescript",
-      version: 2,
-      singleLineStringErrors: false
-    },
-    lineNumbers: true,
-    lineWrapping: true,
-    tabSize: 4,
-    indentUnit: 4,
-    indentWithTabs: true,
-    matchBrackets: true,
-    extraKeys: keymap,
-    foldGutter: true,
-    historyEventDelay: 500,
-    gutters: ["arrow-gutter", "CodeMirror-linenumbers", "CodeMirror-foldgutter"],
-    highlightSelectionMatches: {
-      style: "matchhighlight",
-      minChars: 2,
-      delay: 200,
-      wordsOnly: false,
-      annotateScrollbar: false,
-      showToken: false,
-      trim: true
-    }
-  });
-
-  self.moveSelection = function(direction) {
-    if (direction !== "up" && direction !== "down") {
-      return;
-    }
-    var selections = editor.listSelections();
-    for (var i = 0; i < selections.length; i++) {
-      var top = selections[i].from();
-      var bottom = selections[i].to();
-      var alpha = (direction === "down" ? 1 : -1);
-      if (typeof editor.getLine(top.line + alpha) == 'undefined' || typeof editor.getLine(bottom.line + alpha) == 'undefined') {
-        return;
-      }
-      if (bottom.ch === 0) {
-        bottom.line--;
-        bottom.ch = editor.getLine(bottom.line).length;
-      }
-      var storeLine = (direction === "down" ? editor.getLine(bottom.line + alpha) : editor.getLine(top.line + alpha));
-      var movingLines = editor.getRange({
-        line: top.line,
-        ch: 0
-      }, {
-        line: bottom.line,
-        ch: editor.getLine(bottom.line).length
-      });
-      editor.replaceRange(movingLines, {
-        line: top.line + alpha,
-        ch: 0
-      }, {
-        line: bottom.line + alpha,
-        ch: editor.getLine(bottom.line + alpha).length
-      }); //move lines down
-      if (direction === "down")
-        editor.replaceRange(storeLine, {
-          line: top.line,
-          ch: 0
-        }, {
-          line: top.line,
-          ch: editor.getLine(top.line).length
-        }); //replace the old top
-      else
-        editor.replaceRange(storeLine, {
-          line: bottom.line,
-          ch: 0
-        }, {
-          line: bottom.line,
-          ch: editor.getLine(bottom.line).length
-        }); //replace the old bottom
-      editor.setSelection({
-        line: top.line + alpha,
-        ch: 0
-      }, {
-        line: bottom.line + alpha,
-        ch: editor.getLine(bottom.line + alpha).length
-      });
-    }
-  }
-
-  var speller = function() {
-    var word = new RegExp(/(?=[\"\'])?([A-Za-z\u00C0-\u00FF\u0100-\u017F]+'[A-Za-z\u00C0-\u00FF\u0100-\u017F]+|[A-Za-z\u00C0-\u00FF\u0100-\u017F]{2,}|[AaI]'?)(?=[\s\.,:;\?'\-\!—…\"])/g);
-    var cmd = new RegExp(/\*[A-Za-z_]+\b/);
-    var variable = new RegExp(/\{.*\}/g); //new RegExp(/\{[A-Za-z0-9_\[\]]+\}/g);
-
-    return {
-      token: function(stream) {
-        if (stream.pos === 0) {
-          var indentation = /^( +|\t+)/.exec(stream.string);
-          if (indentation) {
-            stream.pos += indentation[0].length;
-            return(editor.options.visibleTabs ? "visible-indentation" : "null");
-          }
-        }
-        cmd.lastIndex = stream.pos;
-        var cmd_match = cmd.exec(stream.string);
-        if (cmd_match && cmd_match.index == stream.pos) {
-          if (editor.options.spellcheck === 2) { // EXCLUDE CMD LINES FROM SPELL CHECK
-            stream.skipToEnd();
-          }
-          else {
-            stream.pos += cmd_match[0].length || 1;
-            return("cmd");
-          }
-        }
-        word.lastIndex = stream.pos;
-        var word_match = word.exec(stream.string);
-        if (word_match && word_match.index == stream.pos) {
-          stream.pos += word_match[0].length || 1;
-          return cside.spellCheck(word_match[0]) ? style = 'null' : style = "spell-error";
-        } else if (word_match) {
-          stream.pos++; //??
-        } else {
-          stream.skipToEnd();
-        }
-
-        /*query.lastIndex = stream.pos;
-        var match = query.exec(stream.string);
-        if (match && match.index == stream.pos) {
-          stream.pos += match[0].length || 1;
-          return "searching";
-        } else if (match) {
-          stream.pos = match.index;
-        } else {
-          stream.skipToEnd();
-        }*/
-      }
-    };
-  }
-  editor.addOverlay(speller());
-  /* 	editor.on("change", function(cm, change) {
-  		if (change.origin != "paste" || change.text.length < 2) return;
-  		cm.operation(function() {
-  			if (!editor.getLine(change.to.line)) return; //occasionally bugs out on normal paste events without this
-  			var targetLine = change.to.line;
-  			var currentIndent = CodeMirror.countColumn(editor.getLine(change.to.line), null, 1, 0, 0);
-  			for (var line = change.from.line, end = CodeMirror.changeEnd(change).line; line < end + 1; ++line) {
-  				if (line != targetLine) {
-  					var i = 0;
-  					while (i < currentIndent) {
-  						cm.indentLine(line, "add");
-  						i++;
-  					}
-  				}
-  			}
-  		});
-  	}); */
-  //
-  editor.on("dragover", function(cm, e) {
-    $('.CodeMirror-cursors .CodeMirror-cursor').css("visibility", "visible");
-    var xy = {
-      "left": e.x,
-      "top": e.y
-    };
-    var newPos = editor.coordsChar(xy);
-    editor.setCursor(newPos);
-  });
-  editor.on("dragstart", function(cm, e) {
-    e.dataTransfer.setData("Text", editor.getSelection());
-  });
-  editor.on("renderLine", function(cm, line, elt) {
-    var charWidth = editor.defaultCharWidth(),
-      basePadding = 4;
-    var off = CodeMirror.countColumn(line.text, null, cm.getOption("tabSize")) * charWidth;
-    var pixelTabSize = 8 * editor.options.tabSize;
-    var indentLevel = off / pixelTabSize;
-    var leftMargin = pixelTabSize * indentLevel;
-    elt.style.paddingLeft = leftMargin + "px";
-    elt.style.textIndent = "-" + (leftMargin / (indentLevel + 1)) + "px";
-  });
-
-  editor.on("inputRead", function(cm, change) {
-	if (change.text.length == 1) {
-
-	  if (editor.getOption("autoformat")) { // auto-replace em-dash etc.
-	    var tok = cm.getTokenAt(change.from); // try ?precise option if there are future issues
-	    if (tok.type == "formattable") {
-	      var replacement = autoFormatMap[tok.string];
-	      if (typeof replacement != "undefined") {
-		    cm.changeGeneration(true);
-		    cm.replaceRange(replacement, {line: change.from.line, ch: tok.start}, {line: change.from.line, ch: tok.end});
-	      }
-	    }
-	  }
-
-	  if (editor.getOption("autosuggest")) {
-	    if (change.text[0].match(/\w$/)) { //only fire on word characters
-		  if (autoSuggestFn) {
-		    clearTimeout(autoSuggestFn);
-		  }
-		  autoSuggestFn = setTimeout(function() {
-		    CodeMirror.showHint(cm, null, {
-			  completeSingle: false,
-			  extraKeys: {
-			    Enter: function() {
-			      return false;
-			    }
-			  }
-		    });
-		  }, 150);
-	    }
-	  }
-	}
-  });
-
-
-
-  editor.refresh();
-
-  editor["forceSyntaxRedraw"] = function() { //ALIAS METHOD
-      editor.setOption("mode", "choicescript");
-    }
-
-  CodeMirror.commands.duplicateLine = function(cm) {
-    var cur = cm.getCursor();
-    var line = cm.getLine(cur.line).trim(); // remove preceding spaces
-    line = line.replace(/^\t+/, ""); // remove tabs
-    CodeMirror.commands.goLineEnd(cm);
-    CodeMirror.commands.newlineAndIndent(cm); // auto-indent
-    cm.replaceSelection(line);
-  }
-
-    //$('.CodeMirror, cm-s-choicescript').hide();
-
-  //cside.noteEditor.refresh();
 
   var insertTextTags = function(tagStart, tagEnd, allowSpecialLines) {
-    var text = editor.getSelection();
-    var cursorLoc = "around";
+    var text = vseditor.getModel().getValueInRange(vseditor.getSelection());
     if (!text) {
       text = tagStart + tagEnd;
-      cursorLoc = "start";
+      // position the cursor inside the tags
+      var cursorPos = vseditor.getSelection();
+      cursorPos.startColumn += tagStart.length;
+      cursorPos.positionColumn = cursorPos.selectionStartColumn = cursorPos.startColumn;
+      vseditor.executeEdits("insertTextTags", [{range: vseditor.getSelection(), text: text }], [cursorPos]);
     } else {
       var line;
       var whitespace;
       text = text.split("\n");
       for (var i = 0; i < text.length; i++) {
-        line = text[i];
+        line = text[i].replace(/\r?\n|\r/,"");
         if (line === "") continue; //ignore blank lines
         if (!allowSpecialLines && (line.match(/^\s*\*[A-Za-z_]+\b/) || line.match(/^\s*#/))) continue; //ignore full command or option lines
         if (whitespace = line.match(/^\s+/g)) { //retain leading whitespace
@@ -2495,10 +2383,7 @@ function IDEViewModel() {
         text[i] = (whitespace + line);
       }
       text = text.join("\n");
-    }
-    editor.replaceSelection(text, cursorLoc);
-    if (cursorLoc === "start") {
-      editor.setCursor(editor.getCursor().line, editor.getCursor().ch + tagStart.length);
+      vseditor.executeEdits("insertTextTags", [{range: vseditor.getSelection(), text: text }]);
     }
   }
 
@@ -2593,11 +2478,6 @@ function IDEViewModel() {
         title: "Pronouns with Gender-Neutral Options Template",
         desc: "A template for including gender neutral pronouns in your game (they/them), created by Lynnea Glasser. This includes a variable system to make sure your verbs and pronouns will match (\"They go on ahead\"/\"She goes on ahead\").",
         path: "cs_examples/GNO Pronoun Template/"
-      },
-      {
-        title: "Editor Theme Configuration Template",
-        desc: "An example script that customizes the custom editor theme.",
-        path: "cs_examples/Theme Template/"
       }
     ];
 
@@ -2674,6 +2554,14 @@ function IDEViewModel() {
     return null;
   }
 
+  function suggestWord(word) {
+    return new Promise(function(resolve, reject) {
+      typo.suggest(word, 5, function(suggestions) {
+        resolve(suggestions);
+          });
+      });
+  }
+
   var settings = {
     'editor': ko.observableArray([
       new CSIDESetting({
@@ -2684,10 +2572,12 @@ function IDEViewModel() {
         "cat": "editor",
         "desc": "Automatically indent (or dedent) the cursor after flow-control commands",
         "apply": function(val) {
-          if (val) {
-            editor.setOption("smartIndent", true);
+          if (!val) {
+            this.handle = monaco.languages.setLanguageConfiguration('choicescript', {
+              onEnterRules: []
+            });
           } else {
-            editor.setOption("smartIndent", false);
+            if (this.handle) this.handle.dispose();
           }
         }
       }),
@@ -2699,22 +2589,7 @@ function IDEViewModel() {
         "cat": "editor",
         "desc": "Wrap lines that exceed the editor's width (no horizontal scrolling)",
         "apply": function(val) {
-          if (val) {
-            editor.setOption("lineWrapping", true);
-            editor.on("renderLine", function(cm, line, elt) {
-              var off = CodeMirror.countColumn(line.text, null, cm.getOption("tabSize")) * editor.defaultCharWidth();
-              var pixelTabSize = 8 * editor.options.tabSize;
-              var indentLevel = off / pixelTabSize;
-              var leftMargin = pixelTabSize * indentLevel;
-              elt.style.paddingLeft = leftMargin + "px";
-              elt.style.textIndent = "-" + (leftMargin / (indentLevel + 1)) + "px";
-            });
-            editor.refresh();
-          } else {
-            delete editor._handlers.renderLine;
-            editor.setOption("lineWrapping", false);
-            editor.refresh();
-          }
+          vseditor.updateOptions({wordWrap: val ? "on" : "off"});
         }
       }),
       new CSIDESetting({
@@ -2725,7 +2600,7 @@ function IDEViewModel() {
         "cat": "editor",
         "desc": "Prompt quick-complete word suggestions as you type",
         "apply": function(val) {
-          editor.setOption("autosuggest", val);
+          vseditor.updateOptions({quickSuggestions: val});
         }
       }),
       new CSIDESetting({
@@ -2736,7 +2611,7 @@ function IDEViewModel() {
         "cat": "editor",
         "desc": "Automatically replace certain character combinations with their formatted equivalents",
         "apply": function(val) {
-          editor.setOption("autoformat", val);
+          vseditor.updateOptions({formatOnType: val});
         }
       }),
       new CSIDESetting({
@@ -2747,8 +2622,8 @@ function IDEViewModel() {
         "cat": "editor",
         "desc": "Highlight matching instances of selected text",
         "apply": function(val) {
-          editor.setOption("highlightSelectionMatches", val);
-          editor.forceSyntaxRedraw();
+          // FIXME: Highlights can get stuck if disabled whilst visible.
+          vseditor.updateOptions({selectionHighlight: val});
         }
       }),
       new CSIDESetting({
@@ -2759,31 +2634,63 @@ function IDEViewModel() {
         "cat": "editor",
         "desc": "Provides a visible representation of the indentation level in the editor window",
         "apply": function(val) {
-          editor.setOption("visibleTabs", val);
-          editor.forceSyntaxRedraw();
+          vseditor.updateOptions({renderIndentGuides: val});
         }
       }),
       new CSIDESetting({
         "id": "spellcheck",
         "name": "Spell Check",
-        "value": 2,
-        "type": "variable",
+        "value": true,
+        "type": "binary",
         "cat": "editor",
-        "options": [{
-          "desc": "Exclude cmd lines",
-          "value": 2
-        }, {
-          "desc": "Include cmd lines",
-          "value": 1
-        }, {
-          "desc": "Off",
-          "value": 0
-        }],
-        "desc": "Underline any mispelt words in the active scene text",
+        "desc": "Underline any misspelt words in the active scene text",
         "apply": function(val) {
-          //conditional is handled in choicescript.js CodeMirror mode
-          editor.setOption("spellcheck", val);
-          editor.forceSyntaxRedraw();
+          // enable/disable editor diagnostics
+          var monacoOptions = __getMonacoDiagnosticOptions();
+          monacoOptions.spellcheck.enabled = Boolean(val);
+          __updateMonacoDiagnosticOptions(monacoOptions);
+          if (val) {
+            // In an ideal world we'd move this Provider into the language plugin, but
+            // as it stands, we need direct access to the User Dictionary object
+            // in order to add the words to our ignore lists that display in the UI.
+            var self = this;
+            this.handle = monaco.languages.registerCodeActionProvider('choicescript', {
+              provideCodeActions: function(model, range, context, token) {
+                actions = [];
+                return new Promise(function(resolve, reject) {
+                  context.markers.forEach(function(marker) {
+                    if (marker.code === "badSpelling") {
+                      word = meditor.getModel().getWordAtPosition(new monaco.Position(range.startLineNumber, range.startColumn));
+                      if (!word) return;
+                      suggestWord(word.word).then(function(suggestions) {
+                        for (var i = 0; i < suggestions.length; i++)
+                          actions.push({ title: "Correct spelling: " + suggestions[i], kind: "quickfix",
+                            edit: {
+                              edits: [
+                                { edit: { range: range, text: suggestions[i] }, resource: model.uri }
+                              ]
+                            }
+                          });
+                        actions.push({ title: "Ignore '" + word.word + "' this session", kind: "quickfix",
+                          command: {
+                            id: userDictionary.monacoCmds["IGNORE_WORD"], title: "Ignore Word", arguments: [word.word]
+                          }
+                        });
+                        actions.push({ title: "Add '" + word.word + "' to the User Dictionary", kind: "quickfix",
+                          command: {
+                            id: userDictionary.monacoCmds["ADD_WORD"], title: "Add Word", arguments: [word.word]
+                          }
+                        });
+                        resolve(actions.length > 0 ? { actions: actions, dispose: function() {} } : null);
+                      });
+                    }
+                  });
+                });
+              }
+            });
+          } else {
+            if (this.handle) this.handle.dispose();
+          }
         }
       }),
       new CSIDESetting({
@@ -2804,7 +2711,9 @@ function IDEViewModel() {
           typo = new Typo(val, typo._readFile("lib/typo/dictionaries/" + val + "/" + val + ".aff"), typo._readFile("lib/typo/dictionaries/" + val + "/" + val + ".dic"), {
             platform: 'any'
           });
-          editor.forceSyntaxRedraw();
+          var monacoOptions = __getMonacoDiagnosticOptions();
+          monacoOptions.spellcheck.dictionary = val;
+          __updateMonacoDiagnosticOptions(monacoOptions);
         }
       }),
       new CSIDESetting({
@@ -2825,43 +2734,25 @@ function IDEViewModel() {
           "value": 0
         }],
         "apply": function(val) {
-          wordCountOn(val > 0); // 0 == false? off
-          editor.setOption("word_count", val > 0);
-          editor.setOption("exclude_cmd_lines", (val > 1));
+          wordCountOn(val); // 0 == false? off
         }
       }),
+      // FIXME: Each Monaco model has its own local indentation preferences (useSpaces, tabSize),
+      // which override the global ones, so we need to make sure we update each model on swap, or adjustment.
+      // Longer-term we should probably move to the same format: away from a global setting and towards each scene
+      // having its own, much like any other text editor (but this should be easy to adjust on the fly).
       new CSIDESetting({
         "id": "tabtype",
-        "name": "Tab Type",
-        "value": "tabs",
-        "type": "variable",
+        "name": "Use Spaces for Indentation",
+        "value": true,
+        "type": "binary",
         "cat": "editor",
-        "desc": "",
-        "options": [{
-          "desc": "Tabs",
-          "value": "tabs"
-        }, {
-          "desc": "Spaces",
-          "value": "spaces"
-        }],
-        "desc": "Sets the indentation unit (used by smart indent)",
+        "desc": "Sets the indentation unit to spaces (on) or tabs (off)",
         "apply": function(val) {
-          if (val == "spaces") {
-            editor.setOption("indentWithTabs", false);
-            keymap["Tab"] = function(cm) {
-              if (cm.somethingSelected()) {
-                cm.indentSelection("add");
-              } else {
-                var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
-                cm.replaceSelection(spaces);
-              }
-            }
-          } else {
-            editor.setOption("indentWithTabs", true);
-            keymap["Tab"] = function() {
-              editor.execCommand("defaultTab");
-            }
-          }
+          vseditor.updateOptions({insertSpaces: val});
+          var selectedScene = cside.getSelectedScene();
+          if (selectedScene)
+            selectedScene.updateTabType(val);
         }
       }),
       new CSIDESetting({
@@ -2892,11 +2783,12 @@ function IDEViewModel() {
           "desc": "8",
           "value": "8"
         }],
-        "desc": "The number of spaces to indent by, or the visual size of tabs (used by smart indent)",
+        "desc": "The number of spaces to indent by, or the visual size of tabs (used by smart indent).",
         "apply": function(val) {
-          var intVal = parseInt(val, 10);
-          editor.setOption("indentUnit", intVal);
-          editor.setOption("tabSize", intVal);
+          vseditor.updateOptions({tabSize: val});
+          var selectedScene = cside.getSelectedScene();
+          if (selectedScene)
+            selectedScene.updateTabSize(val);
         }
       }),
       new CSIDESetting({
@@ -2920,8 +2812,7 @@ function IDEViewModel() {
         }],
         "desc": "The size of the font in the editor window",
         "apply": function(val) {
-          $('#editor-wrap').css("font-size", val);
-          editor.refresh();
+          vseditor.updateOptions({fontSize: val});
         }
       }),
       new CSIDESetting({
@@ -2945,8 +2836,7 @@ function IDEViewModel() {
         }],
         "desc": "The font family used in the editor window",
         "apply": function(val) {
-          $('#editor-wrap').css("font-family", val);
-          editor.refresh();
+          vseditor.updateOptions({fontFamily: val});
         }
       }),
       new CSIDESetting({
@@ -2956,23 +2846,35 @@ function IDEViewModel() {
         "type": "dropdown",
         "cat": "editor",
         "options": [
-          { "desc": "Dark", "value": "cs-dark"},
-          { "desc": "Dichromatic", "value": "cs-dichromatic"},
+          /* We need dummy theme values here to prevent things
+             going awry on startup. We then repopulate the list
+             via Monaco's themeService below */
           { "desc": "Light", "value": "cs-light"},
-          { "desc": "Custom", "value": "cs-custom"}
+          { "desc": "Dark", "value": "cs-dark"},
         ],
         "desc": "Sets the colour and style of the editor window and its text",
         "apply": function(val) {
-          //conditional is handled in choicescript.js CodeMirror mode
-          if (!["cs-dark", "cs-light", "cs-dichromatic", "cs-custom"].includes(val)) {
-            val = "cs-light"; // handle any old theme config values
+          var self = this;
+          var BASE_THEMES = ["vs", "vs-dark", "hc-black"];
+          var CS_THEMES = ["cs-light", "cs-dark"];
+          if (vseditor._themeService._knownThemes.size > (self.getOptions().length + BASE_THEMES.length)) {
+            var options = [];
+            vseditor._themeService._knownThemes.forEach(function(theme) {
+              if (BASE_THEMES.indexOf(theme.themeName) < 0) // ignore Monaco's base themes
+                options.push({ desc: CS_THEMES.indexOf(theme.themeName) > -1 ? theme.themeName : theme.themeName + " (custom)", value: theme.themeName });
+            });
+            self.setOptions(options);
+            if (options.some(function(opt) { return opt.value === val; })) {
+              self.apply(val);
+            }
           }
-          if (val == "cs-custom") {
-            var storedCSS = localStorage.getItem("CSIDE_userCSS");
-            document.getElementById("user-theme").innerHTML = storedCSS;
+          if (!self.getOptions().some(function(opt) { return opt.value === val; })) {
+            val = "cs-light"; // handle any old/invalid theme config values
           }
-          editor.setOption("theme", val);
-          $("#code-footer, #cs-console").removeClass().addClass("CodeMirror cm-s-" + val);
+          monaco.editor.setTheme(val);
+          $("#code-footer, #cs-console").removeClass(function(i, className) {
+            return (className.match(/cs-\w+/g) || []).join(' ');
+          }).addClass(val);
         }
       })
     ]),
@@ -3026,46 +2928,9 @@ function IDEViewModel() {
         "name": "Command Help (prompts & links)",
         "value": false,
         "type": "binary",
-        "desc": "Commands in the editor window will link to their appropriate choicescriptdev.wikia page when double-clicked",
+        "desc": "Hovering the cursor over a command in the editor window will display additional information",
         "apply": function(val) {
-          if (val) {
-            $(".CodeMirror").off()
-              .on('mouseover', '.cm-builtin, .cm-keyword', function() {
-                //var text = $(this).html();
-                //var commandName = text.match(/^\*[\w]+/)[0].substring(1, text.length); //regex = no spaces
-                $(this).css("cursor", "pointer");
-                $(this).attr("title", "Double-Click for help with this command");
-                //$(this).attr("title", "Click for help on *" + commandName);
-              })
-              .on('mouseout', '.cm-builtin, .cm-keyword', function() {
-                $(this).css("cursor", "");
-                $(this).removeAttr("title");
-              })
-              .on('dblclick', '.cm-builtin, .cm-keyword', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                var cmdEle = $(this).parent().children(":first-child");
-                var text = cmdEle.text().trim();
-                var commandName = text.match(/^\*[\w_]+/);
-                if (!commandName) {
-                  return;
-                } else {
-                  commandName = commandName[0].substring(1, text.length); //regex = no spaces
-                }
-                //frames[1].csideHelp.breadcrumbs = [{ 'url' : 'home.html', 'title': 'Home' }, { 'url' : $(this).attr('href'), 'title' : commandName }];
-                //frames[1].csideHelp.history = ['home.html', $(this).attr('href')];
-                //frames[1].csideHelp.drawPage('commands/' + commandName + '.html'); //CJW needs to not be a magic number?
-                //__selectTab("help");
-                var url = "http://www.choicescriptdev.wikia.com/" + commandName;
-                if (usingNode) {
-                  gui.Shell.openExternal(url); //Link to wiki command page directly
-                } else {
-                  window.open(url);
-                }
-              });
-          } else {
-            $(".CodeMirror").off();
-          }
+          vseditor.updateOptions({hover: { enabled: val }});
         }
       }),
       new CSIDESetting({
@@ -3283,34 +3148,28 @@ function IDEViewModel() {
     });
   });
 
+  self.getCursorPositionString = function() {
+    return "Ln " + (cursorPos().lineNumber) + ", Col " + cursorPos().column;
+  };
+
   self.scenePanel = function(action) {
-    if ($('#page-content-wrapper').is(':animated') || $('#sidebar').is(':animated')) {
-      return;
-    }
     var sidebarLeft = $('#sidebar').css("left");
     if (parseInt(sidebarLeft.slice(0, sidebarLeft.length - 2)) < 0) {
-      $('#page-content-wrapper').animate({
-        "left": 230
-      }, 300, function() {
-        editor.refresh();
+      $('#page-content-wrapper').css({
+        "left": "230px"
       });
-      $('#sidebar').animate({
-        "left": 0
-      }, 300, function() {
-        editor.refresh();
+      $('#sidebar').css({
+        "left": "0px"
       });
     } else {
-      $('#page-content-wrapper').animate({
-        "left": 0
-      }, 300, function() {
-        editor.refresh();
+      $('#page-content-wrapper').css({
+        "left": "0px"
       });
-      $('#sidebar').animate({
-        "left": -230
-      }, 300, function() {
-        editor.refresh();
+      $('#sidebar').css({
+        "left": "-230px"
       });
     }
+    if (vseditor) vseditor.layout();
   }
 
   var consoleCmdBuf = [];
@@ -3390,7 +3249,7 @@ function IDEViewModel() {
         } else if (!result) {
           result = "false";
         }
-        selectedProject().logToConsole(result, "output"); //←
+        selectedProject().logToConsole(result.toString(), "output"); //←
       }
     } catch (e) {
       //strip error scene & line num - as the information is irrelevant
@@ -3417,29 +3276,23 @@ function IDEViewModel() {
     }
 
     if (action == "close" && isOpen || !action && isOpen) {
-      $('.right-wrap').animate({
+      $('.right-wrap').css({
         right: '-50%'
-      }, 500, function() {
-		editor.refresh();
-	  });
-      $('.left-wrap').animate({
+      });
+      $('.left-wrap').css({
         width: '100%'
-      }, 500, function() {
-        editor.refresh();
       });
       $("#expand-collapse-bar").addClass("collapsed");
+      if (vseditor) vseditor.layout();
     } else if (action == "open" && !isOpen || !action && !isOpen) {
-      $('.left-wrap').animate({
-        width: '50%'
-      }, 500, function() {
-		editor.refresh();
-	  });
-      $('.right-wrap').animate({
+      $('.right-wrap').css({
         right: '0%'
-      }, 500, function() {
-        editor.refresh();
+      });
+      $('.left-wrap').css({
+        width: '50%'
       });
       $("#expand-collapse-bar").removeClass("collapsed");
+      if (vseditor) vseditor.layout();
     } else {
       return isOpen;
     }
@@ -3493,17 +3346,16 @@ function IDEViewModel() {
       }
     }
   }
-    /* 	self.pinScene = function(scene) {
-    		var x = scene.document.linkedDoc();
-    		self.noteEditor.swapDoc(x);
-    		self.noteEditor.refresh();
-    	} */
   self.spellCheck = function(word) {
-    if (editor.options.spellcheck)
-      return typo.check(word) || userDictionary.check(word.toLowerCase()) || word.match(/^\d+$/);
+    if (__getMonacoDiagnosticOptions().spellcheck.enabled)
+      return typo.check(word) || userDictionary.check(word.toLowerCase()) || Boolean(word.match(/^\d+$/));
     return true; //always OK
   }
+
   userDictionary = {
+    "monacoCmds": {
+      //interface for Monaco's CodeAction Commands/Quick Fixes
+    },
     "persistentList": {
       //always ignore these words
     },
@@ -3557,6 +3409,7 @@ function IDEViewModel() {
             userDictionary.persistentListArray.push(i.toLowerCase());
           }
         }
+        userDictionary.sync("persistent");
       } catch (err) {
         if (err) {
           //no userDictionary.json file - write it:
@@ -3571,7 +3424,15 @@ function IDEViewModel() {
         var newDictionary = JSON.stringify(userDictionary.persistentList, null, "\t");
         localStorage.setItem("userDictionary", newDictionary);
       }
-      editor.forceSyntaxRedraw();
+      userDictionary.sync(list);
+    },
+    "sync": function(list) {
+      // propagate to monaco for spelling validation
+      var monacoOptions = __getMonacoDiagnosticOptions();
+      if (!monacoOptions.spellcheck.userDictionary)
+        monacoOptions.spellcheck.userDictionary = Object.create({});
+      monacoOptions.spellcheck.userDictionary[list] = userDictionary[list+"List"];
+      __updateMonacoDiagnosticOptions(monacoOptions);
     },
     "sanitize": function() {
       var arr = Object.keys(userDictionary.persistentList);
@@ -3665,8 +3526,14 @@ function IDEViewModel() {
       });
     }
   }
+  // External dictionary APIs
   self.importDictionary = userDictionary.import;
   self.exportDictionary = userDictionary.export;
+  self.checkUserDictionary = function(word) {
+    if (typeof word !== "string")
+      return false;
+    return userDictionary.check(word);
+  }
   self.clearDictionary = function() {
     bootbox.confirm("Are you sure you wish to remove all words from the user dictionary?", function(result) {
       if (result) {
@@ -3694,7 +3561,119 @@ function IDEViewModel() {
       return userDictionary.persistentListArray().sort();
     return userDictionary.persistentListArray().filter(function(word) { return word.startsWith(query); } ).sort();
   }, this);
-  self.init = function() {
+
+  self.init = function(editor) {
+    vseditor = editor;
+
+    // Hotkeys, etc.
+    registerEditorActions(vseditor);
+
+    if (usingNode) {
+      // Load user-themes for the editor
+      var themeDir = gui.App.dataPath + "/userThemes";
+      var themeData = __loadEditorCustomThemes(themeDir);
+      if (themeData.err && themeData.err.code === "ENOENT") {
+        try {
+          fs.mkdirSync(themeDir);
+          themeData = __loadEditorCustomThemes(themeDir);
+        } catch (err) { // give up
+          notification("Unable to Detect Custom Themes",
+            "CSIDE couldn't find or create a themes folder", {
+            type: "error",
+            layout: "bottomRight"
+          });
+        }
+      }
+      if (!themeData.err && themeData.themes.length > 0) {
+        themeData.themes.filter(function(theme) { return theme.err })
+          .forEach(function(theme) {
+            notification("Failed to Load Custom Theme: " + theme.name, theme.err.message || "", {
+              type: "error",
+              layout: "bottomRight"
+            });
+          });
+      }
+    }
+
+    // Connect spellcheck quick fix commands to the User Dictionary
+    userDictionary.monacoCmds["IGNORE_WORD"] = vseditor.addCommand(0, function(s, word) { userDictionary.add(word, "session"); }, '');
+    userDictionary.monacoCmds["ADD_WORD"] = vseditor.addCommand(0, function(s, word) { userDictionary.add(word, "persistent"); }, '');
+
+    // OVERRIDE INTERNAL MONACO EDITOR SERVICES
+
+    // Links in Monaco use a data-href attribute rather than the href attribute.
+    // This means NWJS's new-win-policy event can't determine the url/target.
+    // Thus we need to patch in an alternative handler here.
+    editor.getContribution('editor.linkDetector').openerService._externalOpener = {
+      openExternal: function(href) {
+        if (usingNode) {
+          gui.Shell.openExternal(href);
+        } else if (matchesScheme(href, Schemas.http) || matchesScheme(href, Schemas.https)) {
+          dom.windowOpenNoOpener(href);
+        } else {
+          window.location.href = href;
+        }
+        return Promise.resolve(true);
+      }
+    }
+
+    // Make sure Monaco will look at more than just the editor's attached model.
+    editor._codeEditorService.findModel = function (editor, resource) {
+      const model = editor.getModel();
+      if (!resource)
+        return model;
+      if (model && model.uri.toString() !== resource.toString()) {
+        var newModel = monaco.editor.getModel(resource.toString());
+        return newModel;
+      }
+      return model;
+    }
+
+    // Teach Monaco how to select new Scenes in CSIDE.
+    editor._codeEditorService.doOpenEditor = function (editor, input) {
+      var model = this.findModel(editor, input.resource);
+      if (!model) {
+        if (input.resource) {
+          var schema = input.resource.scheme;
+          if (schema === network_1.Schemas.http || schema === network_1.Schemas.https) {
+            // This is a fully qualified http or https URL
+            // dom_1.windowOpenNoOpener(input.resource.toString());
+            return editor;
+          }
+        }
+        return null;
+      }
+      if (editor.getModel().uri.toString() !== input.resource.toString()) {
+        model.csideScene.select(function(success) {
+          if (success) {
+            var selection = (input.options ? input.options.selection : null);
+            if (selection) {
+              if (typeof selection.endLineNumber === 'number' && typeof selection.endColumn === 'number') {
+                editor.setSelection(selection);
+                editor.revealRangeInCenter(selection, 1 /* Immediate */);
+              }
+              else {
+                var pos = {
+                  lineNumber: selection.startLineNumber,
+                  column: selection.startColumn
+                };
+                editor.setPosition(pos);
+                editor.revealPositionInCenter(pos, 1 /* Immediate */);
+              }
+            }
+            return editor;
+          } else {
+            return null;
+          }
+        });
+      }
+    }
+
+    vseditor.onDidChangeCursorPosition(function(evt) {
+      // only displays primary selection / cursor
+      selectedChars(vseditor.getModel().getValueInRange(vseditor.getSelection()).length);
+      cursorPos(evt.position);
+    });
     if (!usingNode) {
       user.name = "dropbox-user";
     }
@@ -3727,6 +3706,22 @@ function IDEViewModel() {
         self.tabs.push(__csideTabs[tab]);
       }
     }
+    // Pre-configure the language service:
+    var diagnosticsOptions = __getMonacoDiagnosticOptions();
+    if (true) {
+      var dictPath = "lib/typo/dictionaries";
+      if (platform === "web-dropbox") {
+        var loc = window.location.pathname;
+        dictPath = loc.substring(0, loc.length - "index.html".length) + dictPath;
+      } else {
+        dictPath = "file://" + ((process.cwd() + "/") + dictPath);
+      }
+      diagnosticsOptions.spellcheck.dictionaryPath = dictPath;
+    } else {
+      diagnosticsOptions.spellcheck.dictionaryPath = "https://raw.githubusercontent.com/ChoicescriptIDE/main/latest/source/lib/typo/dictionaries/";
+    }
+    diagnosticsOptions.validate = false;
+    __updateMonacoDiagnosticOptions(diagnosticsOptions);
     var scope = settings.editor();
     for (var i = 0; i < scope.length; i++) {
       var val = typeof config.settings.editor[scope[i].getId()] != 'undefined' ? config.settings.editor[scope[i].getId()] : defaultConfig.settings.editor[scope[i].getId()];
@@ -3822,6 +3817,14 @@ function IDEViewModel() {
     bootbox.alert({message: msg, title: title});
   }
 
+  function __updateMonacoDiagnosticOptions(diagOptions) {
+    monaco.languages.choicescript.setDiagnosticsOptions(diagOptions);
+  }
+
+  function __getMonacoDiagnosticOptions() {
+    return monaco.languages.choicescript.diagnosticsOptions;
+  }
+
   function __createImageScene(project, path) {
 
     var image = new Image();
@@ -3892,6 +3895,93 @@ function IDEViewModel() {
         }
       }
     });
+  }
+
+  function __validateEditorCustomThemes(themeData) {
+    // IStandaloneThemeData:
+    //  base: BuiltinTheme
+    //    ("vs" | "vs-dark" | "hc-black")
+    //  colors: IColors
+    //    [colorId: string]: string,
+    //    e.g.: ["editor.foreground": "#0000FF", ...]
+    //  inherit: boolean
+    //  rules: ITokenThemeRule[]
+    //    token: string
+    //    fontStyle?: string
+    //    background?: string
+    //    foreground?: string
+    //  encodedTokensColors?: string[]
+    var compulsoryAttrs = [
+      { key: "base", isValid:
+        function(val) {
+          return ["vs", "vs-dark", "hc-black"].some(function(theme) { return val === theme  });
+        }
+      },
+      { key: "colors", isValid:
+        function(val) {
+          for (key in val) {
+            if (val.hasOwnProperty(key)) {
+              // TODO: Check colorId is valid
+              if (!val[key].match(/^#[0-9A-Fa-f]{6}$/)) {
+                return false;
+              }
+            }
+          }
+          return true;
+        }
+      },
+      { key: "rules", isValid:
+        function(val) {
+          return Array.isArray(val) && val.every(function(entry) {
+            // TODO: Confirm token names are valid? Properties look difficult.
+            return true;
+          });
+        }
+      },
+      { key: "inherit", isValid:
+        function(val) {
+          return typeof val === "boolean";
+        }
+      },
+    ];
+    for (var i = 0; i < compulsoryAttrs.length; i++) {
+      var attr = compulsoryAttrs[i].key;
+      var val = themeData[attr];
+      if (typeof val === "undefined" || val === null)
+        return new Error("Incomplete editor theme is missing an attribute: " + attr);
+      else if (!compulsoryAttrs[i].isValid(val))
+        return new Error("Invalid editor theme: " + attr + " is invalid");
+    }
+    return null;
+  }
+
+  // Returns: { err: err || null, themes: [ { name: string, err: err || null } ]};
+  function __loadEditorCustomThemes(themeDir) {
+    var result = { err: null, themes: [] };
+    try {
+      var themes = fs.readdirSync(themeDir).filter(function(file) {
+        return getFileExtension(file) === ".json";
+      });
+      themes.forEach(function(theme) {
+        var themePath = themeDir + "/" + theme;
+        var themeName = getFileName(themePath);
+        var theme = { name: themeName, err: null };
+        try {
+          var themeData = JSON.parse(fs.readFileSync(themePath).toString());
+          var valErr = __validateEditorCustomThemes(themeData);
+          if (!valErr)
+            monaco.editor.defineTheme(themeName, themeData);
+          else
+            theme.err = valErr;
+        } catch(err) {
+          theme.err = err;
+        }
+        result.themes.push(theme);
+      });
+    } catch(err) {
+      result.err = err;
+    }
+    return result;
   }
 
   /* blank is an optional boolean, default is false: creates with startup & choicescript_stats */
@@ -4062,34 +4152,36 @@ function IDEViewModel() {
       height: 600
     }, callback);
   }
-  function __openScene(sceneDataOrPath, callback) {
-    if (typeof sceneDataOrPath === "string") {
-      var newScene = new CSIDEScene({
-        "path": sceneDataOrPath,
-        "source": platform
-      });
+  function __openScene(scenePath, callback) {
+    if (typeof scenePath !== "string") {
+      throw new Error("Error: Bad scenePath - expect a string.");
     }
-    /*else if (typeof path === "object" && typeof sceneOrPath.path === "string") {
-        var newScene = new CSIDEScene(sceneDataOrPath);
-    }*/
-    else {
-      throw new Error("Error: Bad sceneData or scenePath - cannot be resolved into scene.");
-      return;
-    }
-    var sceneProjectPath = getProjectPath(newScene.getPath());
+
+    scenePath = __normalizePath(scenePath);
+
+    var sceneProjectPath = getProjectPath(scenePath);
     var sceneProject = projectIsOpen(sceneProjectPath);
+    var scene;
+
     if (!sceneProject) {
       sceneProject = new CSIDEProject({
         "path": sceneProjectPath,
         "source": platform
       });
       __addProject(sceneProject);
-    } else {
-      if (sceneAlreadyOpen(newScene.getName(), sceneProject)) {
-        newScene.select();
-        return; //should we callback?
+    }
+    else {
+      scene = sceneAlreadyOpen(getFileName(scenePath), sceneProject);
+      if (scene) {
+        if (callback) callback(scene);
+        return;
       }
     }
+
+    var newScene = new CSIDEScene({
+      "path": scenePath,
+      "source": platform
+    });
     sceneProject.addScene(newScene);
     newScene.load(callback);
   }
@@ -4132,6 +4224,7 @@ function IDEViewModel() {
   }
 
   function sceneAlreadyOpen(sceneName, project) {
+    sceneName = sceneName.toLowerCase();
     var scenes = project.getScenes();
     for (var i = 0; i < scenes.length; i++) {
       if (scenes[i].getName() === sceneName) {
@@ -4173,6 +4266,25 @@ function IDEViewModel() {
     str = str.trim() //cull preceding and trailing whitespace
     str = str.replace(/\s{2,}/g, " "); //remove repetitive whitespace
     return str;
+  }
+
+  function __updateEditorDecorations(scene, additional) {
+    var issues = scene.getIssues();
+    additional = additional || [];
+    scene.decorations = vseditor.deltaDecorations(scene.decorations,
+      issues.filter(function(issue) { return typeof issue.getLineNum() === "number" })
+        .map(function(issue) {
+          var col = meditor.getModel().getLineFirstNonWhitespaceColumn(issue.getLineNum());
+          return {
+            range: new monaco.Range(issue.getLineNum(),col,issue.getLineNum(),col),
+            options: {
+              isWholeLine: true,
+              className: 'line-delete',
+              stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges
+            }
+          }
+        }).concat(additional)
+    );
   }
 
   function __wordCount(string, exclCommandLines) {
@@ -4259,32 +4371,24 @@ function IDEViewModel() {
   }
 
   function __closeProject(project, ask) {
-    if (!project.isDirty()) {
+    function __commitCloseProject() {
       if (project === selectedProject()) {
         if (selectedProject() == activeProject()) {
           activeProject(null);
         }
         selectedScene("");
-        editor.setValue("");
         __getTab("game").href("");
       }
+      project.dispose();
       projects.remove(project);
       __updatePersistenceList();
+    }
+    if (!project.isDirty()) {
+      __commitCloseProject();
     } else {
       bootbox.confirm("This project has unsaved scenes, are you sure you wish to close it?", function(result) {
         if (result) {
-          if (project === selectedProject()) {
-            if (selectedProject() == activeProject()) {
-              activeProject(null);
-            }
-            selectedScene("");
-            editor.setValue("");
-            __getTab("game").href("");
-          }
-          projects.remove(project);
-          __updatePersistenceList();
-        } else {
-          return;
+          __commitCloseProject();
         }
       });
     }
@@ -4310,11 +4414,11 @@ function IDEViewModel() {
     }
   }
 
-  function __normalizeSceneIndentation(scene, indentUnit) {
+  function __normalizeSceneIndentation(scene, useSpaces) {
     var tabSize = settings.asObject("editor")["tabsize"];
-    indentUnit = indentUnit || settings.asObject("editor")["tabtype"];
+    useSpaces = useSpaces || settings.asObject("editor")["tabtype"];
     var lines = scene.getText().split("\n");
-    if (indentUnit == "spaces") {
+    if (useSpaces) {
       for (var i = 0; i < lines.length; i++) {
         var oldIndent = lines[i].match(/^\t+/);
         if (oldIndent) {
@@ -4324,7 +4428,7 @@ function IDEViewModel() {
           lines[i] = lines[i].replace(/^\t+/, newIndent);
         }
       }
-    } else if (indentUnit == "tabs") {
+    } else {
       for (var i = 0; i < lines.length; i++) {
         var oldIndent = lines[i].match(/^\s+/);
         if (oldIndent) {
@@ -4334,8 +4438,6 @@ function IDEViewModel() {
           lines[i] = lines[i].replace(/^\s+/, newIndent);
         }
       }
-    } else {
-      throw new Error("Scene Normalization: Bad indent unit: " + indentUnit);
     }
     scene.setText(lines.join("\n"));
   }
@@ -4683,8 +4785,6 @@ function IDEViewModel() {
     arg.cancelDrop - this defaults to false and can be set to true to indicate that the drop should be cancelled.
   */
   function dragSceneEvent(arg, event, ui) {
-    console.log(arg, arg.item, arg.targetParent, arg.targetParent(), event, ui, ui.target);
-    console.log();
     if (arg.sourceParent == arg.targetParent)
       return;
 
@@ -5222,101 +5322,15 @@ function IDEViewModel() {
   }
 
   //ACCESSOR METHODS
-
+  var menu = ko.observable();
   function CSIDE_ContextMenu() {
     var self = this;
     self.isReady = function() {
       return true;
     }
-    var menu = ko.observable();
     self.getContextMenu = ko.computed(function() {
       return menu();
     }, this);
-    $(function() {
-      if (usingNode) {
-        function Menu(cutLabel, copyLabel, pasteLabel) {
-          var gui = require('nw.gui'),
-            menu = new nw.Menu(),
-            cut = new nw.MenuItem({
-              label: cutLabel || "Cut",
-              click: function() {
-                document.execCommand("cut");
-              }
-            }),
-            copy = new nw.MenuItem({
-              label: copyLabel || "Copy",
-              click: function() {
-                document.execCommand("copy");
-              }
-            }),
-            paste = new nw.MenuItem({
-              label: pasteLabel || "Paste",
-              click: function() {
-                document.execCommand("paste");
-              }
-            }),
-            indent = new nw.MenuItem({
-              label: pasteLabel || "Indent",
-              click: function() {
-                editor.execCommand("indentMore");
-              }
-            }),
-            dedent = new nw.MenuItem({
-              label: pasteLabel || "Dedent",
-              click: function() {
-                editor.execCommand("indentLess");
-              }
-            }),
-            select = new nw.MenuItem({
-              label: "Select all",
-              click: function() {
-                editor.execCommand("selectAll");
-              }
-            }),
-            comment = new nw.MenuItem({
-              label: "Toggle block comment",
-              click: function() {
-                insertTextTags("*comment ", "", true);
-              }
-            }),
-            dblLinebreak = new nw.MenuItem({
-              label: "Insert double line break",
-              click: function() {
-                var cur = editor.getCursor();
-                if (cur) {
-                  var line = editor.getLine(cur.line), whitespace;
-                  if (line && (whitespace = line.match(/^\s+/))) {
-                    editor.replaceSelection("\n" + whitespace + "*line_break\n" + whitespace + "*line_break\n" + whitespace, "end");
-                  }
-                  else {
-                    editor.replaceSelection("\n*line_break\n*line_break\n", "end");
-                  }
-                }
-                editor.focus();
-              }
-            });
-
-          menu.append(cut);
-          menu.append(copy);
-          menu.append(paste);
-          menu.append(indent);
-          menu.append(dedent);
-          menu.append(select);
-          menu.append(dblLinebreak);
-          menu.append(comment);
-
-          return menu;
-        }
-        $(".CodeMirror-scroll").on("contextmenu", function(e) {
-          e.preventDefault();
-        }); //prevent default context menu
-        $("body").on("contextmenu", ".CodeMirror-code", function(e) {
-          var menu = new Menu( /* pass cut, copy, paste labels if you need i18n*/ );
-          e.preventDefault();
-          menu.popup(e.originalEvent.x, e.originalEvent.y);
-        });
-      }
-    });
     //project & scene context menus
     $(function() {
       $('#sidebar').contextmenu({
@@ -5351,67 +5365,6 @@ function IDEViewModel() {
           return true;
         }
       });
-      $('.CodeMirror-code').contextmenu({
-        target: '#context-menu',
-        scopes: '.cm-spell-error',
-        before: function(e, element) {
-          if (typo.working) return;
-          typo.working = true;
-          var menuElement = this.getMenu()[0];
-          menu(new contextMenu(null, ko.observableArray([new menuOption("Working...", function() {})]))); //blank is better than an old context menu
-          var pos = editor.coordsChar({
-            "left": e.originalEvent.x,
-            "top": e.originalEvent.y
-          });
-          editor.setCursor(pos); //manually position the cursor as the context menu prevents default
-          //var tok = editor.getTokenAt(pos);
-          var wordCoords = editor.findWordAt(pos);
-          editor.setSelection(wordCoords.anchor, wordCoords.head);
-          var word = element.text();
-          /*if (word != editor.getRange(wordCoords.anchor, wordCoords.head)) {
-						return false; //word clicked and word found do not match, abort.
-					}*/
-          var menuOptions = ko.observableArray([]);
-
-          function replaceText(text, undo) {
-            editor.replaceSelection(text); //, wordCoords.anchor, wordCoords.head);
-            if (undo) {
-              editor.getDoc().undo();
-            }
-            editor.focus();
-          }
-          typo.suggest(word, 5, function(suggestions) {
-            if (suggestions.length < 1) {
-              menuOptions.push(new menuOption("No suggestions for " + word, function(menu) {}));
-            }
-            for (var i = 0; i < suggestions.length; i++) {
-              (function(i) {
-                var thisSuggestion = suggestions[i];
-                menuOptions.push(new menuOption(thisSuggestion, function(menu) {
-                  replaceText(thisSuggestion, false);
-                  editor.focus();
-                }));
-              })(i);
-            }
-            //defaults
-            menuOptions.push(new menuOption("Ignore '" + word + "' this session", function() {
-              userDictionary.add(word, "session");
-              editor.focus();
-            }));
-            menuOptions.push(new menuOption("Add '" + word + "' to user dictionary", function() {
-              userDictionary.add(word, "persistent");
-              editor.focus();
-            }));
-            typo.working = false;
-            menu(new contextMenu(null, menuOptions));
-            //Horrible DOM hack to force menu to show upwards
-            var offsetBottom = window.innerHeight - menuElement.offsetTop;
-            if (offsetBottom < (25 * menuOptions().length))
-              menuElement.style.top = (menuElement.style.top.slice(0, menuElement.style.top.length - 2) - (18 * menuOptions().length)) + "px";
-          });
-          return true;
-        }
-      });
     });
   }
 
@@ -5422,5 +5375,28 @@ function IDEViewModel() {
 
 window.cside = new IDEViewModel();
 ko.applyBindings(cside, $('.main-wrap')[0]);
-cside.init();
+amdRequire(['vs/editor/editor.main'], function() {
+  window.monaco = monaco;
+  window.meditor = monaco.editor.create(document.getElementById("editor-wrap"), {
+    theme: 'cs-light',
+    value: "",
+    language: 'choicescript',
+    autoIndent: true,
+    formatOnType: true,
+    dragAndDrop: false,
+    renderLineHighlight: "all",
+    minimap: {enabled:false},
+    wordWrap: 'bounded',
+    //wordWrapColumn: 60,
+    wrappingIndent: "same",
+    roundedSelection: true,
+    folding: true,
+    automaticLayout: true,
+    detectIndentation: false,
+    lightbulb: { enabled: true },
+    glyphMargin: true,
+    model: null
+  });
+  cside.init(meditor);
+});
 //label finding regex: cside.projects()[0].scenes()[0].document.getValue().match(/\^*label.+$/gm,"");
