@@ -353,7 +353,12 @@
           }
         };
       })(window);
-  </script>
+	</script>
+	<script>
+			// Monaco uses a custom amd loader that over-rides node's require.
+			// Keep a reference to node's require so we can restore it after executing the amd loader file.
+			var nodeRequire = require;
+	</script>
 	<script type="text/javascript" src="js/all.min.js"></script>
 	<script type="text/javascript">
 		if (usingNode) {
