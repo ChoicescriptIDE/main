@@ -27,7 +27,8 @@
     "mousetrap": "^1.6.0",
     "noty": "^3.2.0-beta",
     "trash": "^2.0.0",
-    "username": "^1.0.1"
+    "username": "^1.0.1",
+    "write-file-atomic": "^2.3.0"
   },
   "window": {
     "show": true,
