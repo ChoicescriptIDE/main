@@ -155,6 +155,17 @@ function IDEViewModel() {
     self.nameInvalid = ko.computed(function() {
       return invalidName();
     }, this);
+    self.getSearchResults = ko.computed(function() {
+      return ko.utils.arrayMap(scenes(), function(scene) {
+        return scene.getSearchResults();
+      }).filter(function(sceneResults) { return sceneResults.getResults().length > 0; });
+    }, this);
+    self.replaceAllScenesSearchResults = function() {
+      var _scenes = scenes();
+      for (var s = 0; s < _scenes.length; s++) {
+        _scenes[s].replaceAllSearchResults();
+      }
+    }
     self.isDirty = ko.computed(function() {
       for (var i = 0; i < scenes().length; i++) {
         if (scenes()[i].isDirty()) {
@@ -273,6 +284,60 @@ function IDEViewModel() {
       },
       owner: this
     });
+    self.searchByEnterKey = function(data, event, domObj) {
+      if (event.type == "keyup" && SEARCH.CONF.searchOnType())
+        return self.search("", "", SEARCH.MODES.SEARCH) || true; // allow the char input to take place
+      else if (event.type != "keydown")
+        return true;
+      if (event.keyCode == 13) {
+        if (!event.ctrlKey) {
+          return self.search("", "", SEARCH.MODES.SEARCH) && false; // don't allow the Enter press to affect the textarea
+        } else { // match monaco's in-model search linebreak behaviour (ctrl+enter)
+          event.target.value += "\n";
+          event.target.scrollTop = event.target.scrollHeight;
+        }
+      }
+      return true;
+    }
+    self.search = function(searchStr, replaceStr, newSearchMode) {
+      var curSearchMode = (typeof newSearchMode === "number") ? newSearchMode : searchMode();
+      if (typeof searchStr != "string" || searchStr === "")
+        searchStr = document.getElementById("searchBox").value;
+      if (curSearchMode === SEARCH.MODES.REPLACE) {
+        replaceStr = replaceStr || document.getElementById("replaceBox").value;
+        bootbox.confirm(self.getSearchResultDesc() + "<br>Replace them with '" + replaceStr + "'?",
+          function(result) {
+            if (result) {
+              scenes().forEach(function(scene) { scene.search(searchStr, replaceStr, false /* forceExpand */, curSearchMode); });
+            }
+          }
+        );
+      }
+      else {
+        scenes().forEach(function(scene) {
+          /* Once a Scene's results tab has been manually expanded it is likely that the user wishes to continue to see those results, so we'd rather
+             not have them re-collapse on every re-search. However, there's the issue of performance (and screen estate) when multiple scene's with large
+             result sets are left open.
+             So, what we do here is make the collapse/expand state for each scene remain honoured *up until* it returns 0 results,
+             implying that it is no longer relevant.
+             This essentially adds a natural 'reset' that makes sure scenes are re-collapsed scenes over time, rather than expecting the user to close them,
+             whilst still allowing for a user to view result changes in their scenes of interest.
+          */
+          var forceExpand = scene.getSearchResults() && (scene.getSearchResults().keepOpen() && scene.getSearchResults().getLength() > 0);
+          scene.search(searchStr, replaceStr, forceExpand, curSearchMode);
+        });
+      }
+      return false; // prevent form submission
+    }
+    self.getSearchResultCount = function() {
+      var count = 0;
+      for (var i = 0; i < self.getSearchResults().length; i++)
+        count += self.getSearchResults()[i].getLength();
+      return count;
+    }
+    self.getSearchResultDesc = function() {
+      return ("Found " + self.getSearchResultCount() + " results in " + self.getSearchResults().length + " scene(s).");
+    }
     self.rename = function(data, event) {
       if (readOnly()) return;
       if (event.type == "keyup" && (event.keyCode != 13 && event.keyCode != 27)) {
@@ -475,6 +540,84 @@ function IDEViewModel() {
     }
   };
 
+  function CSIDESearchResults(data) {
+    var self = this;
+    var searchTerm = data.searchTerm || "";
+    var searchResults = ko.observableArray(data.results || []).extend({ rateLimit: 500 });
+    var keepOpen = data.keepOpen || false; // TODO
+    var expanded = ko.observable(data.expanded || false)
+      .extend({callFunc: { func: function(expand) {
+        // Create search result descriptions as they become visible.
+        if (expand)
+          self.createResultDescriptions();
+        }}
+      });
+    var versionId = data.versionId || null; // state of editor when search initiated
+    var scene = data.scene || null;
+
+    self.getResults = ko.computed(function() {
+      return searchResults();
+    }, this);
+    self.isExpanded = ko.computed(function() {
+      return expanded();
+    }, this);
+    self.getLength = function () {
+      return searchResults().length;
+    }
+    self.getLengthString = function() {
+      var len = self.getLength();
+      return len >= 999 ? "999+" : len.toString();
+    }
+    self.getScene = function() {
+      return scene;
+    }
+    self.getVersionId = function() {
+      return versionId;
+    }
+    self.getSearchTerm = function() {
+      return searchTerm;
+    }
+    self.keepOpen = function() {
+      return keepOpen;
+    }
+    self.expand = function(expand, stayOpen) {
+      if (typeof expand === "boolean") {
+        expanded(expand);
+      }
+      else {
+        expanded(!expanded());
+      }
+      keepOpen = expanded() ? (stayOpen || false) : false;
+    }
+    /* Determines before/after line text for the search result to provide context. */
+    self.createResultDescriptions = function() {
+      var SEARCH_MAX_LINE_LEN = 30;
+      var descriptiveResults = searchResults(); // matches.match.matches
+      for (var i = 0, result = descriptiveResults[i]; i < descriptiveResults.length; result = descriptiveResults[++i]) {
+        // preceding match
+        result.preText = result.range.startColumn > 0 ?
+          scene.getLineContent(result.range.startLineNumber).slice(0, result.range.startColumn-1) : "";
+          if (result.preText.length > SEARCH_MAX_LINE_LEN)
+            result.preText = "…" + result.preText.slice(result.range.startColumn-(SEARCH_MAX_LINE_LEN+1),result.range.startColumn-1);
+        // post match
+        var endLineLen = scene.getLineLength(result.range.endLineNumber);
+        result.postText = result.range.endColumn < endLineLen ?
+          scene.getLineContent(result.range.endLineNumber).slice(result.range.endColumn-1, endLineLen) : "";
+        if (result.postText.length > SEARCH_MAX_LINE_LEN)
+          result.postText = result.postText.slice(0,SEARCH_MAX_LINE_LEN) + "…";
+        // replace text
+        result.replaceText = document.getElementById("replaceBox").value || "";
+        if (SEARCH.CONF.useRegex())
+          result.replaceText = monaco.cside.parseReplaceString(result.replaceText).buildReplaceString(descriptiveResults[i].matches, SEARCH.CONF.preserveCase());
+      }
+      searchResults(descriptiveResults);
+    }
+    // Only (re-)create result descriptions if they're visible.
+    if (scene && expanded) {
+      self.createResultDescriptions();
+    }
+  }
+
   function CSIDEScene(sceneData) {
     var self = this;
     //INSTANCE VARIABLES
@@ -512,6 +655,9 @@ function IDEViewModel() {
     var saving = ko.observable(false);
     var inErrState = ko.observable(false);
     var errStateMsg = ko.observable("");
+    var searchVersionId = null;
+    var searchResults = ko.observable(new CSIDESearchResults({results: []}))
+      .extend({ rateLimit: { rateLimit: 1000, method: "notifyWhenChangesStop" }});
 
     // create initial model
     var edModel = monaco.editor.createModel(sceneData.contents || "", "choicescript", monaco.Uri.file(path()));
@@ -602,6 +748,16 @@ function IDEViewModel() {
     self.getContents = function() {
       return edModel.getValue();
     }
+    self.getLineContent = function(range) {
+      // {} => endColumn, endLineNumber, startColumn, startLineNumber
+      return edModel.getLineContent(range);
+    }
+    self.getLineLength = function(lineNum) {
+      return edModel.getLineLength(lineNum);
+    }
+    self.getSearchResults = ko.computed(function() {
+      return searchResults();
+    }, this);
     self.getErrStateMsg = ko.computed(function() {
       return errStateMsg() + ' - click here to close';
     }, this);
@@ -759,8 +915,70 @@ function IDEViewModel() {
       }
       colouring(!colouring());
     }
+    self.showSearchResult = function(index, data) {
+      if (searchVersionId != edModel.getAlternativeVersionId()) {
+        notification("Stale Search Results", "This scene has been modified since the last search was performed. Please search again.", {type: 'error'});
+        return;
+      }
+      self.focusLine(data, true);
+      vseditor.setSelection(data.range);
+    }
+    self.replaceSearchResult = function(index, data, event) {
+      if (event) event.stopPropagation();
+      if (searchVersionId != edModel.getAlternativeVersionId()) {
+        notification("Stale Search Results", "This scene has been modified since the last search was performed. Please search again.", {type: 'error'});
+        return;
+      }
+      self.focusLine(data, true);
+      vseditor.setSelection(data.range);
+      var oldText = data.matches[0];
+      var newText = document.getElementById("replaceBox").value || "";
+      if (SEARCH.CONF.useRegex())
+        newText = monaco.cside.parseReplaceString(newText).buildReplaceString(data.matches, SEARCH.CONF.preserveCase());
+      var oldRange = new monaco.Range(data.range.startLineNumber, data.range.startColumn, data.range.endLineNumber, data.range.endColumn);
+      var newRange = oldRange;
+      var newSelections = edModel.pushEditOperations([new monaco.Selection(oldRange.startLineNumber, oldRange.startColumn, oldRange.endLineNumber, oldRange.endColumn)], [{text: newText, range: oldRange}], function() {
+        // Calculate new cursor position(s)
+        if (monaco.Range.spansMultipleLines(data.range)) {
+          // TODO handle tricky multi-line change range calculations
+          return [data.range.collapseToStart()]; // BROKEN?
+        }
+        // column only differences
+        var columnDiff = -1*(oldText.length - newText.length);
+        if (columnDiff != 0)
+          newRange = oldRange.setEndPosition(oldRange.endLineNumber, oldRange.endColumn + columnDiff);
+        return [new monaco.Selection(oldRange.startLineNumber, oldRange.startColumn, newRange.endLineNumber, newRange.endColumn)];
+      });
+      edModel.pushStackElement();
+      if (self.isSelected())
+        vseditor.setSelections(newSelections);
+      self.search(oldText, newText, true, SEARCH.MODES.SEARCH);
+    }
+    self.replaceAllSearchResults = function(uiConfirmation) {
+      var searchStr = document.getElementById("searchBox").value;
+      var replaceStr = replaceStr || document.getElementById("replaceBox").value;
+      if (uiConfirmation)
+        bootbox.confirm("Replace all matches in this scene?",
+          function(result) {
+            if (result) {
+              self.search(searchStr, replaceStr, false /* forceExpand */, SEARCH.MODES.REPLACE);
+            }
+          }
+        );
+      else
+        self.search(searchStr, replaceStr, false /* forceExpand */, SEARCH.MODES.REPLACE);
+      //edModel.pushStackElement(); // Undo stack breakpoint.
+    }
     self.focusLine = function(lineNum, noArrow) {
-      lineNum += 1;
+      if (typeof lineNum !== "number") {
+        if (lineNum.range && typeof lineNum.range.startLineNumber === "number")
+          lineNum = lineNum.range.startLineNumber;
+        else
+          return;
+      } else {
+        lineNum += 1;
+      }
+
       self.select(function(selected) {
         if (!selected) return;
         if (!noArrow) {
@@ -953,6 +1171,33 @@ function IDEViewModel() {
       vseditor.focus();
       callback(true);
     }
+    self.search = function(searchStr, replaceStr, forceExpand, newSearchMode) {
+      if (locked())
+        return null;
+      locked(true);
+      newSearchMode = (typeof newSearchMode === "number") ? newSearchMode : searchMode();
+      var replacePattern = monaco.cside.parseReplaceString(replaceStr);
+      var matches = edModel.findMatches(searchStr, false, SEARCH.CONF.useRegex(), SEARCH.CONF.preserveCase(), getWordSeperationValue(), true);
+      // calculate the replace value for display, even if we're just searching:
+      matches = matches.map(function(match) {
+        // Add the .text attribute to convert it to a valid IIdentifiedSingleEditOperation for use in pushEditOperations below
+        match.text = SEARCH.CONF.useRegex() ? replacePattern.buildReplaceString(match.matches, SEARCH.CONF.preserveCase()) : replaceStr;
+        return match;
+      });
+      if (newSearchMode === SEARCH.MODES.REPLACE) {
+        var newSelections = edModel.pushEditOperations([new monaco.Selection(matches[0].range.startLineNumber, matches[0].range.startColumn, matches[0].range.endLineNumber, matches[0].range.endColumn)], matches, function() {
+            return [new monaco.Selection(1,1,1,1)];
+        });
+      }
+      if (newSearchMode === SEARCH.MODES.REPLACE) // re-run initial search after a replace (to keep displayed results valid)
+        matches = edModel.findMatches(searchStr, false, SEARCH.CONF.useRegex(), SEARCH.CONF.preserveCase(), getWordSeperationValue(), true);
+      locked(false);
+      searchVersionId = edModel.getAlternativeVersionId();
+      // Continue to signal expansion of any result updates, unless the expansion is due to the collpaseThreshold (rather than user request).
+      var expandSceneResults = forceExpand || (matches.length < SEARCH.CONF.collapseThreshold());
+      searchResults(new CSIDESearchResults({ searchTerm: searchStr, scene: self, versionId: searchVersionId, results: matches, expanded: expandSceneResults, keepOpen: forceExpand }));
+      return searchResults();
+    }
     self.close = function() {
       self.getProject().closeScene(self);
     }
@@ -1061,6 +1306,8 @@ function IDEViewModel() {
     function updateOnModelEdit() {
       if (!saving())
         lastVersionId !== edModel.getAlternativeVersionId() ? dirty(true) : dirty(false);
+      if (searchResults().getSearchTerm() != "")
+        searchResults().getVersionId !== edModel.getAlternativeVersionId() ? self.search(searchResults().getSearchTerm(), null /* replaceStr */, searchResults() && searchResults().isExpanded() /* forceExpand */, SEARCH.MODES.SEARCH) : null;
       charCount(edModel.getValueLength());
       if (wordCountOn() > 0)
         wordCount(__wordCount(edModel.getValue(), (wordCountOn() > 1)));
@@ -1430,6 +1677,60 @@ function IDEViewModel() {
   var selectedProject = ko.computed(function() {
     return selectedScene() ? selectedScene().getProject() : null;
   });
+  var SEARCH = {
+    MODES: { SEARCH: 0, REPLACE: 1 },
+    CONF: {
+      wordSeperators: "`~!@#$%^&*()-=+[{]}\|;:'\",.<>/?",
+      // The number of results that triggers an automatic UI collapse
+      collapseThreshold: ko.observable(6),
+      // Controls whether the find box expects regexes and the replace box replace patterns
+      useRegex: ko.observable(false).extend({ callFunc: { func: function() { selectedProject().search("", "", SEARCH.MODES.SEARCH); }}}),
+      preserveCase: ko.observable(true).extend({ callFunc: { func: function() { selectedProject().search("", "", SEARCH.MODES.SEARCH); }}}),
+      matchWholeWord: ko.observable(false).extend({ callFunc: { func: function() { selectedProject().search("", "", SEARCH.MODES.SEARCH); }}}),
+      searchOnType: ko.observable(true)
+    }
+  }
+  self.SEARCH_MODES = SEARCH.MODES;
+  function getWordSeperationValue() {
+    if (SEARCH.CONF.matchWholeWord())
+      return SEARCH.CONF.wordSeperators;
+    return null;
+  }
+  var searchMode = ko.observable(SEARCH.MODES.SEARCH);
+  searchMode.extend({ callFunc:
+    {
+      func: function(newVal) {
+        setTimeout(function() { document.getElementById((newVal == SEARCH.MODES.REPLACE) ? "replaceBox" : "searchBox").focus(); }, 200);
+        selectedProject().search("", "", SEARCH.MODES.SEARCH);
+      }
+    }
+  });
+  self.toggleSearchMode = function(newSearchMode) {
+    if (typeof newSearchMode === "number") {
+      searchMode(newSearchMode);
+    } else {
+      switch(searchMode()) {
+        case SEARCH.MODES.REPLACE:
+          newSearchMode = SEARCH.MODES.SEARCH;
+          break;
+        case SEARCH.MODES.SEARCH:
+          newSearchMode = SEARCH.MODES.REPLACE;
+          break;
+        default:
+          throw new Error("Unrecognized search mode: " + searchMode() + ". Please report this.");
+      }
+      searchMode(newSearchMode);
+    }
+  }
+  self.inReplaceMode = function() {
+    return searchMode() === SEARCH.MODES.REPLACE;
+  };
+  self.searchToggles = ko.observableArray([
+    { title: "Match Whole Word", cssClass: 'codicon-whole-word', value: SEARCH.CONF.matchWholeWord },
+    { title: "Use Regular Expression", cssClass: 'codicon-regex', value: SEARCH.CONF.useRegex },
+    { title: "Match Case", cssClass: 'codicon-case-sensitive', value: SEARCH.CONF.preserveCase },
+    { title: "Search on Type", cssClass: 'codicon-record-keys', value: SEARCH.CONF.searchOnType }
+  ]);
   self.getSelectedProject = ko.computed(function() {
     return selectedProject();
   }, this);
@@ -1579,6 +1880,7 @@ function IDEViewModel() {
       "game",
       "issues",
       "settings",
+      "search",
       "help",
       "dictionary"
     ]
@@ -2065,6 +2367,40 @@ function IDEViewModel() {
   function registerEditorActions(editor) {
 
     editor.addAction({
+      id: 'replace-project-scenes',
+      label: 'Replace in Project Scenes',
+      keybindings: [
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_R,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
+        if (!cside.getSelectedProject())
+          return;
+        cside.toggleSearchMode(SEARCH.MODES.REPLACE);
+        __selectTab("search");
+        document.getElementById("replaceBox").focus();
+      }
+    });
+
+    editor.addAction({
+      id: 'search-project-scenes',
+      label: 'Search Project Scenes',
+      keybindings: [
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_F,
+      ],
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
+        if (!cside.getSelectedProject())
+          return;
+        cside.toggleSearchMode(SEARCH.MODES.SEARCH);
+        __selectTab("search");
+        document.getElementById("searchBox").focus();
+      }
+    });
+
+    editor.addAction({
       id: 'save-selected-scene',
       label: 'Save Selected Scene',
       keybindings: [
@@ -2458,6 +2794,18 @@ function IDEViewModel() {
       "content": "",
       "visible": ko.observable(true),
       "getHeaderTitle": "Help & Information"
+    },
+    "search": {
+      "id": "search",
+      "title": "Search and Replace",
+      "showTitle": true,
+      "iconClass": "fa fa-search",
+      "href": "",
+      "content": "",
+      "visible": ko.observable(true),
+      "getHeaderTitle": ko.computed(function() {
+        return (selectedProject() ?  ((self.inReplaceMode()) ? "Replace" : "Search") + " in " + selectedProject().getName() : "Select a Project");
+      }, this)
     },
     "dictionary": {
       "id": "dictionary",
@@ -3597,6 +3945,16 @@ function IDEViewModel() {
 
   self.init = function(editor) {
     vseditor = editor;
+
+    monaco.cside = {};
+
+    // Patch in replace pattern support for find/replace with regexes
+    amdRequire(['vs/editor/contrib/find/replacePattern'], function(replacePattern) {
+      monaco.cside.parseReplaceString = replacePattern.parseReplaceString;
+      monaco.cside.getReplaceString = function(replaceStr, matches, preserveCase) {
+        return replacePattern.parseReplaceString(replaceStr).buildReplaceString(matches, preserveCase);
+      }
+    });
 
     // Hotkeys, etc.
     registerEditorActions(vseditor);

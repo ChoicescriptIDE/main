@@ -271,6 +271,44 @@
                                         </li>
                                     </ul>
                                     <!-- /ko -->
+                                    <!-- ko if: id == 'search' && $root.getSelectedProject -->
+                                    <div id="search-controls-wrap" role="search">
+                                        <div id="search-controls" data-bind="foreach: $root.searchToggles">
+                                            <div data-bind="style: { backgroundColor: value() ?  $root.getUIColour() : 'transparent' }, attr: { title: title, 'aria-label': title, 'aria-checked': value, class: 'monaco-custom-checkbox codicon ' + cssClass }, css: value() ? 'checked' : 'unchecked', click: value.bind($data, !value())" aria-disabled="false" role="checkbox" tabindex="0"></div>
+                                        </div>
+                                        <form data-bind="submit: $root.getSelectedProject().search" autocomplete="off">
+                                            <button type="button" id="search-mode-btn" data-bind="style: { height: $root.inReplaceMode() ? '75px' : '32px' }, click: $root.toggleSearchMode, css: $root.inReplaceMode() ? 'fa fa-angle-down' : 'fa fa-angle-right'"></button>
+                                            <textarea id="searchBox" spellcheck="false" type="text" placeholder="Search" data-bind="event: { keydown: $root.getSelectedProject().searchByEnterKey, keyup: $root.getSelectedProject().searchByEnterKey }"></textarea>
+                                            <textarea id="replaceBox" spellcheck="false" type="text" placeholder="Replace" data-bind="visible: $root.inReplaceMode(), event: { keydown: $root.getSelectedProject().searchByEnterKey, keyup: $root.getSelectedProject().searchByEnterKey }"></textarea>
+                                            <button class="btn btn-default" id="search-btn" data-bind="text: $root.inReplaceMode() ? 'Replace' : 'Search'"></button>
+                                        </form>
+                                        <p data-bind="text: $root.getSelectedProject().getSearchResultDesc()" style="margin-bottom: 0;"></p>
+                                    </div>
+                                    <ul id="search-result-scenelist" data-bind="foreach: $root.getSelectedProject().getSearchResults()">
+                                        <li class="search-result-scene">
+                                            <div class="no-select tab-panel-header col-anim" data-bind="style: { backgroundColor: $root.getUIColour(-25) }">
+                                                <button class="search-expand-btn" data-bind="click: $data.expand.bind($root, !$data.isExpanded(), true), css: $data.isExpanded() ? 'fa fa-angle-down' : 'fa fa-angle-right'"></button><span data-bind="text: $data.getScene().getName()"></span>
+                                            <!-- ko if: $root.inReplaceMode() -->
+                                                <button class="btn search-replace-all-btn" data-bind="text: 'Replace All' + ' (' + $data.getLengthString() + ')', style: { backgroundColor: $root.getUIColour() }, click: $data.getScene().replaceAllSearchResults.bind()"></button>
+                                            <!-- /ko -->
+                                            <!-- ko if: !$root.inReplaceMode() -->
+                                                <span class="search-result-badge" data-bind="text: $data.getLengthString(), style: { backgroundColor: $root.getUIColour() }"></span>
+                                            <!-- /ko -->
+                                            </div>
+                                            <ul data-bind="if: $data.isExpanded">
+                                                <!-- ko if: $data.getLength() >= 999 -->
+                                                <li class="search-max-length-alert" data-bind="style: { backgroundColor: $root.getUIColour(-80) }"><i class="fa fa-warning"></i>The results for this scene have been truncated to the first 999.</li>
+                                                <!-- /ko -->
+                                                <!-- ko foreach: $data.getResults -->
+                                                    <li data-bind="click: $parent.getScene().showSearchResult.bind($data, $index())" class="search-result-item">
+                                                        <span data-bind="text: ' (Line '+ $data.range.startLineNumber + ')'" class="search-result-line-info"></span>
+                                                        <span data-bind="text: $data.preText"></span><span class="search-result-highlight" data-bind="text: $data.matches[0], style: { backgroundColor: $root.getUIColour(0), textDecoration: ($root.inReplaceMode()) ? 'line-through' : 'none' }" style="color: white;"></span><!-- ko if: $root.inReplaceMode() --><span class="search-result-highlight" data-bind="text: $data.replaceText, style: { backgroundColor: $root.getUIColour(20) }"></span><!-- /ko --><span data-bind="text: $data.postText"></span><button data-bind="visible: $root.inReplaceMode, click: $parent.getScene().replaceSearchResult.bind($data, $index())" class="search-replace-item-btn btn btn-default fa fa-search-minus"></button>
+                                                    </li>
+                                                <!-- /ko -->
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                    <!-- /ko -->
                                     <!-- ko if: id == 'examples' -->
                                     <ul data-bind="foreach: $root.cs_examples">
                                         <li>
