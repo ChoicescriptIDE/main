@@ -2568,6 +2568,12 @@ function IDEViewModel() {
     }
   }
   self.tabs = ko.observableArray([]);
+  self.tabs.subscribe(function(tabList) {
+    // Silently drop any tabs we don't recognise.
+    for (var i = 0; i < tabList.length; i++)
+      if (!tabList[i])
+        tabList.splice(i, 1);
+  });
 
   if (usingNode) {
 
@@ -3703,8 +3709,16 @@ function IDEViewModel() {
           scene.load();
         }
       }
-      for (var e = 0; e < config.tabs.length; e++) {
-        self.tabs.push(__csideTabs[config.tabs[e]]);
+      // Attempt to restore tab order.
+      if (config.tabs.length === __csideTabs.length) {
+        for (var e = 0; e < config.tabs.length; e++) {
+          self.tabs.push(__csideTabs[config.tabs[e]]);
+        }
+      } else {
+        // If there is a list mismatch silently restore the defaults.
+        for (var tab in __csideTabs) {
+          self.tabs.push(__csideTabs[tab]);
+        }
       }
     }
     else {
