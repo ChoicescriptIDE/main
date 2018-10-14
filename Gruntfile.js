@@ -129,6 +129,15 @@ module.exports = function(grunt) {
             dest: 'build'
           }
         ]
+      },
+      monaco: {
+        files: [
+          {
+            expand: true, cwd: '',
+            src: [ 'node_modules/monaco-editor/release/min/**'],
+            dest: 'build'
+          }
+        ]
       }
     },
     "concat": {
@@ -175,6 +184,9 @@ module.exports = function(grunt) {
 		      "node_modules/knockout/build/output/knockout-latest.js",
           "source/lib/knockout/knockout-jqueryui.min.js",
           "source/lib/knockout/knockout-sortable.min.js",
+
+          "node_modules/monaco-editor/release/min/vs/loader.js",
+
           "source/js/knockoutCSIDE.js",
 
           "source/lib/encoding/encoding.js",
@@ -309,7 +321,7 @@ module.exports = function(grunt) {
       }
     }
   });
-  var tasks = ["clean", "auto_install:codemirror_npm", "auto_install:codemirror", "auto_install:choicescript_npm", "copy:main", "concat", "uglify", "cssmin", "auto_install:build", "copy:choicescript", "copy:updater", "string-replace", "execute", "compress"];
+  var tasks = ["clean", "auto_install:codemirror_npm", "auto_install:codemirror", "auto_install:choicescript_npm", "copy:main", "concat", "uglify", "cssmin", "auto_install:build", "copy:choicescript", "copy:updater", "copy:monaco", "string-replace", "execute", "compress"];
   grunt.registerTask("default", tasks);
   grunt.registerTask("build-with-nwjs", tasks.concat("nwjs"));
   grunt.registerTask("build-with-windows", tasks.concat("nwjs:windows"));

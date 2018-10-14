@@ -69,239 +69,246 @@
 	</div>
 	<!-- END OF DROPBOX/WEB FILE EXPLORER -->
 	<div class="main-wrap" data-bind="style: { borderColor: getUIColour(-30) }">
-    <div id="headbar" data-bind="style: { backgroundColor: getUIColour() }, event: { dblclick: getPlatform() === 'web-dropbox' ? null : session.win.toggleMaximize() }" class="col-anim">
-    <!-- ko if: getPlatform() != "mac_os" -->
-      <ul data-bind="foreach: getToolbarMenus" id="toolbar"><li data-bind="fadeVisible: (isActive() && ($root.getPlatform() != 'web-dropbox' || $root.webFileBrowserClosed)), style: { backgroundColor: $root.getUIColour(-20) }">
-        <button data-bind="click: toggle, html: getTitle, style: { backgroundColor: $root.getUIColour(-12) }"></button>
-        <div class="menu" data-bind="fadeVisible: isExpanded, style: { backgroundColor: $root.getUIColour(-20) }, event: { mouseleave: toggle.bind(null, false) }">
-            <ul data-bind="foreach: getOptions">
-              <li><button data-bind="text: getLabel(), click: $parent.doAction.bind($data), style: { backgroundColor: $root.getUIColour(-12) }"></button>
-                <div class="sub-menu">
-                  <ul data-bind="foreach: getSubMenuOptions()">
-                    <li>
-                      <button data-bind="text: getLabel(), click: doAction.bind($data, $parents[1]), style: { backgroundColor: $root.getUIColour(-16) }"></button>
-                    </li>
-                  </ul>
-                </div>
-              </li>
-            </ul>
-        </div>
-      </ul>
-    <!-- /ko -->
-    <!-- ko if: getPlatform() != "web-dropbox" -->
-      <div id="win-controls" data-bind="css: getPlatform() == 'mac_os' ? 'mac_os' : 'windows'">
-        <button id="win-close" title="Quit CSIDE" data-bind="click: function() { win.close(); }">
-          <i class="fa fa-close"></i>
-        </button>
-        <button id="win-min" title="Minimize CSIDE window" data-bind="click: function() { win.minimize(); }">
-          <i class="fa fa-chevron-down"></i>
-        </button>
-        <button id="win-max" title="Maximize CSIDE window" data-bind="click: session.win.toggleMaximize">
-          <i data-bind="css: session.win.isFullscreen() ? 'fa fa-compress' : 'fa fa-expand';"></i>
-        </button>
-      </div>
-    <!-- /ko -->
-    </div>
-    <div id="sidebar">
-      <div id="sidebar-header" data-bind="style: { backgroundColor: getUIColour(-8) }" class="col-anim">
-        <span id="projects-header-title">Scenes & Projects</span>
-        <button title="Create a new project" class="create-project-btn col-anim" data-bind="click: createProject, style: { backgroundColor: getUIColour(-12) }"><i class="fa fa-plus col-anim"></i></button>
-        <button title="Open new scene files" class="open-scenes-btn col-anim" data-bind="click: openFileBrowser, style: { backgroundColor: getUIColour(-12) }"><i class="fa fa-folder-open col-anim"></i></button>
-      </div>
-      <ul id="main-project-wrap" data-bind="sortable: { data: getProjects, allowDrop: false, connectClass: 'null', afterMove: cside.updatePersistenceList, options: { axis: 'y', cancel: 'input:not([readonly]), button, .scene', items: '.project-wrapper', containment: $('#main-project-wrap') } }"><li class="project-wrapper">
-          <div class="project-header" data-bind="css: { 'project-header-selected': $data == $root.getSelectedProject(), 'collapsed': isExpanded() === false }, style: { backgroundColor: $root.getUIColour(-15), color: $root.getUIColour(100) }" class="col-anim">
-            <button data-bind="attr: { title: 'Toggle visibility of project ' + getName() }, click: setExpand, css: isExpanded() ? 'fa fa-eye' : 'fa fa-eye-slash'" class="col-anim"></button>
-            <!-- <span data-bind="fadeVisible: beingEdited() ? false : true, event: { dblclick: rename }, text: getName, attr: { title: getPath }"></span> -->
-            <input data-bind="enableTextInput: beingEdited, textInput: nameInterface, event: { dblclick: rename, blur: rename, keyup: rename }, attr: { title: getPath }, style: { backgroundColor: beingEdited() ? $root.getUIColour(-15) : 'transparent' }, css: { 'name-error': nameInvalid }" class="col-anim"></input>
-            <button class="run-project-btn col-anim" title="" data-bind="attr: { title: 'Run project ' + getName() }, click: run, clickBubble: false"><i class="fa fa-play"></i></button>
-            <!-- ko ifnot: isReadOnly() -->
-                <button class="add-scene-btn col-anim" data-bind="attr: { title: 'Add a new scene to project ' + getName() }, click: addNewScene, clickBubble: false"><i class="fa fa-plus"></i></button>
-                <button class="save-project-btn col-anim" data-bind="attr: { title: 'Save all scenes in project ' + getName() }, click: save, clickBubble: false"><i class="fa fa-save"></i></button>
-            <!-- /ko -->
-          </div>
-          <!-- lack of whitespace (line breaks) around scenes <li> is deliberate to avoid a jQuery + knockout bug -->
-          <ul class="project" data-bind="fadeAndSlideVisible: isExpanded, css: { 'project-collapsed': isExpanded() != true }, sortable: { data: getScenes, beforeMove: cside.dragSceneEvent, afterMove: cside.updatePersistenceList, options: { axis: 'y', cancel: 'input:not([readonly]), button', items: '.scene', connectWith: '#main-project-wrap > .project-wrapper > .project', placeholder: 'project-hover', containment: $('#main-project-wrap')} }"><li class="scene" role="button" data-bind="click: getErrState() ? load : select, css: { 'scene-selected': $data === $root.getSelectedScene() }">
-              <button class="save-scene" data-bind="click: getErrState() ? close : save, clickBubble: false, attr: { title: getErrState() ? getErrStateMsg : isReadOnly() ? 'Read-only' : 'Save ' + getName() + '.txt' }"><i data-bind="css: getState"></i></button>
-              <button class="color-marker handle"  data-bind="attr: { title: 'Click to colour project ' + getName() }, click: recolour, clickBubble: false, style: { backgroundColor: getMarkColour }"></button>
-              <!-- <span data-bind="text: getName(), event: { dblclick: rename }, attr: { title: getName }, fadeVisible: beingEdited() ? false : true"></span> -->
-              <input data-bind="attr: { title: getName }, enableTextInput: beingEdited, textInput: nameInterface, event: { click: isSelected() ? rename : null, dblclick: rename, blur: rename, keyup: rename }, css: { 'name-error': nameInvalid }" class="col-anim"></input>
-              <div class="scene-error" data-bind="fadeVisible: nameInvalid">
-                <span data-bind="text: getNameErrorMsg"></span>
-              </div>
-              <ul class="colour-picker" id="colour-picker" data-bind="fadeVisible: beingColoured, event: { mouseleave: recolour }, foreach: $root.getValidSceneColours">
-                <li class="colour-selector" role="button" data-bind="style: { backgroundColor: $data }, click: $parent.recolour, clickBubble: false"></li>
-              </ul>
-            </li></ul>
-        </li></ul>
-    </div>
-		<div id="page-content-wrapper">
-			<div id="second-wrap">
-				<div class="left-wrap">
-					<button id="left-panel-control" title="Toggle scene & project panel" data-bind="click: scenePanel(), style: { backgroundColor: getUIColour(-15), color: getUIColour(-65) }" class="col-anim">
-						<i class="fa fa-arrows-h fa-lg"></i>
+		<div id="inner-wrap">
+			<div id="headbar" data-bind="style: { backgroundColor: getUIColour() }, event: { dblclick: getPlatform() === 'web-dropbox' ? null : session.win.toggleMaximize() }" class="col-anim">
+			<!-- ko if: getPlatform() != "mac_os" -->
+				<ul data-bind="foreach: getToolbarMenus" id="toolbar"><li data-bind="fadeVisible: (isActive() && ($root.getPlatform() != 'web-dropbox' || $root.webFileBrowserClosed)), style: { backgroundColor: $root.getUIColour(-20) }">
+					<button data-bind="click: toggle, html: getTitle, style: { backgroundColor: $root.getUIColour(-12) }"></button>
+					<div class="menu" data-bind="fadeVisible: isExpanded, style: { backgroundColor: $root.getUIColour(-20) }, event: { mouseleave: toggle.bind(null, false) }">
+							<ul data-bind="foreach: getOptions">
+								<li><button data-bind="text: getLabel(), click: $parent.doAction.bind($data), style: { backgroundColor: $root.getUIColour(-12) }"></button>
+									<div class="sub-menu">
+										<ul data-bind="foreach: getSubMenuOptions()">
+											<li>
+												<button data-bind="text: getLabel(), click: doAction.bind($data, $parents[1]), style: { backgroundColor: $root.getUIColour(-16) }"></button>
+											</li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+					</div>
+				</ul>
+			<!-- /ko -->
+			<!-- ko if: getPlatform() != "web-dropbox" -->
+				<div id="win-controls" data-bind="css: getPlatform() == 'mac_os' ? 'mac_os' : 'windows'">
+					<button id="win-close" title="Quit CSIDE" data-bind="click: function() { win.close(); }">
+						<i class="fa fa-close"></i>
 					</button>
-					<div id="doc-bar" data-bind="style: { backgroundColor: getUIColour(-8) }" clas="col-anim">
-						<ul>
-							<li class="doc-title">
-								<span class="no-select" data-bind="text: getSelectedScene() && getSelectedProject() ? (getSelectedProject().getName() + ': ' + (getSelectedScene().getName() + '.txt')) : '', attr: { title: getSelectedScene() ? getSelectedScene().getPath() : '' }"></span>
-							</li>
-						</ul>
-					</div>
-					<div id="editor-wrap" data-bind="fadeVisible: getSelectedScene">
-						<textarea style="display: none;" id="code-textarea" name="code"></textarea>
-						<div id="code-footer" data-bind="if: getSelectedScene() && getSelectedProject()">
-							<button class="console-btn col-anim" data-bind="click: getSelectedProject().toggleConsole">
-								<span class="fa fa-terminal"></span>
-								<span class="console-indicator" data-bind="fadeVisible: getSelectedProject().getUnreadLogCount(), text: getSelectedProject().getUnreadLogCount()" ></span>
-							</button>
-              <span data-bind="fadeVisible: wordCountOn()"><span data-bind="text: getSelectedScene().getCursorString()"></span></span>
-							<span data-bind="fadeVisible: wordCountOn()">Char Count: <span data-bind="text: getSelectedScene().getCharCountString()"></span></span>
-							<span data-bind="fadeVisible: wordCountOn()">Word Count: <span data-bind="text: getSelectedScene().getWordCountString()"></span></span>
-						</div>
-  					<div data-bind="if: getSelectedProject, style: { flex: getSelectedProject() && getSelectedProject().consoleOpen() ? 1 : 0 }" id="cs-console">
-              <ul data-bind="foreach: getSelectedProject().getLogs">
-                <li>
-                  <span data-bind="text: $data.value, css: $data.type"></span>
-                  <span class="meta" data-bind="visible: ($data.scene && $data.line), text: $data.scene + $data.line"></span>
-                </li>
-              </ul>
-              <input data-bind="event: { 'keyup': consoleInput }">
-            </div>
-					</div>
+					<button id="win-min" title="Minimize CSIDE window" data-bind="click: function() { win.minimize(); }">
+						<i class="fa fa-chevron-down"></i>
+					</button>
+					<button id="win-max" title="Maximize CSIDE window" data-bind="click: session.win.toggleMaximize">
+						<i data-bind="css: session.win.isFullscreen() ? 'fa fa-compress' : 'fa fa-expand';"></i>
+					</button>
 				</div>
-				<div class="right-wrap">
-					<button id="panel-control" title="Toggle game panel" data-bind="click: tabPanel(), style: { backgroundColor: getUIColour(-15), color: getUIColour(-65) }" class="col-anim">
-						<i class="fa fa-arrows-h fa-lg"></i>
-					</button>
-					<div id="tabs" data-bind="tabs: { refreshOn: tabs }">
-						<ul data-bind="style: { backgroundColor: getUIColour(-10) }, sortable: { data: tabs, allowDrop: false, connectClass: 'null', afterMove: cside.updatePersistenceList, options: { axis: 'x', items: 'li', containment: 'parent' } }" class="col-anim">
-							<li data-bind="attr: { 'aria-controls': id, title: title }, visible: visible, style: { backgroundColor: $root.getUIColour(-15) }">
-								<a draggable="false" data-bind="attr: { title: title, href: '#' + id, class: 'ui-tabs-anchor ' + iconClass }, style: { color: $root.getUIColour(-65) }"></a>
-							</li>
-						</ul>
-						<!-- ko foreach: tabs -->
-							<div class='tab-wrap' data-bind="attr: { id: id }, visible: visible">
-                <div data-bind="css: 'tab-panel ' + id">
-                  <div class="no-select tab-panel-header col-anim" data-bind="visible: showTitle, text: getHeaderTitle, style: { backgroundColor: $root.getUIColour(-8) }"></div>
-    								<!-- ko if: href != '' -->
-                      <div class="iframe-wrap">
-  									    <iframe data-bind="attr { src: href, title: title, name: title, visible: href, id: id + '-tab-frame' }"></iframe>
-                      </div>
-    								<!-- /ko -->
-                    <!-- ko if: id == 'issues' -->
-  										<!-- ko with: $root.getSelectedProject -->
-                        <ul class="issueList"> <!-- only show issues in selected project -->
-                          <!-- ko if: issueCount() <= 0 -->
-                            <li>There are no issues logged against this project.</li>
-                          <!-- /ko -->
-                          <!-- ko if: issueCount() > 0 -->
-                            <li class="dismiss-all">
-                              <button data-bind="click: dismissAllIssues" class="btn btn-default">Dismiss All</button>
-                            </li>
-                          <!-- /ko -->
-  												<!-- ko foreach: getIssues -->
-  													<li class="issue">
-  														<span class="issue-desc" data-bind="text: getDesc()"></span>
-  														<br>
-  														<span>
-  															Project: <span data-bind='text: $parent.getName' > </span>
-  														</span>
-  														<!-- ko if: getScene() -->
-  															<br>
-  															<span>
-  																Scene: <span data-bind='text: getScene().getName'></span>
-  															</span>
-  														<!-- /ko -->
-  														<br>
-  														<span>
-  															Date: <span data-bind='text: getDate()' > </span>
-  														</span>
-  														<br>
-  														<span>
-  															Time: <span data-bind='text: getTime()' > </span>
-  														</span>
-  														<div class="issue-btn" title="Dismiss this issue" data-bind="click: dismiss"><i class="col-anim fa fa-check fa-lg"></i></div>
-  														<!-- ko if: typeof getLineNum() === 'number' -->
-  															<div class="issue-btn" title="Show this issue in the editor" data-bind="click: show"><i class="col-anim fa fa-search fa-lg"></i></div>
-  														<!-- /ko -->
-  													</li>
-  												<!-- /ko -->
-  											</ul>
-  										<!-- /ko -->
-    								<!-- /ko -->
-    								<!-- ko if: id == 'settings' -->
-    									<script type="text/html" id="setting-option-template">
-    										<!-- ko if: getType() == "binary" -->
-    											<li data-bind="click: toggle, visible: isVisible">
-                            <i data-bind="css: getValue() ? 'fa fa-check-square-o fa-lg fa-fw setting-on' : 'fa fa-square-o fa-lg fa-fw setting-off'"></i>
-    												<span class="setting-name" data-bind="text: getName()"></span>
-                            <br>
-                            <span class="desc" data-bind="text: getDesc()"></span>
-    											</li>
-    										<!-- /ko -->
-    										<!-- ko if: getType() != "binary" -->
-    											<li data-bind="visible: isVisible">
-    												<span class="setting-name" data-bind="text: getName()"></span>
-                            <br>
-                            <span class="desc" data-bind="text: getDesc()"></span>
-            										<!-- ko if: getType() == "dropdown" -->
-                                                    <br>
-            										    <select data-bind="options: getOptions(), optionsText: 'desc', optionsValue: 'value', value: value"></select>
-            										<!-- /ko -->
-            										<!-- ko if: getType() == "variable" || getType() == "custom" -->
-    												<ul data-bind="foreach: getOptions()">
-    													<li class="setting-option" data-bind="css: { 'setting-option-selected': $parent.getValue() == value }, click: $parent.toggle">
-    														<div data-bind="html: desc"></div>
-    													</li>
-    												</ul>
-            										<!-- /ko -->
-    											</li>
-    										<!-- /ko -->
-    									</script>
-										<div data-bind="style: { backgroundColor: $root.getUIColour(-8) }" class="no-select tab-panel-header col-anim">Editor Settings</div>
-										<ul data-bind="template: { name: 'setting-option-template', foreach: $root.getEditorSettings }"></ul>
-										<div data-bind="style: { backgroundColor: $root.getUIColour(-8) }" class="no-select tab-panel-header col-anim">App Settings</div>
-										<ul data-bind="template: { name: 'setting-option-template', foreach: $root.getAppSettings }"></ul>
-    								<!-- /ko -->
-    								<!-- ko if: id == 'dictionary' -->
-										<ul>
-											<li>
-												<input spellcheck="false" type="text" data-bind="textInput: $root.dictWord, event: { 'keyup': $root.addToDictionary }" placeholder="Type to search or add..."></input>
-												<button class="btn btn-default" data-bind="click: $root.addToDictionary">Add Word</button>
-												<div>
-													<button id="dict-btn-import" data-bind="click: $root.importDictionary" title="Import dictionary" class="btn btn-default fa fa-upload"></button>
-													<button id="dict-btn-export" data-bind="click: $root.exportDictionary" title="Export dictionary" class="btn btn-default fa fa-download"></button>
-													<button id="dict-btn-clear" data-bind="click: $root.clearDictionary" title="Clear dictionary" class="btn btn-default fa fa-trash"></button>
+			<!-- /ko -->
+			</div>
+			<div id="sidebar">
+				<div id="sidebar-header" data-bind="style: { backgroundColor: getUIColour(-8) }" class="col-anim">
+					<span id="projects-header-title">Scenes & Projects</span>
+					<button title="Create a new project" class="create-project-btn col-anim" data-bind="click: createProject, style: { backgroundColor: getUIColour(-12) }"><i class="fa fa-plus col-anim"></i></button>
+					<button title="Open new scene files" class="open-scenes-btn col-anim" data-bind="click: openFileBrowser, style: { backgroundColor: getUIColour(-12) }"><i class="fa fa-folder-open col-anim"></i></button>
+				</div>
+				<ul id="main-project-wrap" data-bind="sortable: { data: getProjects, allowDrop: false, connectClass: 'null', afterMove: cside.updatePersistenceList, options: { axis: 'y', cancel: 'input:not([readonly]), button, .scene', items: '.project-wrapper', containment: $('#main-project-wrap') } }"><li class="project-wrapper">
+						<div class="project-header" data-bind="css: { 'project-header-selected': $data == $root.getSelectedProject(), 'collapsed': isExpanded() === false }, style: { backgroundColor: $root.getUIColour(-15), color: $root.getUIColour(100) }" class="col-anim">
+							<button data-bind="attr: { title: 'Toggle visibility of project ' + getName() }, click: setExpand, css: isExpanded() ? 'fa fa-eye' : 'fa fa-eye-slash'" class="col-anim"></button>
+							<!-- <span data-bind="fadeVisible: beingEdited() ? false : true, event: { dblclick: rename }, text: getName, attr: { title: getPath }"></span> -->
+							<input data-bind="enableTextInput: beingEdited, textInput: nameInterface, event: { dblclick: rename, blur: rename, keyup: rename }, attr: { title: getPath }, style: { backgroundColor: beingEdited() ? $root.getUIColour(-15) : 'transparent' }, css: { 'name-error': nameInvalid }" class="col-anim"></input>
+							<button class="run-project-btn col-anim" title="" data-bind="attr: { title: 'Run project ' + getName() }, click: run, clickBubble: false"><i class="fa fa-play"></i></button>
+							<!-- ko ifnot: isReadOnly() -->
+									<button class="add-scene-btn col-anim" data-bind="attr: { title: 'Add a new scene to project ' + getName() }, click: addNewScene, clickBubble: false"><i class="fa fa-plus"></i></button>
+									<button class="save-project-btn col-anim" data-bind="attr: { title: 'Save all scenes in project ' + getName() }, click: save, clickBubble: false"><i class="fa fa-save"></i></button>
+							<!-- /ko -->
+						</div>
+						<!-- lack of whitespace (line breaks) around scenes <li> is deliberate to avoid a jQuery + knockout bug -->
+						<ul class="project" data-bind="fadeAndSlideVisible: isExpanded, css: { 'project-collapsed': isExpanded() != true }, sortable: { data: getScenes, beforeMove: cside.dragSceneEvent, afterMove: cside.updatePersistenceList, options: { axis: 'y', cancel: 'input:not([readonly]), button', items: '.scene', connectWith: '#main-project-wrap > .project-wrapper > .project', placeholder: 'project-hover', containment: $('#main-project-wrap')} }"><li class="scene" role="button" data-bind="click: getErrState() ? load : select, css: { 'scene-selected': $data === $root.getSelectedScene() }">
+								<button class="save-scene" data-bind="click: getErrState() ? close : save, clickBubble: false, attr: { title: getErrState() ? getErrStateMsg : isReadOnly() ? 'Read-only' : 'Save ' + getName() + '.txt' }"><i data-bind="css: getState"></i></button>
+								<button class="color-marker handle"  data-bind="attr: { title: 'Click to colour project ' + getName() }, click: recolour, clickBubble: false, style: { backgroundColor: getMarkColour }"></button>
+								<!-- <span data-bind="text: getName(), event: { dblclick: rename }, attr: { title: getName }, fadeVisible: beingEdited() ? false : true"></span> -->
+								<input data-bind="attr: { title: getName }, enableTextInput: beingEdited, textInput: nameInterface, event: { click: isSelected() ? rename : null, dblclick: rename, blur: rename, keyup: rename }, css: { 'name-error': nameInvalid }" class="col-anim"></input>
+								<div class="scene-error" data-bind="fadeVisible: nameInvalid">
+									<span data-bind="text: getNameErrorMsg"></span>
+								</div>
+								<ul class="colour-picker" id="colour-picker" data-bind="fadeVisible: beingColoured, event: { mouseleave: recolour }, foreach: $root.getValidSceneColours">
+									<li class="colour-selector" role="button" data-bind="style: { backgroundColor: $data }, click: $parent.recolour, clickBubble: false"></li>
+								</ul>
+							</li></ul>
+					</li></ul>
+			</div>
+			<div id="page-content-wrapper">
+				<div id="second-wrap">
+					<div class="left-wrap">
+						<button id="left-panel-control" title="Toggle scene & project panel" data-bind="click: scenePanel(), style: { backgroundColor: getUIColour(-15), color: getUIColour(-65) }" class="col-anim">
+							<i class="fa fa-arrows-h fa-lg"></i>
+						</button>
+						<div id="doc-bar" data-bind="style: { backgroundColor: getUIColour(-8) }" clas="col-anim">
+							<ul>
+								<li class="doc-title">
+									<span class="no-select" data-bind="text: getSelectedScene() && getSelectedProject() ? (getSelectedProject().getName() + ': ' + (getSelectedScene().getName() + '.txt')) : '', attr: { title: getSelectedScene() ? getSelectedScene().getPath() : '' }"></span>
+								</li>
+							</ul>
+						</div>
+						<div id="editor-wrap" data-bind="fadeVisible: getSelectedScene">
+							<textarea style="display: none;" id="code-textarea" name="code"></textarea>
+						</div>
+					</div>
+					<div class="right-wrap">
+						<button id="panel-control" title="Toggle game panel" data-bind="click: tabPanel(), style: { backgroundColor: getUIColour(-15), color: getUIColour(-65) }" class="col-anim">
+							<i class="fa fa-arrows-h fa-lg"></i>
+						</button>
+						<div id="tabs" data-bind="tabs: { refreshOn: tabs }">
+							<ul data-bind="style: { backgroundColor: getUIColour(-10) }, sortable: { data: tabs, allowDrop: false, connectClass: 'null', afterMove: cside.updatePersistenceList, options: { axis: 'x', items: 'li', containment: 'parent' } }" class="col-anim">
+								<li data-bind="attr: { 'aria-controls': id, title: title }, visible: visible, style: { backgroundColor: $root.getUIColour(-15) }">
+									<a draggable="false" data-bind="attr: { title: title, href: '#' + id, class: 'ui-tabs-anchor ' + iconClass }, style: { color: $root.getUIColour(-65) }"></a>
+								</li>
+							</ul>
+							<!-- ko foreach: tabs -->
+								<div class='tab-wrap' data-bind="attr: { id: id }, visible: visible">
+									<div data-bind="css: 'tab-panel ' + id">
+										<div class="no-select tab-panel-header col-anim" data-bind="visible: showTitle, text: getHeaderTitle, style: { backgroundColor: $root.getUIColour(-8) }"></div>
+											<!-- ko if: href != '' -->
+												<div class="iframe-wrap">
+													<iframe data-bind="attr { src: href, title: title, name: title, visible: href, id: id + '-tab-frame' }"></iframe>
 												</div>
+											<!-- /ko -->
+											<!-- ko if: id == 'issues' -->
+												<!-- ko with: $root.getSelectedProject -->
+													<ul class="issueList"> <!-- only show issues in selected project -->
+														<!-- ko if: issueCount() <= 0 -->
+															<li>There are no issues logged against this project.</li>
+														<!-- /ko -->
+														<!-- ko if: issueCount() > 0 -->
+															<li class="dismiss-all">
+																<button data-bind="click: dismissAllIssues" class="btn btn-default">Dismiss All</button>
+															</li>
+														<!-- /ko -->
+														<!-- ko foreach: getIssues -->
+															<li class="issue">
+																<span class="issue-desc" data-bind="text: getDesc()"></span>
+																<br>
+																<span>
+																	Project: <span data-bind='text: $parent.getName' > </span>
+																</span>
+																<!-- ko if: getScene() -->
+																	<br>
+																	<span>
+																		Scene: <span data-bind='text: getScene().getName'></span>
+																	</span>
+																<!-- /ko -->
+																<br>
+																<span>
+																	Date: <span data-bind='text: getDate()' > </span>
+																</span>
+																<br>
+																<span>
+																	Time: <span data-bind='text: getTime()' > </span>
+																</span>
+																<div class="issue-btn" title="Dismiss this issue" data-bind="click: dismiss"><i class="col-anim fa fa-check fa-lg"></i></div>
+																<!-- ko if: typeof getLineNum() === 'number' -->
+																	<div class="issue-btn" title="Show this issue in the editor" data-bind="click: show"><i class="col-anim fa fa-search fa-lg"></i></div>
+																<!-- /ko -->
+															</li>
+														<!-- /ko -->
+													</ul>
+												<!-- /ko -->
+											<!-- /ko -->
+											<!-- ko if: id == 'settings' -->
+												<script type="text/html" id="setting-option-template">
+													<!-- ko if: getType() == "binary" -->
+														<li data-bind="click: toggle, visible: isVisible">
+															<i data-bind="css: getValue() ? 'fa fa-check-square-o fa-lg fa-fw setting-on' : 'fa fa-square-o fa-lg fa-fw setting-off'"></i>
+															<span class="setting-name" data-bind="text: getName()"></span>
+															<br>
+															<span class="desc" data-bind="text: getDesc()"></span>
+														</li>
+													<!-- /ko -->
+													<!-- ko if: getType() != "binary" -->
+														<li data-bind="visible: isVisible">
+															<span class="setting-name" data-bind="text: getName()"></span>
+															<br>
+															<span class="desc" data-bind="text: getDesc()"></span>
+																	<!-- ko if: getType() == "dropdown" -->
+																											<br>
+																			<select data-bind="options: getOptions(), optionsText: 'desc', optionsValue: 'value', value: value"></select>
+																	<!-- /ko -->
+																	<!-- ko if: getType() == "variable" || getType() == "custom" -->
+															<ul data-bind="foreach: getOptions()">
+																<li class="setting-option" data-bind="css: { 'setting-option-selected': $parent.getValue() == value }, click: $parent.toggle">
+																	<div data-bind="html: desc"></div>
+																</li>
+															</ul>
+																	<!-- /ko -->
+														</li>
+													<!-- /ko -->
+												</script>
+											<div data-bind="style: { backgroundColor: $root.getUIColour(-8) }" class="no-select tab-panel-header col-anim">Editor Settings</div>
+											<ul data-bind="template: { name: 'setting-option-template', foreach: $root.getEditorSettings }"></ul>
+											<div data-bind="style: { backgroundColor: $root.getUIColour(-8) }" class="no-select tab-panel-header col-anim">App Settings</div>
+											<ul data-bind="template: { name: 'setting-option-template', foreach: $root.getAppSettings }"></ul>
+											<!-- /ko -->
+											<!-- ko if: id == 'dictionary' -->
+											<ul>
+												<li>
+													<input spellcheck="false" type="text" data-bind="textInput: $root.dictWord, event: { 'keyup': $root.addToDictionary }" placeholder="Type to search or add..."></input>
+													<button class="btn btn-default" data-bind="click: $root.addToDictionary">Add Word</button>
+													<div>
+														<button id="dict-btn-import" data-bind="click: $root.importDictionary" title="Import dictionary" class="btn btn-default fa fa-upload"></button>
+														<button id="dict-btn-export" data-bind="click: $root.exportDictionary" title="Export dictionary" class="btn btn-default fa fa-download"></button>
+														<button id="dict-btn-clear" data-bind="click: $root.clearDictionary" title="Clear dictionary" class="btn btn-default fa fa-trash"></button>
+													</div>
+													</li>
+												<li data-bind="visible: $root.getDictionaryArray().length == 0">
+													<span>Words escape me.</span>
 												</li>
-											<li data-bind="visible: $root.getDictionaryArray().length == 0">
-												<span>Words escape me.</span>
-											</li>
-										</ul>
-										<ul data-bind="foreach: $root.getDictionaryArray">
-											<li>
-												<span data-bind="text: $data, attr: { title: $data }"></span>
-												<i data-bind="click: $root.removeFromDictionary" class="fa fa-times" title="Remove word"></i>
-											</li>
-										</ul>
-    								<!-- /ko -->
-                    <!-- ko if: id == 'examples' -->
-  										<ul data-bind="foreach: $root.cs_examples">
-  											<li>
-  												<h5 style="margin:5px;" data-bind="text: title, attr: { title: title }"></h5>
-                          <p class="desc" data-bind="text: desc"></p>
-                          <button class="btn btn-default" data-bind="click: $root.cloneExample"><span class="fa fa-download"></span> Import Project</button>
-                          <button class="btn btn-default" data-bind="click: $root.runExample"><span class="fa fa-play"></span> Run Project</button>
-                        </li>
-  										</ul>
-    								<!-- /ko -->
-                </div>
-							</div>
-						<!-- /ko -->
+											</ul>
+											<ul data-bind="foreach: $root.getDictionaryArray">
+												<li>
+													<span data-bind="text: $data, attr: { title: $data }"></span>
+													<i data-bind="click: $root.removeFromDictionary" class="fa fa-times" title="Remove word"></i>
+												</li>
+											</ul>
+											<!-- /ko -->
+											<!-- ko if: id == 'examples' -->
+												<ul data-bind="foreach: $root.cs_examples">
+													<li>
+														<h5 style="margin:5px;" data-bind="text: title, attr: { title: title }"></h5>
+														<p class="desc" data-bind="text: desc"></p>
+														<button class="btn btn-default" data-bind="click: $root.cloneExample"><span class="fa fa-download"></span> Import Project</button>
+														<button class="btn btn-default" data-bind="click: $root.runExample"><span class="fa fa-play"></span> Run Project</button>
+													</li>
+												</ul>
+											<!-- /ko -->
+									</div>
+								</div>
+							<!-- /ko -->
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
+		<div data-bind="if: getSelectedProject, style: { display: getSelectedProject() && getSelectedProject().consoleOpen() ? 'flex' : 'none' }" id="cs-console">
+			<div id="console-header" data-bind="style: { backgroundColor: getUIColour(), borderColor: getUIColour(-30) }"></div>
+			<ul data-bind="foreach: getSelectedProject().getLogs">
+				<li>
+					<span data-bind="text: $data.value, css: $data.type"></span>
+					<span class="meta" data-bind="visible: ($data.scene && $data.line), text: $data.scene + $data.line"></span>
+				</li>
+			</ul>
+			<input data-bind="event: { 'keyup': consoleInput }">
+		</div>
+		<div id="code-footer" data-bind="if: getSelectedScene() && getSelectedProject(), style: { backgroundColor: getUIColour(), borderColor: getUIColour(-30) }">
+				<button class="console-btn col-anim" data-bind="click: getSelectedProject().toggleConsole">
+					<span class="fa fa-terminal"></span>
+					<span class="console-indicator" data-bind="fadeVisible: getSelectedProject().getUnreadLogCount(), text: getSelectedProject().getUnreadLogCount()" ></span>
+				</button>
+				<span data-bind="fadeVisible: wordCountOn()"><span data-bind="text: getCursorPositionString()"></span></span>
+				<span data-bind="fadeVisible: wordCountOn()">Char Count: <span data-bind="text: getSelectedScene().getCharCountString()"></span></span>
+				<span data-bind="fadeVisible: wordCountOn()">Word Count: <span data-bind="text: getSelectedScene().getWordCountString()"></span></span>
+				<div data-bind="if: getSelectedScene()" id="scene-data" style="float:right;margin-right:20px;">
+					<span data-bind="text: getSelectedScene().useSpaces() ? 'Spaces: ' : 'Tab Size: '"></span>
+					<span data-bind="text: getSelectedScene().getTabSize()"></span>
+				</div>
+			</div>
 	</div>
 
     <!-- input elements for desktop app -->

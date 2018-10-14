@@ -24,6 +24,8 @@
     "cside-codemirror": "github:ChoicescriptIDE/codemirror",
     "dropbox": "^2.5.2",
     "knockout": "3.2.0",
+    "monaco-editor": "github:ChoicescriptIDE/monaco-editor#lib",
+    "monaco-languages": "^1.5.1",
     "mousetrap": "^1.6.0",
     "noty": "^3.2.0-beta",
     "trash": "^2.0.0",
