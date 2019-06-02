@@ -1,3 +1,46 @@
+## v1.3.0 - 03/06/2019
+
+Feature release focussing on user dictionary improvements and bug fixes.
+
+### Fixes
+- Custom themes should now persist across sessions on all platforms
+- Fixed an issue related to spellchecking words wrapped in quotation marks
+- v1.2.1 HotFix (correctly initialize default tabs)
+- Fixed a minor issue with Dropbox error handling
+- CSIDE will no longer ignore the \*text_image command behaviour
+- Fixed an issue with 'stepping' being unable to handle \*fake_choice
+- Fixed disappearing window control/UI jumping bug
+- The 'Run Project' hotkey is now documented as intended
+
+### Additions
+- User Dictionary Improvements
+    - Optimised add/remove word functionality
+    - Added support for importing/exporting JSON-esque dictionaries
+    - Added a 'Remove All' (words) button
+    - Added real-time search filter behaviour to the input box to help with navigating large dictionaries
+- Added additional options to the indentation setting, and converted its settings control to a dropdown menu
+- Added the line and column position of the cursor to the code editor footer
+- Added support to cycle through the current project's scenes via hotkeys
+    - Mac: Cmd+Alt+PgUp/PgDwn
+    - Windows: Ctrl+PgUp/PgDwn
+- Added hotkeys for changing font size (ctrl/cmd[+-]) [NEEDS DOCUMENTING]
+- Extended custom theme scripting support:
+    - Misc bug fixes and error clarifications.
+    - Adds new tokens: gutter, gutter-numbers, error-lines, cursor, matches
+    - See example project for usage!
+- Atomic file writes (this should help combat reported file corruption)
+
+### Changes
+- Updated internal copy of ChoiceScript to [Github commit](https://github.com/dfabulich/choicescript/commit/4301c06c909c50c0ab63d22601e3d2eeb6e5f1b9 "ChoiceScript Github commit")
+- Moved the right panel tab control to be vertical
+- Updated the notification library:
+    - Should improve accessibility
+    - Modified appearance of notifications
+- Turning the 'Word Count' setting off will now disable word counting
+rather than just hiding it (for performance reasons).
+- Minor UI (colour) improvement for night mode's scene/project drag and drop
+- Added a link to CSIDE's thread in the 'What is CSIDE?' documentation page
+
 ## v1.2.1 - 27/12/2017
 
 Fixes a critical bug caused by turning persistent session 'off' when persistent tabs are supported.
