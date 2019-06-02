@@ -3,7 +3,7 @@
   "main": "index.html",
   "version": "1.2.1",
   "devDependencies": {
-    "grunt": "^1.0.3",
+    "grunt": "^1.0.4",
     "grunt-auto-install": "^0.3.1",
     "grunt-browserify": "^5.3.0",
     "grunt-contrib-clean": "^1.0.0",
