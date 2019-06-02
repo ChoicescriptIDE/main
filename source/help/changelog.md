@@ -20,6 +20,8 @@ Feature release focussing on user dictionary improvements and bug fixes.
     - Added real-time search filter behaviour to the input box to help with navigating large dictionaries
 - Added additional options to the indentation setting, and converted its settings control to a dropdown menu
 - Added the line and column position of the cursor to the code editor footer
+- Added an option to 'clear game data' to a running project's ChoiceScript menu
+    - This will allow for clearing of earned achievements etc.
 - Added support to cycle through the current project's scenes via hotkeys
     - Mac: Cmd+Alt+PgUp/PgDwn
     - Windows: Ctrl+PgUp/PgDwn
@@ -28,7 +30,7 @@ Feature release focussing on user dictionary improvements and bug fixes.
     - Misc bug fixes and error clarifications.
     - Adds new tokens: gutter, gutter-numbers, error-lines, cursor, matches
     - See example project for usage!
-- Atomic file writes (this should help combat reported file corruption)
+- Atomic file writes (this should help combat reported file corruption)g
 
 ### Changes
 - Updated internal copy of ChoiceScript to [Github commit](https://github.com/dfabulich/choicescript/commit/4301c06c909c50c0ab63d22601e3d2eeb6e5f1b9 "ChoiceScript Github commit")
