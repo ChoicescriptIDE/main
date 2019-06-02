@@ -23,7 +23,12 @@ if (usingNode) {
 	});
 	win.on('new-win-policy', function(frame, url, policy) {
 		//disallow new windows (even via middle mouse button)
-		policy.ignore();
+    if (!url.indexOf("https://choicescriptdev.wikia.com")) {
+      policy.ignore();
+    }
+    require('nw.gui').Shell.openExternal(url);
+    policy.ignore();
+    return;
 	});
 
 }
