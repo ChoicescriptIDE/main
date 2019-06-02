@@ -2110,6 +2110,14 @@ function IDEViewModel() {
       "Esc": function(ed) {
         ed.setOption("fullScreen", !ed.getOption("fullScreen"));
       },
+      "Cmd-Alt-PageUp": function(ed) {
+        // Select previous scene
+        __cycleSceneSelection(/* up */ true);
+      },
+      "Cmd-Alt-PageDown": function(ed) {
+        // Select next scene
+        __cycleSceneSelection(/* up */ false);
+      }
       //Mac cut, copy and paste don't work by default? MIGHT be a node-webkit thing.
       /*	"Cmd-X": function(ed) {
 				document.execCommand("cut");
@@ -2215,6 +2223,14 @@ function IDEViewModel() {
       },
       "Esc": function(ed) {
         ed.setOption("fullScreen", !ed.getOption("fullScreen"));
+      },
+      "Ctrl-PageUp": function(ed) {
+        // Select previous scene
+        __cycleSceneSelection(/* up */ true);
+      },
+      "Ctrl-PageDown": function(ed) {
+        // Select next scene
+        __cycleSceneSelection(/* up */ false);
       }
     }
   }
@@ -2603,6 +2619,33 @@ function IDEViewModel() {
         });
       }, true);
     }
+  }
+
+  function __cycleSceneSelection(direction) {
+    // "up" = true / "down" = false
+    if (!cside.getSelectedProject())
+      return;
+    var index;
+    var currentScene = cside.getSelectedScene();
+    var sceneList = cside.getSelectedProject().getScenes();
+    if (!currentScene)
+      return null;
+    if ((index = sceneList.indexOf(cside.getSelectedScene())) > -1) {
+      if (direction) {
+        if (index > 0) {
+          sceneList[--index].select();
+        } else {
+          sceneList[sceneList.length - 1].select();
+        }
+      } else {
+        if (index < (sceneList.length - 1)) {
+          sceneList[++index].select();
+        } else {
+          sceneList[0].select();
+        }
+      }
+    }
+    return null;
   }
 
   function __getTab(id) {
