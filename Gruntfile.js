@@ -20,7 +20,7 @@ module.exports = function(grunt) {
           stdout: true,
           stderr: true,
           failOnError: true,
-          npm: 'trash username',
+          npm: 'trash username write-file-atomic',
           bower: false
         }
       },
