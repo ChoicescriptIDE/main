@@ -23,6 +23,8 @@
 | Toggle console                 | SHIFT + CTRL + C    | SHIFT + CMD + C     |
 | Increase font size             | SHIFT + CTRL + =    | SHIFT + CMD + =     |
 | Decrease font size             | SHIFT + CTRL + -    | SHIFT + CMD + -     |
+| Select previous scene          | CTRL + PGUP         | CMD + ALT + PGUP    |
+| Select next scene              | CTRL + PGDN         | CMD + ALT + PGDN    |
 
 ### Global Shortcuts
 
