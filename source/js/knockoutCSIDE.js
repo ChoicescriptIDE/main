@@ -3405,7 +3405,7 @@ function IDEViewModel() {
   }
   self.openFileBrowser = function() {
     fh.selectFiles(function(selection) {
-      if (selection && selection.length > 1)
+      if (selection && selection.length >= 1)
         __openScenes(selection, true);
     });
   }
