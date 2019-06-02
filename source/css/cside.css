@@ -167,15 +167,18 @@ body.night .left-wrap {
 }
 
 #tabs .tab-wrap {
+    left: 40px;
+    right: 0px;
+    box-shadow: -2px 2px 4px 0 #1f1f1f;
+    border: none;
+    border-bottom: 1px solid;
     position: absolute;
-    width: 100%;
-    top: 30px;
     bottom: 0px;
-    padding:0px;
+    padding: 0px;
     border-radius: 0px;
-    border-left: 1px solid;
     border-color: inherit;
     background-color: #f8f6fb;
+    height: 100%;
 }
 
 .iframe-wrap {
@@ -222,22 +225,23 @@ body.night .left-wrap {
 }
 
 .ui-tabs .ui-tabs-nav {
-	border:none;
-	border-radius: 0px;
-	border-bottom: 1px solid;
-	height: 30px;
-	padding: 0px;
-  border-color: inherit;
+    border: none;
+    border-radius: 0;
+    border-bottom: 1px solid;
+    height: 100%;
+    padding: 0;
+    border-color: inherit;
+    width: 40px;
 }
 
 /* overrides jQuery UI? */
 .ui-tabs .ui-tabs-nav li {
-	height: 100%;
-  width: 50px;
-  border: solid;
-  border-width: 0 1px 0 0;
-  text-align: center;
-  border-color: inherit;
+    width: 100%;
+    height: 32px;
+    border: solid;
+    border-width: 0px 0px 1px 0px;
+    text-align: center;
+    border-color: inherit;
 }
 
 .ui-widget {
