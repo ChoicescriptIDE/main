@@ -180,7 +180,7 @@
 							</li>
 						</ul>
 						<!-- ko foreach: tabs -->
-							<div class='tab-wrap' data-bind="attr: { id: id }, visible: visible">
+							<div class='tab-wrap' data-bind="attr: { id: id }, visible: visible, style: { borderColor: $root.getUIColour(-30) }">
                 <div data-bind="css: 'tab-panel ' + id">
                   <div class="no-select tab-panel-header col-anim" data-bind="visible: showTitle, text: getHeaderTitle, style: { backgroundColor: $root.getUIColour(-8) }"></div>
     								<!-- ko if: href != '' -->

@@ -169,9 +169,9 @@ body.night .left-wrap {
 #tabs .tab-wrap {
     left: 40px;
     right: 0px;
-    box-shadow: -2px 2px 4px 0 #1f1f1f;
     border: none;
     border-bottom: 1px solid;
+    border-left: 1px solid;
     position: absolute;
     bottom: 0px;
     padding: 0px;
