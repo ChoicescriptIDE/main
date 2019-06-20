@@ -1,3 +1,14 @@
+
+## v1.3.1 - 21/06/2019
+
+Hotfix release. Reverts atomic file writing changes from v1.3.0 due to corruption of metadata.
+
+### Fixes
+- Corrupted metadata on file writes
+
+### Changes
+- File writes are no longer atomic
+
 ## v1.3.0 - 03/06/2019
 
 Feature release focussing on user dictionary improvements and bug fixes.
