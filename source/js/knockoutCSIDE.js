@@ -12,7 +12,6 @@ if (typeof nw === "object") {
   var trash = require('trash');
   var getDirName = require('path').dirname;
   var gui = require('nw.gui');
-  var writeFileAtomic = require('write-file-atomic');
   //var http = require('http');
   //var stream = require('stream');
   var updater = require('cside-updater');
@@ -29,7 +28,7 @@ if (typeof nw === "object") {
     } else {
       var installFolderPath = process.execPath.slice(0, process.execPath.lastIndexOf("\\")) + "\\";
     }
-    writeFileAtomic(installFolderPath + 'error-log.txt', err.message() + "\n", {encoding: "utf8" }, function(err) {
+    fs.writeFile(installFolderPath + 'error-log.txt', err.message() + "\n", function(err) {
       if (err) throw err;
     });
   });
@@ -1570,7 +1569,7 @@ function IDEViewModel() {
             if (err) {
               callback(normalizeError(err));
             } else {
-              writeFileAtomic(path, data, {
+              fs.writeFile(path, data, {
                 encoding: 'utf8'
               }, function(err) {
                 callback(normalizeError(err));
@@ -1626,7 +1625,7 @@ function IDEViewModel() {
             if (err) {
               callback(normalizeError(err));
             } else {
-              writeFileAtomic(newPath, data, { encoding: "utf8" }, function(err) {
+              fs.writeFile(newPath, data, function(err) {
                 callback(normalizeError(err));
               });
             }
@@ -4040,7 +4039,7 @@ function IDEViewModel() {
     chooser.off().change(function(evt) {
       var savePath = $(this).val();
       if (!savePath) return;
-      writeFileAtomic(savePath, scene.document.getValue(), { encoding: "utf8" }, function(err) {
+      fs.writeFile(savePath, scene.document.getValue(), function(err) {
         if (err) {
           bootbox.alert(err.message);
           return;
