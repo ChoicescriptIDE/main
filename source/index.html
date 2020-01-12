@@ -182,7 +182,7 @@
 						<!-- ko foreach: tabs -->
 							<div class='tab-wrap' data-bind="attr: { id: id }, visible: visible, style: { borderColor: $root.getUIColour(-30) }">
                 <div data-bind="css: 'tab-panel ' + id">
-                  <div class="no-select tab-panel-header col-anim" data-bind="visible: showTitle, text: getHeaderTitle, style: { backgroundColor: $root.getUIColour(-8) }"></div>
+                  <div class="no-select tab-panel-header col-anim" data-bind="visible: showTitle, text: getHeaderTitle, style: { backgroundColor: $root.getUIColour(-25) }"></div>
     								<!-- ko if: href != '' -->
                       <div class="iframe-wrap">
   									    <iframe data-bind="attr { src: href, title: title, name: title, visible: href, id: id + '-tab-frame' }"></iframe>
@@ -258,9 +258,9 @@
     											</li>
     										<!-- /ko -->
     									</script>
-										<div data-bind="style: { backgroundColor: $root.getUIColour(-8) }" class="no-select tab-panel-header col-anim">Editor Settings</div>
+										<div data-bind="style: { backgroundColor: $root.getUIColour(-25) }" class="no-select tab-panel-header col-anim">Editor Settings</div>
 										<ul data-bind="template: { name: 'setting-option-template', foreach: $root.getEditorSettings }"></ul>
-										<div data-bind="style: { backgroundColor: $root.getUIColour(-8) }" class="no-select tab-panel-header col-anim">App Settings</div>
+										<div data-bind="style: { backgroundColor: $root.getUIColour(-25) }" class="no-select tab-panel-header col-anim">App Settings</div>
 										<ul data-bind="template: { name: 'setting-option-template', foreach: $root.getAppSettings }"></ul>
     								<!-- /ko -->
     								<!-- ko if: id == 'dictionary' -->
