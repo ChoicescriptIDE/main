@@ -64,8 +64,8 @@ function IDEViewModel() {
     return target;
   };
   ko.extenders.callFunc = function(target, option) {
-    target.subscribe(function() {
-      option.func();
+    target.subscribe(function(val) {
+      option.func(val);
     });
     return target;
   };
