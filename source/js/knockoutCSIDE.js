@@ -477,7 +477,7 @@ function IDEViewModel() {
     var name = ko.observable("").extend({
       lowerCase: ""
     });
-	name(getSceneName(path()));
+    name(getFileName(path()));
     var isImportant = name().toUpperCase().match(reservedSceneNames);
     var source = sceneData.source || platform; //won't change - so doesn't need to be an observable?
     var loaded = ko.observable(false);
@@ -4096,9 +4096,9 @@ function IDEViewModel() {
     return el.className && new RegExp("(\\s|^)" + cls + "(\\s|$)").test(el.className);
   }
 
-  function getSceneName(scenePath) {
+  function getFileName(scenePath) {
     var sceneName = getLastDirName(scenePath);
-    return sceneName.substring(0, sceneName.length - 4); //gets rid of .txt extension ... => USED to .toLowerCase(), but it caused problems with capitals in *scene_list (keep an eye!)
+    return sceneName.substring(0, sceneName.length - getFileExtension(scenePath).length);
   }
 
   function getLastDirName(path) {
@@ -4484,7 +4484,7 @@ function IDEViewModel() {
 
     function addScene(fileName, data) {
       var scene = new Scene();
-      var sceneName = getSceneName(fileName);
+      var sceneName = getFileName(fileName);
       try {
         scene.loadLines(data);
       } catch (err) {
