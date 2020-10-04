@@ -15,7 +15,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         include:
           - os: ubuntu-latest
-            platform: "latest"
+            platform: "linux"
             experimental: true # we don't actually ship CSIDE on Linux
           - os: macos-latest
             platform: "mac"
