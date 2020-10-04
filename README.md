@@ -6,8 +6,8 @@ Overview of the health of the many components that make up the ChoiceScript IDE.
 | Component | upstream-merge | build + test |
 |-----------|----------------|--------|
 | ChoiceScript                | ![merge-upstream](https://github.com/ChoicescriptIDE/choicescript/workflows/merge-upstream/badge.svg)                       | ![test](https://github.com/ChoicescriptIDE/choicescript/workflows/test/badge.svg) |
-| monaco-choicescript                 | TBC                                                                                                                 | TBC |
-| vscode-choicescript-languageservice | TBC                                                                                                                 | TBC |
+| monaco-choicescript                 | ![merge-upstream](https://github.com/ChoicescriptIDE/monaco-choicescript/workflows/merge-upstream/badge.svg)        | ![build](https://github.com/ChoicescriptIDE/monaco-choicescript/workflows/build/badge.svg) |
+| vscode-choicescript-languageservice | ![merge-upstream](https://github.com/ChoicescriptIDE/vscode-choicescript-languageservice/workflows/merge-upstream/badge.svg) | ![test](https://github.com/ChoicescriptIDE/vscode-choicescript-languageservice/workflows/test/badge.svg) |
 | monaco-json                         | ![merge-upstream](https://github.com/ChoicescriptIDE/monaco-json/workflows/merge-upstream/badge.svg)                | ![build](https://github.com/ChoicescriptIDE/monaco-json/workflows/build/badge.svg) |
 | vscode-json-languageservice         | ![merge-upstream](https://github.com/ChoicescriptIDE/vscode-json-languageservice/workflows/merge-upstream/badge.svg)| ![test](https://github.com/ChoicescriptIDE/vscode-json-languageservice/workflows/test/badge.svg) |
 | monaco-languages                    | ![merge-upstream](https://github.com/ChoicescriptIDE/monaco-languages/workflows/merge-upstream/badge.svg)           | ![test](https://github.com/ChoicescriptIDE/monaco-languages/workflows/test/badge.svg) |
