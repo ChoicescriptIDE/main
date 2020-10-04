@@ -12,15 +12,14 @@ Overview of the health of the many components that make up the ChoiceScript IDE.
 | vscode-json-languageservice         | ![merge-upstream](https://github.com/ChoicescriptIDE/vscode-json-languageservice/workflows/merge-upstream/badge.svg)| ![test](https://github.com/ChoicescriptIDE/vscode-json-languageservice/workflows/test/badge.svg) |
 | monaco-languages                    | ![merge-upstream](https://github.com/ChoicescriptIDE/monaco-languages/workflows/merge-upstream/badge.svg)           | ![test](https://github.com/ChoicescriptIDE/monaco-languages/workflows/test/badge.svg) |
 | monaco-editor                       | ![merge-upstream](https://github.com/ChoicescriptIDE/monaco-editor/workflows/merge-upstream/badge.svg)              | ![build](https://github.com/ChoicescriptIDE/monaco-editor/workflows/build/badge.svg) ![Upstream Editor CI](https://github.com/ChoicescriptIDE/monaco-editor/workflows/Upstream%20Editor%20CI/badge.svg) |
-| CSIDE/main                          | N/A              | [![Build Status](https://semaphoreci.com/api/v1/choicescriptide/main/branches/latest/badge.svg)](https://semaphoreci.com/choicescriptide/main) |
+| CSIDE/main                          | N/A              | ![build](https://github.com/ChoicescriptIDE/main/workflows/build/badge.svg) |
 
 ## Building
 
 ### Prerequisites
-You'll want at least the following installed in order to build CSIDE:
+You'll want the following installed in order to build CSIDE:
 
-- NodeJS v8.11.2
-- Latest NPM (6.1.0+)
+- NodeJS v10.X and associated version of npm
 - Global install of latest grunt-cli (npm install grunt-cli -g)
 
 This is what the CLI runs with. Other versions/combinations *may* work but please try this combination before reporting a build bug.
