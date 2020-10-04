@@ -2,9 +2,9 @@ name: build
 
 on:
   push:
-    branches: [master]
+    branches: [latest]
   pull_request:
-    branches: [master]
+    branches: [latest]
   workflow_dispatch:
 
 jobs:
@@ -34,4 +34,4 @@ jobs:
         run: |
           npm install grunt-cli -g
           npm install .
-          npm grunt build-with-${{ matrix.platform }}
+          grunt build-with-${{ matrix.platform }}
