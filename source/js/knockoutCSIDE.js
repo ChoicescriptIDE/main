@@ -886,14 +886,17 @@ function IDEViewModel() {
         if (typeof callback == 'function') callback(err);
       }
     }
-    self.select = function() {
+    self.select = function(callback) {
+      if (typeof callback !== "function") callback = function(){};
       if (selectedScene() === self) {
+        callback(true);
         return;
       }
-      if (inErrState() || !loaded() || saving() || self.isLocked()) {
-        return false;
-      }
       //ensure we're not already editing the name of another scene:
+      if (inErrState() || !loaded() || saving() || self.isLocked()) {
+        callback(false);
+        return;
+      }
       editor.clearGutter("arrow-gutter");
       selectedScene(self);
       editor.swapDoc(cmDoc);
@@ -901,7 +904,7 @@ function IDEViewModel() {
         self.getProject().setExpand(true);
       }
       editor.setOption("readOnly", readOnly());
-      return true;
+      callback(true);
     }
     self.close = function() {
       self.getProject().closeScene(self);
