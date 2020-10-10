@@ -352,7 +352,7 @@ function IDEViewModel() {
         projects.remove(self);
       }
     }
-    self.closeScene = function(scene) {
+    self.closeScene = function(scene, callback) {
         function closeScene() {
           if (selectedScene() == scene) {
             selectedScene(null);
@@ -360,12 +360,14 @@ function IDEViewModel() {
           }
           self.removeScene(scene);
           __updatePersistenceList();
+          if (typeof callback === 'function') callback(true);
         }
         if (scene.isDirty()) {
           bootbox.confirm("This scene has unsaved changes, are you sure you wish to close it?", function(result) {
             if (result) {
               closeScene();
             } else {
+              if (typeof callback === 'function') callback(false);
               return;
             }
           });
