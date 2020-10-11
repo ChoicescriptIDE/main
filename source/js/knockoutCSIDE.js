@@ -29,13 +29,7 @@ if (typeof nw === "object") {
     console.log(err);
     //globally catch uncaught errors (i.e. don't crash to node-webkit stacktrace screen)
     //VERY basic error logging:
-    if (cside.getPlatform() === "mac_os") {
-      var usefulDirIndex = process.execPath.lastIndexOf('Choicescript IDE.app');
-      var installFolderPath = process.execPath.substring(0, usefulDirIndex);
-    } else {
-      var installFolderPath = process.execPath.slice(0, process.execPath.lastIndexOf("\\")) + "\\";
-    }
-    fs.writeFile(installFolderPath + 'error-log.txt', err.message() + "\n", function(err) {
+    fs.writeFile(updater.getInstallPath() + 'error-log.txt', err.message() + "\n", function(err) {
       if (err) throw err;
     });
   });
