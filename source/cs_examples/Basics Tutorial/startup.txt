@@ -116,7 +116,7 @@ You collect your prize and find that it is
 
 *label female_name
 
-*fake_Choice
+*fake_choice
 	#Anna
 		*set name "Anna"
 	#Betsy
