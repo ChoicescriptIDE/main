@@ -25,13 +25,12 @@ if (typeof nw === "object") {
   var win = gui.Window.get();
   win.show();
   process.on("uncaughtException", function(err) {
-    bootbox.alert(err.message);
-    console.log(err);
-    //globally catch uncaught errors (i.e. don't crash to node-webkit stacktrace screen)
-    //VERY basic error logging:
-    fs.writeFile(updater.getInstallPath() + 'error-log.txt', err.message() + "\n", function(err) {
-      if (err) throw err;
-    });
+    bootbox.alert("<h3>Uncaught Exception <span aria-hidden=\"true\">=(</span></h3><p>" + err.message + "\
+        </p><p>Something went (unexpectedly!) wrong.<br/>Please close \
+        and restart the application (then report this!).");
+    try {
+      fs.appendFileSync(gui.App.dataPath + '/cside-errors.txt', new Date(Date.now()) + ": " + err.message + "\n" + err.stack + "\n");
+    } catch (err) { /* Failed to write to error log */ }
   });
 } else {
   window.usingNode = false;
