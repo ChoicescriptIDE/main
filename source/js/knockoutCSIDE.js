@@ -1897,7 +1897,7 @@ function IDEViewModel() {
     return n;
   }
   self.notification = function(title, message, options) {
-    notification(title, message, options);
+    return notification(title, message, options);
   };
 
   // initiate dropbox:

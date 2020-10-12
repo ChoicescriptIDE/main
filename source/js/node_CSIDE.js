@@ -128,9 +128,15 @@ function dirtyClosure() {
 			saveandquit: {
 				label: "Save & Quit",
 				callback: function() {
-					noty({"text":"Saving & Quitting...", "closeWith": false, "timeout": false});
-					cside.session.save(function() {
-                        quit();
+					var n = cside.notification("", "<i aria-hidden=true class='fa fa-refresh fa-spin'></i> Saving files. Please do not close CSIDE.",
+						{ closeWith: false, timeout: false });
+					cside.session.save(function(err) {
+						n.close();
+						if (!err) {
+							quit();
+						} else {
+							cside.notification("Error", "Failed to save one or more files. App will not exit.", { type: "error" });
+						}
 					});
 				}
 			},
