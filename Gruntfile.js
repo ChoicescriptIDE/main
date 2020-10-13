@@ -23,19 +23,11 @@ module.exports = function(grunt) {
           npm: 'trash username',
           bower: false
         }
-      },
-      choicescript_npm: {
-        options: {
-          cwd: '',
-          failOnError: true,
-          npm: 'cside-choicescript',
-          bower: false
-        }
       }
-     },
+    },
     "clean": {
       files: ['build/*', 'release/*'],
-      folders: ['build/*/', 'node_modules/cside-choicescript']
+      folders: ['build/*/']
     },
     "copy": {
       main: {
@@ -269,7 +261,7 @@ module.exports = function(grunt) {
       }
     }
   });
-  var tasks = ["clean", "auto_install:choicescript_npm", "copy:main", "concat", "uglify", "cssmin", "auto_install:build", "copy:choicescript", "copy:updater", "copy:monaco", "string-replace", "execute", "compress"];
+  var tasks = ["clean", "copy:main", "concat", "uglify", "cssmin", "auto_install:build", "copy:choicescript", "copy:updater", "copy:monaco", "string-replace", "execute", "compress"];
   grunt.registerTask("default", tasks);
   grunt.registerTask("build-with-nwjs", tasks.concat("nwjs"));
   grunt.registerTask("build-with-windows", tasks.concat("nwjs:windows"));
