@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ChoiceScript IDE"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.4.0"
 #define MyAppPublisher "CJW"
 #define MyAppURL "https://choicescriptide.github.io/"
 #define MyAppExeName "ChoiceScript IDE.exe"
@@ -11,7 +11,7 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{63308F8D-AD72-4FA4-A75D-0E3DC690E119}
+AppId={{63308F8D-AD72-4FA4-A75D-0E3DC690E119}}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
@@ -22,11 +22,11 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={localappdata}\{#MyAppName}
 DisableProgramGroupPage=yes
 ;LicenseFile=C:\Users\Carey\Documents\GitHub\main\inno_output
-InfoBeforeFile=C:\Users\Carey\Documents\GitHub\main\README.txt
-InfoAfterFile=C:\Users\Carey\Documents\GitHub\main\inno\THANKYOU.txt
-OutputDir=C:\Users\Carey\Documents\GitHub\main\inno
+InfoBeforeFile=..\README.txt
+InfoAfterFile=..\THANKYOU.txt
+OutputDir=out
 OutputBaseFilename=cside_setup
-SetupIconFile=C:\Users\Carey\Documents\GitHub\main\source\img\cside.ico
+SetupIconFile=..\source\img\cside.ico
 Compression=lzma
 SolidCompression=yes
 
@@ -37,7 +37,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\Carey\Documents\GitHub\main\nwjsBuild\ChoiceScript IDE\win64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\nwjsBuild\CSIDE\win64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
