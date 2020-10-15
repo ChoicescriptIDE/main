@@ -26,8 +26,12 @@ module.exports = function(grunt) {
       }
     },
     "clean": {
-      files: ['build/*', 'release/*'],
-      folders: ['build/*/']
+      main: {
+        src: ['build/**', 'release/**']
+      },
+      package_lock: {
+        src: ['build/package-lock.json']
+      }
     },
     "copy": {
       main: {
@@ -246,7 +250,7 @@ module.exports = function(grunt) {
           buildDir: './nwjsBuild',
           cacheDir: './nwjsCache',
           version: '0.49.0',
-		  zip: false
+          zip: false
         },
         src: ['./build/**/*']
       },
@@ -261,7 +265,7 @@ module.exports = function(grunt) {
       }
     }
   });
-  var tasks = ["clean", "copy:main", "concat", "uglify", "cssmin", "auto_install:build", "copy:choicescript", "copy:updater", "copy:monaco", "string-replace", "execute", "compress"];
+  var tasks = ["clean", "copy:main", "concat", "uglify", "cssmin", "auto_install:build", "clean:package_lock", "copy:choicescript", "copy:updater", "copy:monaco", "string-replace", "execute", "compress"];
   grunt.registerTask("default", tasks);
   grunt.registerTask("build-with-nwjs", tasks.concat("nwjs"));
   grunt.registerTask("build-with-windows", tasks.concat("nwjs:windows"));
