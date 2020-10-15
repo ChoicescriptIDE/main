@@ -1276,10 +1276,10 @@ function IDEViewModel() {
       //do nothing
     }, [
       new menuOption("Convert all spaces to tabs", function(menu) {
-        __normalizeSceneIndentation(menu.getTarget(), "tabs");
+        vseditor.getAction('editor.action.indentationToTabs').run();
       }),
       new menuOption("Convert all tabs to spaces", function(menu) {
-        __normalizeSceneIndentation(menu.getTarget(), "spaces");
+        vseditor.getAction('editor.action.indentationToSpaces').run();
       })
     ]),
     new menuOption("Review", function(menu) {
@@ -4385,54 +4385,6 @@ function IDEViewModel() {
         }
       });
     }
-  }
-
-  function __testSceneIndentation(scene) {
-    var tabs = false;
-    var spaces = false;
-    var lines = scene.getText().split("\n");
-    for (var i = 0; i < lines.length; i++) {
-      if (lines[i].match(/^\t+/))
-        tabs = true;
-      else if (lines[i].match(/^\s+/))
-        spaces = true;
-      if (spaces && tabs) {
-        bootbox.confirm("<h3>Warning</h3><p><b>" + scene.getName() + ".txt</b> of <b>" + scene.getProject().getName() + "</b> uses both tabs and spaces for indentation. Would you like the IDE to automatically normalize all indents to your settings preference?</p>", function(result) {
-          if (result) {
-            __normalizeSceneIndentation(scene);
-          }
-        });
-        break;
-      }
-    }
-  }
-
-  function __normalizeSceneIndentation(scene, useSpaces) {
-    var tabSize = settings.asObject("editor")["tabsize"];
-    useSpaces = useSpaces || settings.asObject("editor")["tabtype"];
-    var lines = scene.getText().split("\n");
-    if (useSpaces) {
-      for (var i = 0; i < lines.length; i++) {
-        var oldIndent = lines[i].match(/^\t+/);
-        if (oldIndent) {
-          var newIndent = "";
-          for (var c = 0; c < oldIndent[0].length * tabSize; c++)
-            newIndent += " ";
-          lines[i] = lines[i].replace(/^\t+/, newIndent);
-        }
-      }
-    } else {
-      for (var i = 0; i < lines.length; i++) {
-        var oldIndent = lines[i].match(/^\s+/);
-        if (oldIndent) {
-          var newIndent = "";
-          for (var c = 0; c < oldIndent[0].length / tabSize; c++)
-            newIndent += "\t";
-          lines[i] = lines[i].replace(/^\s+/, newIndent);
-        }
-      }
-    }
-    scene.setText(lines.join("\n"));
   }
 
   function __testProject(project, test) {
