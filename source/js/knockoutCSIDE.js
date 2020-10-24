@@ -3265,13 +3265,13 @@ function IDEViewModel() {
     }
 
     var isOpen = true;
-    if (calcWidth($('.left-wrap')) > 60) {
+    if (calcWidth($('.left-wrap')) >= 100) {
       isOpen = false;
     }
 
     if (action == "close" && isOpen || !action && isOpen) {
       $('.right-wrap').css({
-        right: '-50%'
+        width: '0%'
       });
       $('.left-wrap').css({
         width: '100%'
@@ -3280,7 +3280,7 @@ function IDEViewModel() {
       if (vseditor) vseditor.layout();
     } else if (action == "open" && !isOpen || !action && !isOpen) {
       $('.right-wrap').css({
-        right: '0%'
+        width: '50%'
       });
       $('.left-wrap').css({
         width: '50%'

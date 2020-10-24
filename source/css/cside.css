@@ -127,7 +127,7 @@ body.night .left-wrap {
 .right-wrap {
   position:absolute;
   width: 50%;
-  right: -50%;
+  right: 0px;
   bottom: 0px;
   top: 0px;
   border-color: inherit;
@@ -225,7 +225,7 @@ body.night .left-wrap {
     height: 30px;
     cursor: default;
     position: absolute;
-    left: -32px;
+    right: 0px;
     z-index: 8;
     border: solid;
     border-width: 0px 1px;

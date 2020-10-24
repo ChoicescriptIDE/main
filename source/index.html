@@ -140,6 +140,9 @@
 						<button id="left-panel-control" title="Toggle scene & project panel" data-bind="click: scenePanel(), style: { backgroundColor: getUIColour(-15), color: getUIColour(-65) }" class="col-anim">
 							<i class="fa fa-arrows-h fa-lg"></i>
 						</button>
+						<button id="panel-control" title="Toggle game panel" data-bind="click: tabPanel(), style: { backgroundColor: getUIColour(-15), color: getUIColour(-65) }" class="col-anim">
+							<i class="fa fa-arrows-h fa-lg"></i>
+						</button>
 						<div id="doc-bar" data-bind="style: { backgroundColor: getUIColour(-8) }" clas="col-anim">
 							<ul>
 								<li class="doc-title">
@@ -152,9 +155,6 @@
 						</div>
 					</div>
 					<div class="right-wrap">
-						<button id="panel-control" title="Toggle game panel" data-bind="click: tabPanel(), style: { backgroundColor: getUIColour(-15), color: getUIColour(-65) }" class="col-anim">
-							<i class="fa fa-arrows-h fa-lg"></i>
-						</button>
 						<div id="tabs" data-bind="tabs: { refreshOn: tabs }">
 							<ul data-bind="style: { backgroundColor: getUIColour(-10) }, sortable: { data: tabs, allowDrop: false, connectClass: 'null', afterMove: cside.updatePersistenceList, options: { axis: 'x', items: 'li', containment: 'parent' } }" class="col-anim">
 								<li data-bind="attr: { 'aria-controls': id, title: title }, visible: visible, style: { backgroundColor: $root.getUIColour(-15) }">
