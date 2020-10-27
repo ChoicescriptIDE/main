@@ -3147,24 +3147,29 @@ function IDEViewModel() {
   };
 
   self.scenePanel = function(action) {
-    var sidebarLeft = $('#sidebar').css("left");
-    if (parseInt(sidebarLeft.slice(0, sidebarLeft.length - 2)) < 0) {
-      $('#page-content-wrapper').css({
-        "left": "230px"
-      });
-      $('#sidebar').css({
-        "left": "0px"
-      });
+    var sideBarWidth = $('#sidebar').width();
+    var containerWidth = $('#sidebar').parent().width();
+    var onePercent = containerWidth / 100;
+    var defaultWidthPercent = 230 / onePercent; // 230px^M
+    if (sideBarWidth > 0) {
+        $('#page-content-wrapper').css({
+            "width": "100%"
+        });
+        $('#sidebar').css({
+            "width": "0%",
+            "display": "none"
+        });
     } else {
-      $('#page-content-wrapper').css({
-        "left": "0px"
-      });
-      $('#sidebar').css({
-        "left": "-230px"
-      });
+        $('#page-content-wrapper').css({
+            "width": (100 - defaultWidthPercent) + "%"
+        });
+        $('#sidebar').css({
+            "width": defaultWidthPercent + "%",
+            "display": ""
+        });
     }
     if (vseditor) vseditor.layout();
-  }
+}
 
   var consoleCmdBuf = [];
   var consoleCmdBufPtr = 0;

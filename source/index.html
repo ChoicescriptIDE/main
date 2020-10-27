@@ -70,41 +70,41 @@
     </div>
     <!-- END OF DROPBOX/WEB FILE EXPLORER -->
     <div class="main-wrap" data-bind="style: { borderColor: getUIColour(-30) }">
-        <div id="inner-wrap">
-            <div id="headbar" data-bind="style: { backgroundColor: getUIColour() }, event: { dblclick: getPlatform() === 'web-dropbox' ? null : session.win.toggleMaximize() }" class="col-anim">
-                <!-- ko if: getPlatform() != "mac_os" -->
-                <ul data-bind="foreach: getToolbarMenus" id="toolbar">
-                    <li data-bind="fadeVisible: (isActive() && ($root.getPlatform() != 'web-dropbox' || $root.webFileBrowserClosed)), style: { backgroundColor: $root.getUIColour(-20) }">
-                        <button data-bind="click: toggle, html: getTitle, style: { backgroundColor: $root.getUIColour(-12) }"></button>
-                        <div class="menu" data-bind="fadeVisible: isExpanded, style: { backgroundColor: $root.getUIColour(-20) }, event: { mouseleave: toggle.bind(null, false) }">
-                            <ul data-bind="foreach: getOptions">
-                                <li><button data-bind="text: getLabel(), click: $parent.doAction.bind($data), style: { backgroundColor: $root.getUIColour(-12) }"></button>
-                                    <div class="sub-menu">
-                                        <ul data-bind="foreach: getSubMenuOptions()">
-                                            <li>
-                                                <button data-bind="text: getLabel(), click: doAction.bind($data, $parents[1]), style: { backgroundColor: $root.getUIColour(-16) }"></button>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                </ul>
-                <!-- /ko -->
-                <!-- ko if: getPlatform() != "web-dropbox" -->
-                <div id="win-controls" data-bind="css: getPlatform() == 'mac_os' ? 'mac_os' : 'windows'">
-                    <button id="win-close" title="Quit CSIDE" data-bind="click: function() { win.close(); }">
-                        <i class="fa fa-close"></i>
-                    </button>
-                    <button id="win-min" title="Minimize CSIDE window" data-bind="click: function() { win.minimize(); }">
-                        <i class="fa fa-chevron-down"></i>
-                    </button>
-                    <button id="win-max" title="Maximize CSIDE window" data-bind="click: session.win.toggleMaximize">
-                        <i data-bind="css: session.win.isFullscreen() ? 'fa fa-compress' : 'fa fa-expand';"></i>
-                    </button>
-                </div>
-                <!-- /ko -->
+        <div id="headbar" data-bind="style: { backgroundColor: getUIColour() }, event: { dblclick: getPlatform() === 'web-dropbox' ? null : session.win.toggleMaximize() }" class="col-anim">
+            <!-- ko if: getPlatform() != "mac_os" -->
+            <ul data-bind="foreach: getToolbarMenus" id="toolbar">
+                <li data-bind="fadeVisible: (isActive() && ($root.getPlatform() != 'web-dropbox' || $root.webFileBrowserClosed)), style: { backgroundColor: $root.getUIColour(-20) }">
+                    <button data-bind="click: toggle, html: getTitle, style: { backgroundColor: $root.getUIColour(-12) }"></button>
+                    <div class="menu" data-bind="fadeVisible: isExpanded, style: { backgroundColor: $root.getUIColour(-20) }, event: { mouseleave: toggle.bind(null, false) }">
+                        <ul data-bind="foreach: getOptions">
+                            <li><button data-bind="text: getLabel(), click: $parent.doAction.bind($data), style: { backgroundColor: $root.getUIColour(-12) }"></button>
+                                <div class="sub-menu">
+                                    <ul data-bind="foreach: getSubMenuOptions()">
+                                        <li>
+                                            <button data-bind="text: getLabel(), click: doAction.bind($data, $parents[1]), style: { backgroundColor: $root.getUIColour(-16) }"></button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+            </ul>
+            <!-- /ko -->
+            <!-- ko if: getPlatform() != "web-dropbox" -->
+            <div id="win-controls" data-bind="css: getPlatform() == 'mac_os' ? 'mac_os' : 'windows'">
+                <button id="win-close" title="Quit CSIDE" data-bind="click: function() { win.close(); }">
+                    <i class="fa fa-close"></i>
+                </button>
+                <button id="win-min" title="Minimize CSIDE window" data-bind="click: function() { win.minimize(); }">
+                    <i class="fa fa-chevron-down"></i>
+                </button>
+                <button id="win-max" title="Maximize CSIDE window" data-bind="click: session.win.toggleMaximize">
+                    <i data-bind="css: session.win.isFullscreen() ? 'fa fa-compress' : 'fa fa-expand';"></i>
+                </button>
             </div>
+            <!-- /ko -->
+        </div>
+        <div id="inner-wrap">
             <div id="sidebar">
                 <div id="sidebar-header" data-bind="style: { backgroundColor: getUIColour(-8) }" class="col-anim">
                     <span id="projects-header-title">Scenes & Projects</span>
@@ -144,7 +144,7 @@
             <div id="page-content-wrapper">
                 <div id="second-wrap">
                     <div class="left-wrap">
-                        <button id="left-panel-control" title="Toggle scene & project panel" data-bind="click: scenePanel(), style: { backgroundColor: getUIColour(-15), color: getUIColour(-65) }" class="col-anim">
+                        <button id="left-panel-control" title="Toggle scene & project panel" data-bind="click: scenePanel, style: { backgroundColor: getUIColour(-15), color: getUIColour(-65) }" class="col-anim">
                             <i class="fa fa-arrows-h fa-lg"></i>
                         </button>
                         <button id="panel-control" title="Toggle game panel" data-bind="click: tabPanel(), style: { backgroundColor: getUIColour(-15), color: getUIColour(-65) }" class="col-anim">

@@ -131,11 +131,10 @@ body.night input:not([readonly]) {
 }
 
 #page-content-wrapper {
-    position: absolute;
-    top: 30px;
-    bottom: 20px;
-    left: 230px;
-    right: 0px;
+    position: relative;
+    display: inline-block;
+    height: 100%;
+    width: 85%;
     border-color: inherit;
 }
 
@@ -941,12 +940,10 @@ body.night .tab-panel li:nth-child(even) {
 }
 
 #sidebar {
-    position: absolute;
-    top: 30px;
-    bottom: 0px;
-    width: 230px;
+    position: relative;
+    width: 15%;
+    height: 100%;
     float: left;
-    left: -230px;
     z-index: 7;
     border-color: inherit;
 }
@@ -1022,7 +1019,7 @@ body.night .scene.scene-selected {
     top: 2px;
     left: 20px;
     height: 25px;
-    width: 160px;
+    width: 75%;
     z-index: 1;
     border: 1px solid #E0E0E0;
     padding-bottom: 3px;
@@ -1276,7 +1273,7 @@ body.night .project-hover {
     position: absolute;
     padding-left: 2px;
     height: 100%;
-    width: 130px;
+    width: 65%;
     z-index: 1;
     color: white;
     border: solid;
@@ -1428,7 +1425,7 @@ body.night .project-hover {
     margin: 0px;
     position: absolute;
     top: 30px;
-    bottom: 20px;
+    bottom: 0px;
     overflow: auto;
     border: solid;
     border-width: 0px 1px 0px 0px;
