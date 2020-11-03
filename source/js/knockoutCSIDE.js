@@ -2653,14 +2653,15 @@ function IDEViewModel() {
                 return new Promise(function(resolve, reject) {
                   context.markers.forEach(function(marker) {
                     if (marker.code === "badSpelling") {
-                      word = meditor.getModel().getWordAtPosition(new monaco.Position(range.startLineNumber, range.startColumn));
+                      var wordRange = new monaco.Range(marker.startLineNumber, marker.startColumn, marker.endLineNumber, marker.endColumn);
+                      var word = meditor.getModel().getWordAtPosition(new monaco.Position(wordRange.startLineNumber, wordRange.startColumn));
                       if (!word) return;
                       suggestWord(word.word).then(function(suggestions) {
                         for (var i = 0; i < suggestions.length; i++)
                           actions.push({ title: "Correct spelling: " + suggestions[i], kind: "quickfix",
                             edit: {
                               edits: [
-                                { edit: { range: range, text: suggestions[i] }, resource: model.uri }
+                                { edit: { range: wordRange, text: suggestions[i] }, resource: model.uri }
                               ]
                             }
                           });
