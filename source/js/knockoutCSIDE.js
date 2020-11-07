@@ -3265,7 +3265,7 @@ function IDEViewModel() {
     element.value = "";
   }
   self.tabPanel = function(action) {
-    if ($('.left-wrap').is(':animated') || $('.right-wrap').is(':animated')) {
+    if ($('#left-wrap').is(':animated') || $('#right-wrap').is(':animated')) {
       return;
     }
 
@@ -3277,24 +3277,24 @@ function IDEViewModel() {
     }
 
     var isOpen = true;
-    if (calcWidth($('.left-wrap')) >= 100) {
+    if (calcWidth($('#left-wrap')) >= 100) {
       isOpen = false;
     }
 
     if (action == "close" && isOpen || !action && isOpen) {
-      $('.right-wrap').css({
+      $('#right-wrap').css({
         width: '0%'
       });
-      $('.left-wrap').css({
+      $('#left-wrap').css({
         width: '100%'
       });
       $("#expand-collapse-bar").addClass("collapsed");
       if (vseditor) vseditor.layout();
     } else if (action == "open" && !isOpen || !action && !isOpen) {
-      $('.right-wrap').css({
+      $('#right-wrap').css({
         width: '50%'
       });
-      $('.left-wrap').css({
+      $('#left-wrap').css({
         width: '50%'
       });
       $("#expand-collapse-bar").removeClass("collapsed");

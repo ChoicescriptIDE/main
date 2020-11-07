@@ -144,7 +144,7 @@ body.night input:not([readonly]) {
     border-color: inherit;
 }
 
-.left-wrap {
+#left-wrap {
     width: 100%;
     height: 100%;
     float: left;
@@ -153,11 +153,11 @@ body.night input:not([readonly]) {
     border-color: inherit;
 }
 
-body.night .left-wrap {
+body.night #left-wrap {
     background-color: #262626;
 }
 
-.right-wrap {
+#right-wrap {
     position: absolute;
     width: 50%;
     right: 0px;

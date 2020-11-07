@@ -139,7 +139,7 @@
             </div>
             <div id="page-content-wrapper">
                 <div id="second-wrap">
-                    <div class="left-wrap">
+                    <div id="left-wrap">
                         <button id="left-panel-control" title="Toggle scene & project panel" data-bind="click: scenePanel, style: { backgroundColor: getUIColour(-15), color: getUIColour(-65) }" class="col-anim">
                             <i class="fa fa-arrows-h fa-lg"></i>
                         </button>
@@ -157,7 +157,7 @@
                             <textarea style="display: none;" id="code-textarea" name="code"></textarea>
                         </div>
                     </div>
-                    <div class="right-wrap">
+                    <div id="right-wrap">
                         <div id="tabs" data-bind="tabs: { refreshOn: tabs }">
                             <ul data-bind="style: { backgroundColor: getUIColour(-10) }, sortable: { data: tabs, allowDrop: false, connectClass: 'null', afterMove: cside.updatePersistenceList, options: { axis: 'x', items: 'li', containment: 'parent' } }" class="col-anim">
                                 <li data-bind="attr: { 'aria-controls': id, title: title }, visible: visible, style: { backgroundColor: $root.getUIColour(-15) }">
