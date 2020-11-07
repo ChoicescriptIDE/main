@@ -2351,11 +2351,18 @@ function IDEViewModel() {
     var text = vseditor.getModel().getValueInRange(vseditor.getSelection());
     if (!text) {
       text = tagStart + tagEnd;
-      // position the cursor inside the tags
-      var cursorPos = vseditor.getSelection();
-      cursorPos.startColumn += tagStart.length;
-      cursorPos.positionColumn = cursorPos.selectionStartColumn = cursorPos.startColumn;
-      vseditor.executeEdits("insertTextTags", [{range: vseditor.getSelection(), text: text }], [cursorPos]);
+      var currentSel = vseditor.getSelection();
+      var originalSel = Object.assign({}, currentSel);
+      currentSel = vseditor.getModel().pushEditOperations(
+        [originalSel], // Return to original pos on undo
+        [{range: new monaco.Range(originalSel.startLineNumber, originalSel.startColumn, originalSel.startLineNumber, originalSel.startColumn), text: text }],
+        function (inverseEditOperations) { // Set cursor between tags post-edit
+          currentSel.startColumn = currentSel.selectionStartColumn = currentSel.positionColumn = (currentSel.startColumn + tagStart.length);
+          return [currentSel];
+        }
+      );
+      if (currentSel)
+        vseditor.setSelection(currentSel[0]);
     } else {
       var line;
       var whitespace;
