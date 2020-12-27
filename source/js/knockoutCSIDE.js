@@ -3157,8 +3157,8 @@ function IDEViewModel() {
     var sideBarWidth = $('#sidebar').width();
     var containerWidth = $('#sidebar').parent().width();
     var onePercent = containerWidth / 100;
-    var defaultWidthPercent = 230 / onePercent; // 230px^M
-    if (sideBarWidth > 0) {
+    var defaultWidthPercent = 230 / onePercent; // 230px
+    if (sideBarWidth > 0 && action !== "open") {
         $('#page-content-wrapper').css({
             "width": "100%"
         });
@@ -3750,6 +3750,9 @@ function IDEViewModel() {
 
     // ensure the tab panel starts open and on the 'help' tab
     __selectTab("help");
+
+    // force redraw of the scenePanel based on display width
+    self.scenePanel("open");
 
     // hook post-update behaviour here
     if (config.justUpdated || typeof config.justUpdated === "undefined") {
