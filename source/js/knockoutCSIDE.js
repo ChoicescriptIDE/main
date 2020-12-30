@@ -1290,11 +1290,20 @@ function IDEViewModel() {
       })
     ]),
     new menuOption("Reload", function(menu) {
-      menu.getTarget().load(function(err, scene) {
+      var scene = menu.getTarget();
+      var callback = function(err, scene) {
         if (!err && selectedScene() === menu.getTarget()) {
           scene.select();
         }
-      });
+      }
+      if (scene.isDirty()) {
+        bootbox.confirm("<h3>Warning</h3><p>The scene '" + scene.getName() + "' has unsaved changes. Are you sure you wish to reload it?</p>", function(result) {
+          if (result)
+            scene.load(callback);
+        });
+      } else {
+        scene.load(callback);
+      }
     }),
     new menuOption("Close", function(menu) {
       menu.getTarget().close();
