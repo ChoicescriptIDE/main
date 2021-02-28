@@ -478,8 +478,25 @@ function IDEViewModel() {
   function CSIDEScene(sceneData) {
     var self = this;
     //INSTANCE VARIABLES
+    var edModel; // holds the Monaco editor document model
+    self.dispose = function() { edModel.dispose(); };
     var path = ko.observable("").extend({
-      normalizePaths: ""
+      normalizePaths: "",
+      callFunc: {
+        func: function(newPath) {
+          // automatically replace the Monaco model on renames to keep its Uri in sync
+          var oldModel = edModel;
+          try {
+            edModel = monaco.editor.createModel(edModel ? edModel.getValue() : "", "choicescript", monaco.Uri.file(newPath));
+            edModel.csideScene = self;
+            if (oldModel) oldModel.dispose();
+            if (selectedScene() == self) vseditor.setModel(edModel);
+            edModel.onDidChangeContent(updateOnModelEdit);
+          } catch (err) {
+            bootbox.alert("Unrecoverable Error: Couldn't update URI for scene.<br><br>" + err.message + ".<br><br> Please restart the application and report this.");
+          }
+        }
+      }
     });
     path(sceneData.path);
     var name = ko.observable("").extend({
@@ -496,9 +513,6 @@ function IDEViewModel() {
     var saving = ko.observable(false);
     var inErrState = ko.observable(false);
     var errStateMsg = ko.observable("");
-    var edModel = monaco.editor.createModel(sceneData.contents || "", "choicescript", monaco.Uri.file(sceneData.path));
-    self.dispose = function() { edModel.dispose(); };
-    edModel.csideScene = self;
 
     // used for dirtyness
     var lastVersionId = edModel.getAlternativeVersionId();
@@ -1040,13 +1054,13 @@ function IDEViewModel() {
       }
 
     //Update dirty status, char count etc - on change
-    edModel.onDidChangeContent(function(e) {
+    function updateOnModelEdit() {
       if (!saving())
         lastVersionId !== edModel.getAlternativeVersionId() ? dirty(true) : dirty(false);
       charCount(edModel.getValueLength());
       if (wordCountOn() > 0)
         wordCount(__wordCount(edModel.getValue(), (wordCountOn() > 1)));
-    });
+    }
   }
 
   function csideIssue(issueData) {
