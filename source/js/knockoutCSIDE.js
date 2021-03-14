@@ -480,7 +480,7 @@ function IDEViewModel() {
     //INSTANCE VARIABLES
     var edModel; // holds the Monaco editor document model
     self.dispose = function() { edModel.dispose(); };
-    var path = ko.observable("").extend({
+    var path = ko.observable(__normalizePath(sceneData.path)).extend({
       normalizePaths: "",
       callFunc: {
         func: function(newPath) {
@@ -498,7 +498,6 @@ function IDEViewModel() {
         }
       }
     });
-    path(sceneData.path);
     var name = ko.observable("").extend({
       lowerCase: ""
     });
@@ -513,6 +512,11 @@ function IDEViewModel() {
     var saving = ko.observable(false);
     var inErrState = ko.observable(false);
     var errStateMsg = ko.observable("");
+
+    // create initial model
+    var edModel = monaco.editor.createModel(sceneData.contents || "", "choicescript", monaco.Uri.file(path()));
+    edModel.onDidChangeContent(updateOnModelEdit);
+    edModel.csideScene = self;
 
     // used for dirtyness
     var lastVersionId = edModel.getAlternativeVersionId();
