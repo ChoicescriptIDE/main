@@ -125,16 +125,17 @@ body.night input:not([readonly]), body.night textarea:not([readonly]) {
 }
 
 #inner-wrap {
+    display: flex;
     border-color: inherit;
     width: 100%;
     flex-grow: 10;
 }
 
 #page-content-wrapper {
+    flex: 1 1 auto;
     position: relative;
     display: inline-block;
     height: 100%;
-    width: 85%;
     border-color: inherit;
 }
 
@@ -1081,7 +1082,8 @@ body.night .tab-panel li:nth-child(even) {
 
 #sidebar {
     position: relative;
-    width: 15%;
+    flex: 0 1 230px;
+    min-width: 230px;
     height: 100%;
     float: left;
     z-index: 7;
