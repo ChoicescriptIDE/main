@@ -129,6 +129,7 @@ body.night input:not([readonly]), body.night textarea:not([readonly]) {
     border-color: inherit;
     width: 100%;
     flex-grow: 10;
+    flex-basis: 1px; /* prevent Safari collapsing */
 }
 
 #page-content-wrapper {
