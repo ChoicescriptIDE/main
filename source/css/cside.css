@@ -1650,7 +1650,7 @@ body.night .project-hover {
     text-overflow: ellipsis;
     color: #FFF;
     flex-basis: 20px;
-    z-index: 9999;
+    z-index: 9;
     flex-grow: 1;
 }
 
