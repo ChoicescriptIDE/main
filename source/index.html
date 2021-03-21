@@ -123,14 +123,19 @@
                         <ul class="project" data-bind="fadeAndSlideVisible: isExpanded, css: { 'project-collapsed': isExpanded() != true }, sortable: { data: getScenes, beforeMove: cside.dragSceneEvent, afterMove: cside.updatePersistenceList, options: { axis: 'y', cancel: 'input:not([readonly]), button', items: '.scene', connectWith: '#main-project-wrap > .project-wrapper > .project', placeholder: 'project-hover', containment: $('#main-project-wrap')} }">
                             <li class="scene" role="button" data-bind="click: getErrState() ? load : select, css: { 'scene-selected': $data === $root.getSelectedScene() }">
                                 <button class="save-scene" data-bind="click: getErrState() ? close : save, clickBubble: false, attr: { title: getErrState() ? getErrStateMsg : isReadOnly() ? 'Read-only' : 'Save ' + getName() + '.txt' }"><i data-bind="css: getState"></i></button>
-                                <button class="color-marker handle" data-bind="attr: { title: 'Click to colour project ' + getName() }, click: recolour, clickBubble: false, style: { backgroundColor: getMarkColour }"></button>
+                                <button class="colour-marker handle" data-bind="attr: { title: 'Click to colour project ' + getName() }, click: showColours, clickBubble: false, style: { backgroundColor: getMarkColour }"></button>
                                 <!-- <span data-bind="text: getName(), event: { dblclick: rename }, attr: { title: getName }, fadeVisible: beingEdited() ? false : true"></span> -->
                                 <input data-bind="attr: { title: getName }, enableTextInput: beingEdited, textInput: nameInterface, event: { click: isSelected() ? rename : null, dblclick: rename, blur: rename, keyup: rename }, css: { 'name-error': nameInvalid }" class="col-anim"></input>
                                 <div class="scene-error" data-bind="fadeVisible: nameInvalid">
                                     <span data-bind="text: getNameErrorMsg"></span>
                                 </div>
-                                <ul class="colour-picker" id="colour-picker" data-bind="fadeVisible: beingColoured, event: { mouseleave: recolour }, foreach: $root.getValidSceneColours">
-                                    <li class="colour-selector" role="button" data-bind="style: { backgroundColor: $data }, click: $parent.recolour, clickBubble: false"></li>
+                                <ul class="colour-picker" id="colour-picker" data-bind="fadeVisible: beingColoured, event: { mouseleave: showColours }">
+                                    <!-- ko foreach: $root.getRecentSceneColours -->
+                                    <li class="colour-selector" role="button" data-bind="style: { backgroundColor: $data }, click: $parent.recolour.bind($data, $data), clickBubble: false"></li>
+                                    <!-- /ko -->
+                                    <!-- ko if: $root.getPlatform() != "web-dropbox" -->
+                                    <li class="colour-selector new-colour-selector" role="button" data-bind="click: newColour, clickBubble: false" style="border: none;"><i class="fa fa-plus-circle"></i></li>
+                                    <!-- /ko -->
                                 </ul>
                             </li>
                         </ul>
@@ -352,6 +357,7 @@
     <input style="display:none;" id="getFilePaths" type="file" multiple accept=".txt,.log" />
     <input style="display:none;" id="getImagePaths" type="file" accept=".png,.jpeg,.jpg,.gif" />
     <input style="display:none;" id="saveSceneTo" type="file" nwsaveas=".txt" />
+    <input style="display:none;" id="selectColor" type="color">
 
     <!-- CSIDE Code -->
     <script type="text/javascript">

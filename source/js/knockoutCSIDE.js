@@ -674,7 +674,21 @@ function IDEViewModel() {
     var fileStats = sceneData.stats || {
       "mtime": new Date()
     }; //won't change - so doesn't need to be an observable?
-    var markColour = ko.observable(sceneData.color ? sceneData.color : isImportant ? "rgb(119, 151, 236)" : "rgb(119, 119, 119)");
+    var markColour = ko.observable(sceneData.color ? sceneData.color : isImportant ? "#7797ec" : "#777777");
+    markColour.extend({
+      callFunc: {
+        func: function(newCol) {
+          var colIndex = recentSceneColours().indexOf(newCol);
+          recentSceneColours.unshift(newCol);
+          if (colIndex > -1) {
+            recentSceneColours.splice(++colIndex, 1);
+          } else {
+            recentSceneColours.splice(recentSceneColours().length-1, 1);
+          }
+          __updatePersistenceList();
+        }
+      }
+    });
     //var sceneListPosition = ko.observable(self.project().scenes().length);
     var issues = ko.observableArray([]);
     issues.subscribe(function(val) {
@@ -900,20 +914,31 @@ function IDEViewModel() {
         }, 10);
       }
     }
-    self.recolour = function(data, event) {
-      // only ever called from events...?
+    self.showColours = function(scene, event) {
       if (event.type === "mouseleave" && !colouring()) return; // ignore mouseleave after colour select
-      if (self.isLocked()) return;
-      if (typeof data == "string" && data != markColour()) {
-        var reg = new RegExp("(" + validSceneColours().join("|").replace(/\(/g, "\\(").replace(/\)/g, "\\)") + ")");
-        if (!data.match(reg)) {
-          console.log("Scene Recolour Error: Invalid colour");
-          return;
-        }
-        markColour(data);
-        __updatePersistenceList();
-      }
       colouring(!colouring());
+    }
+    self.recolour = function(colour, event) {
+      markColour(colour);
+      colouring(false);
+    }
+    self.newColour = function(scene, event) {
+      var bcr = event.target.getBoundingClientRect();
+      var colSelector = $("#selectColor");
+      colSelector.off();
+      colSelector.val(markColour());
+      colSelector.css({
+        "position": "fixed",
+        "left": bcr.x,
+        "top": bcr.y,
+        "z-index": -999
+      }).change(function(evt) {
+        markColour(colSelector.val());
+        colSelector.hide();
+      });
+      setTimeout(function() {
+        colSelector.show().trigger("click");
+      }, 500);
     }
     self.showSearchResult = function(index, data) {
       if (searchVersionId != edModel.getAlternativeVersionId()) {
@@ -1834,10 +1859,7 @@ function IDEViewModel() {
   }
 
   var reservedSceneNames = "(STARTUP|CHOICESCRIPT_STATS)"; //Should be in upper case
-  var validSceneColours = ko.observableArray(["rgb(125, 186, 125)", "rgb(172, 209, 240)", "rgb(228, 144, 150)",
-    "rgb(237, 216, 161)", "rgb(161, 165, 237)", "rgb(224, 161, 237)", "rgb(163, 163, 163)", "rgb(230, 230, 230)"
-  ]);
-  validSceneColours = ko.observableArray(["rgb(114, 195, 116)", "rgb(119, 151, 236)", "rgb(217, 83, 79)", "rgb(165, 147, 122)", "rgb(255, 141, 43)", "rgb(224, 121, 245)", "rgb(0, 168, 195)", "rgb(119, 119, 119)"]);
+  var recentSceneColours = ko.observableArray(["#72c374", "#7797ec", "#d9534f", "#a5937a", "#ff8d2b", "#e079f5", "#00a8c3", "#777777"]);
   var uiColour = ko.observable().extend({ notify: 'always' });
   uiColour("90,90,90");
   var consoleOpen = ko.observable(false);
@@ -1875,6 +1897,7 @@ function IDEViewModel() {
     },
 	"justUpdated": false,
     "openProjects": [],
+    "recentColours": [],
     "userDictionary": {},
     "tabs": [
       "game",
@@ -2268,8 +2291,8 @@ function IDEViewModel() {
   self.getActiveProject = ko.computed(function() {
     return activeProject();
   }, this);
-  self.getValidSceneColours = ko.computed(function() {
-    return validSceneColours();
+  self.getRecentSceneColours = ko.computed(function() {
+    return recentSceneColours();
   }, this);
   self.getPlatform = function() {
     return platform;
@@ -4057,6 +4080,11 @@ function IDEViewModel() {
       user.name = "dropbox-user";
     }
     if (config.settings.app.persist) {
+
+      // load preferred scene colour swatches
+      if (Array.isArray(config.recentColours) && (config.recentColours.length > 0))
+        recentSceneColours(config.recentColours);
+
       var thisProjectData = [];
       for (var i = 0; i < config.openProjects.length; i++) {
         thisProjectData = config.openProjects[i];
@@ -5076,6 +5104,7 @@ function IDEViewModel() {
   function __updatePersistenceList() {
     config.openProjects = [];
     config.tabs = [];
+    config.recentColours = [];
     var thisProject;
     for (var i = 0; i < projects().length; i++) {
       thisProject = {
@@ -5099,6 +5128,9 @@ function IDEViewModel() {
     }
     for (var e = 0; e < self.tabs().length; e++) {
       config.tabs[e] = self.tabs()[e].id;
+    }
+    for (var c = 0; c < recentSceneColours().length; c++) {
+      config.recentColours.push(recentSceneColours()[c]);
     }
     __updateConfig();
   }

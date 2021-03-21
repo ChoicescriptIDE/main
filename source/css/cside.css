@@ -1240,13 +1240,15 @@ body.night .scene-error {
 
 /* grey scene label */
 
-.scene .color-marker {
+.scene .colour-marker {
     height: 10px;
     width: 10px;
     position: absolute;
     left: 5px;
     top: 10px;
     border-radius: 5px;
+    border: 1px solid;
+    border-color: inherit;
 }
 
 .colour-picker {
@@ -1275,10 +1277,16 @@ body.night .colour-picker {
     width: 12px;
     margin: 6px 4px;
     border-radius: 6px;
-    -webkit-transition: all 200ms ease-in;
-    -moz-transition: all 200ms ease-in;
-    -ms-transition: all 200ms ease-in;
-    transition: all 200ms ease-in;
+    -webkit-transition: all .2s ease-in;
+    -moz-transition: all .2s ease-in;
+    -ms-transition: all .2s ease-in;
+    transition: all .2s ease-in;
+    border: 1px solid;
+    border-color: #cdcdcd;
+}
+
+body.night .colour-selector {
+    border-color: #2b2b2b;
 }
 
 .colour-selector:hover {
@@ -1286,6 +1294,11 @@ body.night .colour-picker {
     -moz-transform: scale(1.35);
     -ms-transform: scale(1.35);
     transform: scale(1.35);
+}
+
+.colour-selector.new-colour-selector > i {
+    position: absolute;
+    font-size: 13px;
 }
 
 .scene-issues {
