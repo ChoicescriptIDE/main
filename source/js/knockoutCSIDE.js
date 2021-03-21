@@ -952,7 +952,7 @@ function IDEViewModel() {
       edModel.pushStackElement();
       if (self.isSelected())
         vseditor.setSelections(newSelections);
-      self.search(oldText, newText, true, SEARCH.MODES.SEARCH);
+      self.search(self.getSearchResults().getSearchTerm(), newText, true, SEARCH.MODES.SEARCH);
     }
     self.replaceAllSearchResults = function(uiConfirmation) {
       var searchStr = document.getElementById("searchBox").value;
