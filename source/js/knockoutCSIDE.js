@@ -1184,7 +1184,7 @@ function IDEViewModel() {
         match.text = SEARCH.CONF.useRegex() ? replacePattern.buildReplaceString(match.matches, SEARCH.CONF.preserveCase()) : replaceStr;
         return match;
       });
-      if (newSearchMode === SEARCH.MODES.REPLACE) {
+      if ((newSearchMode === SEARCH.MODES.REPLACE) && (matches.length > 0)) {
         var newSelections = edModel.pushEditOperations([new monaco.Selection(matches[0].range.startLineNumber, matches[0].range.startColumn, matches[0].range.endLineNumber, matches[0].range.endColumn)], matches, function() {
             return [new monaco.Selection(1,1,1,1)];
         });
