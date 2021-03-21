@@ -1722,9 +1722,9 @@ function IDEViewModel() {
       searchMode(newSearchMode);
     }
   }
-  self.inReplaceMode = function() {
+  self.inReplaceMode = ko.computed(function() {
     return searchMode() === SEARCH.MODES.REPLACE;
-  };
+  }, this);
   self.searchToggles = ko.observableArray([
     { title: "Match Whole Word", cssClass: 'codicon-whole-word', value: SEARCH.CONF.matchWholeWord },
     { title: "Use Regular Expression", cssClass: 'codicon-regex', value: SEARCH.CONF.useRegex },
