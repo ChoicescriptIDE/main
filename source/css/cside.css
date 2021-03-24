@@ -47,7 +47,7 @@ span {
     cursor: default;
 }
 
-body.night input:not([readonly]), body.night textarea:not([readonly]) {
+body.night input:not([readonly]):not(.monaco-mouse-cursor-text), body.night textarea:not([readonly]):not(.monaco-mouse-cursor-text) {
     background-color: #3e3e3e;
     border: 1px solid #2b2b2b;
     color: white;
