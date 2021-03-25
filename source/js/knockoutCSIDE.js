@@ -2402,6 +2402,7 @@ function IDEViewModel() {
           return;
         cside.toggleSearchMode(SEARCH.MODES.REPLACE);
         __selectTab("search");
+        cside.tabPanel("open");
         document.getElementById("replaceBox").focus();
       }
     });
@@ -2419,6 +2420,7 @@ function IDEViewModel() {
           return;
         cside.toggleSearchMode(SEARCH.MODES.SEARCH);
         __selectTab("search");
+        cside.tabPanel("open");
         document.getElementById("searchBox").focus();
       }
     });
