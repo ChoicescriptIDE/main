@@ -658,6 +658,10 @@ function IDEViewModel() {
     var searchVersionId = null;
     var searchResults = ko.observable(new CSIDESearchResults({results: []}))
       .extend({ rateLimit: { rateLimit: 1000, method: "notifyWhenChangesStop" }});
+    var indentSize = ko.observable(settings.byId("editor", "tabsize").getValue())
+      .extend({ callFunc: { func: function(newVal) { edModel.updateOptions({tabSize: newVal});}}});
+    var useSpaces = ko.observable(settings.byId("editor", "usespaces").getValue())
+      .extend({ callFunc: { func: function(newVal) { edModel.updateOptions({insertSpaces: newVal});}}});
 
     // create initial model
     var edModel = monaco.editor.createModel(sceneData.contents || "", "choicescript", monaco.Uri.file(path()));
@@ -804,6 +808,9 @@ function IDEViewModel() {
     self.getWordCount = function(exclCommandLines, selected) {
       return selected ?  __wordCount(vseditor.getModel().getValueInRange(vseditor.getSelection()), exclCommandLines) : __wordCount(edModel.getValue(), exclCommandLines);
     };
+    self.getIndentDesc = ko.computed(function() {
+      return ((useSpaces() ? "Spaces: " : "Tabs: ") + indentSize());
+    }, this);
     self.getState = ko.computed(function() {
       if (saving())
         return "fa fa-spinner fa-spin";
@@ -811,20 +818,16 @@ function IDEViewModel() {
         return "fa fa-ban"
       return inErrState() ? "fa fa-exclamation-triangle scene-unsaved" : readOnly() ? "fa fa-lock" : dirty() ? "fa fa-save scene-unsaved" : "fa fa-save scene-saved"
     });
-    // FIXME: See tabtype setting for explanation
-    self.updateTabSize = function(val) {
+    // FIXME: See useSpaces setting for explanation
+    self.updateIndentSize = function(val) {
       if (typeof val === "undefined")
-        val = settings.asObject("editor")["tabsize"];
-      edModel.updateOptions({tabSize: val});
+        val = useSpaces() ? settings.asObject("editor")["indentspaces"].getValue() : settings.asObject("editor")["tabsize"];
+      indentSize(val);
     }
-    self.updateTabType = function(val) {
+    self.updateUseSpaces = function(val) {
       if (typeof val === "undefined")
-        val = settings.asObject("editor")["tabtype"];
-      edModel.updateOptions({insertSpaces: val});
-    }
-    self.refreshIndentationSettings = function() {
-      self.updateTabSize();
-      self.updateTabType();
+        val = settings.asObject("editor")["usespaces"];
+      useSpaces(val);
     }
 
     //SETTER METHODS
@@ -1070,10 +1073,15 @@ function IDEViewModel() {
         } else {
           inErrState(false);
           edModel.setValue(data);
+          edModel.detectIndentation(
+            settings.byId("editor", "usespaces").getValue(),
+            useSpaces() ? settings.byId("editor", "indentspaces").getValue() : settings.byId("editor", "tabsize").getValue()
+          );
+          useSpaces(edModel.getOptions().insertSpaces);
+          // pull the visual tab size from the global setting, or the space count from the model detection
+          indentSize(useSpaces() ? edModel.getOptions().indentSize : settings.byId("editor", "tabsize").getValue());
           dirty(false);
           __updatePersistenceList();
-          //check tab/space collsion:
-          //__testSceneIndentation(self);
         }
         loaded(true);
         saving(false);
@@ -1181,8 +1189,6 @@ function IDEViewModel() {
       if (selectedScene())
         selectedScene().updateViewState();
       selectedScene(self);
-
-      self.refreshIndentationSettings();
 
       vseditor.setModel(edModel);
       cursorPos(vseditor.getPosition());
@@ -1870,9 +1876,10 @@ function IDEViewModel() {
   var defaultConfig = {
     "settings": {
       "editor": {
-        "tabtype": true,
+        "usespaces": true,
         "smartindent": true,
-        "tabsize": "4",
+        "tabsize": 4,
+        "indentspaces": 4,
         "linewrap": true,
         "fontsize": "12px",
         "fontfamily": "'Courier New', Courier, monospace",
@@ -2251,6 +2258,67 @@ function IDEViewModel() {
   self.notification = function(title, message, options) {
     return notification(title, message, options);
   };
+
+  function _bootboxSelect(msg, opts, callback, currentValue) {
+    function _createWideBootboxBtn(val) {
+      var btn = document.createElement("button");
+      btn.className = "btn " + ((currentValue == val) ? "btn-primary" : "btn-default");
+      btn.innerText = val;
+      return btn;
+    }
+
+    function _createBootBoxBtnWrapper(msg) {
+      var template = document.createElement("template");
+      template.innerHTML = ("<div class=\"bootbox-select\"><p></p></div>");
+      template.content.firstChild.querySelector("p").innerText = msg;
+      return template.content.firstChild;
+    }
+
+    var div = _createBootBoxBtnWrapper(msg);
+    for (var i = 0; i < opts.length; i++) {
+      var btnElement = _createWideBootboxBtn(opts[i]);
+      (function(x) { btnElement.addEventListener(
+        "click", function() { bootbox.hideAll(); callback(opts[x]); }
+        );
+      })(i);
+      div.appendChild(btnElement);
+    }
+    bootbox.dialog({ message: div, closeButton: false, onEscape: true });
+  }
+
+  self.promptForSceneIndentation = function() {
+    var types = ["Tabs", "Spaces"];
+    _bootboxSelect("Select Indentation Unit", types,
+      function(unitOpt) {
+        self.getSelectedScene().updateUseSpaces(unitOpt === "Spaces");
+        var sizes = settings.byId("editor", "tabsize").getOptions().map(function(o) { return o.value; });
+        _bootboxSelect("Select Indentation Size", sizes,
+          function(sizeOpt) {
+            self.getSelectedScene().updateIndentSize(sizeOpt);
+            bootbox.hideAll();
+          }, meditor.getModel().getOptions().tabSize
+        );
+      }, types[Number(meditor.getModel().getOptions().insertSpaces)]
+    );
+  }
+
+  self.footerBtnHover = function(IDEmodel, evt) {
+    var ele = evt.currentTarget;
+    switch (evt.type) {
+      case "mousedown":
+        ele.style.backgroundColor = this.getUIColour(-20);
+        break;
+      case "mouseover":
+        ele.style.backgroundColor = this.getUIColour(-10);
+        break;
+      case "mouseup":
+      case "mouseout":
+        ele.style.backgroundColor = "transparent";
+        break;
+      default:
+        return;
+    }
+  }
 
   // initiate dropbox:
   if (platform == "web-dropbox") {
@@ -3138,23 +3206,14 @@ function IDEViewModel() {
           wordCountOn(val); // 0 == false? off
         }
       }),
-      // FIXME: Each Monaco model has its own local indentation preferences (useSpaces, tabSize),
-      // which override the global ones, so we need to make sure we update each model on swap, or adjustment.
-      // Longer-term we should probably move to the same format: away from a global setting and towards each scene
-      // having its own, much like any other text editor (but this should be easy to adjust on the fly).
       new CSIDESetting({
-        "id": "tabtype",
+        "id": "usespaces",
         "name": "Use Spaces for Indentation",
         "value": true,
         "type": "binary",
         "cat": "editor",
-        "desc": "Sets the indentation unit to spaces (on) or tabs (off)",
-        "apply": function(val) {
-          vseditor.updateOptions({insertSpaces: val});
-          var selectedScene = cside.getSelectedScene();
-          if (selectedScene)
-            selectedScene.updateTabType(val);
-        }
+        "desc": "Sets the preferred indentation unit to spaces (on) or tabs (off). Note that this will only be applied to newly created scenes. This setting can be overridden per scene.",
+        "apply": function(val) {} // only adjusts value for new scenes
       }),
       new CSIDESetting({
         "id": "tabsize",
@@ -3184,13 +3243,39 @@ function IDEViewModel() {
           "desc": "8",
           "value": "8"
         }],
-        "desc": "The number of spaces to indent by, or the visual size of tabs (used by smart indent).",
-        "apply": function(val) {
-          vseditor.updateOptions({tabSize: val});
-          var selectedScene = cside.getSelectedScene();
-          if (selectedScene)
-            selectedScene.updateTabSize(val);
-        }
+        "desc": "Sets the default visual size of tabs. This setting can be overridden per scene.",
+        "apply": function(val) {} // only adjusts value for new scenes
+      }),
+      new CSIDESetting({
+        "id": "indentspaces",
+        "name": "Space Indentation Size",
+        "value": "4",
+        "type": "dropdown",
+        "cat": "editor",
+        "options": [{
+          "desc": "2",
+          "value": "2"
+        }, {
+          "desc": "3",
+          "value": "3"
+        }, {
+          "desc": "4",
+          "value": "4"
+        }, {
+          "desc": "5",
+          "value": "5"
+        }, {
+          "desc": "6",
+          "value": "6"
+        }, {
+          "desc": "7",
+          "value": "7"
+        }, {
+          "desc": "8",
+          "value": "8"
+        }],
+        "desc": "Sets the preferred number of spaces used for indentation. Note that this will only be applied to newly created scenes. This setting can be overridden per scene.",
+        "apply": function(val) {} // only adjusts value for new scenes
       }),
       new CSIDESetting({
         "id": "fontsize",
@@ -5760,7 +5845,7 @@ amdRequire(['vs/editor/editor.main'], function() {
     roundedSelection: true,
     folding: true,
     automaticLayout: true,
-    detectIndentation: false,
+    detectIndentation: true,
     lightbulb: { enabled: true },
     glyphMargin: true,
     model: null

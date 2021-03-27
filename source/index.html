@@ -349,6 +349,7 @@
             <span data-bind="text: getCursorPositionString()"></span>
             <span data-bind="visible: wordCountOn()">Char Count: <span data-bind="text: getSelectedScene().getCharCountString()"></span></span>
             <span data-bind="visible: wordCountOn()">Word Count: <span data-bind="text: getSelectedScene().getWordCountString()"></span></span>
+            <button title="Change scene indentation" id="scene-indentation-btn" data-bind="event: { mouseover: footerBtnHover, mouseout: footerBtnHover, mousedown: footerBtnHover, mouseup: footerBtnHover }, text: getSelectedScene().getIndentDesc(), click: $root.promptForSceneIndentation"></button>
         </div>
     </div>
 
