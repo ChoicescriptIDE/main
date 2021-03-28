@@ -40,13 +40,6 @@ body,
     font-family: "Century Gothic", "AppleGothic", "Arial", "Helvetica", "sans-serif";
 }
 
-a,
-button,
-div,
-span {
-    cursor: default;
-}
-
 body.night input:not([readonly]):not(.monaco-mouse-cursor-text), body.night textarea:not([readonly]):not(.monaco-mouse-cursor-text) {
     background-color: #3e3e3e;
     border: 1px solid #2b2b2b;
@@ -196,6 +189,7 @@ body.night #left-wrap {
     height: 100%;
     padding: 5px;
     width: 100%;
+    cursor: pointer;
     outline: none;
     /* fix ugly black border on MAC OS */
 }
@@ -253,7 +247,6 @@ body.night #left-wrap {
     outline: none;
     width: 32px;
     height: 30px;
-    cursor: default;
     position: absolute;
     z-index: 7;
     border: solid;
@@ -265,7 +258,6 @@ body.night #left-wrap {
     outline: none;
     width: 32px;
     height: 30px;
-    cursor: default;
     position: absolute;
     right: 0px;
     z-index: 8;
@@ -956,9 +948,9 @@ body.night .setting-option-selected {
 .tab-panel.dictionary i {
     /* 'x' icon */
     float: right;
-    cursor: default;
     margin: 2px;
     color: rgb(195, 195, 195);
+		cursor: pointer;
 }
 
 .tab-panel.dictionary i:hover {
@@ -1272,7 +1264,6 @@ body.night .colour-picker {
 
 .colour-selector {
     display: inline-block;
-    cursor: default;
     height: 12px;
     width: 12px;
     margin: 6px 4px;
@@ -1309,11 +1300,9 @@ body.night .colour-selector {
     height: 16px;
     background-image: url('../img/ui/exclamation.png');
     background-repeat: no-repeat;
-    cursor: pointer;
 }
 
 .save-scene {
-    cursor: default;
     position: absolute;
     top: 5px;
     right: 4px;
@@ -1520,7 +1509,6 @@ body.night .project-hover {
     position: absolute;
     top: 7px;
     right: 27px;
-    cursor: default;
 }
 
 #newProjectBtn {
@@ -1529,7 +1517,6 @@ body.night .project-hover {
     position: absolute;
     top: 7px;
     right: 3px;
-    cursor: default;
 }
 
 .issueList {
@@ -1553,7 +1540,6 @@ body.night .project-hover {
 }
 
 .issue-btn {
-    cursor: default;
     background: none;
     border: none;
     width: 16px;
@@ -1654,7 +1640,6 @@ body.night .project-hover {
 }
 
 #code-footer {
-    cursor: default;
     width: 100%;
     height: 20px;
     max-height: 20px;
@@ -1708,7 +1693,6 @@ body.night .project-hover {
     padding-left: 10px;
     font-size: 12px;
     vertical-align: baseline;
-    cursor: default;
 }
 
 #code-footer>button {
@@ -1725,10 +1709,6 @@ body.night .project-hover {
 #code-footer>#scene-indentation-btn {
 	float: right;
 	margin-right: 10px;
-}
-
-#code-footer * {
-    cursor: default;
 }
 
 #code-footer>span:first-child {
