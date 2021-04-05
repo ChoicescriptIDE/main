@@ -1,66 +1,57 @@
 nav = new SceneNavigator(["startup"]);
 stats = {};
 isHeadless = true;
-var scope = window.opener ? window.opener.parent.window : parent.window;
-var thisProject = scope.cside.getActiveProject();
-//var scope = parent.window;
-window.allScenes = scope.cside.allScenes;
+var cside = {
+  project: {},
+  platform: null,
+  popout: { is: window.opener, window: null },
+  server: null,
+  parent: () => {}
+};
 
 Scene.prototype.lineMsg = function lineMsg() {
 	return "line " + (this.lineNum + 1) + " of " + stats.sceneName + ": ";
 }
 
-function findScene(sceneName) {
-	if (!sceneName) return false;
-	var projectSceneList = thisProject.getScenes(); //if pop-out window
-	for (var i = 0; i < projectSceneList.length; i++) {
-		if (projectSceneList[i].getName().toLowerCase() === sceneName.toLowerCase()) {
-			//found it, return the data model:
-			return projectSceneList[i];
-		}
-	}
-	//we didn't find it
-	return false;
-}
+window.addEventListener("message", (event) => {
+  switch (event.data.type) {
+    case "startGame":
+      window.allScenes = event.data.allScenes;
+      cside.project = event.data.project;
+      cside.server = event.data.server;
+      window.CSIDEPlatform = event.data.platform;
+      if (!event.data.allowScript)
+        Scene.prototype["script"] = function script(code) { throw new Error("\*script usage is disabled."); }
+      window.alreadyLoaded = false;
+      window.onload();
+      cside.parent = event.source;
+    default:
+      return;
+  }
+}, false);
 
-Scene.prototype.script = function() {
-    Scene.validCommands["script"] = false;
-}
+if (cside.popout.is) window.allScenes = window.opener.allScenes;
 
 /* ERROR HANDLING (FOR ISSUES) */
 window.onerror = function(msg, file, line, stack) {
-    var e = {};
-    e.message = msg;
-    if (msg) {
-		// scene doesn't exist - don't bother trying to open it
-		if (/file/i.test(msg) && /exist/i.test(msg)) {
-			thisProject.logIssue(e);
-			return;
-		}
-        //window.onerror(e.message, e.fileName, e.lineNumber, e.stack); avoid pop-ups if we can
-        var scene = findScene(stats.sceneName);
-        e.message.match(/line [0-9]+/) ? e.lineNumber = parseInt(e.message.match(/line ([0-9]+)/)[1]) : e.lineNumber = "undefined"; //attempt to source a line number (!e.lineNumber && e.message.match(/[0-9]+/))
-        if (scene) {
-            thisProject.logIssue(e, scene);
-        }
-        else {
-            //the scene isn't open - so open it first
-            scope.cside.openScene(thisProject.getPath() + stats.sceneName + '.txt', function(err, scene) {
-                if (err) {
-					thisProject.logIssue(e);
-                }
-                else {
-                    thisProject.logIssue(e, scene);
-                }
-            });
-        }
+  var e = {};
+  e.message = msg;
+  if (msg) {
+    // scene doesn't exist - don't bother trying to open it
+    if (/file/i.test(msg) && /exist/i.test(msg)) {
+      cside.parent.postMessage({type: "logIssue", project: cside.project, error: e});
+      return;
     }
+    //window.onerror(e.message, e.fileName, e.lineNumber, e.stack); avoid pop-ups if we can
+    e.message.match(/line [0-9]+/) ? e.lineNumber = parseInt(e.message.match(/line ([0-9]+)/)[1]) : e.lineNumber = "undefined"; //attempt to source a line number (!e.lineNumber && e.message.match(/[0-9]+/))
+    cside.parent.postMessage({type: "logIssue", error: e, project: cside.project, scene: { name: stats.sceneName }});
+  }
 }
 
 //make image's sourced from the project directory
 function printImage(source, alignment, alt, invert) {
   var img = document.createElement("img");
-  img.src = source.match("data:image") ? source : "file://" + thisProject.getPath() + source; //interal image, don't add directory
+  img.src = source.match("data:image") ? source : cside.server + source; //interal image, don't add directory
   if (alt !== null && String(alt).length > 0) img.setAttribute("alt", alt);
   if (invert) {
     setClass(img, "invert align"+alignment);
@@ -90,56 +81,28 @@ function printLink(target, href, anchorText, onclick) {
 
 //make sound sourced from the project directory
 Scene.prototype.sound = function sound(source) {
-	source = "file://" + thisProject.getPath() + source;
-    if (source.substring(source.length - 4, source.length) === ".mp3") {
-      var scene = findScene(stats.sceneName);
-      if (scene) {
-        var e = {};
-        e.lineNumber = (stats.scene.lineNum + 1);
-        e.message = "Unable to play proprietary format.\nPlease export game to test .mp3 audio.";
-        thisProject.logIssue(e, scene);
-      }
-    }
-    if (typeof playSound == "function") playSound(source);
-    if (this.verifyImage) this.verifyImage(source);
+	source = cside.server + source;
+  if (typeof playSound == "function") playSound(source);
+  if (this.verifyImage) this.verifyImage(source);
 };
 
 // create popout instance of game (at same state as original)
 function popOutWindow() {
-  if (scope.cside.getPlatform() != 'web-dropbox') { //focus
-    if (thisProject.window) {
-        thisProject.window.focus();
-    }
-    else { //create new
-      parent.nw.Window.open('run_index.html?persistence=CSIDE', {focus: true, width: 500, height: 500, title: ""}, function(new_win) {
-        thisProject.window = new_win;
-        // don't allow the popout window to overwrite the persistent store (allows popout testing of multiple choices etc)
-        new_win.on("loaded", function() {
-          new_win.window.storeName = null;
-        });
-        new_win.on("closed", function() {
-          thisProject.window.leaveFullscreen();
-          thisProject.window.hide();
-          thisProject.window.close(true);
-          thisProject.window = null;
-        });
-        });
-        //window.location = "about:blank";
-    }
+  if (cside.popout.window) {
+    cside.popout.window.focus();
   }
-  else {
-    thisProject.window = window.open("run_index.html?persistence=CSIDE", thisProject.getName(), "height=500,width=500,scrollbars=1");
-            //window.location = "about:blank";
+  else { //create new
+    cside.popout.window = window.open("run_index.html?persistence=CSIDE", cside.project.name, "height=500,width=500,scrollbars=1");
   }
 };
 
 //prevent links from opening *inside* desktop version
-if (scope.cside.getPlatform() != 'web-dropbox') {
+if (cside.platform != 'web-dropbox') {
 	setTimeout(function() {
 	 	window.$('body').on('click', 'a', function(e) {
 			e.preventDefault();
 			if ($(this).hasClass('alertify-button')) return false;
-			scope.nw.Shell.openExternal(this.href);
+			cside.parent.postMessage({type: "handleLink", url: this.href});
 			return false;
 		});
 	}, 1000); //needs a timeout or it seems to fire before the body is created.
@@ -147,12 +110,12 @@ if (scope.cside.getPlatform() != 'web-dropbox') {
 
 //inject buttons:
 $(document).ready(function() {
-	if (scope === window.parent) {
-		var button = document.createElement("button");
-		button.innerHTML = "Popout";
-		button.setAttribute("title", "Pop out window");
-		button.setAttribute("class", "spacedLink");
-    button.setAttribute('onclick', "popOutWindow();");
-    document.getElementById("buttons").appendChild(button);
-	}
+  if (!cside.popout.is) {
+    //var button = document.createElement("button");
+    //button.innerHTML = "Popout";
+    //button.setAttribute("title", "Pop out window");
+    //button.setAttribute("class", "spacedLink");
+    //button.setAttribute('onclick', "popOutWindow();");
+    //document.getElementById("buttons").appendChild(button);
+  }
 });

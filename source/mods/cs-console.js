@@ -1,4 +1,42 @@
-var cside = window.parent.cside;
+window.addEventListener("message", (event) => {
+    switch (event.data.type) {
+        case "runCommand":
+            try {
+                if (event.data.cmd === null)
+                    stats.scene.runCommand(event.data.input);
+                else if (event.data.cmd) {
+                    stats.scene[event.data.cmd](event.data.input);
+                }
+                else {
+
+                }
+            } catch (e) {
+                //strip error scene & line num - as the information is irrelevant
+                e.message = e.message.replace(/line [0-9]+ of\s\w+: /, "");
+                cside.console.log("Error: " + e.message, "cm-error");
+            }
+        default:
+        return;
+    }
+}, false);
+
+cside.console = {};
+cside.console.log = function(msg, style, metadata) {
+    cside.parent.postMessage(
+        {
+            type: "console", action: "log",
+            msg: msg, style: style, metadata: metadata,
+            project: cside.project
+        }
+    );
+}
+cside.console.clear = function(msg) {
+    cside.parent.postMessage(
+        {
+            type: "console", action: "clear", project: cside.project
+        }
+    );
+}
 
 Scene.prototype.CSIDEConsole_tracking = {track_all: false, temps: {}, stats: {}};
 Scene.prototype.CSIDEConsole_getVarCat = function(variable) {
@@ -120,17 +158,17 @@ Scene.prototype.console_help = function (line) {
             throw new Error("Invalid help category '" + token + "'");
         }
     }
-    thisProject.logToConsole(cat.text, "null");
+    cside.console.log(cat.text, "null");
 };
 
 Scene.prototype.console_log = function(line) {
     var stack = this.tokenizeExpr(line);
     var value = this.CSIDEConsole_quoteStringVal(this.evaluateExpr(stack));
-    thisProject.logToConsole(value, "output", {scene: stats.sceneName + ".txt: ", line: stats.scene.lineNum + 1});
+    cside.console.log(value, "output", {scene: stats.sceneName + ".txt: ", line: stats.scene.lineNum + 1});
 }
 
  Scene.prototype.console_clear = function() {
-     thisProject.clearConsole();
+    cside.console.clear();
  }
 
  Scene.prototype.console_track = function(line) {
@@ -206,7 +244,7 @@ Scene.prototype.console_track_list = function(line) {
     for (var variable in this.CSIDEConsole_tracking.temps) {
         if (this.CSIDEConsole_tracking.temps.hasOwnProperty(variable)) {
             if (variable.match(filter)) {
-                thisProject.logToConsole("temps." + variable + " " + this.CSIDEConsole_quoteStringVal(this.temps[variable]), "output");
+                cside.console.log("temps." + variable + " " + this.CSIDEConsole_quoteStringVal(this.temps[variable]), "output");
                 counter++;
             }
         }
@@ -214,13 +252,13 @@ Scene.prototype.console_track_list = function(line) {
     for (var variable in this.CSIDEConsole_tracking.stats) {
         if (this.CSIDEConsole_tracking.stats.hasOwnProperty(variable)) {
             if (variable.match(filter)) {
-                thisProject.logToConsole("stats." + variable + " " + this.CSIDEConsole_quoteStringVal(this.stats[variable]), "output");
+                cside.console.log("stats." + variable + " " + this.CSIDEConsole_quoteStringVal(this.stats[variable]), "output");
                 counter++;
             }
         }
     }
     if (counter === 0) {
-        thisProject.logToConsole("Empty.", "output");
+        cside.console.log("Empty.", "output");
     }
 }
 
@@ -282,6 +320,17 @@ Scene.prototype.CSIDEConsole_forceStoreVarUpdate = function(type, variable) {
     });
 }
 
+Scene.prototype.CSIDEConsole_eval_expr = function(input) {
+    var stack = stats.scene.tokenizeExpr(input);
+    var result = stats.scene.evaluateExpr(stack);
+    if (typeof result === "string") {
+      result = '"' + result + '"';
+    } else if (!result) {
+      result = "false";
+    }
+    cside.console.log(result.toString(), "output");
+}
+
 Scene.prototype.setVar = function setVar(variable, value) {
     variable = variable.toLowerCase();
     if (this.debugMode) println(variable +"="+ value);
@@ -291,7 +340,7 @@ Scene.prototype.setVar = function setVar(variable, value) {
         }
         if (this.CSIDEConsole_tracking.track_all || this.CSIDEConsole_tracking.stats[variable]) {
             var log = "value of stats." + variable + " changed from " + this.CSIDEConsole_quoteStringVal(this.stats[variable]) + " to " + this.CSIDEConsole_quoteStringVal(value);
-            thisProject.logToConsole(log, "null", {scene: stats.sceneName + ".txt: ", line: (stats.scene.lineNum + 1)});
+            cside.console.log(log, "null", {scene: stats.sceneName + ".txt: ", line: (stats.scene.lineNum + 1)});
         }
         this.stats[variable] = value;
         if (this.saveSlot == "temp") tempStatWrites[variable] = value;
@@ -303,7 +352,7 @@ Scene.prototype.setVar = function setVar(variable, value) {
     } else {
        if (this.CSIDEConsole_tracking.track_all || this.CSIDEConsole_tracking.temps[variable]) {
            var log = "value of temps." + variable + " changed from " + this.CSIDEConsole_quoteStringVal(this.temps[variable]) + " to " + this.CSIDEConsole_quoteStringVal(value);
-           thisProject.logToConsole(log, "null", {scene: stats.sceneName + ".txt: ", line: (stats.scene.lineNum + 1)});
+           cside.console.log(log, "null", {scene: stats.sceneName + ".txt: ", line: (stats.scene.lineNum + 1)});
        }
         this.temps[variable] = value;
     }

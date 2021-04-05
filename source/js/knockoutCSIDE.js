@@ -22,6 +22,7 @@ if (typeof nw === "object") {
   //var http = require('http');
   //var stream = require('stream');
   var updater = require('cside-updater');
+  var mediaServer = require('cside-server');
   var win = gui.Window.get();
   win.show();
   process.on("uncaughtException", function(err) {
@@ -506,13 +507,7 @@ function IDEViewModel() {
       for (var i = 0; i < scenes().length; i++)
         scenes()[i].load();
     }
-    self.logIssue = function(err, scene) {
-      var issue = new csideIssue({
-        project: self,
-        scene: scene,
-        desc: err.message,
-        lineNum: err.lineNumber
-      });
+    self.logIssue = function(issue) {
       issues.push(issue);
       //visually notify
       var buttons = [{
@@ -1348,7 +1343,7 @@ function IDEViewModel() {
     }
   }
 
-  function csideIssue(issueData) {
+  function CSIDEIssue(issueData) {
     var self = this;
 
     //INSTANCE VARIABLES
@@ -3516,6 +3511,17 @@ function IDEViewModel() {
         }
       }),
       new CSIDESetting({
+        "id": "allowscript",
+        "name": "Allow Script",
+        "value": false,
+        "type": "binary",
+        "desc": "Enables usage of the \*script command in your ChoiceScript games.",
+        "apply": function(val) {
+          if (platform === "web-dropbox")
+            this.setVisibility(false);
+        }
+      }),
+      new CSIDESetting({
         "id": "update-channel",
         "name": "Update Channel",
         "value": "stable",
@@ -3717,7 +3723,7 @@ function IDEViewModel() {
     selectedProject().logToConsole(input, input.substring(0,1) == "*" ? "cm-builtin" : "cm-variable");
     // Must have a running game
     var gameFrame = document.getElementById("game-tab-frame").contentWindow || document.getElementById("#game-tab-frame");
-    if (typeof gameFrame === 'undefined' || typeof gameFrame === 'undefined' || typeof gameFrame.stats === 'undefined') {
+    if (typeof gameFrame === 'undefined' || typeof gameFrame === 'undefined') {
       selectedProject().logToConsole("Error: no choicescript game running", "cm-error");
       element.value = "";
       return;
@@ -3740,26 +3746,20 @@ function IDEViewModel() {
           if (input.match(/^\*goto/)) {
             if (input.match(/^\*goto\s+/)) {
               input = input.replace(/^\*goto\s+/, ""); //convert *goto label into (*goto_scene) current_scene label
-              gameFrame.stats.scene.CSIDEConsole_goto(input);
-            } else {
-              input = input.replace(/^\*goto_scene\s+/, "");
-              gameFrame.stats.scene.CSIDEConsole_goto_scene(input);
+              gameFrame.postMessage({ type: "runCommand", cmd: "CSIDEConsole_goto", input: input });
             }
-          } else if (!gameFrame.stats.scene.runCommand(input)) {
-            selectedProject().logToConsole("Error: an unknown error occured whilst attempting to execute that command", "cm-error");
+            else {
+              input = input.replace(/^\*goto_scene\s+/, "");
+              gameFrame.postMessage({ type: "runCommand", cmd: "CSIDEConsole_goto_scene", input: input });
+            }
+          } else {
+            gameFrame.postMessage({ type: "runCommand", cmd: null, input: input });
           }
         } else {
           selectedProject().logToConsole("Error: invalid console command", "cm-error");
         }
       } else { //assume expression:
-        var stack = gameFrame.stats.scene.tokenizeExpr(input);
-        var result = gameFrame.stats.scene.evaluateExpr(stack);
-        if (typeof result === "string") {
-          result = '"' + result + '"';
-        } else if (!result) {
-          result = "false";
-        }
-        selectedProject().logToConsole(result.toString(), "output"); //←
+        gameFrame.postMessage({ type: "runCommand", cmd: "CSIDEConsole_eval_expr", input: input });
       }
     } catch (e) {
       //strip error scene & line num - as the information is irrelevant
@@ -5001,12 +5001,13 @@ function IDEViewModel() {
   }
 
   function __runProject(project) {
+    mediaServer.setDir(project.getPath());
+    document.getElementById("game-tab-frame").terminate();
     __shortCompile(project, function(err, allScenes) {
       if (err) {
         bootbox.alert("<h3>Compilation Error</h3>" + err.message);
         console.log(err);
       } else {
-        cside.allScenes = allScenes;
         notification("Running", project.getName(), {
           timeout: 2000
         });
@@ -5014,6 +5015,32 @@ function IDEViewModel() {
         __reloadTab(__getTab("game"), 'run_index.html?restart=true');
         cside.tabPanel("open");
         __selectTab("game");
+        setTimeout(function() {
+          var webview = document.getElementById('game-tab-frame');
+          webview.addEventListener("unresponsive", function(pid) {
+            var buttons = [
+              {
+                addClass: 'btn', text: 'Close', onClick: function(note) { webview.terminate(); note.close(); }
+              },
+              {
+                addClass: 'btn', text: 'Wait', onClick: function(note) { note.close(); }
+              }
+            ];
+            return notification(project.getName() + " Seems to be Unresponsive", "Should we force it to close?" ,
+              { closeWith: true, timeout: false, buttons: buttons, type: "warning" }
+            );
+          });
+          webview.contentWindow.postMessage(
+            {
+              type: "startGame",
+              allScenes: allScenes,
+              project: { path: project.getPath(), name: project.getName() },
+              platform: platform,
+              server: mediaServer.getAddr(),
+              allowScript: (platform !== "web-dropbox") && settings.byId("app", "allowscript").getValue(),
+            }
+          );
+        }, 1000);
       }
     });
   }
@@ -5260,6 +5287,72 @@ function IDEViewModel() {
   self.makeSortable = function(data) {
     __makeSortable(data);
   }
+
+  window.addEventListener("message", (event) => {
+    var eventProject = null;
+    if (event.data.project)
+      eventProject = getProject(event.data.project.path);
+    switch (event.data.type) {
+      case "handleLink":
+        nw.Shell.openExternal(event.data.url);
+        break;
+      case "console":
+        switch(event.data.action) {
+          case "clear":
+            eventProject.clearConsole();
+            break;
+          case "log":
+            eventProject.logToConsole(event.data.msg, event.data.style, event.data.metadata);
+            break;
+        }
+        break;
+      case "focusLine":
+        __openScene(event.data.project.path + event.data.scene.name + ".txt", function(err, scene) {
+          if (!err) {
+            try {
+              var lineNum = parseInt(event.data.scene.lineNum); scene.focusLine(lineNum);
+            } catch (e) {
+              // no line number, but we can still show the scene
+              scene.select();
+            }
+          }
+        });
+        break;
+      case "logIssue":
+        var issueData = { project: eventProject, scene: null, desc: event.data.error.message, lineNum: event.data.error.lineNumber };
+        if (event.data.scene) {
+          __openScene(event.data.project.path + event.data.scene.name + ".txt", function(err, scene) {
+            if (!err) {
+              issueData.scene = scene;
+              var issue = new CSIDEIssue(issueData);
+              issueData.project.logIssue(issue);
+            }
+          });
+        }
+        else {
+          var issue = new CSIDEIssue(issueData);
+          issueData.project.logIssue(issue);
+        }
+        break;
+      case "popOut":
+        nw.Window.open("run_index.html?persistence=CSIDE", {focus: true, width: 500, height: 500, title: ""}, function(new_win) {
+          cside.popout.window = new_win;
+          // don't allow the popout window to overwrite the persistent store (allows popout testing of multiple choices etc)
+          new_win.on("loaded", function() {
+            new_win.window.storeName = null;
+          });
+          new_win.on("closed", function() {
+            cside.popout.window.leaveFullscreen();
+            cside.popout.window.hide();
+            cside.popout.window.close(true);
+            cside.popout.window = null;
+          });
+        });
+        break;
+      default:
+        return;
+    }
+  }, false);
 
   /*
     arg.item - the actual item being moved

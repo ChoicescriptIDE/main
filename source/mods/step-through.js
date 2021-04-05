@@ -21,20 +21,13 @@ Scene.prototype.printLoopBackup = function printLoopStep() {
   line = this.lines[this.lineNum];
 
   // track the current line in the CSIDE editor whenever possible
-  var scene = findScene(stats.sceneName);
-  if (scene && CSIDE_stepping) {
-    scene.focusLine(this.lineNum);
-  }
-  else if (CSIDE_stepping) {
-    scope.cside.openScene(thisProject.getPath() + stats.sceneName + '.txt', function(err, scene) {
-      if (err) {
-        // Can't open the scene. I think we may as fail silently.
-      }
-      else {
-        scene.focusLine(self.lineNum);
-      }
-    });
-  }
+  cside.parent.postMessage(
+    {
+        type: "focusLine",
+        project: cside.project,
+        scene: { name: stats.sceneName, lineNum: this.lineNum }
+    }
+  );
 
   // skip black lines
   if (!trim(line)) {
@@ -92,6 +85,7 @@ Scene.prototype.printLoopBackup = function printLoopStep() {
 };
 
 function swapLoop(button) {
+	var stepBtn = document.getElementById("stepBtn");
 	if (CSIDE_stepping && !CSIDE_steppingAllowSwapBack) {
 		while (!CSIDE_steppingAllowSwapBack) {
 			stats.scene.printLoop();

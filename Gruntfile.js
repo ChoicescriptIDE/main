@@ -30,7 +30,7 @@ module.exports = function(grunt) {
           stdout: true,
           stderr: true,
           failOnError: true,
-          npm: 'trash username',
+          npm: 'trash username node-static',
           bower: false
         }
       }
@@ -112,6 +112,15 @@ module.exports = function(grunt) {
           {
             expand: true, cwd: 'source',
             src: [ 'node_modules/cside-updater/**'],
+            dest: 'build'
+          }
+        ]
+      },
+      server: {
+        files: [
+          {
+            expand: true, cwd: 'source',
+            src: [ 'node_modules/cside-server/**'],
             dest: 'build'
           }
         ]
@@ -276,7 +285,7 @@ module.exports = function(grunt) {
     }
   });
   var tasks = ["clean", "shell:docs", "copy:main", "concat", "uglify", "cssmin", "auto_install:build", "clean:package_lock",
-    "copy:choicescript", "copy:updater", "copy:monaco", "string-replace", "execute", "compress"];
+    "copy:choicescript", "copy:updater", "copy:server", "copy:monaco", "string-replace", "execute", "compress"];
   grunt.registerTask("default", tasks);
   grunt.registerTask("build-with-nwjs", tasks.concat("nwjs"));
   grunt.registerTask("build-with-windows", tasks.concat("nwjs:windows"));

@@ -25,6 +25,7 @@
     "knockout": "3.2.0",
     "monaco-editor": "github:ChoicescriptIDE/monaco-editor#lib",
     "mousetrap": "^1.6.0",
+    "node-static": "^0.7.11",
     "noty": "^3.2.0-beta",
     "trash": "^2.0.0",
     "username": "^1.0.1"
@@ -40,6 +41,31 @@
   },
   "webkit": {
     "plugin": true
+  },
+  "webview": {
+    "partitions": [
+      {
+        "name": "untrusted-game",
+        "accessible_resources": [
+          "run_index.html",
+          "*.apng",
+          "*.png",
+          "*.jpg",
+          "*.jpeg",
+          "*.gif",
+          "*.bmp",
+          "*.svg",
+          "*.wav",
+          "*.ogg",
+          "*.mp3",
+          "lib/jquery/jquery-1.11.3.min.js",
+          "node_modules/cside-choicescript/web/*.js",
+          "node_modules/cside-choicescript/web/*.css",
+          "mods/*.js",
+          "js/cs_override.min.js"
+        ]
+      }
+    ]
   },
   "chromium-args": "--allow-file-access-from-files"
 }
