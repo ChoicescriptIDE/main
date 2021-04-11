@@ -560,6 +560,10 @@ body.night #left-wrap {
     background-color: #EEE;
 }
 
+body.night #editor-wrap {
+    background-color: #262626;
+}
+
 #cs-console {
     width: 100%;
     bottom: 0px;
