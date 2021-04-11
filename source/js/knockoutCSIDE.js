@@ -4703,7 +4703,7 @@ function IDEViewModel() {
     else {
       scene = sceneAlreadyOpen(getFileName(scenePath), sceneProject);
       if (scene) {
-        if (callback) callback(scene);
+        if (callback) callback(null, scene);
         return;
       }
     }
