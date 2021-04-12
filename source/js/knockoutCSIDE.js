@@ -4163,30 +4163,28 @@ function IDEViewModel() {
         }
         return null;
       }
-      if (editor.getModel().uri.toString() !== input.resource.toString()) {
-        model.csideScene.select(function(success) {
-          if (success) {
-            var selection = (input.options ? input.options.selection : null);
-            if (selection) {
-              if (typeof selection.endLineNumber === 'number' && typeof selection.endColumn === 'number') {
-                editor.setSelection(selection);
-                editor.revealRangeInCenter(selection, 1 /* Immediate */);
-              }
-              else {
-                var pos = {
-                  lineNumber: selection.startLineNumber,
-                  column: selection.startColumn
-                };
-                editor.setPosition(pos);
-                editor.revealPositionInCenter(pos, 1 /* Immediate */);
-              }
+      model.csideScene.select(function(success) {
+        if (success) {
+          var selection = (input.options ? input.options.selection : null);
+          if (selection) {
+            if (typeof selection.endLineNumber === 'number' && typeof selection.endColumn === 'number') {
+              editor.setSelection(selection);
+              editor.revealRangeInCenter(selection, 1 /* Immediate */);
             }
-            return editor;
-          } else {
-            return null;
+            else {
+              var pos = {
+                lineNumber: selection.startLineNumber,
+                column: selection.startColumn
+              };
+              editor.setPosition(pos);
+              editor.revealPositionInCenter(pos, 1 /* Immediate */);
+            }
           }
-        });
-      }
+          return editor;
+        } else {
+          return null;
+        }
+      });
     }
 
     vseditor.onDidChangeCursorPosition(function(evt) {
