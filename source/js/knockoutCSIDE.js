@@ -19,6 +19,7 @@ if (typeof nw === "object") {
   var trash = require('trash');
   var getDirName = require('path').dirname;
   var gui = require('nw.gui');
+  var resolvePath = require('path').resolve;
   //var http = require('http');
   //var stream = require('stream');
   var updater = require('cside-updater');
@@ -3144,44 +3145,9 @@ function IDEViewModel() {
           monacoOptions.spellcheck.enabled = Boolean(val);
           __updateMonacoDiagnosticOptions(monacoOptions);
           if (val) {
-            // In an ideal world we'd move this Provider into the language plugin, but
-            // as it stands, we need direct access to the User Dictionary object
-            // in order to add the words to our ignore lists that display in the UI.
             var self = this;
-            this.handle = monaco.languages.registerCodeActionProvider('choicescript', {
-              provideCodeActions: function(model, range, context, token) {
-                actions = [];
-                return new Promise(function(resolve, reject) {
-                  context.markers.forEach(function(marker) {
-                    if (marker.code === "badSpelling") {
-                      var wordRange = new monaco.Range(marker.startLineNumber, marker.startColumn, marker.endLineNumber, marker.endColumn);
-                      var word = meditor.getModel().getWordAtPosition(new monaco.Position(wordRange.startLineNumber, wordRange.startColumn));
-                      if (!word) return;
-                      suggestWord(word.word).then(function(suggestions) {
-                        for (var i = 0; i < suggestions.length; i++)
-                          actions.push({ title: "Correct spelling: " + suggestions[i], kind: "quickfix",
-                            edit: {
-                              edits: [
-                                { edit: { range: wordRange, text: suggestions[i] }, resource: model.uri }
-                              ]
-                            }
-                          });
-                        actions.push({ title: "Ignore '" + word.word + "' this session", kind: "quickfix",
-                          command: {
-                            id: userDictionary.monacoCmds["IGNORE_WORD"], title: "Ignore Word", arguments: [word.word]
-                          }
-                        });
-                        actions.push({ title: "Add '" + word.word + "' to the User Dictionary", kind: "quickfix",
-                          command: {
-                            id: userDictionary.monacoCmds["ADD_WORD"], title: "Add Word", arguments: [word.word]
-                          }
-                        });
-                        resolve(actions.length > 0 ? { actions: actions, dispose: function() {} } : null);
-                      });
-                    }
-                  });
-                });
-              }
+            this.handle = monaco.languages.choicescript.onDictionaryChange((dictEvent) => {
+              userDictionary.add(dictEvent.word, dictEvent.dictionary);
             });
           } else {
             if (this.handle) this.handle.dispose();
@@ -4115,10 +4081,6 @@ function IDEViewModel() {
       }
     }
 
-    // Connect spellcheck quick fix commands to the User Dictionary
-    userDictionary.monacoCmds["IGNORE_WORD"] = vseditor.addCommand(0, function(s, word) { userDictionary.add(word, "session"); }, '');
-    userDictionary.monacoCmds["ADD_WORD"] = vseditor.addCommand(0, function(s, word) { userDictionary.add(word, "persistent"); }, '');
-
     // OVERRIDE INTERNAL MONACO EDITOR SERVICES
 
     // Links in Monaco use a data-href attribute rather than the href attribute.
@@ -4234,9 +4196,11 @@ function IDEViewModel() {
     if (true) {
       var dictPath = "lib/typo/dictionaries";
       if (platform === "web-dropbox") {
+        diagnosticsOptions.spellcheck.workerPath = "/lib/typo/wordprocessor.js";
         var loc = window.location.pathname;
         dictPath = loc.substring(0, loc.length - "index.html".length) + dictPath;
       } else {
+        diagnosticsOptions.spellcheck.workerPath = "file://" + resolvePath("lib/typo/wordprocessor.js");
         dictPath = "file://" + ((process.cwd() + "/") + dictPath);
       }
       diagnosticsOptions.spellcheck.dictionaryPath = dictPath;
