@@ -1400,13 +1400,15 @@ body.night .project-hover {
     width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
-    position: relative;
+    position: sticky;
     background-color: #5A5A5A;
     border: solid;
     border-color: inherit;
     border-width: 1px 0px 1px 0px;
     color: white;
     height: 24px;
+    top: 0;
+    z-index: 2;
 }
 
 .project-wrapper:first-of-type>.project-header {
@@ -1556,7 +1558,6 @@ body.night .project-hover {
 }
 
 .project-wrapper {
-    overflow: hidden;
     border-color: inherit;
 }
 
