@@ -126,7 +126,7 @@
                                 <button class="colour-marker handle" data-bind="attr: { title: 'Click to colour project ' + getName() }, click: showColours, clickBubble: false, style: { backgroundColor: getMarkColour }"></button>
                                 <!-- <span data-bind="text: getName(), event: { dblclick: rename }, attr: { title: getName }, fadeVisible: beingEdited() ? false : true"></span> -->
                                 <input data-bind="attr: { title: getName }, enableTextInput: beingEdited, textInput: nameInterface, event: { click: isSelected() ? rename : null, dblclick: rename, blur: rename, keyup: rename }, css: { 'name-error': nameInvalid }" class="col-anim"></input>
-                                <div class="scene-error" data-bind="fadeVisible: nameInvalid">
+                                <div class="scene-error validation-error-text" data-bind="fadeVisible: nameInvalid">
                                     <span data-bind="text: getNameErrorMsg"></span>
                                 </div>
                                 <ul class="colour-picker" id="colour-picker" data-bind="fadeVisible: beingColoured, event: { mouseleave: showColours }">
@@ -243,6 +243,12 @@
                                             <!-- ko if: getType() == "dropdown" -->
                                             <br>
                                             <select data-bind="options: getOptions(), optionsText: 'desc', optionsValue: 'value', value: value"></select>
+                                            <!-- /ko -->
+                                            <!-- ko if: getType() == "number" -->
+                                            <br>
+                                            <input type="number" data-bind="attr: { 'min': min, 'max': max, 'step': step }, value: value ">
+                                            <br>
+                                            <p class="validation-error-text" data-bind="fadeVisible: value.isErroneous, text: value.errorMessage"></p>
                                             <!-- /ko -->
                                             <!-- ko if: getType() == "variable" || getType() == "custom" -->
                                             <ul data-bind="foreach: getOptions()">

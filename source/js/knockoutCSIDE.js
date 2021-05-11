@@ -71,6 +71,21 @@ function IDEViewModel() {
     });
     return target;
   };
+  ko.extenders.validate = function(target, validateFunc) {
+    target.isErroneous = ko.observable();
+    target.errorMessage = ko.observable();
+
+    function doValidate(newValue) {
+      var result = validateFunc(target());
+      target.isErroneous(!result.valid);
+      target.errorMessage(result.message);
+    }
+
+    doValidate(target());
+    target.subscribe(doValidate);
+
+    return target;
+  };
 
   function __normalizePath(path) {
     //replace backslashes
@@ -1419,6 +1434,8 @@ function IDEViewModel() {
         "desc": "off",
         "value": false
       }]);
+    } else if (type === "number")  {
+      value.extend({ notify: 'always', validate: settingData.validate.bind(setting) });
     } else {
       var options = ko.observableArray(settingData.options);
     }
@@ -1440,7 +1457,7 @@ function IDEViewModel() {
       return cat;
     }
     setting.getOptions = ko.computed(function() {
-      return options();
+      return options ? options() : null;
     }, this);
     setting.getSelectedOptionId = function () {
       for (var i = 0; i < options().length; i++)
@@ -1483,9 +1500,15 @@ function IDEViewModel() {
     }
     value.subscribe(function(option) {
       config.settings[cat][id] = value(); //store
-      setting.apply(value());
-      __updateConfig(); //then write new settings object to localStorage
+      if (typeof value.isErroneous === "undefined" || !value.isErroneous()) {
+        setting.apply(value());
+        __updateConfig(); //then write new settings object to localStorage
+      }
     });
+
+    setting.max = settingData.max || null;
+    setting.min = settingData.min || null;
+    setting.step = settingData.step || null;
 
     setting.extAPI = {
       getName: setting.getName,
@@ -1495,7 +1518,10 @@ function IDEViewModel() {
       value: value,
       toggle: setting.toggle,
       getOptions: setting.getOptions,
-      isVisible: setting.isVisible
+      isVisible: setting.isVisible,
+      max: setting.max,
+      min: setting.min,
+      step: setting.step
     }
   }
 
@@ -2654,9 +2680,12 @@ function IDEViewModel() {
       keybindingContext: null,
       run: function(ed) {
         var fontSizeSetting = settings.byId("editor", "fontsize");
-        var optionId = fontSizeSetting.getSelectedOptionId();
-        if (typeof optionId == "number" && optionId < (fontSizeSetting.getOptions().length - 1))
-          fontSizeSetting.toggle(fontSizeSetting.getOptions()[optionId + 1]);
+        var value = fontSizeSetting.getValue();
+        if (value < fontSizeSetting.min) {
+          fontSizeSetting.setValue(fontSizeSetting.min);
+        } else if (value < fontSizeSetting.max) {
+          fontSizeSetting.setValue(++value);
+        }
         return null;
       }
     });
@@ -2671,9 +2700,12 @@ function IDEViewModel() {
       keybindingContext: null,
       run: function(ed) {
         var fontSizeSetting = settings.byId("editor", "fontsize");
-        var optionId = fontSizeSetting.getSelectedOptionId();
-        if (typeof optionId == "number" && optionId > 0)
-          fontSizeSetting.toggle(fontSizeSetting.getOptions()[optionId - 1]);
+        var value = fontSizeSetting.getValue();
+        if (value > fontSizeSetting.max) {
+          fontSizeSetting.setValue(fontSizeSetting.max);
+        } else if (value > fontSizeSetting.min) {
+          fontSizeSetting.setValue(--value);
+        }
         return null;
       }
     });
@@ -3211,84 +3243,81 @@ function IDEViewModel() {
         "id": "tabsize",
         "name": "Tab/Indent Block Size",
         "value": "4",
-        "type": "dropdown",
+        "type": "number",
         "cat": "editor",
-        "options": [{
-          "desc": "2",
-          "value": "2"
-        }, {
-          "desc": "3",
-          "value": "3"
-        }, {
-          "desc": "4",
-          "value": "4"
-        }, {
-          "desc": "5",
-          "value": "5"
-        }, {
-          "desc": "6",
-          "value": "6"
-        }, {
-          "desc": "7",
-          "value": "7"
-        }, {
-          "desc": "8",
-          "value": "8"
-        }],
+        "min": 1,
+        "max": 12,
+        "step": 1,
         "desc": "Sets the default visual size of tabs. This setting can be overridden per scene.",
-        "apply": function(val) {} // only adjusts value for new scenes
+        "validate": function(newValue) {
+          var message = "Invalid value";
+          newValue = parseInt(newValue);
+          var valid = !isNaN(newValue);
+          if (valid) {
+            if (newValue < this.min) {
+              valid = false;
+              message = "Value should be greater than or equal to " + this.min;
+            } else if (newValue > this.max) {
+              valid = false;
+              message = "Value should be less than or equal to " + this.max;
+            }
+          }
+          return { valid: valid, message: message }
+        },
+        "apply": function(val) {}, // only adjusts value for new scenes
       }),
       new CSIDESetting({
         "id": "indentspaces",
         "name": "Space Indentation Size",
         "value": "4",
-        "type": "dropdown",
+        "type": "number",
         "cat": "editor",
-        "options": [{
-          "desc": "2",
-          "value": "2"
-        }, {
-          "desc": "3",
-          "value": "3"
-        }, {
-          "desc": "4",
-          "value": "4"
-        }, {
-          "desc": "5",
-          "value": "5"
-        }, {
-          "desc": "6",
-          "value": "6"
-        }, {
-          "desc": "7",
-          "value": "7"
-        }, {
-          "desc": "8",
-          "value": "8"
-        }],
+        "min": 1,
+        "max": 12,
+        "step": 1,
         "desc": "Sets the preferred number of spaces used for indentation. Note that this will only be applied to newly created scenes. This setting can be overridden per scene.",
+        "validate": function(newValue) {
+          var message = "Invalid value";
+          newValue = parseInt(newValue);
+          var valid = !isNaN(newValue);
+          if (valid) {
+            if (newValue < this.min) {
+              valid = false;
+              message = "Value should be greater than or equal to " + this.min;
+            } else if (newValue > this.max) {
+              valid = false;
+              message = "Value should be less than or equal to " + this.max;
+            }
+          }
+          return { valid: valid, message: message }
+        },
         "apply": function(val) {} // only adjusts value for new scenes
       }),
       new CSIDESetting({
         "id": "fontsize",
         "name": "Font Size (px)",
-        "value": "12px",
-        "type": "variable",
+        "value": "12",
+        "type": "number",
         "cat": "editor",
-        "options": [{
-          "desc": "10",
-          "value": "10px"
-        }, {
-          "desc": "12",
-          "value": "12px"
-        }, {
-          "desc": "14",
-          "value": "14px"
-        }, {
-          "desc": "16",
-          "value": "16px"
-        }],
+        "min": 8,
+        "max": 30,
+        "step": 1,
         "desc": "The size of the font in the editor window",
+        "validate": function(newValue) {
+          var message = "Invalid value";
+          newValue = parseInt(newValue);
+          var valid = !isNaN(newValue);
+          if (valid) {
+            if (newValue < this.min) {
+              valid = false;
+              message = "Value should be greater than or equal to " + this.min;
+            } else if (newValue > this.max) {
+              valid = false;
+              message = "Value should be less than or equal to " + this.max;
+            }
+          }
+          return { valid: valid, message: message }
+        },
         "apply": function(val) {
           vseditor.updateOptions({fontSize: val});
         }

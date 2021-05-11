@@ -849,9 +849,10 @@ body.night .tab-panel.search #search-controls-wrap {
     float: right;
 }
 
-.tab-panel.settings>input {
-    margin-left: 10px;
-    height: 24px;
+.tab-panel.settings input {
+    color: inherit;
+    width: 100px;
+    margin-top: 5px;
 }
 
 .tab-panel.settings>label {
@@ -1231,7 +1232,6 @@ body.night .scene-error {
 
 .scene-error span {
     font-weight: normal;
-    color: salmon;
     font-size: 12px;
     left: 10px;
     margin-left: 2px;
@@ -1468,6 +1468,18 @@ body.night .project-hover {
 .name-error {
     color: rgb(249, 112, 112) !important;
 }
+
+body.night .validation-error-text {
+    color: salmon;
+}
+
+.validation-error-text {
+    color: #e80b0b;
+    font-size: 12px;
+    margin: 5px 0px 0px 0px;
+}
+
+#d00909
 
 .project-header-selected {
     background-color: rgb(99, 99, 99);
