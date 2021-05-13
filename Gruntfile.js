@@ -65,8 +65,6 @@ module.exports = function(grunt) {
               'help/site/**',
               'cs_examples/**',
               'lib/font-awesome/**',
-              'lib/typo/dictionaries/**',
-              'lib/typo/wordprocessor.js',       // used by typo.js
               'lib/jquery/jquery-1.11.3.min.js', // for help tab page
               'lib/marked/marked.min.js',        // ...
               'css/font/century_gothic.ttf',     // 'Century Gothic' font
@@ -152,7 +150,6 @@ module.exports = function(grunt) {
           "node_modules/dropbox/dist/Dropbox-sdk.min.js",
 
           "node_modules/mousetrap/mousetrap.min.js",
-          "source/lib/typo/typo.js",
           "node_modules/knockout/build/output/knockout-latest.js",
           "source/lib/knockout/knockout-jqueryui.min.js",
           "source/lib/knockout/knockout-sortable.min.js",

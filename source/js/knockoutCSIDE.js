@@ -2380,9 +2380,6 @@ function IDEViewModel() {
   window.db = db;
 
   var dropboxAuthorised = ko.observable(false);
-  var typo = new Typo("", "", "", {
-    platform: 'any'
-  }); //spellchecking library var to avoid initial errors (we'll init it properly via settings)
 
   //GETTER METHODS
   self.dbAuth = ko.computed(function() {
@@ -2495,6 +2492,34 @@ function IDEViewModel() {
   }();
 
   function registerEditorActions(editor) {
+
+    editor.addAction({
+      id: 'ignore-word',
+      label: 'Ignore Word this Session',
+      contextMenuGroupId: "1_modification",
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
+        var wordObj = ed.getModel().getWordAtPosition(meditor.getSelection().getStartPosition());
+        if (wordObj) {
+          vseditor.trigger("", `add-words`, {uri: "", dict: "session", words: [wordObj.word]});
+        }
+      }
+    });
+
+    editor.addAction({
+      id: 'add-word-to-dictionary',
+      label: 'Add Word to Dictionary',
+      contextMenuGroupId: "1_modification",
+      precondition: null,
+      keybindingContext: null,
+      run: function(ed) {
+        var wordObj = ed.getModel().getWordAtPosition(meditor.getSelection().getStartPosition());
+        if (wordObj) {
+          vseditor.trigger("", `add-words`, {uri: "", dict: "persistent", words: [wordObj.word]});
+        }
+      }
+    });
 
     editor.addAction({
       id: 'replace-project-scenes',
@@ -3070,14 +3095,6 @@ function IDEViewModel() {
     return null;
   }
 
-  function suggestWord(word) {
-    return new Promise(function(resolve, reject) {
-      typo.suggest(word, 5, function(suggestions) {
-        resolve(suggestions);
-          });
-      });
-  }
-
   var settings = {
     'editor': ko.observableArray([
       new CSIDESetting({
@@ -3179,7 +3196,13 @@ function IDEViewModel() {
           if (val) {
             var self = this;
             this.handle = monaco.languages.choicescript.onDictionaryChange((dictEvent) => {
-              userDictionary.add(dictEvent.word, dictEvent.dictionary);
+              for (var i = 0; i < dictEvent.words.length; i++) {
+                if (dictEvent.removed) {
+                  userDictionary.remove(dictEvent.words[i], dictEvent.dictionary);
+                } else {
+                  userDictionary.add(dictEvent.words[i], dictEvent.dictionary);
+                }
+              }
             });
           } else {
             if (this.handle) this.handle.dispose();
@@ -3201,9 +3224,6 @@ function IDEViewModel() {
         }],
         "desc": "The dictionary to spellcheck against",
         "apply": function(val) {
-          typo = new Typo(val, typo._readFile("lib/typo/dictionaries/" + val + "/" + val + ".aff"), typo._readFile("lib/typo/dictionaries/" + val + "/" + val + ".dic"), {
-            platform: 'any'
-          });
           var monacoOptions = __getMonacoDiagnosticOptions();
           monacoOptions.spellcheck.dictionary = val;
           __updateMonacoDiagnosticOptions(monacoOptions);
@@ -3851,11 +3871,6 @@ function IDEViewModel() {
       }
     }
   }
-  self.spellCheck = function(word) {
-    if (__getMonacoDiagnosticOptions().spellcheck.enabled)
-      return typo.check(word) || userDictionary.check(word.toLowerCase()) || Boolean(word.match(/^\d+$/));
-    return true; //always OK
-  }
 
   userDictionary = {
     "monacoCmds": {
@@ -3929,7 +3944,6 @@ function IDEViewModel() {
         var newDictionary = JSON.stringify(userDictionary.persistentList, null, "\t");
         localStorage.setItem("userDictionary", newDictionary);
       }
-      userDictionary.sync(list);
     },
     "sync": function(list) {
       // propagate to monaco for spelling validation
@@ -4050,15 +4064,15 @@ function IDEViewModel() {
   self.dictWord = ko.observable("");
   self.addToDictionary = function(obj, e) {
     if (e.type == "click" || e.type == "keyup" && e.keyCode == 13) {
-      if (!userDictionary.add(self.dictWord(), "persistent")) {
+      if (!userDictionary.validateWord(self.dictWord())) {
         bootbox.alert("<h3>Error</h3>Unable to add to user dictionary: not a word!");
+        return;
       }
+      vseditor.trigger("", `add-words`, {uri: "", dict: "persistent", words: [self.dictWord()]});
     }
   };
   self.removeFromDictionary = function(word) {
-    if (userDictionary.persistentList.hasOwnProperty(word)) {
-      userDictionary.remove(word, "persistent");
-    }
+    vseditor.trigger("", `remove-words`, {uri: "", dict: "persistent", words: [word]});
   };
   self.getDictionaryArray = ko.computed(function() {
     var query = self.dictWord().toLowerCase();
@@ -4222,20 +4236,6 @@ function IDEViewModel() {
     }
     // Pre-configure the language service:
     var diagnosticsOptions = __getMonacoDiagnosticOptions();
-    if (true) {
-      var dictPath = "lib/typo/dictionaries";
-      if (platform === "web-dropbox") {
-        diagnosticsOptions.spellcheck.workerPath = "/lib/typo/wordprocessor.js";
-        var loc = window.location.pathname;
-        dictPath = loc.substring(0, loc.length - "index.html".length) + dictPath;
-      } else {
-        diagnosticsOptions.spellcheck.workerPath = "file://" + resolvePath("lib/typo/wordprocessor.js");
-        dictPath = "file://" + ((process.cwd() + "/") + dictPath);
-      }
-      diagnosticsOptions.spellcheck.dictionaryPath = dictPath;
-    } else {
-      diagnosticsOptions.spellcheck.dictionaryPath = "https://raw.githubusercontent.com/ChoicescriptIDE/main/latest/source/lib/typo/dictionaries/";
-    }
     diagnosticsOptions.validate = false;
     __updateMonacoDiagnosticOptions(diagnosticsOptions);
     var scope = settings.editor();
