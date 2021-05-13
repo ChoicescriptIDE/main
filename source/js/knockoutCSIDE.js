@@ -1892,6 +1892,7 @@ function IDEViewModel() {
         "word-count": 2,
         "visible-tabs": false,
         "selection-match": false,
+        "cursor-match": false
       },
       "app": {
         "persist": true,
@@ -3092,6 +3093,17 @@ function IDEViewModel() {
         "apply": function(val) {
           // FIXME: Highlights can get stuck if disabled whilst visible.
           vseditor.updateOptions({selectionHighlight: val});
+        }
+      }),
+      new CSIDESetting({
+        "id": "cursor-match",
+        "name": "Cursor Match",
+        "value": true,
+        "type": "binary",
+        "cat": "editor",
+        "desc": "Highlights other instances of the word under the editor caret",
+        "apply": function(val) {
+          vseditor.updateOptions({occurrencesHighlight: val});
         }
       }),
       new CSIDESetting({
