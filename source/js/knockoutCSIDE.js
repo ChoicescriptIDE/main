@@ -428,6 +428,8 @@ function IDEViewModel() {
         function closeScene() {
           if (selectedScene() == scene) {
             selectedScene(null);
+            cursorPos({lineNumber: 0, column: 0});
+            selectedChars(0);
           }
           self.removeScene(scene);
           __updatePersistenceList();
@@ -798,7 +800,7 @@ function IDEViewModel() {
     };
     self.getWordCountString = function() {
       var suffix = (wordCountOn() > 1) ? " [excl. cmds]" : " [inc. cmds]";
-      if (selectedChars() > 0) {
+      if (selected && selectedChars() > 0) {
         var selectedWords = __wordCount(vseditor.getModel().getValueInRange(vseditor.getSelection()), wordCountOn() > 1);
         return (wordCount() + (" (" + selectedWords + ") " + suffix));
       } else {
@@ -1192,6 +1194,7 @@ function IDEViewModel() {
 
       vseditor.setModel(edModel);
       cursorPos(vseditor.getPosition());
+      selectedChars(vseditor.getModel().getValueInRange(vseditor.getSelection()).length);
       __updateEditorDecorations(self);
       if (editorViewState) {
         vseditor.restoreViewState(editorViewState);
