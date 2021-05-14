@@ -4431,7 +4431,7 @@ function IDEViewModel() {
           for (key in val) {
             if (val.hasOwnProperty(key)) {
               // TODO: Check colorId is valid
-              if (!val[key].match(/^#[0-9A-Fa-f]{6}$/)) {
+              if (!val[key].match(/^#[0-9A-Fa-f]{6,8}$/)) {
                 return false;
               }
             }
