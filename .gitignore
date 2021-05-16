@@ -7,3 +7,4 @@ inno/*
 !inno/*.iss
 compile_head.txt
 compile_tail.txt
+.DS_Store
