@@ -3,6 +3,7 @@ release/*
 nwjsBuild/*
 nwjsCache/*
 /node_modules/*
+/source/help/site/*
 inno/*
 !inno/*.iss
 compile_head.txt
