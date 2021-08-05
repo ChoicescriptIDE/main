@@ -12,6 +12,16 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-execute');
   grunt.loadNpmTasks('grunt-string-replace');
   grunt.initConfig({
+    "shell": {
+      docs: {
+        command: 'mkdocs build',
+        options: {
+          execOptions: {
+              cwd: 'source/help'
+          }
+        }
+      }
+    },
     "auto_install": {
       local: {},
       build: {
@@ -52,7 +62,7 @@ module.exports = function(grunt) {
               'run_index.html',
               'mods/*',
               'img/*',
-              'help/**',
+              'help/site/**',
               'cs_examples/**',
               'lib/font-awesome/**',
               'lib/typo/dictionaries/**',
@@ -265,7 +275,8 @@ module.exports = function(grunt) {
       }
     }
   });
-  var tasks = ["clean", "copy:main", "concat", "uglify", "cssmin", "auto_install:build", "clean:package_lock", "copy:choicescript", "copy:updater", "copy:monaco", "string-replace", "execute", "compress"];
+  var tasks = ["clean", "shell:docs", "copy:main", "concat", "uglify", "cssmin", "auto_install:build", "clean:package_lock",
+    "copy:choicescript", "copy:updater", "copy:monaco", "string-replace", "execute", "compress"];
   grunt.registerTask("default", tasks);
   grunt.registerTask("build-with-nwjs", tasks.concat("nwjs"));
   grunt.registerTask("build-with-windows", tasks.concat("nwjs:windows"));

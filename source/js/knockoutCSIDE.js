@@ -1869,7 +1869,17 @@ function IDEViewModel() {
 
   var reservedSceneNames = "(STARTUP|CHOICESCRIPT_STATS)"; //Should be in upper case
   var recentSceneColours = ko.observableArray(["#72c374", "#7797ec", "#d9534f", "#a5937a", "#ff8d2b", "#e079f5", "#00a8c3", "#777777"]);
-  var uiColour = ko.observable().extend({ notify: 'always' });
+  var uiColour = ko.observable().extend({
+    notify: 'always',
+    callFunc: { func: function() {
+      // refresh header colour on documentation
+      if (self.tabs) {
+        var path = document.getElementById("help-tab-frame").contentWindow.location.href;
+        if (path && path.match(/\.html$/))
+          __reloadTab(__getTab("help"), path);
+      }
+    }}
+  });
   uiColour("90,90,90");
   var consoleOpen = ko.observable(false);
   var activeProject = ko.observable("");
@@ -2374,7 +2384,7 @@ function IDEViewModel() {
   });
   self.getUIColour = function(delta) {
     delta = delta || 0;
-    if (config.settings.app["night-mode"]) {
+    if (self.isInNightMode()) {
       delta -= 30;  // darken night-mode colours even further
     }
     var rgb = uiColour().split(",");
@@ -2391,6 +2401,9 @@ function IDEViewModel() {
     var color = rgb.join(",");
     return ("rgb(" + color + ")");
   };
+  self.isInNightMode = function() {
+    return config.settings.app["night-mode"];
+  }
 
   self.selectTab = function(tab) {
     var tabs = self.tabs();
@@ -2887,10 +2900,13 @@ function IDEViewModel() {
       "title": "Help & Information",
       "showTitle": true,
       "iconClass": "fa fa-question-circle",
-      "href": "help/index.html",
+      "href": ko.observable("help/site/index.html"),
+      "onload": function() {
+        //__csideTabs["help"].href(this.contentWindow.location);
+      },
       "content": "",
       "visible": ko.observable(true),
-      "getHeaderTitle": "Help & Information"
+      "getHeaderTitle": ""
     },
     "search": {
       "id": "search",

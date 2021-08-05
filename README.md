@@ -21,6 +21,7 @@ You'll want the following installed in order to build CSIDE:
 
 - NodeJS v10.X and associated version of npm
 - Global install of latest grunt-cli (npm install grunt-cli -g)
+- mkdocs && mkdocs-localsearch
 
 This is what the CLI runs with. Other versions/combinations *may* work but please try this combination before reporting a build bug.
 

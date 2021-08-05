@@ -1,0 +1,28 @@
+site_name: Help & Information
+use_directory_urls: false
+markdown_extensions:
+  - meta
+theme:
+  logo: assets/img/logo.png
+  name: material
+  custom_dir: overrides
+  palette:
+    - scheme: default
+      primary: light blue
+      accent: blue
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - scheme: slate
+      primary: blue
+      accent: light blue
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+plugins:
+  - search
+  - localsearch
+extra_javascript:
+  - assets/js/extra.js
+extra_css:
+  - assets/css/extra.css

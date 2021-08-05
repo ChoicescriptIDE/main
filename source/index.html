@@ -175,7 +175,7 @@
                                     <div class="no-select tab-panel-header col-anim" data-bind="visible: showTitle, text: getHeaderTitle, style: { backgroundColor: $root.getUIColour(-8) }"></div>
                                     <!-- ko if: href != '' -->
                                     <div class="iframe-wrap">
-                                        <iframe data-bind="attr { src: href, title: title, name: title, visible: href, id: id + '-tab-frame' }"></iframe>
+                                        <iframe data-bind="attr { src: href, title: title, name: title, visible: href, id: id + '-tab-frame' }, event: { load: onload }"></iframe>
                                     </div>
                                     <!-- /ko -->
                                     <!-- ko if: id == 'issues' -->

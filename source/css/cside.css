@@ -225,11 +225,15 @@ body.night #left-wrap {
     height: 100%;
 }
 
-.iframe-wrap {
+.iframe-wrap  {
     position: absolute;
-    top: 42px;
+    top: 0px;
     bottom: 0px;
     width: 100%;
+}
+
+.tab-panel.game > .iframe-wrap {
+    top: 42px;
 }
 
 #tabs iframe {
