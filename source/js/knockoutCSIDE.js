@@ -800,7 +800,7 @@ function IDEViewModel() {
     };
     self.getWordCountString = function() {
       var suffix = (wordCountOn() > 1) ? " [excl. cmds]" : " [inc. cmds]";
-      if (selected && selectedChars() > 0) {
+      if (selectedChars() > 0) {
         var selectedWords = __wordCount(vseditor.getModel().getValueInRange(vseditor.getSelection()), wordCountOn() > 1);
         return (wordCount() + (" (" + selectedWords + ") " + suffix));
       } else {
