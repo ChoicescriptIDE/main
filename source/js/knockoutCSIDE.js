@@ -3892,7 +3892,6 @@ function IDEViewModel() {
       if (!userDictionary.validateWord(word)) {
         return false;
       }
-      word = word.toLowerCase();
       if (userDictionary[list + "List"][word])
         return true;
       userDictionary[list + "List"][word] = true;
@@ -3925,8 +3924,8 @@ function IDEViewModel() {
       try {
         userDictionary.persistentList = JSON.parse(localStorage.getItem("userDictionary")) || {};
         for (var i in userDictionary.persistentList) {
-          if (userDictionary.persistentList.hasOwnProperty(i.toLowerCase())) {
-            userDictionary.persistentListArray.push(i.toLowerCase());
+          if (userDictionary.persistentList.hasOwnProperty(i)) {
+            userDictionary.persistentListArray.push(i);
           }
         }
         userDictionary.sync("persistent");
@@ -3956,9 +3955,7 @@ function IDEViewModel() {
     "sanitize": function() {
       var arr = Object.keys(userDictionary.persistentList);
       for (var i = 0; i < arr.length; i++)
-        if (arr[i] !== arr[i].toLowerCase())
-          throw new Error("Error: Entry should be lowercase: " + arr[i]);
-        else if (!userDictionary.validateWord(arr[i]))
+        if (!userDictionary.validateWord(arr[i]))
           throw new Error("Error: Invalid entry (not a word): " + arr[i]);
         else if (userDictionary.persistentList[arr[i]] !== true)
           throw new Error("Error: Entry value should be 'true' for: " + arr[i])
@@ -4075,7 +4072,7 @@ function IDEViewModel() {
     vseditor.trigger("", `remove-words`, {uri: "", dict: "persistent", words: [word]});
   };
   self.getDictionaryArray = ko.computed(function() {
-    var query = self.dictWord().toLowerCase();
+    var query = self.dictWord();
     if (query == "")
       return userDictionary.persistentListArray().sort();
     return userDictionary.persistentListArray().filter(function(word) { return word.startsWith(query); } ).sort();
