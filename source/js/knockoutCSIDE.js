@@ -1726,6 +1726,10 @@ function IDEViewModel() {
   }
 
   var vseditor = null;
+  var panelStatus = {
+    "scene": ko.observable(true),
+    "tab": ko.observable(true)
+  }
   var projects = ko.observableArray([]);
   var cursorPos = ko.observable({lineNumber: 0, column: 0});
   var selectedChars = ko.observable(0);
@@ -1733,6 +1737,14 @@ function IDEViewModel() {
   var selectedProject = ko.computed(function() {
     return selectedScene() ? selectedScene().getProject() : null;
   });
+  self.togglePanel = function(panel, force) {
+    // force is an optional boolean
+    var isOpen = typeof force === "boolean" ? force : !panelStatus[panel]();
+    panelStatus[panel](isOpen);
+  }
+  self.isPanelOpen = function(panel) {
+    return panelStatus[panel]();
+  }
   var SEARCH = {
     MODES: { SEARCH: 0, REPLACE: 1 },
     CONF: {
@@ -2534,7 +2546,7 @@ function IDEViewModel() {
           return;
         cside.toggleSearchMode(SEARCH.MODES.REPLACE);
         __selectTab("search");
-        cside.tabPanel("open");
+        cside.togglePanel("tab", true /* open */);
         document.getElementById("replaceBox").focus();
       }
     });
@@ -2552,7 +2564,7 @@ function IDEViewModel() {
           return;
         cside.toggleSearchMode(SEARCH.MODES.SEARCH);
         __selectTab("search");
-        cside.tabPanel("open");
+        cside.togglePanel("tab", true /* open */);
         document.getElementById("searchBox").focus();
       }
     });
@@ -2676,7 +2688,7 @@ function IDEViewModel() {
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        cside.scenePanel();
+        cside.togglePanel("scene");
         return null;
       }
     });
@@ -2690,7 +2702,7 @@ function IDEViewModel() {
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        cside.tabPanel();
+        cside.togglePanel("tab");
         return null;
       }
     });
@@ -3690,19 +3702,6 @@ function IDEViewModel() {
     return "Ln " + (cursorPos().lineNumber) + ", Col " + cursorPos().column;
   };
 
-  self.scenePanel = function(action) {
-    if ($('#sidebar').is(':visible') && action !== "open") {
-      $('#sidebar').css({
-          "display": "none"
-      });
-    } else {
-      $('#sidebar').css({
-          "display": ""
-      });
-    }
-    if (vseditor) vseditor.layout();
-}
-
   var consoleCmdBuf = [];
   var consoleCmdBufPtr = 0;
   var consoleIndicator = ko.observable(0);
@@ -3782,45 +3781,6 @@ function IDEViewModel() {
       selectedProject().logToConsole("Error: " + e.message, "cm-error");
     }
     element.value = "";
-  }
-  self.tabPanel = function(action) {
-    if ($('#left-wrap').is(':animated') || $('#right-wrap').is(':animated')) {
-      return;
-    }
-
-    function calcWidth(ele) {
-      var width = ele.width();
-      var parentWidth = ele.offsetParent().width();
-      var percent = 100 * width / parentWidth;
-      return percent;
-    }
-
-    var isOpen = true;
-    if (calcWidth($('#left-wrap')) >= 100) {
-      isOpen = false;
-    }
-
-    if (action == "close" && isOpen || !action && isOpen) {
-      $('#right-wrap').css({
-        width: '0%'
-      });
-      $('#left-wrap').css({
-        width: '100%'
-      });
-      $("#expand-collapse-bar").addClass("collapsed");
-      if (vseditor) vseditor.layout();
-    } else if (action == "open" && !isOpen || !action && !isOpen) {
-      $('#right-wrap').css({
-        width: '50%'
-      });
-      $('#left-wrap').css({
-        width: '50%'
-      });
-      $("#expand-collapse-bar").removeClass("collapsed");
-      if (vseditor) vseditor.layout();
-    } else {
-      return isOpen;
-    }
   }
 
   // used by nodeCSIDE.js drag/drop file opening
@@ -4258,8 +4218,8 @@ function IDEViewModel() {
     // ensure the tab panel starts open and on the 'help' tab
     __selectTab("help");
 
-    // force redraw of the scenePanel based on display width
-    self.scenePanel("open");
+    // force redraw of the scene panel based on display width
+    cside.togglePanel("scene", true /* open */);
 
     // hook post-update behaviour here
     if (config.justUpdated || typeof config.justUpdated === "undefined") {
@@ -5001,7 +4961,7 @@ function IDEViewModel() {
         });
         activeProject(project);
         __reloadTab(__getTab("game"), 'run_index.html?restart=true');
-        cside.tabPanel("open");
+        cside.togglePanel("tab", true /* open */);
         __selectTab("game");
         setTimeout(function() {
           var webview = document.getElementById('game-tab-frame');

@@ -140,9 +140,7 @@ body.night input:not([readonly]):not(.monaco-mouse-cursor-text), body.night text
 }
 
 #left-wrap {
-    width: 100%;
-    height: 100%;
-    float: left;
+    flex: 1 1 400px;
     position: relative;
     background-color: #EEE;
     border-color: inherit;
@@ -153,11 +151,7 @@ body.night #left-wrap {
 }
 
 #right-wrap {
-    position: absolute;
-    width: 50%;
-    right: 0px;
-    bottom: 0px;
-    top: 0px;
+    flex: 1 1 400px;
     border-color: inherit;
 }
 
@@ -247,27 +241,35 @@ body.night #left-wrap {
     text-align: right;
 }
 
-#left-panel-control {
-    outline: none;
-    width: 32px;
-    height: 30px;
-    position: absolute;
-    z-index: 7;
-    border: solid;
+.resize-bar {
+    flex: 0 0 10px;
     border-color: inherit;
-    border-width: 0px 1px 0px 0px;
+    cursor: pointer;
+    -webkit-transition: all .15s ease;
+    -moz-transition: all .15s ease;
+    -o-transition: all .15s ease;
+    -ms-transition: all .15s ease;
+    transition: all .15s;
 }
 
-#panel-control {
-    outline: none;
-    width: 32px;
-    height: 30px;
+.resize-bar:hover {
+    flex: 0 0 15px;
+}
+
+.resize-bar > i.fa {
+    text-align: center;
     position: absolute;
-    right: 0px;
-    z-index: 8;
-    border: solid;
-    border-width: 0px 1px;
-    border-color: inherit;
+    top: 50%;
+    color: black;
+    display: block;
+    margin: auto;
+    width: 10px;
+    font-size: 12px;
+}
+
+.resize-bar:hover > i.fa {
+    width: 15px; /* same as resize-bar:hover */
+    color: white;
 }
 
 .ui-tabs .ui-tabs-nav {
@@ -276,6 +278,7 @@ body.night #left-wrap {
     border-bottom: 1px solid;
     height: 100%;
     padding: 0;
+    border-left: 1px solid;
     border-color: inherit;
     width: 40px;
 }
