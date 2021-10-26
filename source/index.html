@@ -339,14 +339,16 @@
                 </div>
             </div>
         </div>
-        <div data-bind="if: getSelectedProject, style: { display: getSelectedProject() && getSelectedProject().consoleOpen() ? 'flex' : 'none' }" id="cs-console" class="monaco-editor-background">
+        <div data-bind="style: { display: getSelectedProject() && getSelectedProject().consoleOpen() ? 'flex' : 'none' }" id="cs-console" class="monaco-editor-background">
             <div id="console-header" data-bind="style: { backgroundColor: getUIColour(), borderColor: getUIColour(-30) }"></div>
+            <!-- ko if: getSelectedProject -->
             <ul data-bind="foreach: getSelectedProject().getLogs">
                 <li data-bind="html: $data.value"></li>
                 <span class="meta" data-bind="visible: ($data.scene && $data.line), text: $data.scene + $data.line"></span>
                 </li>
             </ul>
-            <input data-bind="event: { 'keyup': consoleInput }" placeholder=" > Enter your ChoiceScript expression here">
+            <!-- /ko -->
+            <div id="monaco-console-input"></div>
         </div>
         <div id="code-footer" data-bind="if: getSelectedScene() && getSelectedProject(), style: { backgroundColor: getUIColour(), borderColor: getUIColour(-30) }">
             <button class="console-btn col-anim" data-bind="click: getSelectedProject().toggleConsole">

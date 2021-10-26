@@ -575,7 +575,6 @@ body.night #editor-wrap {
     flex-direction: column;
     flex-wrap: wrap;
     z-index: 999;
-    overflow: hidden;
     -webkit-touch-callout: all;
     -webkit-user-select: all;
     -khtml-user-select: all;
@@ -614,9 +613,9 @@ body.night #editor-wrap {
     border-color: #776D43;
 }
 
-#cs-console input {
+#cs-console > #monaco-console-input {
+    flex: 30px 0 0;
     width: 100%;
-    flex-grow: 1;
 }
 
 #cs-console>ul {
@@ -627,7 +626,6 @@ body.night #editor-wrap {
     height: 100%;
     overflow-x: hidden;
     overflow-y: scroll;
-    z-index: 9999999;
     flex-basis: 100px;
     flex-grow: 9;
     position: relative;

@@ -251,6 +251,7 @@ function IDEViewModel() {
       if (consoleOpen()) {
         unreadLogs(0);
       }
+      monacoConsole.layout();
       return consoleOpen();
     }
     self.clearConsole = function() {
@@ -3702,31 +3703,32 @@ function IDEViewModel() {
     return "Ln " + (cursorPos().lineNumber) + ", Col " + cursorPos().column;
   };
 
+  var monacoConsole = null;
+
   var consoleCmdBuf = [];
   var consoleCmdBufPtr = 0;
   var consoleIndicator = ko.observable(0);
-  self.consoleInput = function(data, evt) {
+  self.consoleInput = function(keyCode) {
     var consoleCommands = /^\*(console_)?(clear|track|untrack|track_all_off|track_all_on|track_list|help)/
     var validCSCommands = /^\*(?:set|temp|rand|achieve|restart|goto|goto_scene)/
-    if (!evt) {
+    if (!keyCode) {
       return;
     }
-    var element = evt.originalEvent.target;
-    var input = element.value;
-    if (evt.keyCode === 38) { //up arrow
+    var input = monacoConsole.getValue();
+    if (keyCode === monaco.KeyCode.UpArrow) {
       if (consoleCmdBuf.length <= 0) return;
       if (--consoleCmdBufPtr < 0) {
         consoleCmdBufPtr = (consoleCmdBuf.length - 1);
       }
-      element.value = consoleCmdBuf[consoleCmdBufPtr];
-    } else if (evt.keyCode === 40) { //down arrow
+      monacoConsole.setValue(consoleCmdBuf[consoleCmdBufPtr]);
+    } else if (keyCode === monaco.KeyCode.DownArrow) {
       if (consoleCmdBuf.length <= 0) return;
       if (++consoleCmdBufPtr > (consoleCmdBuf.length - 1)) {
         consoleCmdBufPtr = 0;
       }
-      element.value = consoleCmdBuf[consoleCmdBufPtr];
+      monacoConsole.setValue(consoleCmdBuf[consoleCmdBufPtr]);
     }
-    if (!input || evt.keyCode !== 13) {
+    if (!input || keyCode !== monaco.KeyCode.Enter) {
       return;
     }
     if (consoleCmdBuf.length > 9) {
@@ -3739,13 +3741,13 @@ function IDEViewModel() {
     var gameFrame = document.getElementById("game-tab-frame").contentWindow || document.getElementById("#game-tab-frame");
     if (typeof gameFrame === 'undefined' || typeof gameFrame === 'undefined') {
       selectedProject().logToConsole("Error: no choicescript game running", "cm-error");
-      element.value = "";
+      monacoConsole.setValue("");
       return;
     }
     // Prevent the confusing use of commands through non active project consoles
     if (selectedProject() != activeProject()) {
       selectedProject().logToConsole("Error: this project is not the one running", "cm-error");
-      element.value = "";
+      monacoConsole.setValue("");
       return;
     }
     try {
@@ -3780,7 +3782,7 @@ function IDEViewModel() {
       e.message = e.message.replace(/line [0-9]+ of\s\w+: /, "");
       selectedProject().logToConsole("Error: " + e.message, "cm-error");
     }
-    element.value = "";
+    monacoConsole.setValue("");
   }
 
   // used by nodeCSIDE.js drag/drop file opening
@@ -4039,6 +4041,50 @@ function IDEViewModel() {
   }, this);
 
   self.init = function(editor) {
+
+    // Create the "console" input as a single-line Monaco Editor instance
+    // to allow for more interactive behaviour in the future.
+    // This is a bit hacky as there is no official support right now.
+    // See: https://github.com/microsoft/monaco-editor/issues/2009
+    monacoConsole = monaco.editor.create(document.getElementById("monaco-console-input"), {
+      wordWrap: 'off',
+      lineNumbers: 'off',
+      lineNumbersMinChars: 0,
+      overviewRulerLanes: 0,
+      overviewRulerBorder: false,
+      lineDecorationsWidth: 0,
+      hideCursorInOverviewRuler: true,
+      glyphMargin: false,
+      folding: false,
+      scrollBeyondLastColumn: 0,
+      scrollbar: {horizontal: 'hidden', vertical: 'hidden'},
+      find: { addExtraSpaceOnTop: false, autoFindInSelection: 'never', seedSearchStringFromSelection: false },
+      minimap: {enabled: false},
+      language: "choicescript",
+      lineHeight: "30px",
+      fontSize: "12px",
+      renderValidationDecorations: "off",
+      contextmenu: false,
+      hover: { enabled: false },
+      suggestOnTriggerCharacters: false,
+      lightbulb: { enabled: false },
+      parameterHints: { enabled: false },
+      quickSuggestions: false
+    });
+
+    monacoConsole.onKeyDown(e => {
+      switch(e.keyCode) {
+        case monaco.KeyCode.Enter:
+        case monaco.KeyCode.UpArrow:
+        case monaco.KeyCode.DownArrow:
+          self.consoleInput(e.keyCode);
+          e.preventDefault();
+          break;
+        default:
+          return;
+      }
+    });
+
     vseditor = editor;
 
     monaco.cside = {};
