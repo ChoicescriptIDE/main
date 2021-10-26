@@ -71,6 +71,7 @@
     <!-- END OF DROPBOX/WEB FILE EXPLORER -->
     <div class="main-wrap" data-bind="style: { borderColor: getUIColour(-30) }">
         <div id="headbar" data-bind="style: { backgroundColor: getUIColour() }, event: { dblclick: getPlatform() === 'web-dropbox' ? null : session.win.toggleMaximize() }" class="col-anim">
+            <span class="title" data-bind="text: getActiveProject() ? getActiveProject().getName() : 'CSIDE'"></span>
             <!-- ko if: getPlatform() != "mac_os" -->
             <ul data-bind="foreach: getToolbarMenus" id="toolbar"><li data-bind="fadeVisible: (isActive() && ($root.getPlatform() != 'web-dropbox' || $root.webFileBrowserClosed)), style: { backgroundColor: $root.getUIColour(-20) }">
                     <button data-bind="click: toggle, html: getTitle, style: { backgroundColor: $root.getUIColour(-12) }"></button>
@@ -109,7 +110,7 @@
                 </div>
                 <ul id="main-project-wrap" data-bind="sortable: { data: getProjects, allowDrop: false, connectClass: 'null', afterMove: cside.updatePersistenceList, options: { axis: 'y', cancel: 'input:not([readonly]), button, .scene', items: '.project-wrapper', containment: $('#main-project-wrap') } }">
                     <li class="project-wrapper">
-                        <div class="project-header" data-bind="css: { 'project-header-selected': $data == $root.getSelectedProject(), 'collapsed': isExpanded() === false }, style: { backgroundColor: $root.getUIColour(-15), color: $root.getUIColour(100) }" class="col-anim">
+                        <div class="project-header" data-bind="css: { 'project-header-selected': $data == $root.getActiveProject(), 'collapsed': isExpanded() === false }, style: { backgroundColor: $root.getUIColour(-15), color: $root.getUIColour(100) }" class="col-anim">
                             <button data-bind="attr: { title: 'Toggle visibility of project ' + getName() }, click: setExpand, css: isExpanded() ? 'fa fa-eye' : 'fa fa-eye-slash'" class="col-anim"></button>
                             <!-- <span data-bind="fadeVisible: beingEdited() ? false : true, event: { dblclick: rename }, text: getName, attr: { title: getPath }"></span> -->
                             <input data-bind="enableTextInput: beingEdited, textInput: nameInterface, event: { dblclick: rename, blur: rename, keyup: rename }, attr: { title: getPath }, style: { backgroundColor: beingEdited() ? $root.getUIColour(-15) : 'transparent' }, css: { 'name-error': nameInvalid }"
@@ -121,11 +122,11 @@
                             <!-- /ko -->
                         </div>
                         <ul class="project" data-bind="fadeAndSlideVisible: isExpanded, css: { 'project-collapsed': isExpanded() != true }, sortable: { data: getScenes, beforeMove: cside.dragSceneEvent, afterMove: cside.updatePersistenceList, options: { axis: 'y', cancel: 'input:not([readonly]), button', items: '.scene', connectWith: '#main-project-wrap > .project-wrapper > .project', placeholder: 'project-hover', containment: $('#main-project-wrap')} }">
-                            <li class="scene" role="button" data-bind="click: getErrState() ? load : select, css: { 'scene-selected': $data === $root.getSelectedScene() }">
+                            <li class="scene" role="button" data-bind="click: getErrState() ? load : $root.selectSceneClick, css: { 'scene-selected':  isSelected() }">
                                 <button class="save-scene" data-bind="click: getErrState() ? close : save, clickBubble: false, attr: { title: getErrState() ? getErrStateMsg : isReadOnly() ? 'Read-only' : 'Save ' + getName() + '.txt' }"><i data-bind="css: getState"></i></button>
                                 <button class="colour-marker handle" data-bind="attr: { title: 'Click to colour project ' + getName() }, click: showColours, clickBubble: false, style: { backgroundColor: getMarkColour }"></button>
                                 <!-- <span data-bind="text: getName(), event: { dblclick: rename }, attr: { title: getName }, fadeVisible: beingEdited() ? false : true"></span> -->
-                                <input data-bind="attr: { title: getName }, enableTextInput: beingEdited, textInput: nameInterface, event: { click: isSelected() ? rename : null, dblclick: rename, blur: rename, keyup: rename }, css: { 'name-error': nameInvalid }" class="col-anim"></input>
+                                <input data-bind="attr: { title: getName }, enableTextInput: beingEdited, textInput: nameInterface, event: { dblclick: rename, blur: rename, keyup: rename }, css: { 'name-error': nameInvalid }" class="col-anim"></input>
                                 <div class="scene-error validation-error-text" data-bind="fadeVisible: nameInvalid">
                                     <span data-bind="text: getNameErrorMsg"></span>
                                 </div>
@@ -142,22 +143,22 @@
                     </li>
                 </ul>
             </div>
-            <div class="resize-bar" data-bind="click: togglePanel.bind(null, 'scene'), style: { backgroundColor: getUIColour(0) }">
+            <div class="resize-bar" data-bind="click: togglePanel.bind(null, 'scene'), style: { backgroundColor: getUIColour(0) }" style="border-right: 1px solid; border-color: inherit;">
                 <i class="fa" data-bind="css: !isPanelOpen.bind(null, 'scene')() ? 'fa-chevron-right' : 'fa-chevron-left'"></i>
             </div>
-            <div id="left-wrap">
-                <div id="doc-bar" data-bind="style: { backgroundColor: getUIColour(0) }" clas="col-anim">
-                    <ul>
-                        <li class="doc-title">
-                            <span class="no-select" data-bind="text: getSelectedScene() && getSelectedProject() ? (getSelectedProject().getName() + ': ' + (getSelectedScene().getName() + '.txt')) : '', attr: { title: getSelectedScene() ? getSelectedScene().getPath() : '' }"></span>
-                        </li>
-                    </ul>
-                </div>
-                <div id="editor-wrap" data-bind="fadeVisible: getSelectedScene">
-                    <textarea style="display: none;" id="code-textarea" name="code"></textarea>
-                </div>
+            <div id="left-wrap" data-bind="style: { backgroundColor: $root.getUIColour(-10) }">
+                <!-- ko if: $root.getActiveProject -->
+                <ul id="editor-tab-list" data-bind="sortable: { data: $root.getActiveProject().getEditors || [], beforeMove: $root.moveEditor, options: { axis: 'x', items: 'li', helper: 'clone' , containment: $('#editor-tab-list'), tolerance: 'pointer' } }">
+                    <li class="editor-tag" data-bind="click: makeActive, attr: { id: 'editor-tag-' + $index(), title: getName() }, style: { backgroundColor: $root.getUIColour(isActive() ? 0 : -8), borderColor: $root.getUIColour(-30) }">
+                        <button data-bind="click: close, style: { color: $root.getUIColour(-40) }, attr: { class: getFileStateCSS() }" class="codicon codicon-close" title="Close editor"></button>
+                        <span data-bind="text: getName()"></span>
+                    </li>
+                </ul>
+                <!-- /ko -->
+                <!-- editor instances should be retained between projects: -->
+                <ul class="editor-list" id="editor-list"></ul>
             </div>
-            <div class="resize-bar" data-bind="click: togglePanel.bind(null, 'tab'), style: { backgroundColor: getUIColour(0) }">
+            <div class="resize-bar" data-bind="click: togglePanel.bind(null, 'tab'), style: { backgroundColor: getUIColour(0) }" style="border-left: 1px solid; border-color: inherit;">
                 <i class="fa" data-bind="css: !isPanelOpen.bind(null, 'tab')() ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
             </div>
             <div id="right-wrap" data-bind="visible: isPanelOpen.bind(null, 'tab')()">
@@ -182,7 +183,7 @@
                             </div>
                             <!-- /ko -->
                             <!-- ko if: id == 'issues' -->
-                            <!-- ko with: $root.getSelectedProject -->
+                            <!-- ko with: $root.getActiveProject -->
                             <ul class="issueList">
                                 <!-- only show issues in selected project -->
                                 <!-- ko if: issueCount() <= 0 -->
@@ -285,20 +286,20 @@
                                 </li>
                             </ul>
                             <!-- /ko -->
-                            <!-- ko if: id == 'search' && $root.getSelectedProject -->
+                            <!-- ko if: id == 'search' && $root.getActiveProject -->
                             <div id="search-controls-wrap" role="search">
                                 <div id="search-controls" data-bind="foreach: $root.searchToggles">
                                     <div data-bind="style: { backgroundColor: value() ?  $root.getUIColour() : 'transparent' }, attr: { title: title, 'aria-label': title, 'aria-checked': value, class: 'monaco-custom-checkbox codicon ' + cssClass }, css: value() ? 'checked' : 'unchecked', click: value.bind($data, !value())" aria-disabled="false" role="checkbox" tabindex="0"></div>
                                 </div>
-                                <form data-bind="submit: $root.getSelectedProject().search" autocomplete="off">
+                                <form data-bind="submit: $root.getActiveProject().search" autocomplete="off">
                                     <button type="button" id="search-mode-btn" data-bind="style: { height: $root.inReplaceMode() ? '75px' : '32px' }, click: $root.toggleSearchMode, css: $root.inReplaceMode() ? 'fa fa-angle-down' : 'fa fa-angle-right'"></button>
-                                    <textarea id="searchBox" spellcheck="false" type="text" placeholder="Search" data-bind="event: { keydown: $root.getSelectedProject().searchByEnterKey, keyup: $root.getSelectedProject().searchByEnterKey }"></textarea>
-                                    <textarea id="replaceBox" spellcheck="false" type="text" placeholder="Replace" data-bind="visible: $root.inReplaceMode(), event: { keydown: $root.getSelectedProject().searchByEnterKey, keyup: $root.getSelectedProject().searchByEnterKey }"></textarea>
+                                    <textarea id="searchBox" spellcheck="false" type="text" placeholder="Search" data-bind="event: { keydown: $root.getActiveProject().searchByEnterKey, keyup: $root.getActiveProject().searchByEnterKey }"></textarea>
+                                    <textarea id="replaceBox" spellcheck="false" type="text" placeholder="Replace" data-bind="visible: $root.inReplaceMode(), event: { keydown: $root.getActiveProject().searchByEnterKey, keyup: $root.getActiveProject().searchByEnterKey }"></textarea>
                                     <button class="btn btn-default" id="search-btn" data-bind="text: $root.inReplaceMode() ? 'Replace' : 'Search'"></button>
                                 </form>
-                                <p data-bind="text: $root.getSelectedProject().getSearchResultDesc()" style="margin-bottom: 0;"></p>
+                                <p data-bind="text: $root.getActiveProject().getSearchResultDesc()" style="margin-bottom: 0;"></p>
                             </div>
-                            <ul id="search-result-scenelist" data-bind="foreach: $root.getSelectedProject().getSearchResults()">
+                            <ul id="search-result-scenelist" data-bind="foreach: $root.getActiveProject().getSearchResults()">
                                 <li class="search-result-scene">
                                     <div class="no-select tab-panel-header col-anim" data-bind="style: { backgroundColor: $root.getUIColour(-25) }">
                                         <button class="search-expand-btn" data-bind="click: $data.expand.bind($root, !$data.isExpanded(), true), css: $data.isExpanded() ? 'fa fa-angle-down' : 'fa fa-angle-right'"></button><span data-bind="text: $data.getScene().getName()"></span>
@@ -339,10 +340,10 @@
                 </div>
             </div>
         </div>
-        <div data-bind="style: { display: getSelectedProject() && getSelectedProject().consoleOpen() ? 'flex' : 'none' }" id="cs-console" class="monaco-editor-background">
+        <div data-bind="style: { display: getActiveProject() && getActiveProject().consoleOpen() ? 'flex' : 'none' }" id="cs-console" class="monaco-editor-background">
             <div id="console-header" data-bind="style: { backgroundColor: getUIColour(), borderColor: getUIColour(-30) }"></div>
-            <!-- ko if: getSelectedProject -->
-            <ul data-bind="foreach: getSelectedProject().getLogs">
+            <!-- ko if: getActiveProject -->
+            <ul data-bind="foreach: getActiveProject().getLogs">
                 <li data-bind="html: $data.value"></li>
                 <span class="meta" data-bind="visible: ($data.scene && $data.line), text: $data.scene + $data.line"></span>
                 </li>
@@ -350,15 +351,15 @@
             <!-- /ko -->
             <div id="monaco-console-input"></div>
         </div>
-        <div id="code-footer" data-bind="if: getSelectedScene() && getSelectedProject(), style: { backgroundColor: getUIColour(), borderColor: getUIColour(-30) }">
-            <button class="console-btn col-anim" data-bind="click: getSelectedProject().toggleConsole">
+        <div id="code-footer" data-bind="if: getActiveEditor() && getActiveScene(), style: { backgroundColor: getUIColour(), borderColor: getUIColour(-30) }">
+            <button class="console-btn col-anim" data-bind="click: getActiveProject().toggleConsole">
                     <span class="fa fa-terminal"></span>
-                    <span class="console-indicator" data-bind="fadeVisible: getSelectedProject().getUnreadLogCount(), text: getSelectedProject().getUnreadLogCount()" ></span>
+                    <span class="console-indicator" data-bind="fadeVisible: getActiveProject() && getActiveProject().getUnreadLogCount(), text: getActiveProject() ? getActiveProject().getUnreadLogCount() : ''" ></span>
                 </button>
-            <span data-bind="text: getCursorPositionString()"></span>
-            <span data-bind="visible: wordCountOn()">Char Count: <span data-bind="text: getSelectedScene().getCharCountString()"></span></span>
-            <span data-bind="visible: wordCountOn()">Word Count: <span data-bind="text: getSelectedScene().getWordCountString()"></span></span>
-            <button title="Change scene indentation" id="scene-indentation-btn" data-bind="event: { mouseover: footerBtnHover, mouseout: footerBtnHover, mousedown: footerBtnHover, mouseup: footerBtnHover }, text: getSelectedScene().getIndentDesc(), click: $root.promptForSceneIndentation"></button>
+            <span data-bind="text: getActiveEditor().getCursorPositionString()"></span>
+            <span data-bind="visible: wordCountOn()">Char Count: <span data-bind="text: getActiveEditor().getCharCountString()"></span></span>
+            <span data-bind="visible: wordCountOn()">Word Count: <span data-bind="text: getActiveEditor().getWordCountString()"></span></span>
+            <button title="Change scene indentation" id="scene-indentation-btn" data-bind="event: { mouseover: footerBtnHover, mouseout: footerBtnHover, mousedown: footerBtnHover, mouseup: footerBtnHover }, text: getActiveScene().getIndentDesc(), click: $root.promptForSceneIndentation"></button>
         </div>
     </div>
 

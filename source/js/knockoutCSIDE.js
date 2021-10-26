@@ -130,6 +130,8 @@ function IDEViewModel() {
     var readOnly = ko.observable(projectData.readOnly || false);
     var editing = ko.observable(false);
     var invalidName = ko.observable(false);
+    var projectEditors = ko.observableArray([]);
+    self.getEditors = projectEditors;
 
     //GETTER METHODS
     self.getName = ko.computed(function() {
@@ -192,18 +194,20 @@ function IDEViewModel() {
         }
       }
     });
-    self.getWordCount = function(exclCommandLines, selected) {
-      exclCommandLines = exclCommandLines || false;
-      var wordCount = 0;
+    self.getWordCount = function() {
+      var incCmdWordCount = 0;
+      var exCmdWordCount = 0;
       for (var i = 0; i < scenes().length; i++) {
-        wordCount = (wordCount + scenes()[i].getWordCount(exclCommandLines, selected));
+        var counts = scenes()[i].getWordCount();
+        incCmdWordCount += counts.incmds;
+        exCmdWordCount +=counts.excmds;
       }
-      return wordCount;
+      return { incmds: incCmdWordCount, excmds: exCmdWordCount }
     }
-    self.getCharCount = function(selected) {
+    self.getCharCount = function() {
       var charCount = 0;
       for (var i = 0; i < scenes().length; i++) {
-        charCount += scenes()[i].getCharCount(selected);
+        charCount += scenes()[i].getCharCount();
       }
       return charCount;
     }
@@ -397,17 +401,14 @@ function IDEViewModel() {
     self.close = function() {
       __closeProject(self);
     }
-    self.dispose = function() {
-      scenes().forEach(function(scene) {
-        scene.dispose(); // clean up the monaco models
-      });
-    }
-    self.select = function() {
+    self.select = function(callback) {
       /* select first possible scene */
-      for (var i = 0; i < scenes().length; i++) {
-        if (scenes()[i].select()) return true;
+      var scene = scenes()[0];
+      if (scene) {
+        scene.viewInEditor(callback);
+      } else {
+        callback(null);
       }
-      return false;
     }
     self.save = function(cb) {
       if (typeof cb != "function") cb = function() {}; //ui click
@@ -437,6 +438,10 @@ function IDEViewModel() {
       if (scenes().lastIndexOf(scene) === -1) {
         return;
       }
+      var editors = scene.getEditors();
+      for (var i = 0; i < editors.length; i++) {
+        editor[i].close();
+      }
       scenes.remove(scene);
       if (scenes().length < 1) {
         projects.remove(self);
@@ -444,14 +449,12 @@ function IDEViewModel() {
     }
     self.closeScene = function(scene, callback) {
         function closeScene() {
-          if (selectedScene() == scene) {
-            selectedScene(null);
+          if (activeScene() == scene) {
             cursorPos({lineNumber: 0, column: 0});
             selectedChars(0);
           }
           self.removeScene(scene);
           __updatePersistenceList();
-          scene.dispose();
           if (typeof callback === 'function') callback(true);
         }
         if (scene.isDirty()) {
@@ -467,6 +470,14 @@ function IDEViewModel() {
           closeScene();
         }
       }
+    self.subscribeEditor = function(ed) {
+      if (projectEditors.indexOf(ed) < 0) {
+        projectEditors.push(ed);
+      }
+    }
+    self.unsubscribeEditor = function(ed) {
+      projectEditors.remove(ed);
+    }
       /* callback(err, success_boolean) */
     self.exportScenes = function() {
       fh.selectFolder(function(newPath) {
@@ -535,7 +546,7 @@ function IDEViewModel() {
           if (issue.getLineNum()) {
             issue.show();
           }
-          if (selectedProject() == self) {
+          if (activeProject() == self) {
             __selectTab("issues");
           } else {
             self.select();
@@ -551,6 +562,22 @@ function IDEViewModel() {
     }
     self.removeIssue = function(issue) {
       issues.remove(issue);
+    }
+    /* Display only this project and its editors */
+    self.makeActive = function() {
+      var oldProject = activeProject();
+      if (oldProject) {
+         if (oldProject === self) {
+          return;
+        }
+        oldProject.getEditors().forEach(function(ed) {
+          ed.hide();
+        });
+      }
+      activeProject(self);
+      self.getEditors().forEach(function(ed) {
+        ed.show();
+      });
     }
   };
 
@@ -636,7 +663,7 @@ function IDEViewModel() {
     var self = this;
     //INSTANCE VARIABLES
     var edModel; // holds the Monaco editor document model
-    self.dispose = function() { edModel.dispose(); };
+    var _updateModel = function(model) { edModel = model; }
     var path = ko.observable(__normalizePath(sceneData.path)).extend({
       normalizePaths: "",
       callFunc: {
@@ -644,10 +671,13 @@ function IDEViewModel() {
           // automatically replace the Monaco model on renames to keep its Uri in sync
           var oldModel = edModel;
           try {
-            edModel = monaco.editor.createModel(edModel ? edModel.getValue() : "", "choicescript", monaco.Uri.file(newPath));
+            _updateModel(monaco.editor.createModel(edModel ? edModel.getValue() : "", "choicescript", monaco.Uri.file(newPath)));
             edModel.csideScene = self;
             if (oldModel) oldModel.dispose();
-            if (selectedScene() == self) vseditor.setModel(edModel);
+            // update any subscribed editors immediately
+            self.getEditors().forEach(function(ed) {
+              ed.setModel(edModel); // reset model
+            });
             edModel.onDidChangeContent(updateOnModelEdit);
           } catch (err) {
             bootbox.alert("Unrecoverable Error: Couldn't update URI for scene.<br><br>" + err.message + ".<br><br> Please restart the application and report this.");
@@ -670,6 +700,7 @@ function IDEViewModel() {
     var inErrState = ko.observable(false);
     var errStateMsg = ko.observable("");
     var searchVersionId = null;
+
     var searchResults = ko.observable(new CSIDESearchResults({results: []}))
       .extend({ rateLimit: { rateLimit: 1000, method: "notifyWhenChangesStop" }});
     var indentSize = ko.observable(settings.byId("editor", "tabsize").getValue())
@@ -678,7 +709,7 @@ function IDEViewModel() {
       .extend({ callFunc: { func: function(newVal) { edModel.updateOptions({insertSpaces: newVal});}}});
 
     // create initial model
-    var edModel = monaco.editor.createModel(sceneData.contents || "", "choicescript", monaco.Uri.file(path()));
+    edModel = monaco.editor.createModel(sceneData.contents || "", "choicescript", monaco.Uri.file(path()));
     edModel.onDidChangeContent(updateOnModelEdit);
     edModel.csideScene = self;
 
@@ -688,7 +719,7 @@ function IDEViewModel() {
     var editorViewState = null;
     //won't change - so doesn't need to be an observable?
     var charCount = ko.observable(sceneData.contents ? sceneData.contents.length : 0); //prepopulate otherwise .load() text replacement results in '0' on new startup.txts
-    var wordCount = ko.observable(0);
+    var wordCount = ko.observable({ incmds: 0, excmds: 0 });
     var fileStats = sceneData.stats || {
       "mtime": new Date()
     }; //won't change - so doesn't need to be an observable?
@@ -710,8 +741,9 @@ function IDEViewModel() {
     //var sceneListPosition = ko.observable(self.project().scenes().length);
     var issues = ko.observableArray([]);
     issues.subscribe(function(val) {
-      if (self == selectedScene()) {
-        __updateEditorDecorations(self);
+      if (self == activeScene()) {
+        var ed = self.getEditors()[0];
+        __updateEditorDecorations(ed, self);
       }
     });
     var invalidName = ko.observable(false);
@@ -719,7 +751,7 @@ function IDEViewModel() {
     self.isLocked = ko.computed(function() {
       if (locked()) return true;
       //is another scene selected but also being 'edited'? If yes, we can't select this scene yet.
-      var curScene = cside.getSelectedScene();
+      var curScene = cside.getActiveScene();
       if (curScene && (curScene.beingEdited() && curScene != self)) return true;
       return false;
     }, this);
@@ -731,6 +763,9 @@ function IDEViewModel() {
     }, this);
     self.getPath = ko.computed(function() {
       return path();
+    }, this);
+    self.getModel = ko.computed(function() {
+      return edModel;
     }, this);
     self.hasLoaded = ko.computed(function() {
       return loaded();
@@ -747,9 +782,9 @@ function IDEViewModel() {
     self.beingEdited = ko.computed(function() {
       return editing();
     }, this);
-    self.isSelected = ko.computed(function() {
-      return (this === selectedScene());
-    }, this);
+    self.isActive = function() {
+      return activeScene() === self;
+    }
     self.beingColoured = ko.computed(function() {
       return colouring();
     }, this);
@@ -758,6 +793,15 @@ function IDEViewModel() {
     };
     self.getProject = function() {
       return getProject(getProjectPath(path()));
+    };
+    self.getEditors = ko.computed(function() {
+      if (!self.getProject()) return [];
+      return self.getProject().getEditors().filter(function(ed) {
+        return ed.getScene() === self;
+      });
+    }, this);
+    self.isSelected = function() {
+      return (self.getEditors().length > 0);
     };
     self.getText = function() {
       return edModel.getValue();
@@ -796,31 +840,11 @@ function IDEViewModel() {
     self.getErrState = ko.computed(function() {
       return inErrState();
     }, this);
-    self.getCharCountString = function() {
-      if (selectedChars() > 0) {
-        return charCount() + " (" + selectedChars() + ")";
-      } else {
-        return charCount();
-      }
+    self.getCharCount = function() {
+      return charCount();
     };
-    self.getCharCount = function(selected) {
-      if (selected) {
-        return selectedChars();
-      } else {
-        return charCount();
-      }
-    };
-    self.getWordCountString = function() {
-      var suffix = (wordCountOn() > 1) ? " [excl. cmds]" : " [inc. cmds]";
-      if (selectedChars() > 0) {
-        var selectedWords = __wordCount(vseditor.getModel().getValueInRange(vseditor.getSelection()), wordCountOn() > 1);
-        return (wordCount() + (" (" + selectedWords + ") " + suffix));
-      } else {
-        return wordCount() + suffix;
-      }
-    };
-    self.getWordCount = function(exclCommandLines, selected) {
-      return selected ?  __wordCount(vseditor.getModel().getValueInRange(vseditor.getSelection()), exclCommandLines) : __wordCount(edModel.getValue(), exclCommandLines);
+    self.getWordCount = function() {
+      return wordCount();
     };
     self.getIndentDesc = ko.computed(function() {
       return ((useSpaces() ? "Spaces: " : "Tabs: ") + indentSize());
@@ -962,8 +986,9 @@ function IDEViewModel() {
         notification("Stale Search Results", "This scene has been modified since the last search was performed. Please search again.", {type: 'error'});
         return;
       }
-      self.focusLine(data, true);
-      vseditor.setSelection(data.range);
+      self.focusLine(data, true, function(ed) {
+        if (ed) ed.getMonacoEditor().setSelection(data.range);
+      });
     }
     self.replaceSearchResult = function(index, data, event) {
       if (event) event.stopPropagation();
@@ -971,8 +996,9 @@ function IDEViewModel() {
         notification("Stale Search Results", "This scene has been modified since the last search was performed. Please search again.", {type: 'error'});
         return;
       }
-      self.focusLine(data, true);
-      vseditor.setSelection(data.range);
+      self.focusLine(data, true, function(ed) {
+        if (ed) ed.getMonacoEditor().setSelection(data.range);
+      });
       var oldText = data.matches[0];
       var newText = document.getElementById("replaceBox").value || "";
       if (SEARCH.CONF.useRegex())
@@ -992,8 +1018,9 @@ function IDEViewModel() {
         return [new monaco.Selection(oldRange.startLineNumber, oldRange.startColumn, newRange.endLineNumber, newRange.endColumn)];
       });
       edModel.pushStackElement();
-      if (self.isSelected())
-        vseditor.setSelections(newSelections);
+      self.viewInEditor(function(ed) {
+        if (ed) ed.getMonacoEditor().setSelections(newSelections);
+      });
       self.search(self.getSearchResults().getSearchTerm(), newText, true, SEARCH.MODES.SEARCH);
     }
     self.replaceAllSearchResults = function(uiConfirmation) {
@@ -1011,31 +1038,37 @@ function IDEViewModel() {
         self.search(searchStr, replaceStr, false /* forceExpand */, SEARCH.MODES.REPLACE);
       //edModel.pushStackElement(); // Undo stack breakpoint.
     }
-    self.focusLine = function(lineNum, noArrow) {
+    self.focusLine = function(lineNum, noArrow, callback) {
       if (typeof lineNum !== "number") {
         if (lineNum.range && typeof lineNum.range.startLineNumber === "number")
           lineNum = lineNum.range.startLineNumber;
         else
           return;
-      } else {
-        lineNum += 1;
       }
-
-      self.select(function(selected) {
-        if (!selected) return;
-        if (!noArrow) {
-          __updateEditorDecorations(self, [
-            {
-              range: new monaco.Range(lineNum,1,lineNum,1),
-              options: {
-                isWholeLine: false,
-                className: '',
-                glyphMarginClassName: 'arrow-gutter'
+      self.viewInEditor(function(ed) {
+        if (ed) {
+          if (!noArrow) {
+            __updateEditorDecorations(ed, self, [
+              {
+                range: new monaco.Range(lineNum,1,lineNum,1),
+                options: {
+                  isWholeLine: false,
+                  className: '',
+                  glyphMarginClassName: 'arrow-gutter'
+                }
               }
-            }
-          ]);
+            ]);
+          }
+          var med = ed.getMonacoEditor();
+          var pos = {
+            lineNumber: lineNum,
+            column: med.getModel().getLineMaxColumn(lineNum)
+          };
+          med.setPosition(pos);
+          med.revealPositionInCenter(pos, monaco.editor.ScrollType.Immediate);
+          med.focus();
         }
-        vseditor.revealLineInCenter(lineNum, monaco.editor.ScrollType.Immediate);
+        if (typeof callback === "function") callback(ed);
       });
       // fail silently
     }
@@ -1044,11 +1077,6 @@ function IDEViewModel() {
     }
     self.removeIssue = function(issue) {
       issues.remove(issue);
-    }
-    self.updateViewState = function() {
-      if (self === selectedScene())
-        return (editorViewState = vseditor.saveViewState());
-      return null;
     }
       //MISC METHODS
     self.load = function(callback) {
@@ -1146,7 +1174,7 @@ function IDEViewModel() {
                   saving(false);
                   self.load(function(err, scene) {
                     if (!err) {
-                      scene.select();
+                      scene.viewInEditor();
                     }
                   });
 				  return;
@@ -1189,33 +1217,28 @@ function IDEViewModel() {
         if (typeof callback == 'function') callback(err);
       }
     }
-    self.select = function(callback) {
-      if (typeof callback !== "function") callback = function(){};
-      if (selectedScene() === self) {
-        callback(true);
-        return;
+    self.viewInEditor = function(callback) {
+      self.getProject().makeActive();
+      var sceneEditor = self.getEditors()[0];
+      if (sceneEditor) {
+        sceneEditor.makeActive();
+        if (typeof callback === "function") callback(sceneEditor);
+      } else {
+        cside.openNewEditor(self, function(ed) {
+          ed.makeActive();
+          if (typeof callback === "function") callback(ed);
+        });
       }
-      //ensure we're not already editing the name of another scene:
-      if (inErrState() || !loaded() || saving() || self.isLocked()) {
-        callback(false);
-        return;
-      }
-      if (selectedScene())
-        selectedScene().updateViewState();
-      selectedScene(self);
-
-      vseditor.setModel(edModel);
-      cursorPos(vseditor.getPosition());
-      selectedChars(vseditor.getModel().getValueInRange(vseditor.getSelection()).length);
-      __updateEditorDecorations(self);
+    }
+    self.loadEditorViewState = function(editor) {
       if (editorViewState) {
-        vseditor.restoreViewState(editorViewState);
+        editor.waitForRender(function() {
+          editor.getMonacoEditor().restoreViewState(editorViewState);
+        });
       }
-      if (!self.getProject().isExpanded()) {
-        self.getProject().setExpand(true);
-      }
-      vseditor.focus();
-      callback(true);
+    }
+    self.saveEditorViewState = function(editor) {
+      editorViewState = editor.getMonacoEditor().saveViewState();
     }
     self.search = function(searchStr, replaceStr, forceExpand, newSearchMode) {
       if (locked())
@@ -1245,6 +1268,11 @@ function IDEViewModel() {
       return searchResults();
     }
     self.close = function() {
+      if (self.isLocked()) return;
+      self.getEditors().forEach(function(ed) {
+        ed.close();
+      });
+      edModel.dispose();
       self.getProject().closeScene(self);
     }
     self.copyTo = function(targetProject) {
@@ -1349,15 +1377,20 @@ function IDEViewModel() {
       }
 
     //Update dirty status, char count etc - on change
-    function updateOnModelEdit() {
+    var __updateOnModelEdit = __limitExecution(function() {
       if (!saving())
         lastVersionId !== edModel.getAlternativeVersionId() ? dirty(true) : dirty(false);
       if (searchResults().getSearchTerm() != "")
         searchResults().getVersionId !== edModel.getAlternativeVersionId() ? self.search(searchResults().getSearchTerm(), null /* replaceStr */, searchResults() && searchResults().isExpanded() /* forceExpand */, SEARCH.MODES.SEARCH) : null;
       charCount(edModel.getValueLength());
       if (wordCountOn() > 0)
-        wordCount(__wordCount(edModel.getValue(), (wordCountOn() > 1)));
+        wordCount(__wordCount(edModel.getValue()));
+    }, 250);
+
+    function updateOnModelEdit() {
+      __updateOnModelEdit();
     }
+
   }
 
   function CSIDEIssue(issueData) {
@@ -1404,9 +1437,10 @@ function IDEViewModel() {
       if (!scene) {
         return;
       }
-      scene.select();
       if (typeof self.getLineNum() === "number") {
         scene.focusLine(self.getLineNum(), true);
+      } else {
+        scene.viewInEditor();
       }
     }
 
@@ -1526,6 +1560,186 @@ function IDEViewModel() {
     }
   }
 
+  var edId = 0;
+  function __createEditorAnchor() {
+    var li = document.createElement("LI");
+    li.setAttribute("name", "monaco-anchor-" + edId++);
+    li.style.flexGrow = "1";
+    // hide by default as this might not be for the active project
+    li.style.display = "none";
+    document.getElementById("editor-list").appendChild(li);
+    return li;
+  }
+
+  var MIN_EDITOR_WIDTH = 400; /* (pixels) used to auto-inflate active editor size */
+  function CSIDEEditor(data) {
+    var self = this;
+    var _scene = ko.observable(data.scene || null);
+    var _cursorPos = ko.observable({lineNumber: 0, column: 0});
+    var _selectedChars = ko.observable(0);
+    var _editorDOMAnchor = __createEditorAnchor();
+    var _monacoEditor = monaco.editor.create(_editorDOMAnchor, editorOptionStore);
+
+    self.waitForRender = function(func) {
+      __onElementRender("li[name='" + self.getAnchor().getAttribute("name") + "'] > div", func);
+    }
+
+    self.getName = function() {
+      if (!scene()) return "";
+      var editorName = _scene().getName();
+      if (_type === "diff") {
+        editorName = "Diff: " + editorName;
+      }
+    }
+
+    self.saveScene = function() {
+      _scene().save();
+    }
+
+    self.assignAnchor = function(htmlElement) {
+      _editorDOMAnchor = htmlElement;
+    }
+
+    self.getAnchor = function() {
+      return _editorDOMAnchor;
+    }
+
+    self.getCursorPositionString = function() {
+      if (!_monacoEditor) return "";
+      if (!_cursorPos()) return "";
+      return "Ln " + (_cursorPos().lineNumber) + ", Col " + _cursorPos().column;
+    };
+
+    self.getCharCountString = function() {
+      if (!_monacoEditor) return "";
+      var charCount = _scene().getCharCount();
+      if (_selectedChars() > 0) {
+        return charCount + " (" + _selectedChars() + ")";
+      }
+      return charCount;
+    };
+
+    self.getWordCountString = function() {
+      if (!_monacoEditor) return "";
+      var excludeCommands = wordCountOn() > 1;
+      var wordCount = _scene().getWordCount()[excludeCommands ? "excmds" : "incmds"];
+      var suffix = (excludeCommands) ? " [excl. cmds]" : " [inc. cmds]";
+      if (_selectedChars() > 0) {
+        var counts = __wordCount(_monacoEditor.getModel().getValueInRange(_monacoEditor.getSelection()));
+        var selectedCount = (excludeCommands) ? counts.excmds : counts.incmds;
+        return (wordCount + (" (" + selectedCount + ") " + suffix));
+      }
+      return wordCount + suffix;
+    };
+
+    self.getDocModel = function() {
+      if (_monacoEditor) {
+        return _monacoEditor.getModel();
+      }
+      return null;
+    }
+
+    self.getMonacoEditor = function() {
+      return _monacoEditor;
+    }
+
+    self.getScene = function() {
+      return _scene();
+    }
+
+    self.setScene = function(newScene, diffScene) {
+      var scene = _scene();
+      if (scene !== newScene) {
+        scene.getProject().unsubscribeEditor(self);
+        newScene.getProject().subscribeEditor(self);
+        scene.saveEditorViewState(self);
+      }
+      newScene.loadEditorViewState(self);
+      _monacoEditor.setModel(newScene.getModel());
+      _scene(newScene);
+    }
+
+    self.getName = function() {
+      if (_scene())
+        return _scene().getName();
+      return "Empty";
+    }
+
+    function _dispose() {
+      if (_monacoEditor) _monacoEditor.dispose();
+      if (_editorDOMAnchor) {
+        // li -> #editor-list
+        _editorDOMAnchor.parentElement.removeChild(_editorDOMAnchor);
+      }
+    }
+
+    self.show = function() {
+      if (_editorDOMAnchor) _editorDOMAnchor.style.display = "";
+    }
+
+    self.hide = function() {
+       if (_editorDOMAnchor) _editorDOMAnchor.style.display = "none";
+    }
+
+    self.close = function() {
+      var scene = _scene();
+      scene.getProject().unsubscribeEditor(self);
+      scene.saveEditorViewState(self);
+      _dispose();
+      if (activeEditor() === self) activeEditor(null);
+    }
+
+    self.makeActive = function() {
+      var oldEd = null;
+      var activeEditors = activeProject().getEditors();
+      var isNewProject = activeEditor() && (activeEditor().getScene().getProject() !== activeProject());
+      /* TODO: Revisit manual resizing.
+         For now this is a simple flexbox hack to keep
+         the active editor from getting too small.
+       */
+      if ((oldEd = activeEditor()) && !isNewProject) {
+        oldEd.getAnchor().style.flexGrow = 1;
+        document.getElementById("editor-tag-" + activeEditors.indexOf(oldEd)).style.flexGrow = 1;
+      }
+      if (_editorDOMAnchor.clientWidth < MIN_EDITOR_WIDTH) {
+        _editorDOMAnchor.style.flexGrow = activeEditors.length;
+        document.getElementById("editor-tag-" + activeEditors.indexOf(self)).style.flexGrow = activeEditors.length;
+      }
+      activeEditor(self);
+      if (!_monacoEditor.hasTextFocus()) _monacoEditor.focus();
+    }
+
+    self.isActive = function() {
+      return activeEditor() === self;
+    }
+
+    self.getFileStateCSS = function() {
+      if (_scene().isDirty()) {
+        return "codicon codicon-circle-outline";
+      } else {
+        return "codicon codicon-close";
+      }
+    }
+
+    // initialize various monaco editor configurations
+    __registerEditorActions(_monacoEditor);
+    __overrideEditorServices(_monacoEditor);
+    _monacoEditor.onDidFocusEditorText(function() {
+      self.makeActive();
+    });
+
+    var updateCursorInfo = __limitExecution(function(evt) {
+      _selectedChars(_monacoEditor.getModel().getValueInRange(_monacoEditor.getSelection()).length);
+      _cursorPos(evt.position);
+    }, 250);
+
+    _monacoEditor.onDidChangeCursorPosition(function(evt) {
+      updateCursorInfo(evt); // only displays primary selection / cursor
+    });
+    _cursorPos(_monacoEditor.getPosition());
+
+  }
+
   // ╔═╗┬ ┬┌┐ ┬  ┬┌─┐  ╔═╗┌─┐┌─┐┌─┐┌─┐
   // ╠═╝│ │├┴┐│  ││    ╚═╗│  │ │├─┘├┤
   // ╩  └─┘└─┘┴─┘┴└─┘  ╚═╝└─┘└─┘┴  └─┘
@@ -1594,14 +1808,21 @@ function IDEViewModel() {
   ]);
 
   var sceneMenuOptions = ko.observableArray([
+    new menuOption("Open", function(menu) {
+      //do nothing
+    }, [
+      new menuOption("In new editor", function(menu) {
+        self.openNewEditor(menu.getTarget());
+      }),
+    ]),
     new menuOption("Edit", function(menu) {
       //do nothing
     }, [
       new menuOption("Convert all spaces to tabs", function(menu) {
-        vseditor.getAction('editor.action.indentationToTabs').run();
+        activeEditor().getMonacoEditor().getAction('editor.action.indentationToTabs').run();
       }),
       new menuOption("Convert all tabs to spaces", function(menu) {
-        vseditor.getAction('editor.action.indentationToSpaces').run();
+        activeEditor().getMonacoEditor().getAction('editor.action.indentationToSpaces').run();
       })
     ]),
     new menuOption("Review", function(menu) {
@@ -1614,8 +1835,8 @@ function IDEViewModel() {
     new menuOption("Reload", function(menu) {
       var scene = menu.getTarget();
       var callback = function(err, scene) {
-        if (!err && selectedScene() === menu.getTarget()) {
-          scene.select();
+        if (!err && activeScene() === menu.getTarget()) {
+          scene.viewInEditor();
         }
       }
       if (scene.isDirty()) {
@@ -1726,18 +1947,19 @@ function IDEViewModel() {
     );
   }
 
-  var vseditor = null;
   var panelStatus = {
     "scene": ko.observable(true),
     "tab": ko.observable(true)
   }
-  var projects = ko.observableArray([]);
-  var cursorPos = ko.observable({lineNumber: 0, column: 0});
-  var selectedChars = ko.observable(0);
-  var selectedScene = ko.observable(null);
-  var selectedProject = ko.computed(function() {
-    return selectedScene() ? selectedScene().getProject() : null;
-  });
+
+  // these are hoisted intentionally for
+  // use in the following definitions (mac menu etc.)
+  var activeProject = ko.observable(null);
+  var activeEditor = ko.observable(null);
+  var activeScene = ko.computed(function() {
+    return activeEditor() ? activeEditor().getScene() : null;
+  }, this);
+
   self.togglePanel = function(panel, force) {
     // force is an optional boolean
     var isOpen = typeof force === "boolean" ? force : !panelStatus[panel]();
@@ -1753,9 +1975,9 @@ function IDEViewModel() {
       // The number of results that triggers an automatic UI collapse
       collapseThreshold: ko.observable(6),
       // Controls whether the find box expects regexes and the replace box replace patterns
-      useRegex: ko.observable(false).extend({ callFunc: { func: function() { selectedProject().search("", "", SEARCH.MODES.SEARCH); }}}),
-      preserveCase: ko.observable(true).extend({ callFunc: { func: function() { selectedProject().search("", "", SEARCH.MODES.SEARCH); }}}),
-      matchWholeWord: ko.observable(false).extend({ callFunc: { func: function() { selectedProject().search("", "", SEARCH.MODES.SEARCH); }}}),
+      useRegex: ko.observable(false).extend({ callFunc: { func: function() { activeProject().search("", "", SEARCH.MODES.SEARCH); }}}),
+      preserveCase: ko.observable(true).extend({ callFunc: { func: function() { activeProject().search("", "", SEARCH.MODES.SEARCH); }}}),
+      matchWholeWord: ko.observable(false).extend({ callFunc: { func: function() { activeProject().search("", "", SEARCH.MODES.SEARCH); }}}),
       searchOnType: ko.observable(true)
     }
   }
@@ -1770,7 +1992,7 @@ function IDEViewModel() {
     {
       func: function(newVal) {
         setTimeout(function() { document.getElementById((newVal == SEARCH.MODES.REPLACE) ? "replaceBox" : "searchBox").focus(); }, 200);
-        selectedProject().search("", "", SEARCH.MODES.SEARCH);
+        activeProject().search("", "", SEARCH.MODES.SEARCH);
       }
     }
   });
@@ -1800,9 +2022,41 @@ function IDEViewModel() {
     { title: "Match Case", cssClass: 'codicon-case-sensitive', value: SEARCH.CONF.preserveCase },
     { title: "Search on Type", cssClass: 'codicon-record-keys', value: SEARCH.CONF.searchOnType }
   ]);
-  self.getSelectedProject = ko.computed(function() {
-    return selectedProject();
-  }, this);
+
+  /*
+  arg.item - the actual item being moved
+  arg.sourceIndex - the position of the item in the original observableArray
+  arg.sourceParent - the original observableArray
+  arg.sourceParentNode - the container node of the original list. Useful if moving items between lists, but within a single array.
+    The value of this in the callback will be the target container node.
+  arg.targetIndex - the position of the item in the destination observableArray
+  arg.targetParent - the destination observableArray
+  */
+  self.moveEditor = function(arg, event, ui) {
+    var list = document.getElementById("editor-list");
+    var movingLi = arg.targetParent()[arg.sourceIndex].getAnchor();
+    var targetLi = arg.targetParent()[arg.targetIndex].getAnchor();
+    list.removeChild(movingLi);
+    if (list.children.length <= arg.targetIndex) {
+      list.appendChild(movingLi, list.lastElementChild);
+    } else {
+      list.insertBefore(movingLi, targetLi);
+    }
+    /*var moving = g_editors.indexOf(arg.targetParent[arg.sourceIndex]);
+    var target = g_editors.indexOf(arg.targetParent[arg.targetIndex]);
+    var cache = g_editors()[moving];
+    g_editors.replace(g_editors()[moving], g_editors()[target]);
+    g_editors.replace(g_editors()[target], cache);*/
+  }
+
+  self.openNewEditor = function(scene, callback) {
+    var ed = new CSIDEEditor({scene: scene});
+    ed.setScene(scene);
+    if (scene.getProject() === activeProject())
+      ed.show();
+    scene.getProject().subscribeEditor(ed);
+    if (typeof callback === "function") callback(ed);
+  }
 
   if (platform === "mac_os") {
     var nativeMenuBar = new nw.Menu({
@@ -1814,7 +2068,7 @@ function IDEViewModel() {
     win.menu = nativeMenuBar;
     (function() {
       var projectMenu = new nw.Menu();
-      projectMenu.getTarget = selectedProject;
+      projectMenu.getTarget = activeProject;
       var subMenu;
       var options = projectMenuOptions();
       for (var i = 0; i < options.length; i++) {
@@ -1847,7 +2101,7 @@ function IDEViewModel() {
 
     (function() {
       var sceneMenu = new nw.Menu();
-      sceneMenu.getTarget = selectedScene;
+      sceneMenu.getTarget = activeScene;
       var subMenu;
       var options = sceneMenuOptions();
       for (var i = 0; i < options.length; i++) {
@@ -1897,8 +2151,8 @@ function IDEViewModel() {
         });
         return target;
       };
-      selectedScene.extend({ updateMenuBarStates: "" });
-      selectedScene.valueHasMutated(); //force initialMenubarStates call
+      activeScene.extend({ updateMenuBarStates: "" });
+      activeEditor.valueHasMutated(); //force initialMenubarStates call
     }
   }
 
@@ -1917,8 +2171,12 @@ function IDEViewModel() {
   });
   uiColour("90,90,90");
   var consoleOpen = ko.observable(false);
-  var activeProject = ko.observable("");
   var projects = ko.observableArray([]);
+  var allEditors = ko.computed(function() {
+    return projects().reduce(function(editors, currentProject, currentIndex, array) {
+      return editors.concat(currentProject.getEditors());
+    }, []);
+  }, this);
   var wordCountOn = ko.observable(true);
   var config;
   var defaultConfig = {
@@ -1963,6 +2221,26 @@ function IDEViewModel() {
       "help",
       "dictionary"
     ]
+  };
+  var editorOptionStore = {
+    theme: 'cs-light',
+    value: "",
+    language: 'choicescript',
+    autoIndent: true,
+    formatOnType: true,
+    dragAndDrop: false,
+    renderLineHighlight: "all",
+    minimap: {enabled:false},
+    wordWrap: 'bounded',
+    //wordWrapColumn: 60,
+    wrappingIndent: "same",
+    roundedSelection: true,
+    folding: true,
+    automaticLayout: true,
+    detectIndentation: false,
+    lightbulb: { enabled: true },
+    glyphMargin: true,
+    model: null
   };
   if (usingNode) {
     defaultConfig.tabs.push("examples");
@@ -2337,17 +2615,19 @@ function IDEViewModel() {
 
   self.promptForSceneIndentation = function() {
     var types = ["Tabs", "Spaces"];
+    var docModel = activeEditor().getDocModel();
+    if (!docModel) return;
     _bootboxSelect("Select Indentation Unit", types,
       function(unitOpt) {
-        self.getSelectedScene().updateUseSpaces(unitOpt === "Spaces");
+        self.getActiveScene().updateUseSpaces(unitOpt === "Spaces");
         var sizes = settings.byId("editor", "tabsize").getOptions().map(function(o) { return o.value; });
         _bootboxSelect("Select Indentation Size", sizes,
           function(sizeOpt) {
-            self.getSelectedScene().updateIndentSize(sizeOpt);
+            self.getActiveScene().updateIndentSize(sizeOpt);
             bootbox.hideAll();
-          }, meditor.getModel().getOptions().tabSize
+          }, docModel.getOptions().tabSize
         );
-      }, types[Number(meditor.getModel().getOptions().insertSpaces)]
+      }, types[Number(docModel.getOptions().insertSpaces)]
     );
   }
 
@@ -2399,8 +2679,11 @@ function IDEViewModel() {
     return dropboxAuthorised();
   }, this);
   self.getProjects = projects;
-  self.getSelectedScene = ko.computed(function() {
-    return selectedScene();
+  self.getActiveEditor = ko.computed(function() {
+    return activeEditor();
+  }, this);
+  self.getActiveScene = ko.computed(function() {
+    return activeScene();
   }, this);
   self.getActiveProject = ko.computed(function() {
     return activeProject();
@@ -2453,8 +2736,20 @@ function IDEViewModel() {
   self.readFile = function(url, callback) {
     fh.readFile(url, callback);
   };
-  self.selectScene = function(scene) {
-    scene.select();
+  self.selectSceneClick = function(scene, event) {
+    var aProject = activeProject();
+    var nProject = scene.getProject();
+    var tProject = (aProject !== nProject) ? nProject : aProject;
+    if (scene.isSelected()) {
+      scene.viewInEditor();
+    } else if ((tProject.getEditors().length === 1) && !event.shiftKey) {
+      tProject.getEditors()[0].setScene(scene);
+      scene.viewInEditor();
+    } else {
+      self.openNewEditor(scene, function(ed) {
+        if (ed) scene.viewInEditor();
+      });
+    }
   }
   self.session = {
     "save": function(cb) {
@@ -2504,7 +2799,7 @@ function IDEViewModel() {
     }
   }();
 
-  function registerEditorActions(editor) {
+  function __registerEditorActions(editor) {
 
     editor.addAction({
       id: 'ignore-word',
@@ -2515,7 +2810,7 @@ function IDEViewModel() {
       run: function(ed) {
         var wordObj = ed.getModel().getWordAtPosition(meditor.getSelection().getStartPosition());
         if (wordObj) {
-          vseditor.trigger("", `add-words`, {uri: "", dict: "session", words: [wordObj.word]});
+          editor.trigger("", `add-words`, {uri: "", dict: "session", words: [wordObj.word]});
         }
       }
     });
@@ -2529,7 +2824,7 @@ function IDEViewModel() {
       run: function(ed) {
         var wordObj = ed.getModel().getWordAtPosition(meditor.getSelection().getStartPosition());
         if (wordObj) {
-          vseditor.trigger("", `add-words`, {uri: "", dict: "persistent", words: [wordObj.word]});
+          editor.trigger("", `add-words`, {uri: "", dict: "persistent", words: [wordObj.word]});
         }
       }
     });
@@ -2543,7 +2838,7 @@ function IDEViewModel() {
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        if (!cside.getSelectedProject())
+        if (!cside.getActiveProject())
           return;
         cside.toggleSearchMode(SEARCH.MODES.REPLACE);
         __selectTab("search");
@@ -2561,7 +2856,7 @@ function IDEViewModel() {
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        if (!cside.getSelectedProject())
+        if (!cside.getActiveProject())
           return;
         cside.toggleSearchMode(SEARCH.MODES.SEARCH);
         __selectTab("search");
@@ -2579,7 +2874,7 @@ function IDEViewModel() {
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        cside.getSelectedScene().save();
+        cside.getActiveEditor().saveScene();
         return null;
       }
     });
@@ -2619,7 +2914,7 @@ function IDEViewModel() {
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        cside.getSelectedScene().close();
+        cside.getActiveEditor().close();
         return null;
       }
     });
@@ -2633,7 +2928,7 @@ function IDEViewModel() {
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        cside.getSelectedProject().addNewScene();
+        cside.getActiveProject().addNewScene();
         return null;
       }
     });
@@ -2647,7 +2942,7 @@ function IDEViewModel() {
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        cside.getSelectedProject().save();
+        cside.getActiveProject().save();
         return null;
       }
     });
@@ -2661,7 +2956,7 @@ function IDEViewModel() {
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        cside.getSelectedProject().close();
+        cside.getActiveProject().close();
         return null;
       }
     });
@@ -2757,7 +3052,7 @@ function IDEViewModel() {
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        cside.getSelectedProject().openAllScenes();
+        cside.getActiveProject().openAllScenes();
         return null;
       }
     });
@@ -2837,7 +3132,7 @@ function IDEViewModel() {
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        cside.getSelectedProject().test("quick");
+        cside.getActiveProject().test("quick");
         return null;
       }
     });
@@ -2851,7 +3146,7 @@ function IDEViewModel() {
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        cside.getSelectedProject().test("random");
+        cside.getActiveProject().test("random");
         return null;
       }
     });
@@ -2865,7 +3160,7 @@ function IDEViewModel() {
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        cside.getSelectedProject().run();
+        cside.getActiveProject().run();
         return null;
       }
     });
@@ -2879,7 +3174,7 @@ function IDEViewModel() {
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        var open = cside.getSelectedProject().toggleConsole();
+        var open = cside.getActiveProject().toggleConsole();
         if (open) $("#cs-console > input").focus();
       }
     });
@@ -2887,12 +3182,15 @@ function IDEViewModel() {
   }
 
   var insertTextTags = function(tagStart, tagEnd, allowSpecialLines) {
-    var text = vseditor.getModel().getValueInRange(vseditor.getSelection());
+    ed = activeEditor();
+    if (!ed) return;
+    ed = ed.getMonacoEditor();
+    var text = ed.getModel().getValueInRange(ed.getSelection());
     if (!text) {
       text = tagStart + tagEnd;
-      var currentSel = vseditor.getSelection();
+      var currentSel = ed.getSelection();
       var originalSel = Object.assign({}, currentSel);
-      currentSel = vseditor.getModel().pushEditOperations(
+      currentSel = ed.getModel().pushEditOperations(
         [originalSel], // Return to original pos on undo
         [{range: new monaco.Range(originalSel.startLineNumber, originalSel.startColumn, originalSel.startLineNumber, originalSel.startColumn), text: text }],
         function (inverseEditOperations) { // Set cursor between tags post-edit
@@ -2901,7 +3199,7 @@ function IDEViewModel() {
         }
       );
       if (currentSel)
-        vseditor.setSelection(currentSel[0]);
+        ed.setSelection(currentSel[0]);
     } else {
       var line;
       var whitespace;
@@ -2922,7 +3220,7 @@ function IDEViewModel() {
         text[i] = (whitespace + line);
       }
       text = text.join("\n");
-      vseditor.executeEdits("insertTextTags", [{range: vseditor.getSelection(), text: text }]);
+      ed.executeEdits("insertTextTags", [{range: ed.getSelection(), text: text }]);
     }
   }
 
@@ -2948,7 +3246,7 @@ function IDEViewModel() {
       "content": "",
       "visible": ko.observable(true),
       "getHeaderTitle": ko.computed(function() {
-        return (selectedProject() ? ("Issues with " + selectedProject().getName()) : "Select a Project");
+        return (activeProject() ? ("Issues with " + activeProject().getName()) : "Select a Project");
       }, this)
     },
     "settings": {
@@ -2983,7 +3281,7 @@ function IDEViewModel() {
       "content": "",
       "visible": ko.observable(true),
       "getHeaderTitle": ko.computed(function() {
-        return (selectedProject() ?  ((self.inReplaceMode()) ? "Replace" : "Search") + " in " + selectedProject().getName() : "Select a Project");
+        return (activeProject() ?  ((self.inReplaceMode()) ? "Replace" : "Search") + " in " + activeProject().getName() : "Select a Project");
       }, this)
     },
     "dictionary": {
@@ -3065,27 +3363,35 @@ function IDEViewModel() {
 
   function __cycleSceneSelection(direction) {
     // "up" = true / "down" = false
-    if (!cside.getSelectedProject())
+    if (!cside.getActiveProject())
       return;
     var index;
-    var currentScene = cside.getSelectedScene();
-    var sceneList = cside.getSelectedProject().getScenes();
-    if (!currentScene)
+    var currentEditor = cside.getActiveEditor();
+    var currentScene = cside.getActiveScene();
+    var newScene = null;
+    var sceneList = cside.getActiveProject().getScenes();
+    var index = sceneList.indexOf(cside.getActiveScene());
+    if (!currentScene || index < 0)
       return null;
-    if ((index = sceneList.indexOf(cside.getSelectedScene())) > -1) {
+    while (!newScene && newScene !== currentScene) {
       if (direction) {
         if (index > 0) {
-          sceneList[--index].select();
+          newScene = sceneList[--index];
         } else {
-          sceneList[sceneList.length - 1].select();
+          newScene = sceneList[sceneList.length - 1];
+          index = [sceneList.length - 1];
         }
       } else {
         if (index < (sceneList.length - 1)) {
-          sceneList[++index].select();
+          newScene = sceneList[++index];
         } else {
-          sceneList[0].select();
+          newScene = sceneList[0];
+          index = 0;
         }
       }
+      if (newScene === currentScene) break;
+      if (newScene.isSelected()) newScene = null;
+      else { currentEditor.setScene(newScene); }
     }
     return null;
   }
@@ -3135,7 +3441,7 @@ function IDEViewModel() {
         "cat": "editor",
         "desc": "Wrap lines that exceed the editor's width (no horizontal scrolling)",
         "apply": function(val) {
-          vseditor.updateOptions({wordWrap: val ? "on" : "off"});
+          __applyToAllEditors("wordWrap", val ? "on" : "off");
         }
       }),
       new CSIDESetting({
@@ -3146,7 +3452,7 @@ function IDEViewModel() {
         "cat": "editor",
         "desc": "Prompt quick-complete word suggestions as you type",
         "apply": function(val) {
-          vseditor.updateOptions({quickSuggestions: val});
+          __applyToAllEditors("quickSuggestions", val);
         }
       }),
       new CSIDESetting({
@@ -3157,7 +3463,7 @@ function IDEViewModel() {
         "cat": "editor",
         "desc": "Automatically replace certain character combinations with their formatted equivalents",
         "apply": function(val) {
-          vseditor.updateOptions({formatOnType: val});
+          __applyToAllEditors("formatOnType", val);
         }
       }),
       new CSIDESetting({
@@ -3169,7 +3475,7 @@ function IDEViewModel() {
         "desc": "Highlight matching instances of selected text",
         "apply": function(val) {
           // FIXME: Highlights can get stuck if disabled whilst visible.
-          vseditor.updateOptions({selectionHighlight: val});
+          __applyToAllEditors("selectionHighlight", val);
         }
       }),
       new CSIDESetting({
@@ -3180,7 +3486,7 @@ function IDEViewModel() {
         "cat": "editor",
         "desc": "Highlights other instances of the word under the editor caret",
         "apply": function(val) {
-          vseditor.updateOptions({occurrencesHighlight: val});
+          __applyToAllEditors("occurrencesHighlight", val);
         }
       }),
       new CSIDESetting({
@@ -3191,7 +3497,7 @@ function IDEViewModel() {
         "cat": "editor",
         "desc": "Provides a visible representation of the indentation level in the editor window",
         "apply": function(val) {
-          vseditor.updateOptions({renderIndentGuides: val});
+          __applyToAllEditors("renderIndentGuides", val);
         }
       }),
       new CSIDESetting({
@@ -3207,7 +3513,6 @@ function IDEViewModel() {
           monacoOptions.spellcheck.enabled = Boolean(val);
           __updateMonacoDiagnosticOptions(monacoOptions);
           if (val) {
-            var self = this;
             this.handle = monaco.languages.choicescript.onDictionaryChange((dictEvent) => {
               for (var i = 0; i < dictEvent.words.length; i++) {
                 if (dictEvent.removed) {
@@ -3352,7 +3657,7 @@ function IDEViewModel() {
           return { valid: valid, message: message }
         },
         "apply": function(val) {
-          vseditor.updateOptions({fontSize: val});
+          __applyToAllEditors("fontSize", val);
         }
       }),
       new CSIDESetting({
@@ -3376,7 +3681,7 @@ function IDEViewModel() {
         }],
         "desc": "The font family used in the editor window",
         "apply": function(val) {
-          vseditor.updateOptions({fontFamily: val});
+          __applyToAllEditors("fontFamily", val);
         }
       }),
       new CSIDESetting({
@@ -3397,9 +3702,12 @@ function IDEViewModel() {
           var self = this;
           var BASE_THEMES = ["vs", "vs-dark", "hc-black"];
           var CS_THEMES = ["cs-light", "cs-dark"];
-          if (vseditor._themeService._knownThemes.size > (self.getOptions().length + BASE_THEMES.length)) {
+          // unfortunately we need an editor instance to grab theme information
+          // and the console editor is the only one guaranteed to be available
+          editor = monacoConsole;
+          if (editor._themeService._knownThemes.size > (self.getOptions().length + BASE_THEMES.length)) {
             var options = [];
-            vseditor._themeService._knownThemes.forEach(function(theme) {
+            editor._themeService._knownThemes.forEach(function(theme) {
               if (BASE_THEMES.indexOf(theme.themeName) < 0) // ignore Monaco's base themes
                 options.push({ desc: CS_THEMES.indexOf(theme.themeName) > -1 ? theme.themeName : theme.themeName + " (custom)", value: theme.themeName });
             });
@@ -3411,6 +3719,7 @@ function IDEViewModel() {
           if (!self.getOptions().some(function(opt) { return opt.value === val; })) {
             val = "cs-light"; // handle any old/invalid theme config values
           }
+          editorOptionStore["theme"] = val;
           monaco.editor.setTheme(val);
           $("#code-footer, #cs-console").removeClass(function(i, className) {
             return (className.match(/cs-\w+/g) || []).join(' ');
@@ -3470,7 +3779,7 @@ function IDEViewModel() {
         "type": "binary",
         "desc": "Hovering the cursor over a command in the editor window will display additional information",
         "apply": function(val) {
-          vseditor.updateOptions({hover: { enabled: val }});
+          __applyToAllEditors("hover", { enabled: val });
         }
       }),
       new CSIDESetting({
@@ -3736,17 +4045,17 @@ function IDEViewModel() {
     }
     consoleCmdBuf.push(input);
     consoleCmdBufPtr = consoleCmdBuf.length;
-    selectedProject().logToConsole(input, input.substring(0,1) == "*" ? "cm-builtin" : "cm-variable");
+    activeProject().logToConsole(input, input.substring(0,1) == "*" ? "cm-builtin" : "cm-variable");
     // Must have a running game
     var gameFrame = document.getElementById("game-tab-frame").contentWindow || document.getElementById("#game-tab-frame");
     if (typeof gameFrame === 'undefined' || typeof gameFrame === 'undefined') {
-      selectedProject().logToConsole("Error: no choicescript game running", "cm-error");
+      activeProject().logToConsole("Error: no choicescript game running", "cm-error");
       monacoConsole.setValue("");
       return;
     }
     // Prevent the confusing use of commands through non active project consoles
-    if (selectedProject() != activeProject()) {
-      selectedProject().logToConsole("Error: this project is not the one running", "cm-error");
+    if (activeProject() != activeProject()) {
+      activeProject().logToConsole("Error: this project is not the one running", "cm-error");
       monacoConsole.setValue("");
       return;
     }
@@ -3772,7 +4081,7 @@ function IDEViewModel() {
             gameFrame.postMessage({ type: "runCommand", cmd: null, input: input });
           }
         } else {
-          selectedProject().logToConsole("Error: invalid console command", "cm-error");
+          activeProject().logToConsole("Error: invalid console command", "cm-error");
         }
       } else { //assume expression:
         gameFrame.postMessage({ type: "runCommand", cmd: "CSIDEConsole_eval_expr", input: input });
@@ -3780,7 +4089,7 @@ function IDEViewModel() {
     } catch (e) {
       //strip error scene & line num - as the information is irrelevant
       e.message = e.message.replace(/line [0-9]+ of\s\w+: /, "");
-      selectedProject().logToConsole("Error: " + e.message, "cm-error");
+      activeProject().logToConsole("Error: " + e.message, "cm-error");
     }
     monacoConsole.setValue("");
   }
@@ -3821,7 +4130,7 @@ function IDEViewModel() {
       switch (getFileExtension(paths[lastIndex])) {
         case ".txt":
           __openScene(paths[lastIndex], function(err, scene) {
-            if (!err) scene.select();
+            if (!err) scene.viewInEditor();
           });
           break;
         case ".log":
@@ -4027,11 +4336,11 @@ function IDEViewModel() {
         bootbox.alert("<h3>Error</h3>Unable to add to user dictionary: not a word!");
         return;
       }
-      vseditor.trigger("", `add-words`, {uri: "", dict: "persistent", words: [self.dictWord()]});
+      monacoConsole.trigger("", `add-words`, {uri: "", dict: "persistent", words: [self.dictWord()]});
     }
   };
   self.removeFromDictionary = function(word) {
-    vseditor.trigger("", `remove-words`, {uri: "", dict: "persistent", words: [word]});
+    monacoConsole.trigger("", `remove-words`, {uri: "", dict: "persistent", words: [word]});
   };
   self.getDictionaryArray = ko.computed(function() {
     var query = self.dictWord();
@@ -4040,7 +4349,7 @@ function IDEViewModel() {
     return userDictionary.persistentListArray().filter(function(word) { return word.startsWith(query); } ).sort();
   }, this);
 
-  self.init = function(editor) {
+  self.init = function() {
 
     // Create the "console" input as a single-line Monaco Editor instance
     // to allow for more interactive behaviour in the future.
@@ -4085,8 +4394,6 @@ function IDEViewModel() {
       }
     });
 
-    vseditor = editor;
-
     monaco.cside = {};
 
     // Patch in replace pattern support for find/replace with regexes
@@ -4096,9 +4403,6 @@ function IDEViewModel() {
         return replacePattern.parseReplaceString(replaceStr).buildReplaceString(matches, preserveCase);
       }
     });
-
-    // Hotkeys, etc.
-    registerEditorActions(vseditor);
 
     if (usingNode) {
       // Load user-themes for the editor
@@ -4127,79 +4431,6 @@ function IDEViewModel() {
       }
     }
 
-    // OVERRIDE INTERNAL MONACO EDITOR SERVICES
-
-    // Links in Monaco use a data-href attribute rather than the href attribute.
-    // This means NWJS's new-win-policy event can't determine the url/target.
-    // Thus we need to patch in an alternative handler here.
-    editor.getContribution('editor.linkDetector').openerService._externalOpener = {
-      openExternal: function(href) {
-        if (usingNode) {
-          gui.Shell.openExternal(href);
-        } else if (matchesScheme(href, Schemas.http) || matchesScheme(href, Schemas.https)) {
-          dom.windowOpenNoOpener(href);
-        } else {
-          window.location.href = href;
-        }
-        return Promise.resolve(true);
-      }
-    }
-
-    // Make sure Monaco will look at more than just the editor's attached model.
-    editor._codeEditorService.findModel = function (editor, resource) {
-      const model = editor.getModel();
-      if (!resource)
-        return model;
-      if (model && model.uri.toString() !== resource.toString()) {
-        var newModel = monaco.editor.getModel(resource.toString());
-        return newModel;
-      }
-      return model;
-    }
-
-    // Teach Monaco how to select new Scenes in CSIDE.
-    editor._codeEditorService.doOpenEditor = function (editor, input) {
-      var model = this.findModel(editor, input.resource);
-      if (!model) {
-        if (input.resource) {
-          var schema = input.resource.scheme;
-          if (schema === network_1.Schemas.http || schema === network_1.Schemas.https) {
-            // This is a fully qualified http or https URL
-            // dom_1.windowOpenNoOpener(input.resource.toString());
-            return editor;
-          }
-        }
-        return null;
-      }
-      model.csideScene.select(function(success) {
-        if (success) {
-          var selection = (input.options ? input.options.selection : null);
-          if (selection) {
-            if (typeof selection.endLineNumber === 'number' && typeof selection.endColumn === 'number') {
-              editor.setSelection(selection);
-              editor.revealRangeInCenter(selection, 1 /* Immediate */);
-            }
-            else {
-              var pos = {
-                lineNumber: selection.startLineNumber,
-                column: selection.startColumn
-              };
-              editor.setPosition(pos);
-              editor.revealPositionInCenter(pos, 1 /* Immediate */);
-            }
-          }
-          return editor;
-        } else {
-          return null;
-        }
-      });
-    }
-
-    vseditor.onDidChangeCursorPosition(function(evt) {
-      // only displays primary selection / cursor
-      selectedChars(vseditor.getModel().getValueInRange(vseditor.getSelection()).length);
-      cursorPos(evt.position);
-    });
     if (!usingNode) {
       user.name = "dropbox-user";
     }
@@ -4318,25 +4549,13 @@ function IDEViewModel() {
   };
 
   self.showWordCount = function(sceneOrProject) {
-    var incWordCount = sceneOrProject.getWordCount();
-    var exWordCount = sceneOrProject.getWordCount(true);
-    var charCount = sceneOrProject.getCharCount();
     var type = sceneOrProject.constructor.name.substring("CSIDE".length, sceneOrProject.constructor.name.length);
-    var selectedTitle = (type == "Scene") ? "Currently Selected Text (this scene)" : "Currently Selected Text (in all scenes)";
     var title = (type + " - " + sceneOrProject.getName());
+    var counts = sceneOrProject.getWordCount();
     var msg = "<h5>Word Count</h5> \
-      Including command lines: " + sceneOrProject.getWordCount() +
-      "<br>Excluding command lines: " + sceneOrProject.getWordCount(true);
-      msg += "<br>Characters: " + sceneOrProject.getCharCount();
-    if (cside.getSelectedScene()) {
-      incWordCount = sceneOrProject.getWordCount(false, true);
-      exWordCount = sceneOrProject.getWordCount(true, true);
-      charCount = sceneOrProject.getCharCount(true);
-      msg += "<br><br><h5>" + selectedTitle + "</h5> \
-      Words including command lines: " + incWordCount +
-      "<br>Words excluding command lines: " + exWordCount +
-      "<br>Characters: " + charCount;
-    }
+      Including command lines: " + counts.incmds +
+      "<br>Excluding command lines: " + counts.excmds;
+    msg += "<br>Characters: " + sceneOrProject.getCharCount();
     msg += "<br><br>Please note that these figures are only approximations.<br>Project word counts only include those of open scenes.";
     bootbox.alert({message: msg, title: title});
   }
@@ -4347,6 +4566,79 @@ function IDEViewModel() {
 
   function __getMonacoDiagnosticOptions() {
     return monaco.languages.choicescript.diagnosticsOptions;
+  }
+
+
+  // OVERRIDE INTERNAL MONACO EDITOR SERVICES
+  function __overrideEditorServices(monacoEditorInst) {
+    // Links in Monaco use a data-href attribute rather than the href attribute.
+    // This means NWJS's new-win-policy event can't determine the url/target.
+    // Thus we need to patch in an alternative handler here.
+    monacoEditorInst.getContribution('editor.linkDetector').openerService._externalOpener = {
+      openExternal: function(href) {
+        if (usingNode) {
+          gui.Shell.openExternal(href);
+        } else if (matchesScheme(href, Schemas.http) || matchesScheme(href, Schemas.https)) {
+          dom.windowOpenNoOpener(href);
+        } else {
+          window.location.href = href;
+        }
+        return Promise.resolve(true);
+      }
+    }
+
+    // Make sure Monaco will look at more than just the editor's attached model.
+    monacoEditorInst._codeEditorService.findModel = function (editor, resource) {
+      const model = editor.getModel();
+      if (!resource)
+        return model;
+      if (model && model.uri.toString() !== resource.toString()) {
+        var newModel = monaco.editor.getModel(resource.toString());
+        return newModel;
+      }
+      return model;
+    }
+
+    // Teach Monaco how to select new Scenes in CSIDE.
+    monacoEditorInst._codeEditorService.doOpenEditor = function (editor, input) {
+      var model = this.findModel(editor, input.resource);
+      if (!model) {
+        if (input.resource) {
+          var schema = input.resource.scheme;
+          if (schema === network_1.Schemas.http || schema === network_1.Schemas.https) {
+            // This is a fully qualified http or https URL
+            // dom_1.windowOpenNoOpener(input.resource.toString());
+            return editor;
+          }
+        }
+        return null;
+      }
+      if (editor.getModel().uri.toString() !== input.resource.toString()) {
+        model.csideScene.viewInEditor(function(ed) {
+          if (ed) {
+            var med = ed.getMonacoEditor();
+            ed.waitForRender(function() {
+              var selection = (input.options ? input.options.selection : null);
+              if (selection) {
+                if (typeof selection.endLineNumber === 'number' && typeof selection.endColumn === 'number') {
+                  med.setSelection(selection);
+                  med.revealRangeInCenter(selection, 1);
+                }
+                else {
+                  var pos = {
+                    lineNumber: selection.startLineNumber,
+                    column: selection.startColumn
+                  };
+                  med.setPosition(pos);
+                  med.revealPositionInCenter(pos, 1);
+                }
+                med.focus();
+              }
+            });
+          }
+        });
+      }
+    }
   }
 
   function __createImageScene(project, path) {
@@ -4572,13 +4864,22 @@ function IDEViewModel() {
               bootbox.alert(err.message);
             } else {
               newScene.load(function(err, scene) {
-                if (!err) scene.select();
+                if (!err) scene.viewInEditor();
               });
             }
           });
         }
       });
     }
+  }
+
+  function __applyToAllEditors(settingId, value) {
+    editorOptionStore[settingId] = value;
+    var valueData = {};
+    valueData[settingId] = value;
+    allEditors().forEach(function(ed) {
+      ed.getMonacoEditor().updateOptions(valueData);
+    });
   }
 
   function __addProject(project) {
@@ -4639,8 +4940,8 @@ function IDEViewModel() {
           }
           project.addScene(scene);
           scene.load(function(err, scene) {
-            if (!err) {
-              scene.select();
+            if (!err && scene.getName() === "startup") {
+              scene.viewInEditor();
             }
           });
         });
@@ -4792,10 +5093,11 @@ function IDEViewModel() {
     return str;
   }
 
-  function __updateEditorDecorations(scene, additional) {
+  function __updateEditorDecorations(editor, scene, additional) {
+    var meditor = editor.getMonacoEditor();
     var issues = scene.getIssues();
     additional = additional || [];
-    scene.decorations = vseditor.deltaDecorations(scene.decorations,
+    scene.decorations = meditor.deltaDecorations(scene.decorations,
       issues.filter(function(issue) { return typeof issue.getLineNum() === "number" })
         .map(function(issue) {
           var col = meditor.getModel().getLineFirstNonWhitespaceColumn(issue.getLineNum());
@@ -4811,20 +5113,12 @@ function IDEViewModel() {
     );
   }
 
-  function __wordCount(string, exclCommandLines) {
-    exclCommandLines = exclCommandLines || false;
-    var wordCount = 0;
-    if (exclCommandLines) {
-      var nonCommandLines = string.replace(/\*.+$/gm, "");
-      nonCommandLines.replace(/^\s+|\s+$/g, "").split(/\s+/).length;
-      wordCount = nonCommandLines.replace(/^\s+|\s+$/g, "").split(/\s+/).length;
-    } else {
-      wordCount = string.replace(/^\s+|\s+$/g, "").split(/\s+/).length; //split remaining lines into words
+  function __wordCount(string) {
+    var nonCommandLines = string.replace(/\*.+$/gm, "");
+    return {
+      incmds: string.replace(/^\s+|\s+$/g, "").split(/\s+/).length,
+      excmds: nonCommandLines.replace(/^\s+|\s+$/g, "").split(/\s+/).length
     }
-    if (wordCount === 1 && string === "") {
-      wordCount = 0;
-    }
-    return wordCount;
   }
 
   function __copyProjectTo(oldPath, newPath, callback) {
@@ -4896,14 +5190,17 @@ function IDEViewModel() {
 
   function __closeProject(project, ask) {
     function __commitCloseProject() {
-      if (project === selectedProject()) {
-        if (selectedProject() == activeProject()) {
+      if (project === activeProject()) {
+        if (activeProject() == activeProject()) {
           activeProject(null);
         }
-        selectedScene("");
         __getTab("game").href("");
       }
-      project.dispose();
+      // copy to avoid mutating array during iteration
+      var scenes = Array.from(project.getScenes());
+      scenes.forEach(function(s) {
+        s.close();
+      });
       projects.remove(project);
       __updatePersistenceList();
     }
@@ -5005,7 +5302,7 @@ function IDEViewModel() {
         notification("Running", project.getName(), {
           timeout: 2000
         });
-        activeProject(project);
+        project.makeActive();
         __reloadTab(__getTab("game"), 'run_index.html?restart=true');
         cside.togglePanel("tab", true /* open */);
         __selectTab("game");
@@ -5307,7 +5604,7 @@ function IDEViewModel() {
               var lineNum = parseInt(event.data.scene.lineNum); scene.focusLine(lineNum);
             } catch (e) {
               // no line number, but we can still show the scene
-              scene.select();
+              scene.viewInEditor();
             }
           }
         });
@@ -5804,7 +6101,7 @@ function IDEViewModel() {
       return title;
     }
     self.getOptions = ko.computed(function() {
-      return options();
+      return ko.unwrap(options);
     }, this);
     self.getTarget = function() {
       return target;
@@ -5869,22 +6166,22 @@ function IDEViewModel() {
       [
         new toolbarMenu({
           title: "<span title='Project' class='fa fa-folder-open-o '>",
-          active: self.getSelectedProject,
+          active: self.getActiveProject,
           options: ko.computed(function() {
-            return (new contextMenu(selectedProject(), projectMenuOptions).getOptions())
+            return (new contextMenu(activeProject(), projectMenuOptions).getOptions())
           }, this),
           target: ko.computed(function() {
-            return selectedProject()
+            return activeProject()
           }, this)
         }),
         new toolbarMenu({
           title: "<span title='Scene' class='fa fa-file-text-o'>",
-          active: self.getSelectedScene,
+          active: self.getActiveScene,
           options: ko.computed(function() {
-            return (new contextMenu(selectedScene(), sceneMenuOptions).getOptions())
+            return (new contextMenu(activeScene(), sceneMenuOptions).getOptions())
           }, this),
           target: ko.computed(function() {
-            return selectedScene()
+            return activeScene()
           }, this)
         })
       ]
@@ -5950,26 +6247,6 @@ window.cside = new IDEViewModel();
 ko.applyBindings(cside, $('.main-wrap')[0]);
 amdRequire(['vs/editor/editor.main'], function() {
   window.monaco = monaco;
-  window.meditor = monaco.editor.create(document.getElementById("editor-wrap"), {
-    theme: 'cs-light',
-    value: "",
-    language: 'choicescript',
-    autoIndent: true,
-    formatOnType: true,
-    dragAndDrop: false,
-    renderLineHighlight: "all",
-    minimap: {enabled:false},
-    wordWrap: 'bounded',
-    //wordWrapColumn: 60,
-    wrappingIndent: "same",
-    roundedSelection: true,
-    folding: true,
-    automaticLayout: true,
-    detectIndentation: true,
-    lightbulb: { enabled: true },
-    glyphMargin: true,
-    model: null
-  });
-  cside.init(meditor);
+  cside.init();
 });
 //label finding regex: cside.projects()[0].scenes()[0].document.getValue().match(/\^*label.+$/gm,"");
