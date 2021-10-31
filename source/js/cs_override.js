@@ -1,3 +1,6 @@
+/* pause execution until CSIDE can pass the data */
+window.alreadyLoaded = true;
+
 nav = new SceneNavigator(["startup"]);
 stats = {};
 isHeadless = true;
