@@ -618,6 +618,19 @@ body.night #left-wrap {
     margin-left: 5px;
 }
 
+.editor-tag > .tag-colour-marker {
+        height: 2px;
+        width: 100%;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        border: 1px solid;
+        border-bottom: 0;
+        border-left: 0px;
+        border-right: 0px;
+        border-color: inherit;
+}
+
 .editor-tag button.codicon:hover::before {
     content: '\ea76';
 }

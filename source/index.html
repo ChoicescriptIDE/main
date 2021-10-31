@@ -152,6 +152,7 @@
                     <li class="editor-tag" data-bind="click: makeActive, attr: { id: 'editor-tag-' + $index(), title: getName() }, style: { backgroundColor: $root.getUIColour(isActive() ? 0 : -8), borderColor: $root.getUIColour(-30) }">
                         <button data-bind="click: close, style: { color: $root.getUIColour(-40) }, attr: { class: getFileStateCSS() }" class="codicon codicon-close" title="Close editor"></button>
                         <span data-bind="text: getName()"></span>
+                        <div class="tag-colour-marker" data-bind="visible: !$root.isPanelOpen.bind(null, 'scene')(), style: { backgroundColor: $data.getScene().getMarkColour }"></div>
                     </li>
                 </ul>
                 <!-- /ko -->
