@@ -2690,14 +2690,18 @@ function IDEViewModel() {
     if (!docModel) return;
     _bootboxSelect("Select Indentation Unit", types,
       function(unitOpt) {
-        self.getActiveFile().updateUseSpaces(unitOpt === "Spaces");
-        var sizes = settings.byId("editor", "tabsize").getOptions().map(function(o) { return o.value; });
-        _bootboxSelect("Select Indentation Size", sizes,
-          function(sizeOpt) {
-            self.getActiveFile().updateIndentSize(sizeOpt);
-            bootbox.hideAll();
-          }, docModel.getOptions().tabSize
-        );
+        var useSpaces = (unitOpt === "Spaces");
+        var setting = settings.byId("editor", useSpaces ? "indentspaces" : "tabsize");
+        self.getActiveFile().updateUseSpaces(useSpaces);
+        __promptForInteger(function(value, errmsg) {
+          if (value) {
+            self.getActiveFile().updateIndentSize(value);
+          } else if (errmsg) {
+            bootbox.alert("Invalid value: " + errmsg);
+          } else {
+            // user cancelled / didn't give a value
+          }
+        }, "Indentation Size", setting.getValue(), { max: setting.max, min: setting.min });
       }, types[Number(docModel.getOptions().insertSpaces)]
     );
   }
@@ -4780,6 +4784,35 @@ function IDEViewModel() {
         }
         else {
           callback(__trimWhitespace(str));
+        }
+      }
+    });
+  }
+
+  function __promptForInteger(callback, title, placeholder, options) {
+    // options = { min, max }
+    bootbox.prompt({
+      title: title || "Please enter text",
+      value: placeholder || "",
+      callback: function(input) {
+        newVal = Number(input);
+        isInteger = Number.isInteger(newVal);
+        if (!input) {
+          callback("", (input === null) ? "" : "no input"); // cancelled / empty
+        } else if (isNaN(newVal)) {
+          callback("", "not a number");
+        } else if (!Number.isInteger(newVal)) {
+          callback("", "not an integer");
+        } else {
+          if (options) {
+            if (newVal > options.max) {
+              callback("", newVal + " should be less than or equal to " + options.max);
+            } else if (newVal < options.min) {
+              callback("", newVal + " should be greater than or equal to " + options.min);
+            } else {
+              callback(newVal);
+            }
+          }
         }
       }
     });
