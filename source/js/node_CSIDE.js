@@ -303,17 +303,18 @@ function __onElementRender(elementSelector, callback) {
 // Limit execution of a given function to every *limit* milliseconds
 // inspired by: https://davidwalsh.name/javascript-debounce-function
 function __limitExecution(func, limit) {
-    var timeout = null;
-    var locked = false;
-    return function() {
-        var unlock = function() {
-            locked = false;
-        }
-        if (locked) {
-            clearTimeout(timeout);
-            timeout = setTimeout(this, unlock);
-        } else {
-            func.apply(this, arguments);
-        }
-    }
+	var timeout = null;
+	var locked = false;
+	return function () {
+		var unlock = function () {
+			locked = false;
+		}
+		var retrigger = function () {
+			locked = true;
+			clearTimeout(timeout);
+			timeout = setTimeout(unlock, limit);
+		}
+		if (!locked) func.apply(this, arguments);
+		retrigger();
+	}
 }
