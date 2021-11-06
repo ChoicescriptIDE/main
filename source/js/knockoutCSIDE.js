@@ -2080,6 +2080,12 @@ function IDEViewModel() {
   }
 
   self.openNewEditor = function(scene, callback) {
+    // don't allow multiple editors per scene
+    if (scene.isSelected()) {
+      scene.viewInEditor();
+      if (typeof callback === "function") callback(scene.getEditors()[0]);
+      return;
+    }
     var ed = new CSIDEEditor({scene: scene});
     ed.setScene(scene);
     if (scene.getProject() === activeProject())
