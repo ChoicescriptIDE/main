@@ -1856,6 +1856,36 @@ function IDEViewModel() {
     }),
   ]);
 
+  var EditorTagOptions = ko.observableArray([
+    new menuOption("Close editor", function(menu) {
+      menu.getTarget().close();
+    }),
+    new menuOption("Close other editors", function(menu) {
+      var project = cside.getActiveProject();
+      var thisEditor = menu.getTarget();
+      var projectEditors = project.getEditors().slice();
+      var editorsToClose = projectEditors.filter(function(ed, index) {
+        return ed !== thisEditor;
+      });
+      editorsToClose.forEach(function(ed) { ed.close(); });
+    }),
+    new menuOption("Close editors to the right", function(menu) {
+      var project = cside.getActiveProject();
+      var thisEditor = menu.getTarget();
+      var projectEditors = project.getEditors().slice();
+      var thisEditorIndex = projectEditors.indexOf(thisEditor);
+      var editorsToClose = projectEditors.filter(function(ed, index) {
+        return index > thisEditorIndex;
+      });
+      editorsToClose.forEach(function(ed) { ed.close(); });
+    }),
+    new menuOption("Close all editors", function(menu) {
+      var project = cside.getActiveProject();
+      var projectEditors = project.getEditors().slice();
+      projectEditors.forEach(function(ed) { ed.close(); });
+    })
+  ]);
+
   if (usingNode) {
     sceneMenuOptions.push(
       new menuOption("Export", function(menu) {
@@ -6220,6 +6250,16 @@ function IDEViewModel() {
           if (scene.getErrState() || !scene.hasLoaded() || scene.isSaving() || scene.isLocked()) //disallow allow context-menus for unloaded scenes etc
             return false;
           menu(new contextMenu(scene, sceneMenuOptions));
+          return true;
+        }
+      });
+      // editor tags
+      $('#editor-tab-list-event-wrapper').contextmenu({
+        target: '#context-menu',
+        scopes: '.editor-tag',
+        before: function(event, element) {
+          var editor = ko.dataFor(element.get(0));
+          menu(new contextMenu(editor, EditorTagOptions));
           return true;
         }
       });
