@@ -93,6 +93,38 @@ function IDEViewModel() {
     return path;
   }
 
+  function __onElementRender(elementSelector, callback) {
+    var timeout = false;
+    var timer = setTimeout(function() { timeout = true; }, 2000); // bail on timeout
+    function __checkRender() {
+      if (!document.querySelector(elementSelector) && timeout) {
+        window.requestAnimationFrame(__checkRender);
+      } else {
+              setTimeout(function(){ callback(); }, 0); // catch up 
+      }
+    };
+    __checkRender();
+  }
+
+  // Limit execution of a given function to every *limit* milliseconds
+  // inspired by: https://davidwalsh.name/javascript-debounce-function
+  function __limitExecution(func, limit) {
+    var timeout = null;
+    var locked = false;
+    return function () {
+      var unlock = function () {
+        locked = false;
+      }
+      var retrigger = function () {
+        locked = true;
+        clearTimeout(timeout);
+        timeout = setTimeout(unlock, limit);
+      }
+      if (!locked) func.apply(this, arguments);
+      retrigger();
+    }
+  }
+
   // ╔═╗┌─┐┌┐┌┌─┐┌┬┐┬─┐┬ ┬┌─┐┌┬┐┌─┐┬─┐  ╔═╗┬ ┬┌┐┌┌─┐┌┬┐┬┌─┐┌┐┌┌─┐
   // ║  │ ││││└─┐ │ ├┬┘│ ││   │ │ │├┬┘  ╠╣ │ │││││   │ ││ ││││└─┐
   // ╚═╝└─┘┘└┘└─┘ ┴ ┴└─└─┘└─┘ ┴ └─┘┴└─  ╚  └─┘┘└┘└─┘ ┴ ┴└─┘┘└┘└─┘
