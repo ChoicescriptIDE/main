@@ -35,10 +35,10 @@ The CSIDE Team!
 <p><a rel="external" href="http://bootboxjs.com/">Bootbox.js</a></p>
 <p><a rel="external" href="http://craig.is/killing/mice">Mousetrap</a></p>
 <p><a rel="external" href="https://github.com/sydcanem/bootstrap-contextmenu">bootstrap contextmenu</a> by sydcanem</p>
-<p><a rel="external" href="http://codemirror.net/">CodeMirror</a></p>
+<p><a rel="external" href="https://microsoft.github.io/monaco-editor">Monaco Editor</a></p>
 <p><a rel="external" href="http://fontawesome.io/">Font Awesome</a></p>
 <p><a rel="external" href="https://github.com/chjj/marked">marked</a></p>
-<p><a rel="external" href="https://github.com/cfinke/Typo.js/">TypoJS</a></p>
+<p><a rel="external" href="https://github.com/wooorm/nspell">nspell</a></p>
 <p><a rel="external" href="http://www.jrsoftware.org/isinfo.php">Inno Setup</a></p>
 <p><a rel="external" href="https://www.npmjs.com/package/write-file-atomic">write-file-atomic</a></p>
 <p>'Trash' and 'Username' by <a rel="external" href="https://github.com/sindresorhus">sindresorhus</a></p>
