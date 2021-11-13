@@ -707,7 +707,7 @@ function IDEViewModel() {
             if (oldModel) oldModel.dispose();
             // update any subscribed editors immediately
             self.getEditors().forEach(function(ed) {
-              ed.setModel(edModel()); // reset model
+              ed.setDocModel(edModel()); // reset model
             });
             edModel().onDidChangeContent(updateOnModelEdit);
           } catch (err) {
@@ -1664,6 +1664,12 @@ function IDEViewModel() {
         return _monacoEditor.getModel();
       }
       return null;
+    }
+
+    self.setDocModel = function(model) {
+      if (_monacoEditor) {
+        _monacoEditor.setModel(model);
+      }
     }
 
     self.getMonacoEditor = function() {
