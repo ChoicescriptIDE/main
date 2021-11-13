@@ -694,23 +694,22 @@ function IDEViewModel() {
   function CSIDEFile(fileData) {
     var self = this;
     //INSTANCE VARIABLES
-    var edModel; // holds the Monaco editor document model
-    var _updateModel = function(model) { edModel = model; }
+    var edModel = ko.observable(null); // holds the Monaco editor document model
     var path = ko.observable(__normalizePath(fileData.path)).extend({
       normalizePaths: "",
       callFunc: {
         func: function(newPath) {
           // automatically replace the Monaco model on renames to keep its Uri in sync
-          var oldModel = edModel;
+          var oldModel = edModel();
           try {
-            _updateModel(monaco.editor.createModel(edModel ? edModel.getValue() : "", "choicescript", monaco.Uri.file(newPath)));
-            edModel.csideFile = self;
+            edModel(monaco.editor.createModel(edModel() ? edModel().getValue() : "", "choicescript", monaco.Uri.file(newPath)));
+            edModel().csideFile = self;
             if (oldModel) oldModel.dispose();
             // update any subscribed editors immediately
             self.getEditors().forEach(function(ed) {
-              ed.setModel(edModel); // reset model
+              ed.setModel(edModel()); // reset model
             });
-            edModel.onDidChangeContent(updateOnModelEdit);
+            edModel().onDidChangeContent(updateOnModelEdit);
           } catch (err) {
             bootbox.alert("Unrecoverable Error: Couldn't update URI for file.<br><br>" + err.message + ".<br><br> Please restart the application and report this.");
           }
@@ -736,17 +735,17 @@ function IDEViewModel() {
     var searchResults = ko.observable(new CSIDESearchResults({results: []}))
       .extend({ rateLimit: { rateLimit: 1000, method: "notifyWhenChangesStop" }});
     var indentSize = ko.observable(settings.byId("editor", "tabsize").getValue())
-      .extend({ callFunc: { func: function(newVal) { edModel.updateOptions({tabSize: newVal});}}});
+      .extend({ callFunc: { func: function(newVal) { edModel().updateOptions({tabSize: newVal});}}});
     var useSpaces = ko.observable(settings.byId("editor", "usespaces").getValue())
-      .extend({ callFunc: { func: function(newVal) { edModel.updateOptions({insertSpaces: newVal});}}});
+      .extend({ callFunc: { func: function(newVal) { edModel().updateOptions({insertSpaces: newVal});}}});
 
     // create initial model
-    edModel = monaco.editor.createModel(fileData.contents || "", "choicescript", monaco.Uri.file(path()));
-    edModel.onDidChangeContent(updateOnModelEdit);
-    edModel.csideFile = self;
+    edModel(monaco.editor.createModel(fileData.contents || "", "choicescript", monaco.Uri.file(path())));
+    edModel().onDidChangeContent(updateOnModelEdit);
+    edModel().csideFile = self;
 
     // used for dirtyness
-    var lastVersionId = edModel.getAlternativeVersionId();
+    var lastVersionId = edModel().getAlternativeVersionId();
     var dirty = ko.observable(false);
     var editorViewState = null;
     //won't change - so doesn't need to be an observable?
@@ -796,7 +795,7 @@ function IDEViewModel() {
       return path();
     }, this);
     self.getModel = ko.computed(function() {
-      return edModel;
+      return edModel();
     }, this);
     self.hasLoaded = ko.computed(function() {
       return loaded();
@@ -835,7 +834,7 @@ function IDEViewModel() {
       return (self.getEditors().length > 0);
     };
     self.getText = function() {
-      return edModel.getValue();
+      return edModel().getValue();
     };
     self.getMarkColour = ko.computed(function() {
       return markColour();
@@ -850,14 +849,14 @@ function IDEViewModel() {
       return issues();
     }, this);
     self.getContents = function() {
-      return edModel.getValue();
+      return edModel().getValue();
     }
     self.getLineContent = function(range) {
       // {} => endColumn, endLineNumber, startColumn, startLineNumber
-      return edModel.getLineContent(range);
+      return edModel().getLineContent(range);
     }
     self.getLineLength = function(lineNum) {
-      return edModel.getLineLength(lineNum);
+      return edModel().getLineLength(lineNum);
     }
     self.getSearchResults = ko.computed(function() {
       return searchResults();
@@ -900,7 +899,7 @@ function IDEViewModel() {
     self.setText = function(value) {
       if (readOnly()) return;
       if (typeof value != "string") return;
-      edModel.setValue(value);
+      edModel().setValue(value);
     }
     var renameFile = function(newName) {
       if (invalidName())
@@ -1010,7 +1009,7 @@ function IDEViewModel() {
       }, 500);
     }
     self.showSearchResult = function(index, data) {
-      if (searchVersionId != edModel.getAlternativeVersionId()) {
+      if (searchVersionId != edModel().getAlternativeVersionId()) {
         notification("Stale Search Results", "This file has been modified since the last search was performed. Please search again.", {type: 'error'});
         return;
       }
@@ -1020,7 +1019,7 @@ function IDEViewModel() {
     }
     self.replaceSearchResult = function(index, data, event) {
       if (event) event.stopPropagation();
-      if (searchVersionId != edModel.getAlternativeVersionId()) {
+      if (searchVersionId != edModel().getAlternativeVersionId()) {
         notification("Stale Search Results", "This file has been modified since the last search was performed. Please search again.", {type: 'error'});
         return;
       }
@@ -1033,7 +1032,7 @@ function IDEViewModel() {
         newText = monaco.cside.parseReplaceString(newText).buildReplaceString(data.matches, SEARCH.CONF.preserveCase());
       var oldRange = new monaco.Range(data.range.startLineNumber, data.range.startColumn, data.range.endLineNumber, data.range.endColumn);
       var newRange = oldRange;
-      var newSelections = edModel.pushEditOperations([new monaco.Selection(oldRange.startLineNumber, oldRange.startColumn, oldRange.endLineNumber, oldRange.endColumn)], [{text: newText, range: oldRange}], function() {
+      var newSelections = edModel().pushEditOperations([new monaco.Selection(oldRange.startLineNumber, oldRange.startColumn, oldRange.endLineNumber, oldRange.endColumn)], [{text: newText, range: oldRange}], function() {
         // Calculate new cursor position(s)
         if (monaco.Range.spansMultipleLines(data.range)) {
           // TODO handle tricky multi-line change range calculations
@@ -1045,7 +1044,7 @@ function IDEViewModel() {
           newRange = oldRange.setEndPosition(oldRange.endLineNumber, oldRange.endColumn + columnDiff);
         return [new monaco.Selection(oldRange.startLineNumber, oldRange.startColumn, newRange.endLineNumber, newRange.endColumn)];
       });
-      edModel.pushStackElement();
+      edModel().pushStackElement();
       self.viewInEditor(function(ed) {
         if (ed) ed.getMonacoEditor().setSelections(newSelections);
       });
@@ -1142,14 +1141,14 @@ function IDEViewModel() {
           callback(err);
         } else {
           inErrState(false);
-          edModel.setValue(data);
-          edModel.detectIndentation(
+          edModel().setValue(data);
+          edModel().detectIndentation(
             settings.byId("editor", "usespaces").getValue(),
             useSpaces() ? settings.byId("editor", "indentspaces").getValue() : settings.byId("editor", "tabsize").getValue()
           );
-          useSpaces(edModel.getOptions().insertSpaces);
+          useSpaces(edModel().getOptions().insertSpaces);
           // pull the visual tab size from the global setting, or the space count from the model detection
-          indentSize(useSpaces() ? edModel.getOptions().indentSize : settings.byId("editor", "tabsize").getValue());
+          indentSize(useSpaces() ? edModel().getOptions().indentSize : settings.byId("editor", "tabsize").getValue());
           dirty(false);
           __updatePersistenceList();
         }
@@ -1228,7 +1227,7 @@ function IDEViewModel() {
     }
 
     function saveFile(callback) {
-      var data = edModel.getValue();
+      var data = edModel().getValue();
       fh.writeFile(path(), data, function(err) {
         finalizeSave(err);
       });
@@ -1238,7 +1237,7 @@ function IDEViewModel() {
           console.log(err);
         } else {
           dirty(false);
-          lastVersionId = edModel.getAlternativeVersionId();
+          lastVersionId = edModel().getAlternativeVersionId();
           fileStats.mtime ? fileStats.mtime = new Date() : fileStats.modifiedAt = new Date();
         }
         saving(false);
@@ -1274,7 +1273,7 @@ function IDEViewModel() {
       locked(true);
       newSearchMode = (typeof newSearchMode === "number") ? newSearchMode : searchMode();
       var replacePattern = monaco.cside.parseReplaceString(replaceStr);
-      var matches = edModel.findMatches(searchStr, false, SEARCH.CONF.useRegex(), SEARCH.CONF.preserveCase(), getWordSeperationValue(), true);
+      var matches = edModel().findMatches(searchStr, false, SEARCH.CONF.useRegex(), SEARCH.CONF.preserveCase(), getWordSeperationValue(), true);
       // calculate the replace value for display, even if we're just searching:
       matches = matches.map(function(match) {
         // Add the .text attribute to convert it to a valid IIdentifiedSingleEditOperation for use in pushEditOperations below
@@ -1282,14 +1281,14 @@ function IDEViewModel() {
         return match;
       });
       if ((newSearchMode === SEARCH.MODES.REPLACE) && (matches.length > 0)) {
-        var newSelections = edModel.pushEditOperations([new monaco.Selection(matches[0].range.startLineNumber, matches[0].range.startColumn, matches[0].range.endLineNumber, matches[0].range.endColumn)], matches, function() {
+        var newSelections = edModel().pushEditOperations([new monaco.Selection(matches[0].range.startLineNumber, matches[0].range.startColumn, matches[0].range.endLineNumber, matches[0].range.endColumn)], matches, function() {
             return [new monaco.Selection(1,1,1,1)];
         });
       }
       if (newSearchMode === SEARCH.MODES.REPLACE) // re-run initial search after a replace (to keep displayed results valid)
-        matches = edModel.findMatches(searchStr, false, SEARCH.CONF.useRegex(), SEARCH.CONF.preserveCase(), getWordSeperationValue(), true);
+        matches = edModel().findMatches(searchStr, false, SEARCH.CONF.useRegex(), SEARCH.CONF.preserveCase(), getWordSeperationValue(), true);
       locked(false);
-      searchVersionId = edModel.getAlternativeVersionId();
+      searchVersionId = edModel().getAlternativeVersionId();
       // Continue to signal expansion of any result updates, unless the expansion is due to the collpaseThreshold (rather than user request).
       var expandResults = forceExpand || (matches.length < SEARCH.CONF.collapseThreshold());
       searchResults(new CSIDESearchResults({ searchTerm: searchStr, file: self, versionId: searchVersionId, results: matches, expanded: expandResults, keepOpen: forceExpand }));
@@ -1300,7 +1299,7 @@ function IDEViewModel() {
       self.getEditors().forEach(function(ed) {
         ed.close();
       });
-      edModel.dispose();
+      edModel().dispose();
       self.getProject().closeFile(self);
     }
     self.copyTo = function(targetProject) {
@@ -1326,7 +1325,7 @@ function IDEViewModel() {
           var newFile = new CSIDEFile({
             "path": newPath,
             "source": source,
-            "contents": edModel.getValue()
+            "contents": edModel().getValue()
           });
           targetProject.addFile(newFile);
           newFile.load(); //contains _updatePersistenceList()
@@ -1407,12 +1406,12 @@ function IDEViewModel() {
     //Update dirty status, char count etc - on change
     var __updateOnModelEdit = __limitExecution(function() {
       if (!saving())
-        lastVersionId !== edModel.getAlternativeVersionId() ? dirty(true) : dirty(false);
+        lastVersionId !== edModel().getAlternativeVersionId() ? dirty(true) : dirty(false);
       if (searchResults().getSearchTerm() != "")
-        searchResults().getVersionId !== edModel.getAlternativeVersionId() ? self.search(searchResults().getSearchTerm(), null /* replaceStr */, searchResults() && searchResults().isExpanded() /* forceExpand */, SEARCH.MODES.SEARCH) : null;
-      charCount(edModel.getValueLength());
+        searchResults().getVersionId !== edModel().getAlternativeVersionId() ? self.search(searchResults().getSearchTerm(), null /* replaceStr */, searchResults() && searchResults().isExpanded() /* forceExpand */, SEARCH.MODES.SEARCH) : null;
+      charCount(edModel().getValueLength());
       if (wordCountOn() > 0)
-        wordCount(__wordCount(edModel.getValue()));
+        wordCount(__wordCount(edModel().getValue()));
     }, 250);
 
     function updateOnModelEdit() {
