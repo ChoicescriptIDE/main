@@ -2901,7 +2901,7 @@ function IDEViewModel() {
       id: 'replace-project-scenes',
       label: 'Replace in Project Scenes',
       keybindings: [
-        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_R,
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyR,
       ],
       precondition: null,
       keybindingContext: null,
@@ -2919,7 +2919,7 @@ function IDEViewModel() {
       id: 'search-project-scenes',
       label: 'Search Project Scenes',
       keybindings: [
-        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_F,
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyF,
       ],
       precondition: null,
       keybindingContext: null,
@@ -2937,7 +2937,7 @@ function IDEViewModel() {
       id: 'save-selected-scene',
       label: 'Save Selected Scene',
       keybindings: [
-        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S,
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
       ],
       precondition: null,
       keybindingContext: null,
@@ -2977,7 +2977,7 @@ function IDEViewModel() {
       id: 'close-selected-scene',
       label: 'Close Selected Scene',
       keybindings: [
-        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_W,
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyW,
       ],
       precondition: null,
       keybindingContext: null,
@@ -2991,7 +2991,7 @@ function IDEViewModel() {
       id: 'add-new-scene',
       label: 'Add New Scene',
       keybindings: [
-        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_N,
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyN,
       ],
       precondition: null,
       keybindingContext: null,
@@ -3005,7 +3005,7 @@ function IDEViewModel() {
       id: 'save-selected-project',
       label: 'Save Selected Project',
       keybindings: [
-        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S,
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
       ],
       precondition: null,
       keybindingContext: null,
@@ -3019,7 +3019,7 @@ function IDEViewModel() {
       id: 'close-selected-project',
       label: 'Close Selected Project',
       keybindings: [
-        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_W,
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyW,
       ],
       precondition: null,
       keybindingContext: null,
@@ -3033,7 +3033,7 @@ function IDEViewModel() {
       id: 'create-project',
       label: 'Create Project',
       keybindings: [
-        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_N,
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyN,
       ],
       precondition: null,
       keybindingContext: null,
@@ -3115,7 +3115,7 @@ function IDEViewModel() {
       id: 'open-all-scenes',
       label: 'Open All Scenes',
       keybindings: [
-        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_O,
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyO,
       ],
       precondition: null,
       keybindingContext: null,
@@ -3129,7 +3129,7 @@ function IDEViewModel() {
       id: 'open-file-browser',
       label: 'Open File Browser',
       keybindings: [
-        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_O,
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyO,
       ],
       precondition: null,
       keybindingContext: null,
@@ -3143,7 +3143,7 @@ function IDEViewModel() {
       id: 'toggle-bold',
       label: 'Toggle Bold',
       keybindings: [
-        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_B,
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyB,
       ],
       precondition: null,
       keybindingContext: null,
@@ -3156,7 +3156,7 @@ function IDEViewModel() {
       id: 'wrap-variable',
       label: 'Wrap Variable',
       keybindings: [
-        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_D,
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyD,
       ],
       precondition: null,
       keybindingContext: null,
@@ -3169,7 +3169,7 @@ function IDEViewModel() {
       id: 'toggle-italics',
       label: 'Toggle Italics',
       keybindings: [
-        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_I,
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyI,
       ],
       precondition: null,
       keybindingContext: null,
@@ -3195,7 +3195,7 @@ function IDEViewModel() {
       id: 'quicktest',
       label: 'Quicktest Project',
       keybindings: [
-        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_T,
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyT,
       ],
       precondition: null,
       keybindingContext: null,
@@ -3209,7 +3209,7 @@ function IDEViewModel() {
       id: 'randomtest-project',
       label: 'Randomtest Project',
       keybindings: [
-        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_T,
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyT,
       ],
       precondition: null,
       keybindingContext: null,
@@ -3237,7 +3237,7 @@ function IDEViewModel() {
       id: 'toggle-console',
       label: 'Toggle ChoiceScript Console',
       keybindings: [
-        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_C,
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyC,
       ],
       precondition: null,
       keybindingContext: null,
