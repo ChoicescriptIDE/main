@@ -2598,6 +2598,9 @@ function IDEViewModel() {
       err.message = "Dropbox: " + err.error.error_summary;
     }
     switch (err.code) {
+      case 409:
+        if (err.error.error_summary !== "path/not_found/")
+          break;
       case "not_found":
       case "ENOENT":
       case 404:
