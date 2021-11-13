@@ -6323,6 +6323,7 @@ function IDEViewModel() {
 
 window.cside = new IDEViewModel();
 ko.applyBindings(cside, $('.main-wrap')[0]);
+require = amdRequire; // restore for monaco's lazy loading
 amdRequire(['vs/editor/editor.main'], function() {
   window.monaco = monaco;
   cside.init();
