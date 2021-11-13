@@ -138,7 +138,7 @@ function IDEViewModel() {
       normalizePaths: ""
     }); //convert relative paths to direct paths and normalize slashes
     path(projectData.path);
-    var scenes = ko.observableArray([]);
+    var files = ko.observableArray([]);
     var issues = ko.observableArray([]);
     var console_logs = ko.observableArray([])
       .extend({
@@ -172,7 +172,7 @@ function IDEViewModel() {
     self.getPath = ko.computed(function() {
       return path();
     }, this);
-    self.getScenes = scenes;
+    self.getFiles = files;
     self.getIssues = ko.computed(function() {
       return issues();
     }, this);
@@ -207,21 +207,21 @@ function IDEViewModel() {
       return invalidName();
     }, this);
     self.getSearchResults = ko.computed(function() {
-      return ko.utils.arrayMap(scenes(), function(scene) {
-        return scene.getSearchResults();
-      }).filter(function(sceneResults) { return sceneResults.getResults().length > 0; });
+      return ko.utils.arrayMap(files(), function(file) {
+        return file.getSearchResults();
+      }).filter(function(fileResults) { return fileResults.getResults().length > 0; });
     }, this);
-    self.replaceAllScenesSearchResults = function() {
-      var _scenes = scenes();
-      for (var s = 0; s < _scenes.length; s++) {
-        _scenes[s].replaceAllSearchResults();
+    self.replaceAllFilesSearchResults = function() {
+      var _files = files();
+      for (var s = 0; s < _files.length; s++) {
+        _files[s].replaceAllSearchResults();
       }
     }
     self.isDirty = ko.computed(function() {
-      for (var i = 0; i < scenes().length; i++) {
-        if (scenes()[i].isDirty()) {
+      for (var i = 0; i < files().length; i++) {
+        if (files()[i].isDirty()) {
           return true;
-        } else if (i === scenes().length - 1) {
+        } else if (i === files().length - 1) {
           return false;
         }
       }
@@ -229,8 +229,8 @@ function IDEViewModel() {
     self.getWordCount = function() {
       var incCmdWordCount = 0;
       var exCmdWordCount = 0;
-      for (var i = 0; i < scenes().length; i++) {
-        var counts = scenes()[i].getWordCount();
+      for (var i = 0; i < files().length; i++) {
+        var counts = files()[i].getWordCount();
         incCmdWordCount += counts.incmds;
         exCmdWordCount +=counts.excmds;
       }
@@ -238,8 +238,8 @@ function IDEViewModel() {
     }
     self.getCharCount = function() {
       var charCount = 0;
-      for (var i = 0; i < scenes().length; i++) {
-        charCount += scenes()[i].getCharCount();
+      for (var i = 0; i < files().length; i++) {
+        charCount += files()[i].getCharCount();
       }
       return charCount;
     }
@@ -362,23 +362,23 @@ function IDEViewModel() {
         bootbox.confirm(self.getSearchResultDesc() + "<br>Replace them with '" + replaceStr + "'?",
           function(result) {
             if (result) {
-              scenes().forEach(function(scene) { scene.search(searchStr, replaceStr, false /* forceExpand */, curSearchMode); });
+              files().forEach(function(file) { file.search(searchStr, replaceStr, false /* forceExpand */, curSearchMode); });
             }
           }
         );
       }
       else {
-        scenes().forEach(function(scene) {
-          /* Once a Scene's results tab has been manually expanded it is likely that the user wishes to continue to see those results, so we'd rather
-             not have them re-collapse on every re-search. However, there's the issue of performance (and screen estate) when multiple scene's with large
+        files().forEach(function(file) {
+          /* Once a file's results tab has been manually expanded it is likely that the user wishes to continue to see those results, so we'd rather
+             not have them re-collapse on every re-search. However, there's the issue of performance (and screen estate) when multiple file's with large
              result sets are left open.
-             So, what we do here is make the collapse/expand state for each scene remain honoured *up until* it returns 0 results,
+             So, what we do here is make the collapse/expand state for each file remain honoured *up until* it returns 0 results,
              implying that it is no longer relevant.
-             This essentially adds a natural 'reset' that makes sure scenes are re-collapsed scenes over time, rather than expecting the user to close them,
-             whilst still allowing for a user to view result changes in their scenes of interest.
+             This essentially adds a natural 'reset' that makes sure files are re-collapsed over time, rather than expecting the user to close them,
+             whilst still allowing for a user to view result changes in their files of interest.
           */
-          var forceExpand = scene.getSearchResults() && (scene.getSearchResults().keepOpen() && scene.getSearchResults().getLength() > 0);
-          scene.search(searchStr, replaceStr, forceExpand, curSearchMode);
+          var forceExpand = file.getSearchResults() && (file.getSearchResults().keepOpen() && file.getSearchResults().getLength() > 0);
+          file.search(searchStr, replaceStr, forceExpand, curSearchMode);
         });
       }
       return false; // prevent form submission
@@ -390,7 +390,7 @@ function IDEViewModel() {
       return count;
     }
     self.getSearchResultDesc = function() {
-      return ("Found " + self.getSearchResultCount() + " results in " + self.getSearchResults().length + " scene(s).");
+      return ("Found " + self.getSearchResultCount() + " results in " + self.getSearchResults().length + " file(s).");
     }
     self.rename = function(data, event) {
       if (readOnly()) return;
@@ -434,10 +434,10 @@ function IDEViewModel() {
       __closeProject(self);
     }
     self.select = function(callback) {
-      /* select first possible scene */
-      var scene = scenes()[0];
-      if (scene) {
-        scene.viewInEditor(callback);
+      /* select first possible file */
+      var file = files()[0];
+      if (file) {
+        file.viewInEditor(callback);
       } else {
         callback(null);
       }
@@ -445,10 +445,10 @@ function IDEViewModel() {
     self.save = function(cb) {
       if (typeof cb != "function") cb = function() {}; //ui click
       var failed = false;
-      var count = scenes().length;
-      scenes().forEach(function(scene, index) {
+      var count = files().length;
+      files().forEach(function(file, index) {
         if (failed) return;
-        scene.save(null, null, function(err) {
+        file.save(null, null, function(err) {
           if (err) {
             failed = true;
             return cb(err);
@@ -462,44 +462,44 @@ function IDEViewModel() {
       if (event) event.stopPropagation();
       addNewScene(self);
     }
-    self.addScene = function(scene) {
-      if (scene.getProject() !== self && scene.getProject() !== false) return; //invalid call (only at scene creation or via scene.move())
-      scenes.push(scene);
+    self.addFile = function(file) {
+      if (file.getProject() !== self && file.getProject() !== false) return; //invalid call (only at file creation or via file.move())
+      files.push(file);
     }
-    self.removeScene = function(scene) {
-      if (scenes().lastIndexOf(scene) === -1) {
+    self.removeFile = function(file) {
+      if (files().lastIndexOf(file) === -1) {
         return;
       }
-      var editors = scene.getEditors();
+      var editors = file.getEditors();
       for (var i = 0; i < editors.length; i++) {
         editor[i].close();
       }
-      scenes.remove(scene);
-      if (scenes().length < 1) {
+      files.remove(file);
+      if (files().length < 1) {
         projects.remove(self);
       }
     }
-    self.closeScene = function(scene, callback) {
-        function closeScene() {
-          if (activeScene() == scene) {
+    self.closeFile = function(file, callback) {
+        function closeFile() {
+          if (activeFile() == file) {
             cursorPos({lineNumber: 0, column: 0});
             selectedChars(0);
           }
-          self.removeScene(scene);
+          self.removeFile(file);
           __updatePersistenceList();
           if (typeof callback === 'function') callback(true);
         }
-        if (scene.isDirty()) {
-          bootbox.confirm("This scene has unsaved changes, are you sure you wish to close it?", function(result) {
+        if (file.isDirty()) {
+          bootbox.confirm("This file has unsaved changes, are you sure you wish to close it?", function(result) {
             if (result) {
-              closeScene();
+              closeFile();
             } else {
               if (typeof callback === 'function') callback(false);
               return;
             }
           });
         } else {
-          closeScene();
+          closeFile();
         }
       }
     self.subscribeEditor = function(ed) {
@@ -511,7 +511,7 @@ function IDEViewModel() {
       projectEditors.remove(ed);
     }
       /* callback(err, success_boolean) */
-    self.exportScenes = function() {
+    self.exportFiles = function() {
       fh.selectFolder(function(newPath) {
         if (newPath) {
           bootbox.confirm("<h3>Warning</h3><p>This will <b>overwrite</b> any files with the same name in '<i>" + newPath + "</i>'.<br>Are you sure you wish to continue?</p>",
@@ -532,7 +532,7 @@ function IDEViewModel() {
                       note.close();
                     }
                   }]
-                  var n = notification("Game Exported Successfully", "All scenes exported successfully to " + newPath, {
+                  var n = notification("Game Exported Successfully", "All files exported successfully to " + newPath, {
                     type: "success",
                     buttons: buttons
                   });
@@ -563,9 +563,9 @@ function IDEViewModel() {
     self.openAllScenes = function() {
       __openAllProjectScenes(self);
     }
-    self.reloadAllScenes = function() {
-      for (var i = 0; i < scenes().length; i++)
-        scenes()[i].load();
+    self.reloadAllFiles = function() {
+      for (var i = 0; i < files().length; i++)
+        files()[i].load();
     }
     self.logIssue = function(issue) {
       issues.push(issue);
@@ -626,7 +626,7 @@ function IDEViewModel() {
         }}
       });
     var versionId = data.versionId || null; // state of editor when search initiated
-    var scene = data.scene || null;
+    var file = data.file || null;
 
     self.getResults = ko.computed(function() {
       return searchResults();
@@ -641,8 +641,8 @@ function IDEViewModel() {
       var len = self.getLength();
       return len >= 999 ? "999+" : len.toString();
     }
-    self.getScene = function() {
-      return scene;
+    self.getFile = function() {
+      return file;
     }
     self.getVersionId = function() {
       return versionId;
@@ -669,13 +669,13 @@ function IDEViewModel() {
       for (var i = 0, result = descriptiveResults[i]; i < descriptiveResults.length; result = descriptiveResults[++i]) {
         // preceding match
         result.preText = result.range.startColumn > 0 ?
-          scene.getLineContent(result.range.startLineNumber).slice(0, result.range.startColumn-1) : "";
+          file.getLineContent(result.range.startLineNumber).slice(0, result.range.startColumn-1) : "";
           if (result.preText.length > SEARCH_MAX_LINE_LEN)
             result.preText = "…" + result.preText.slice(result.range.startColumn-(SEARCH_MAX_LINE_LEN+1),result.range.startColumn-1);
         // post match
-        var endLineLen = scene.getLineLength(result.range.endLineNumber);
+        var endLineLen = file.getLineLength(result.range.endLineNumber);
         result.postText = result.range.endColumn < endLineLen ?
-          scene.getLineContent(result.range.endLineNumber).slice(result.range.endColumn-1, endLineLen) : "";
+          file.getLineContent(result.range.endLineNumber).slice(result.range.endColumn-1, endLineLen) : "";
         if (result.postText.length > SEARCH_MAX_LINE_LEN)
           result.postText = result.postText.slice(0,SEARCH_MAX_LINE_LEN) + "…";
         // replace text
@@ -686,17 +686,17 @@ function IDEViewModel() {
       searchResults(descriptiveResults);
     }
     // Only (re-)create result descriptions if they're visible.
-    if (scene && expanded) {
+    if (file && expanded) {
       self.createResultDescriptions();
     }
   }
 
-  function CSIDEScene(sceneData) {
+  function CSIDEFile(fileData) {
     var self = this;
     //INSTANCE VARIABLES
     var edModel; // holds the Monaco editor document model
     var _updateModel = function(model) { edModel = model; }
-    var path = ko.observable(__normalizePath(sceneData.path)).extend({
+    var path = ko.observable(__normalizePath(fileData.path)).extend({
       normalizePaths: "",
       callFunc: {
         func: function(newPath) {
@@ -704,7 +704,7 @@ function IDEViewModel() {
           var oldModel = edModel;
           try {
             _updateModel(monaco.editor.createModel(edModel ? edModel.getValue() : "", "choicescript", monaco.Uri.file(newPath)));
-            edModel.csideScene = self;
+            edModel.csideFile = self;
             if (oldModel) oldModel.dispose();
             // update any subscribed editors immediately
             self.getEditors().forEach(function(ed) {
@@ -712,7 +712,7 @@ function IDEViewModel() {
             });
             edModel.onDidChangeContent(updateOnModelEdit);
           } catch (err) {
-            bootbox.alert("Unrecoverable Error: Couldn't update URI for scene.<br><br>" + err.message + ".<br><br> Please restart the application and report this.");
+            bootbox.alert("Unrecoverable Error: Couldn't update URI for file.<br><br>" + err.message + ".<br><br> Please restart the application and report this.");
           }
         }
       }
@@ -722,10 +722,10 @@ function IDEViewModel() {
     });
     name(getFileName(path()));
     var isImportant = name().toUpperCase().match(reservedSceneNames);
-    var source = sceneData.source || platform; //won't change - so doesn't need to be an observable?
+    var source = fileData.source || platform; //won't change - so doesn't need to be an observable?
     var loaded = ko.observable(false);
     var locked = ko.observable(false);
-    var readOnly = ko.observable(sceneData.readOnly || false); //app relative files are always read-only
+    var readOnly = ko.observable(fileData.readOnly || false); //app relative files are always read-only
     var editing = ko.observable(false);
     var colouring = ko.observable(false);
     var saving = ko.observable(false);
@@ -741,39 +741,38 @@ function IDEViewModel() {
       .extend({ callFunc: { func: function(newVal) { edModel.updateOptions({insertSpaces: newVal});}}});
 
     // create initial model
-    edModel = monaco.editor.createModel(sceneData.contents || "", "choicescript", monaco.Uri.file(path()));
+    edModel = monaco.editor.createModel(fileData.contents || "", "choicescript", monaco.Uri.file(path()));
     edModel.onDidChangeContent(updateOnModelEdit);
-    edModel.csideScene = self;
+    edModel.csideFile = self;
 
     // used for dirtyness
     var lastVersionId = edModel.getAlternativeVersionId();
     var dirty = ko.observable(false);
     var editorViewState = null;
     //won't change - so doesn't need to be an observable?
-    var charCount = ko.observable(sceneData.contents ? sceneData.contents.length : 0); //prepopulate otherwise .load() text replacement results in '0' on new startup.txts
+    var charCount = ko.observable(fileData.contents ? fileData.contents.length : 0); //prepopulate otherwise .load() text replacement results in '0' on new startup.txts
     var wordCount = ko.observable({ incmds: 0, excmds: 0 });
-    var fileStats = sceneData.stats || {
+    var fileStats = fileData.stats || {
       "mtime": new Date()
     }; //won't change - so doesn't need to be an observable?
-    var markColour = ko.observable(sceneData.color ? sceneData.color : isImportant ? "#7797ec" : "#777777");
+    var markColour = ko.observable(fileData.color ? fileData.color : isImportant ? "#7797ec" : "#777777");
     markColour.extend({
       callFunc: {
         func: function(newCol) {
-          var colIndex = recentSceneColours().indexOf(newCol);
-          recentSceneColours.unshift(newCol);
+          var colIndex = recentFileColours().indexOf(newCol);
+          recentFileColours.unshift(newCol);
           if (colIndex > -1) {
-            recentSceneColours.splice(++colIndex, 1);
+            recentFileColours.splice(++colIndex, 1);
           } else {
-            recentSceneColours.splice(recentSceneColours().length-1, 1);
+            recentFileColours.splice(recentFileColours().length-1, 1);
           }
           __updatePersistenceList();
         }
       }
     });
-    //var sceneListPosition = ko.observable(self.project().scenes().length);
     var issues = ko.observableArray([]);
     issues.subscribe(function(val) {
-      if (self == activeScene()) {
+      if (self == activeFile()) {
         var ed = self.getEditors()[0];
         __updateEditorDecorations(ed, self);
       }
@@ -782,9 +781,9 @@ function IDEViewModel() {
     var nameErrMsg = ko.observable();
     self.isLocked = ko.computed(function() {
       if (locked()) return true;
-      //is another scene selected but also being 'edited'? If yes, we can't select this scene yet.
-      var curScene = cside.getActiveScene();
-      if (curScene && (curScene.beingEdited() && curScene != self)) return true;
+      //is another file selected but also being 'edited'? If yes, we can't select this file yet.
+      var curFile = cside.getActiveFile();
+      if (curFile && (curFile.beingEdited() && curFile != self)) return true;
       return false;
     }, this);
 
@@ -815,7 +814,7 @@ function IDEViewModel() {
       return editing();
     }, this);
     self.isActive = function() {
-      return activeScene() === self;
+      return activeFile() === self;
     }
     self.beingColoured = ko.computed(function() {
       return colouring();
@@ -829,7 +828,7 @@ function IDEViewModel() {
     self.getEditors = ko.computed(function() {
       if (!self.getProject()) return [];
       return self.getProject().getEditors().filter(function(ed) {
-        return ed.getScene() === self;
+        return ed.getFile() === self;
       });
     }, this);
     self.isSelected = function() {
@@ -847,9 +846,6 @@ function IDEViewModel() {
     self.getNameErrorMsg = ko.computed(function() {
       return nameErrMsg();
     }, this);
-    /* 		self.getIndex = ko.computed(function() {
-    			return sceneListPosition();
-    		}, this); */
     self.getIssues = ko.computed(function() {
       return issues();
     }, this);
@@ -906,7 +902,7 @@ function IDEViewModel() {
       if (typeof value != "string") return;
       edModel.setValue(value);
     }
-    var renameSceneFile = function(newName) {
+    var renameFile = function(newName) {
       if (invalidName())
         return;
       saving(true);
@@ -957,11 +953,11 @@ function IDEViewModel() {
         } else {
           var newName = event.target.value.trim();
           if (newName != name()) {
-            sceneExists(newName, self.getProject(), function(exists) {
+            fileExists(newName, self.getProject(), function(exists) {
               if (!exists) {
-                renameSceneFile(newName);
+                renameFile(newName);
               } else {
-                notification("Failed to Rename Scene", "Scene '" + event.target.value.toLowerCase() + "' already exists in this Project", {
+                notification("Failed to Rename File", "File '" + event.target.value.toLowerCase() + "' already exists in this Project", {
                   type: "error"
                 });
                 event.target.value = name();
@@ -972,7 +968,7 @@ function IDEViewModel() {
         }
       } else if (isImportant) {
         if (isImportant) {
-          notification("", "Reserved scene cannot be renamed", {
+          notification("", "Reserved file cannot be renamed", {
             type: "error",
             layout: "bottomLeft"
           });
@@ -987,7 +983,7 @@ function IDEViewModel() {
         }, 10);
       }
     }
-    self.showColours = function(scene, event) {
+    self.showColours = function(file, event) {
       if (event.type === "mouseleave" && !colouring()) return; // ignore mouseleave after colour select
       colouring(!colouring());
     }
@@ -995,7 +991,7 @@ function IDEViewModel() {
       markColour(colour);
       colouring(false);
     }
-    self.newColour = function(scene, event) {
+    self.newColour = function(file, event) {
       var bcr = event.target.getBoundingClientRect();
       var colSelector = $("#selectColor");
       colSelector.off();
@@ -1015,7 +1011,7 @@ function IDEViewModel() {
     }
     self.showSearchResult = function(index, data) {
       if (searchVersionId != edModel.getAlternativeVersionId()) {
-        notification("Stale Search Results", "This scene has been modified since the last search was performed. Please search again.", {type: 'error'});
+        notification("Stale Search Results", "This file has been modified since the last search was performed. Please search again.", {type: 'error'});
         return;
       }
       self.focusLine(data, true, function(ed) {
@@ -1025,7 +1021,7 @@ function IDEViewModel() {
     self.replaceSearchResult = function(index, data, event) {
       if (event) event.stopPropagation();
       if (searchVersionId != edModel.getAlternativeVersionId()) {
-        notification("Stale Search Results", "This scene has been modified since the last search was performed. Please search again.", {type: 'error'});
+        notification("Stale Search Results", "This file has been modified since the last search was performed. Please search again.", {type: 'error'});
         return;
       }
       self.focusLine(data, true, function(ed) {
@@ -1059,7 +1055,7 @@ function IDEViewModel() {
       var searchStr = document.getElementById("searchBox").value;
       var replaceStr = replaceStr || document.getElementById("replaceBox").value;
       if (uiConfirmation)
-        bootbox.confirm("Replace all matches in this scene?",
+        bootbox.confirm("Replace all matches in this file?",
           function(result) {
             if (result) {
               self.search(searchStr, replaceStr, false /* forceExpand */, SEARCH.MODES.REPLACE);
@@ -1162,9 +1158,9 @@ function IDEViewModel() {
         if (typeof callback != 'undefined') callback(err, self);
       }
     }
-    self.save = function(scene, event, callback) {
+    self.save = function(file, event, callback) {
       if (event) event.stopPropagation();
-      //skip clean, error'd or currently saving scenes
+      //skip clean, error'd or currently saving files
       if ((!dirty() && loaded()) || inErrState() || saving() || locked() || readOnly()) {
         if (typeof callback == 'function') callback(null);
         return;
@@ -1173,8 +1169,8 @@ function IDEViewModel() {
       var lastModifiedAt = fileStats.mtime || fileStats.modifiedAt;
       fh.stat(path(), function(err, newfileStats) {
         if (err && (err.code == 404 || err.code == "ENOENT")) {
-          //new scene, we're cool, bypass:
-          saveScene(callback);
+          //new file, we're cool, bypass:
+          saveFile(callback);
         } else if (err) {
           console.log(err);
           saving(false);
@@ -1204,9 +1200,9 @@ function IDEViewModel() {
                 label: "Reload",
                 callback: function() {
                   saving(false);
-                  self.load(function(err, scene) {
+                  self.load(function(err, file) {
                     if (!err) {
-                      scene.viewInEditor();
+                      file.viewInEditor();
                     }
                   });
 				  return;
@@ -1216,7 +1212,7 @@ function IDEViewModel() {
                 label: "Save",
                 className: "btn-primary",
                 callback: function() {
-                  saveScene(callback);
+                  saveFile(callback);
                 }
               }
             },
@@ -1226,12 +1222,12 @@ function IDEViewModel() {
             }
 	       });
         } else {
-          saveScene(callback);
+          saveFile(callback);
         }
       }
     }
 
-    function saveScene(callback) {
+    function saveFile(callback) {
       var data = edModel.getValue();
       fh.writeFile(path(), data, function(err) {
         finalizeSave(err);
@@ -1251,10 +1247,10 @@ function IDEViewModel() {
     }
     self.viewInEditor = function(callback) {
       self.getProject().makeActive();
-      var sceneEditor = self.getEditors()[0];
-      if (sceneEditor) {
-        sceneEditor.makeActive();
-        if (typeof callback === "function") callback(sceneEditor);
+      var fileEditor = self.getEditors()[0];
+      if (fileEditor) {
+        fileEditor.makeActive();
+        if (typeof callback === "function") callback(fileEditor);
       } else {
         cside.openNewEditor(self, function(ed) {
           ed.makeActive();
@@ -1295,8 +1291,8 @@ function IDEViewModel() {
       locked(false);
       searchVersionId = edModel.getAlternativeVersionId();
       // Continue to signal expansion of any result updates, unless the expansion is due to the collpaseThreshold (rather than user request).
-      var expandSceneResults = forceExpand || (matches.length < SEARCH.CONF.collapseThreshold());
-      searchResults(new CSIDESearchResults({ searchTerm: searchStr, scene: self, versionId: searchVersionId, results: matches, expanded: expandSceneResults, keepOpen: forceExpand }));
+      var expandResults = forceExpand || (matches.length < SEARCH.CONF.collapseThreshold());
+      searchResults(new CSIDESearchResults({ searchTerm: searchStr, file: self, versionId: searchVersionId, results: matches, expanded: expandResults, keepOpen: forceExpand }));
       return searchResults();
     }
     self.close = function() {
@@ -1305,13 +1301,13 @@ function IDEViewModel() {
         ed.close();
       });
       edModel.dispose();
-      self.getProject().closeScene(self);
+      self.getProject().closeFile(self);
     }
     self.copyTo = function(targetProject) {
       if (typeof targetProject !== "object") return;
       if (inErrState() || !loaded() || saving()) return;
       if (targetProject.isReadOnly()) {
-        notification("", "Cannot Move Scene to Read-Only Project", {
+        notification("", "Cannot Move File to Read-Only Project", {
           type: 'error',
           closeWith: ["click"]
         });
@@ -1327,13 +1323,13 @@ function IDEViewModel() {
           bootbox.alert(err.message);
           console.log(err);
         } else {
-          var newScene = new CSIDEScene({
+          var newFile = new CSIDEFile({
             "path": newPath,
             "source": source,
             "contents": edModel.getValue()
           });
-          targetProject.addScene(newScene);
-          newScene.load(); //contains _updatePersistenceList()
+          targetProject.addFile(newFile);
+          newFile.load(); //contains _updatePersistenceList()
         }
       }
     }
@@ -1341,14 +1337,14 @@ function IDEViewModel() {
       if (typeof targetProject !== "object") return;
       if (inErrState() || !loaded() || saving() || readOnly()) return;
       if (isImportant) {
-        notification("", "Cannot Move Reserved Scene", {
+        notification("", "Cannot Move Reserved File", {
           type: 'error',
           closeWith: ["click"]
         });
         return;
       }
       if (targetProject.isReadOnly()) {
-        notification("", "Cannot Move Scene to Read-Only Project", {
+        notification("", "Cannot Move File to Read-Only Project", {
           type: 'error',
           closeWith: ["click"]
         });
@@ -1366,9 +1362,9 @@ function IDEViewModel() {
           bootbox.alert(err.message);
           console.log(err);
         } else {
-          currentProject.removeScene(self);
+          currentProject.removeFile(self);
           path(newPath);
-          targetProject.addScene(self);
+          targetProject.addFile(self);
           __updatePersistenceList();
         }
       }
@@ -1376,13 +1372,13 @@ function IDEViewModel() {
     self.del = function() {
         if (inErrState() || !loaded() || saving()) return;
         if (isImportant) {
-          notification("", "Cannot Delete Reserved Scene", {
+          notification("", "Cannot Delete Reserved File", {
             type: 'error',
             closeWith: ["click"]
           });
           return;
         } else if (readOnly()) {
-          notification("", "Cannot Delete Read-Only Scene", {
+          notification("", "Cannot Delete Read-Only File", {
             type: 'error',
             closeWith: ["click"]
           });
@@ -1429,7 +1425,7 @@ function IDEViewModel() {
     var self = this;
 
     //INSTANCE VARIABLES
-    var scene = issueData.scene || null;
+    var file = issueData.file || null;
     var project = issueData.project || null;
     if (project === null) {
       return null;
@@ -1444,8 +1440,8 @@ function IDEViewModel() {
     time = d.getHours() + ":" + d.getMinutes();
 
     //GETTER METHODS
-    self.getScene = function() {
-      return scene;
+    self.getFile = function() {
+      return file;
     }
     self.getDesc = function() {
       return desc;
@@ -1461,23 +1457,23 @@ function IDEViewModel() {
     };
     self.dismiss = function() {
       project.removeIssue(self);
-      if (scene) {
-        scene.removeIssue(self);
+      if (file) {
+        file.removeIssue(self);
       }
     }
     self.show = function() {
-      if (!scene) {
+      if (!file) {
         return;
       }
       if (typeof self.getLineNum() === "number") {
-        scene.focusLine(self.getLineNum(), true);
+        file.focusLine(self.getLineNum(), true);
       } else {
-        scene.viewInEditor();
+        file.viewInEditor();
       }
     }
 
-    if (scene) {
-      scene.addIssue(self); //register issue with scene
+    if (file) {
+      file.addIssue(self); //register issue with file
     }
   }
 
@@ -1606,7 +1602,7 @@ function IDEViewModel() {
   var MIN_EDITOR_WIDTH = 400; /* (pixels) used to auto-inflate active editor size */
   function CSIDEEditor(data) {
     var self = this;
-    var _scene = ko.observable(data.scene || null);
+    var _file = ko.observable(data.file || null);
     var _cursorPos = ko.observable({lineNumber: 0, column: 0});
     var _selectedChars = ko.observable(0);
     var _editorDOMAnchor = __createEditorAnchor();
@@ -1617,15 +1613,15 @@ function IDEViewModel() {
     }
 
     self.getName = function() {
-      if (!scene()) return "";
-      var editorName = _scene().getName();
+      if (!_file()) return "";
+      var editorName = _file().getName();
       if (_type === "diff") {
         editorName = "Diff: " + editorName;
       }
     }
 
-    self.saveScene = function() {
-      _scene().save();
+    self.saveFile = function() {
+      _file().save();
     }
 
     self.assignAnchor = function(htmlElement) {
@@ -1644,7 +1640,7 @@ function IDEViewModel() {
 
     self.getCharCountString = function() {
       if (!_monacoEditor) return "";
-      var charCount = _scene().getCharCount();
+      var charCount = _file().getCharCount();
       if (_selectedChars() > 0) {
         return charCount + " (" + _selectedChars() + ")";
       }
@@ -1654,7 +1650,7 @@ function IDEViewModel() {
     self.getWordCountString = function() {
       if (!_monacoEditor) return "";
       var excludeCommands = wordCountOn() > 1;
-      var wordCount = _scene().getWordCount()[excludeCommands ? "excmds" : "incmds"];
+      var wordCount = _file().getWordCount()[excludeCommands ? "excmds" : "incmds"];
       var suffix = (excludeCommands) ? " [excl. cmds]" : " [inc. cmds]";
       if (_selectedChars() > 0) {
         var counts = __wordCount(_monacoEditor.getModel().getValueInRange(_monacoEditor.getSelection()));
@@ -1675,25 +1671,25 @@ function IDEViewModel() {
       return _monacoEditor;
     }
 
-    self.getScene = function() {
-      return _scene();
+    self.getFile = function() {
+      return _file();
     }
 
-    self.setScene = function(newScene, diffScene) {
-      var scene = _scene();
-      if (scene !== newScene) {
-        scene.getProject().unsubscribeEditor(self);
-        newScene.getProject().subscribeEditor(self);
-        scene.saveEditorViewState(self);
+    self.setFile = function(newFile, diffFile) {
+      var file = _file();
+      if (file !== newFile) {
+        file.getProject().unsubscribeEditor(self);
+        newFile.getProject().subscribeEditor(self);
+        file.saveEditorViewState(self);
       }
-      newScene.loadEditorViewState(self);
-      _monacoEditor.setModel(newScene.getModel());
-      _scene(newScene);
+      newFile.loadEditorViewState(self);
+      _monacoEditor.setModel(newFile.getModel());
+      _file(newFile);
     }
 
     self.getName = function() {
-      if (_scene())
-        return _scene().getName();
+      if (_file())
+        return _file().getName();
       return "Empty";
     }
 
@@ -1714,9 +1710,9 @@ function IDEViewModel() {
     }
 
     self.close = function() {
-      var scene = _scene();
-      scene.getProject().unsubscribeEditor(self);
-      scene.saveEditorViewState(self);
+      var file = _file();
+      file.getProject().unsubscribeEditor(self);
+      file.saveEditorViewState(self);
       _dispose();
       if (activeEditor() === self) activeEditor(null);
     }
@@ -1724,7 +1720,7 @@ function IDEViewModel() {
     self.makeActive = function() {
       var oldEd = null;
       var activeEditors = activeProject().getEditors();
-      var isNewProject = activeEditor() && (activeEditor().getScene().getProject() !== activeProject());
+      var isNewProject = activeEditor() && (activeEditor().getFile().getProject() !== activeProject());
       /* TODO: Revisit manual resizing.
          For now this is a simple flexbox hack to keep
          the active editor from getting too small.
@@ -1746,7 +1742,7 @@ function IDEViewModel() {
     }
 
     self.getFileStateCSS = function() {
-      if (_scene().isDirty()) {
+      if (_file().isDirty()) {
         return "codicon codicon-circle-outline";
       } else {
         return "codicon codicon-close";
@@ -1811,8 +1807,8 @@ function IDEViewModel() {
     new menuOption("Open all scenes", function(menu) {
       menu.getTarget().openAllScenes();
     }),
-    new menuOption("Reload all scenes", function(menu) {
-      menu.getTarget().reloadAllScenes();
+    new menuOption("Reload all files", function(menu) {
+      menu.getTarget().reloadAllFiles();
     }),
     new menuOption("Review", function(menu) {
       //do nothing
@@ -1824,8 +1820,8 @@ function IDEViewModel() {
     new menuOption("Export", function(menu) {
       //do nothing
     }, [
-      new menuOption("All scenes to folder", function(menu) {
-        menu.getTarget().exportScenes();
+      new menuOption("All files to folder", function(menu) {
+        menu.getTarget().exportFiles();
       })
     ]),
     new menuOption("Open folder in " + (platform === "mac_os" ? "Finder" : "Explorer"), function(menu) {
@@ -1839,7 +1835,7 @@ function IDEViewModel() {
     })
   ]);
 
-  var sceneMenuOptions = ko.observableArray([
+  var fileMenuOptions = ko.observableArray([
     new menuOption("Open", function(menu) {
       //do nothing
     }, [
@@ -1865,19 +1861,19 @@ function IDEViewModel() {
       })
     ]),
     new menuOption("Reload", function(menu) {
-      var scene = menu.getTarget();
-      var callback = function(err, scene) {
-        if (!err && activeScene() === menu.getTarget()) {
-          scene.viewInEditor();
+      var file = menu.getTarget();
+      var callback = function(err, file) {
+        if (!err && activeFile() === menu.getTarget()) {
+          file.viewInEditor();
         }
       }
-      if (scene.isDirty()) {
-        bootbox.confirm("<h3>Warning</h3><p>The scene '" + scene.getName() + "' has unsaved changes. Are you sure you wish to reload it?</p>", function(result) {
+      if (file.isDirty()) {
+        bootbox.confirm("<h3>Warning</h3><p>The file '" + file.getName() + "' has unsaved changes. Are you sure you wish to reload it?</p>", function(result) {
           if (result)
-            scene.load(callback);
+            file.load(callback);
         });
       } else {
-        scene.load(callback);
+        file.load(callback);
       }
     }),
     new menuOption("Close", function(menu) {
@@ -1919,18 +1915,18 @@ function IDEViewModel() {
   ]);
 
   if (usingNode) {
-    sceneMenuOptions.push(
+    fileMenuOptions.push(
       new menuOption("Export", function(menu) {
         //do nothing
       }, [
         new menuOption("Copy file to folder", function(menu) {
-          var scene = menu.getTarget();
+          var file = menu.getTarget();
           fh.selectFolder(function(newPath) {
             if (newPath) {
               bootbox.confirm("<h3>Warning</h3><p>This will <b>overwrite</b> any file with the same name in '<i>" + newPath + "</i>'.<br>Are you sure you wish to continue?</p>",
                 function(result) {
                   if (result) {
-                    fh.copyFile(scene.getPath(), newPath + scene.getName() + ".txt", function(err, data) {
+                    fh.copyFile(file.getPath(), newPath + file.getName() + ".txt", function(err, data) {
                       if (err) {
                         notification("Export Failed", err.message, {
                           type: "error"
@@ -1945,7 +1941,7 @@ function IDEViewModel() {
                             note.close();
                           }
                         }];
-                        note = notification("Export Succesful", "Copied " + scene.getName() + " to " + newPath, {
+                        note = notification("Export Succesful", "Copied " + file.getName() + " to " + newPath, {
                           type: "success",
                           buttons: buttons
                         });
@@ -2018,8 +2014,8 @@ function IDEViewModel() {
   // use in the following definitions (mac menu etc.)
   var activeProject = ko.observable(null);
   var activeEditor = ko.observable(null);
-  var activeScene = ko.computed(function() {
-    return activeEditor() ? activeEditor().getScene() : null;
+  var activeFile = ko.computed(function() {
+    return activeEditor() ? activeEditor().getFile() : null;
   }, this);
 
   self.togglePanel = function(panel, force) {
@@ -2111,18 +2107,18 @@ function IDEViewModel() {
     g_editors.replace(g_editors()[target], cache);*/
   }
 
-  self.openNewEditor = function(scene, callback) {
-    // don't allow multiple editors per scene
-    if (scene.isSelected()) {
-      scene.viewInEditor();
-      if (typeof callback === "function") callback(scene.getEditors()[0]);
+  self.openNewEditor = function(file, callback) {
+    // don't allow multiple editors per file
+    if (file.isSelected()) {
+      file.viewInEditor();
+      if (typeof callback === "function") callback(file.getEditors()[0]);
       return;
     }
-    var ed = new CSIDEEditor({scene: scene});
-    ed.setScene(scene);
-    if (scene.getProject() === activeProject())
+    var ed = new CSIDEEditor({file: file});
+    ed.setFile(file);
+    if (file.getProject() === activeProject())
       ed.show();
-    scene.getProject().subscribeEditor(ed);
+    file.getProject().subscribeEditor(ed);
     if (typeof callback === "function") callback(ed);
   }
 
@@ -2168,35 +2164,35 @@ function IDEViewModel() {
     })();
 
     (function() {
-      var sceneMenu = new nw.Menu();
-      sceneMenu.getTarget = activeScene;
+      var fileMenu = new nw.Menu();
+      fileMenu.getTarget = activeFile;
       var subMenu;
-      var options = sceneMenuOptions();
+      var options = fileMenuOptions();
       for (var i = 0; i < options.length; i++) {
         if (options[i].getSubMenuOptions()) {
           subMenu = new nw.Menu();
           for (var o = 0; o < options[i].getSubMenuOptions().length; o++) {
             subMenu.append(new nw.MenuItem({
               label: options[i].getSubMenuOptions()[o].getLabel(),
-              click: options[i].getSubMenuOptions()[o].doAction.bind(null, sceneMenu)
+              click: options[i].getSubMenuOptions()[o].doAction.bind(null, fileMenu)
             }));
           }
-          sceneMenu.append(new nw.MenuItem({
+          fileMenu.append(new nw.MenuItem({
             label: options[i].getLabel(),
-            click: options[i].doAction.bind(null, sceneMenu),
+            click: options[i].doAction.bind(null, fileMenu),
             submenu: subMenu
           }));
         } else {
-          sceneMenu.append(new nw.MenuItem({
+          fileMenu.append(new nw.MenuItem({
             label: options[i].getLabel(),
-            click: options[i].doAction.bind(null, sceneMenu)
+            click: options[i].doAction.bind(null, fileMenu)
           }));
         }
       }
       var index = ((platform === "mac_os") ? 4 : 2);
       win.menu.insert(new nw.MenuItem({
-        label: "Scene",
-        submenu: sceneMenu
+        label: "File",
+        submenu: fileMenu
       }), index);
     })();
 
@@ -2205,12 +2201,12 @@ function IDEViewModel() {
     }
     else {
       ko.extenders.updateMenuBarStates = function(target, option) {
-        target.subscribe(function(scene) {
-          var b = scene ? true : false;
+        target.subscribe(function(file) {
+          var b = file ? true : false;
           var projectIndex = ((platform === "mac_os") ? 3 : 1);
-          var sceneIndex = ((platform === "mac_os") ? 4 : 2);
+          var fileIndex = ((platform === "mac_os") ? 4 : 2);
           win.menu = nw.Window.get().menu;
-          for (var index = projectIndex; index <= sceneIndex; index++) {
+          for (var index = projectIndex; index <= fileIndex; index++) {
             for (var item = 0; item < win.menu.items[index].submenu.items.length; item++) {
               win.menu.items[index].submenu.items[item].enabled = b;
             }
@@ -2219,13 +2215,13 @@ function IDEViewModel() {
         });
         return target;
       };
-      activeScene.extend({ updateMenuBarStates: "" });
+      activeFile.extend({ updateMenuBarStates: "" });
       activeEditor.valueHasMutated(); //force initialMenubarStates call
     }
   }
 
   var reservedSceneNames = "(STARTUP|CHOICESCRIPT_STATS)"; //Should be in upper case
-  var recentSceneColours = ko.observableArray(["#72c374", "#7797ec", "#d9534f", "#a5937a", "#ff8d2b", "#e079f5", "#00a8c3", "#777777"]);
+  var recentFileColours = ko.observableArray(["#72c374", "#7797ec", "#d9534f", "#a5937a", "#ff8d2b", "#e079f5", "#00a8c3", "#777777"]);
   var uiColour = ko.observable().extend({
     notify: 'always',
     callFunc: { func: function() {
@@ -2684,17 +2680,17 @@ function IDEViewModel() {
     bootbox.dialog({ message: div, closeButton: false, onEscape: true });
   }
 
-  self.promptForSceneIndentation = function() {
+  self.promptForFileIndentation = function() {
     var types = ["Tabs", "Spaces"];
     var docModel = activeEditor().getDocModel();
     if (!docModel) return;
     _bootboxSelect("Select Indentation Unit", types,
       function(unitOpt) {
-        self.getActiveScene().updateUseSpaces(unitOpt === "Spaces");
+        self.getActiveFile().updateUseSpaces(unitOpt === "Spaces");
         var sizes = settings.byId("editor", "tabsize").getOptions().map(function(o) { return o.value; });
         _bootboxSelect("Select Indentation Size", sizes,
           function(sizeOpt) {
-            self.getActiveScene().updateIndentSize(sizeOpt);
+            self.getActiveFile().updateIndentSize(sizeOpt);
             bootbox.hideAll();
           }, docModel.getOptions().tabSize
         );
@@ -2753,14 +2749,14 @@ function IDEViewModel() {
   self.getActiveEditor = ko.computed(function() {
     return activeEditor();
   }, this);
-  self.getActiveScene = ko.computed(function() {
-    return activeScene();
+  self.getActiveFile = ko.computed(function() {
+    return activeFile();
   }, this);
   self.getActiveProject = ko.computed(function() {
     return activeProject();
   }, this);
-  self.getRecentSceneColours = ko.computed(function() {
-    return recentSceneColours();
+  self.getRecentFileColours = ko.computed(function() {
+    return recentFileColours();
   }, this);
   self.getPlatform = function() {
     return platform;
@@ -2807,18 +2803,18 @@ function IDEViewModel() {
   self.readFile = function(url, callback) {
     fh.readFile(url, callback);
   };
-  self.selectSceneClick = function(scene, event) {
+  self.selectFileClick = function(file, event) {
     var aProject = activeProject();
-    var nProject = scene.getProject();
+    var nProject = file.getProject();
     var tProject = (aProject !== nProject) ? nProject : aProject;
-    if (scene.isSelected()) {
-      scene.viewInEditor();
+    if (file.isSelected()) {
+      file.viewInEditor();
     } else if ((tProject.getEditors().length === 1) && !event.shiftKey) {
-      tProject.getEditors()[0].setScene(scene);
-      scene.viewInEditor();
+      tProject.getEditors()[0].setFile(file);
+      file.viewInEditor();
     } else {
-      self.openNewEditor(scene, function(ed) {
-        if (ed) scene.viewInEditor();
+      self.openNewEditor(file, function(ed) {
+        if (ed) file.viewInEditor();
       });
     }
   }
@@ -2901,8 +2897,8 @@ function IDEViewModel() {
     });
 
     editor.addAction({
-      id: 'replace-project-scenes',
-      label: 'Replace in Project Scenes',
+      id: 'replace-project-files',
+      label: 'Replace in Project Files',
       keybindings: [
         monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyR,
       ],
@@ -2919,8 +2915,8 @@ function IDEViewModel() {
     });
 
     editor.addAction({
-      id: 'search-project-scenes',
-      label: 'Search Project Scenes',
+      id: 'search-project-files',
+      label: 'Search Project Files',
       keybindings: [
         monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyF,
       ],
@@ -2937,48 +2933,48 @@ function IDEViewModel() {
     });
 
     editor.addAction({
-      id: 'save-selected-scene',
-      label: 'Save Selected Scene',
+      id: 'save-selected-file',
+      label: 'Save Selected File',
       keybindings: [
         monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
       ],
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        cside.getActiveEditor().saveScene();
+        cside.getActiveEditor().saveFile();
         return null;
       }
     });
 
     editor.addAction({
-      id: 'select-previous-scene',
-      label: 'Select Previous Scene',
+      id: 'select-previous-file',
+      label: 'Select Previous File',
       keybindings: [
         monaco.KeyMod.CtrlCmd | monaco.KeyCode.PageUp,
       ],
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        __cycleSceneSelection(true);
+        __cycleFileSelection(true);
       }
     });
 
     editor.addAction({
-      id: 'select-next-scene',
-      label: 'Select Next Scene',
+      id: 'select-next-file',
+      label: 'Select Next File',
       keybindings: [
         monaco.KeyMod.CtrlCmd | monaco.KeyCode.PageDown,
       ],
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        __cycleSceneSelection(false);
+        __cycleFileSelection(false);
       }
     });
 
     editor.addAction({
-      id: 'close-selected-scene',
-      label: 'Close Selected Scene',
+      id: 'close-selected-file',
+      label: 'Close Selected File',
       keybindings: [
         monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyW,
       ],
@@ -3432,37 +3428,37 @@ function IDEViewModel() {
     }
   }
 
-  function __cycleSceneSelection(direction) {
+  function __cycleFileSelection(direction) {
     // "up" = true / "down" = false
     if (!cside.getActiveProject())
       return;
     var index;
     var currentEditor = cside.getActiveEditor();
-    var currentScene = cside.getActiveScene();
-    var newScene = null;
-    var sceneList = cside.getActiveProject().getScenes();
-    var index = sceneList.indexOf(cside.getActiveScene());
-    if (!currentScene || index < 0)
+    var currentFile = cside.getActiveFile();
+    var newFile = null;
+    var fileList = cside.getActiveProject().getFiles();
+    var index = fileList.indexOf(cside.getActiveFile());
+    if (!currentFile || index < 0)
       return null;
-    while (!newScene && newScene !== currentScene) {
+    while (!newFile && newFile !== currentFile) {
       if (direction) {
         if (index > 0) {
-          newScene = sceneList[--index];
+          newFile = fileList[--index];
         } else {
-          newScene = sceneList[sceneList.length - 1];
-          index = [sceneList.length - 1];
+          newFile = fileList[fileList.length - 1];
+          index = [fileList.length - 1];
         }
       } else {
-        if (index < (sceneList.length - 1)) {
-          newScene = sceneList[++index];
+        if (index < (fileList.length - 1)) {
+          newFile = fileList[++index];
         } else {
-          newScene = sceneList[0];
+          newFile = fileList[0];
           index = 0;
         }
       }
-      if (newScene === currentScene) break;
-      if (newScene.isSelected()) newScene = null;
-      else { currentEditor.setScene(newScene); }
+      if (newFile === currentFile) break;
+      if (newFile.isSelected()) newFile = null;
+      else { currentEditor.setFile(newFile); }
     }
     return null;
   }
@@ -3577,7 +3573,7 @@ function IDEViewModel() {
         "value": true,
         "type": "binary",
         "cat": "editor",
-        "desc": "Underline any misspelt words in the active scene text",
+        "desc": "Underline any misspelt words in active scenes",
         "apply": function(val) {
           // enable/disable editor diagnostics
           var monacoOptions = __getMonacoDiagnosticOptions();
@@ -3645,8 +3641,8 @@ function IDEViewModel() {
         "value": true,
         "type": "binary",
         "cat": "editor",
-        "desc": "Sets the preferred indentation unit to spaces (on) or tabs (off). Note that this will only be applied to newly created scenes. This setting can be overridden per scene.",
-        "apply": function(val) {} // only adjusts value for new scenes
+        "desc": "Sets the preferred indentation unit to spaces (on) or tabs (off). Note that this will only be applied to newly created files. This setting can be overridden per file.",
+        "apply": function(val) {} // only adjusts value for new files
       }),
       new CSIDESetting({
         "id": "tabsize",
@@ -3657,7 +3653,7 @@ function IDEViewModel() {
         "min": 1,
         "max": 12,
         "step": 1,
-        "desc": "Sets the default visual size of tabs. This setting can be overridden per scene.",
+        "desc": "Sets the default visual size of tabs. This setting can be overridden per file.",
         "validate": function(newValue) {
           var message = "Invalid value";
           newValue = parseInt(newValue);
@@ -3673,7 +3669,7 @@ function IDEViewModel() {
           }
           return { valid: valid, message: message }
         },
-        "apply": function(val) {}, // only adjusts value for new scenes
+        "apply": function(val) {}, // only adjusts value for new files
       }),
       new CSIDESetting({
         "id": "indentspaces",
@@ -3684,7 +3680,7 @@ function IDEViewModel() {
         "min": 1,
         "max": 12,
         "step": 1,
-        "desc": "Sets the preferred number of spaces used for indentation. Note that this will only be applied to newly created scenes. This setting can be overridden per scene.",
+        "desc": "Sets the preferred number of spaces used for indentation. Note that this will only be applied to newly created files. This setting can be overridden per file.",
         "validate": function(newValue) {
           var message = "Invalid value";
           newValue = parseInt(newValue);
@@ -3700,7 +3696,7 @@ function IDEViewModel() {
           }
           return { valid: valid, message: message }
         },
-        "apply": function(val) {} // only adjusts value for new scenes
+        "apply": function(val) {} // only adjusts value for new files
       }),
       new CSIDESetting({
         "id": "fontsize",
@@ -3810,7 +3806,7 @@ function IDEViewModel() {
       }),
       new CSIDESetting({
         "id": "autosave",
-        "name": "Autosave Scenes & Projects",
+        "name": "Autosave Files & Projects",
         "value": false,
         "type": "binary",
         "desc": "Save all unsaved changes automatically (every 5 minutes)",
@@ -3836,7 +3832,7 @@ function IDEViewModel() {
         "name": "Persistent Session",
         "value": false,
         "type": "binary",
-        "desc": "Retain open scenes & project data between sessions",
+        "desc": "Retain open file & project data between sessions",
         "apply": function(val) {
           if (val) {
             //self.updatePersistenceList(); causes issues
@@ -4177,11 +4173,11 @@ function IDEViewModel() {
   self.openFileBrowser = function() {
     fh.selectFiles(function(selection) {
       if (selection && selection.length >= 1)
-        __openScenes(selection, true);
+        __openFiles(selection, true);
     });
   }
 
-  function __openScenes(paths, selectLast) {
+  function __openFiles(paths, selectLast) {
     var lastIndex = selectLast ? (paths.length - 1) : paths.length;
     for (var i = 0; i < lastIndex; i++) {
       var ext = getFileExtension(paths[i]);
@@ -4507,9 +4503,9 @@ function IDEViewModel() {
     }
     if (config.settings.app.persist) {
 
-      // load preferred scene colour swatches
+      // load preferred file colour swatches
       if (Array.isArray(config.recentColours) && (config.recentColours.length > 0))
-        recentSceneColours(config.recentColours);
+        recentFileColours(config.recentColours);
 
       var thisProjectData = [];
       for (var i = 0; i < config.openProjects.length; i++) {
@@ -4517,9 +4513,9 @@ function IDEViewModel() {
         var project = new CSIDEProject(thisProjectData);
         __addProject(project);
         for (var n = 0; n < thisProjectData.openScenes.length; n++) {
-          var scene = new CSIDEScene(thisProjectData.openScenes[n]);
-          project.addScene(scene);
-          scene.load();
+          var file = new CSIDEFile(thisProjectData.openScenes[n]);
+          project.addFile(file);
+          file.load();
         }
       }
       // Attempt to restore tab order.
@@ -4670,7 +4666,7 @@ function IDEViewModel() {
       return model;
     }
 
-    // Teach Monaco how to select new Scenes in CSIDE.
+    // Teach Monaco how to select new files in CSIDE.
     monacoEditorInst._codeEditorService.doOpenEditor = function (editor, input) {
       var model = this.findModel(editor, input.resource);
       if (!model) {
@@ -4685,7 +4681,7 @@ function IDEViewModel() {
         return null;
       }
       if (editor.getModel().uri.toString() !== input.resource.toString()) {
-        model.csideScene.viewInEditor(function(ed) {
+        model.csideFile.viewInEditor(function(ed) {
           if (ed) {
             var med = ed.getMonacoEditor();
             ed.waitForRender(function() {
@@ -4730,7 +4726,7 @@ function IDEViewModel() {
         return;
       }
       canvas.getContext('2d').drawImage(image, 0, 0);
-      sceneExists(imgSceneName, project, function(exists) {
+      fileExists(imgSceneName, project, function(exists) {
         if (exists) {
           bootbox.prompt({
             title: "That Image Already Exists - Copy & Paste Code Below",
@@ -4738,7 +4734,7 @@ function IDEViewModel() {
             callback: function(result) {}
           });
         } else {
-          var newScene = new CSIDEScene({
+          var newScene = new CSIDEFile({
             "path": scenePath,
             "source": platform
           });
@@ -4913,7 +4909,7 @@ function IDEViewModel() {
     generateName(sceneName);
 
     function generateName(newName) {
-      sceneExists(newName, project, function(exists) {
+      fileExists(newName, project, function(exists) {
         if (exists) {
           var n = newName.substring(newName.lastIndexOf("_") + 1, newName.length);
           if (isNaN(n)) {
@@ -4924,12 +4920,12 @@ function IDEViewModel() {
           generateName("untitled_" + n);
         } else {
           var scenePath = project.getPath() + newName + '.txt';
-          var newScene = new CSIDEScene({
+          var newScene = new CSIDEFile({
             "path": scenePath,
             "source": platform,
             "readOnly": project.isReadOnly()
           });
-          project.addScene(newScene);
+          project.addFile(newScene);
           newScene.save(null, null, function(err) {
             if (err) {
               bootbox.alert(err.message);
@@ -4989,19 +4985,17 @@ function IDEViewModel() {
       });
       __addProject(project);
       var startupContents = "*title " + projectName + "\n*author " + user.name + "\n*comment your code goes here\n*finish";
-      //var globalContents = "*comment This is a global scene file, any code added to this file will be appended to each and every other file upon project compilation (aside from startup + choicescript_stats)";
       var scenes = blank ? [] : [
-        new CSIDEScene({
+        new CSIDEFile({
           'path': projectPath + 'choicescript_stats.txt',
           'contents': "",
           'source': platform
         }),
-        new CSIDEScene({
+        new CSIDEFile({
           'path': projectPath + 'startup.txt',
           'contents': startupContents,
           'source': platform
         })
-        //new CSIDEScene({'path': projectPath + 'global.txt', 'contents': globalContents, 'source': platform})
       ];
       scenes.forEach(function(scene, index) {
         scene.save(null, null, function(err) {
@@ -5009,7 +5003,7 @@ function IDEViewModel() {
             bootbox.alert(err.message);
             return;
           }
-          project.addScene(scene);
+          project.addFile(scene);
           scene.load(function(err, scene) {
             if (!err && scene.getName() === "startup") {
               scene.viewInEditor();
@@ -5021,13 +5015,13 @@ function IDEViewModel() {
     });
   }
 
-  function __saveSceneTo(scene, callback) {
-    var chooser = $('#saveSceneTo');
-    chooser.attr("nwsaveas", scene.getName() + ".txt."); //default name, no idea why it needs the trailing . but it does
+  function __saveFileTo(file, callback) {
+    var chooser = $('#saveFileTo');
+    chooser.attr("nwsaveas", file.getName() + ".txt."); //default name, no idea why it needs the trailing . but it does
     chooser.off().change(function(evt) {
       var savePath = $(this).val();
       if (!savePath) return;
-      fs.writeFile(savePath, scene.document.getValue(), function(err) {
+      fs.writeFile(savePath, file.document.getValue(), function(err) {
         if (err) {
           bootbox.alert(err.message);
           return;
@@ -5067,18 +5061,18 @@ function IDEViewModel() {
       __addProject(sceneProject);
     }
     else {
-      scene = sceneAlreadyOpen(getFileName(scenePath), sceneProject);
+      scene = fileAlreadyOpen(getFileName(scenePath), sceneProject);
       if (scene) {
         if (callback) callback(null, scene);
         return;
       }
     }
 
-    var newScene = new CSIDEScene({
+    var newScene = new CSIDEFile({
       "path": scenePath,
       "source": platform
     });
-    sceneProject.addScene(newScene);
+    sceneProject.addFile(newScene);
     newScene.load(callback);
   }
 
@@ -5086,9 +5080,9 @@ function IDEViewModel() {
     return el.className && new RegExp("(\\s|^)" + cls + "(\\s|$)").test(el.className);
   }
 
-  function getFileName(scenePath) {
-    var sceneName = getLastDirName(scenePath);
-    return sceneName.substring(0, sceneName.length - getFileExtension(scenePath).length);
+  function getFileName(filePath) {
+    var fileName = getLastDirName(filePath);
+    return fileName.substring(0, fileName.length - getFileExtension(filePath).length);
   }
 
   function getLastDirName(path) {
@@ -5102,8 +5096,8 @@ function IDEViewModel() {
     return path.substring(path.lastIndexOf(divider) + 1, path.length);
   }
 
-  function getFileExtension(scenePath) {
-    return scenePath.substring(scenePath.lastIndexOf("."), scenePath.length);
+  function getFileExtension(filePath) {
+    return filePath.substring(filePath.lastIndexOf("."), filePath.length);
   }
 
   function getProject(projectPath) {
@@ -5115,17 +5109,17 @@ function IDEViewModel() {
     return null; //project doesn't exist
   }
 
-  function getProjectPath(scenePath) {
-    return scenePath.substring(0, scenePath.lastIndexOf("/") + 1);
+  function getProjectPath(filePath) {
+    return filePath.substring(0, filePath.lastIndexOf("/") + 1);
   }
 
-  function sceneAlreadyOpen(sceneName, project) {
-    sceneName = sceneName.toLowerCase();
-    var scenes = project.getScenes();
-    for (var i = 0; i < scenes.length; i++) {
-      if (scenes[i].getName() === sceneName) {
-        return scenes[i];
-      } else if (i === scenes.length - 1) {
+  function fileAlreadyOpen(fileName, project) {
+    fileName = fileName.toLowerCase();
+    var files = project.getFiles();
+    for (var i = 0; i < files.length; i++) {
+      if (files[i].getName() === fileName) {
+        return files[i];
+      } else if (i === files.length - 1) {
         return false;
       }
     }
@@ -5164,11 +5158,11 @@ function IDEViewModel() {
     return str;
   }
 
-  function __updateEditorDecorations(editor, scene, additional) {
+  function __updateEditorDecorations(editor, file, additional) {
     var meditor = editor.getMonacoEditor();
-    var issues = scene.getIssues();
+    var issues = file.getIssues();
     additional = additional || [];
-    scene.decorations = meditor.deltaDecorations(scene.decorations,
+    file.decorations = meditor.deltaDecorations(file.decorations,
       issues.filter(function(issue) { return typeof issue.getLineNum() === "number" })
         .map(function(issue) {
           var col = meditor.getModel().getLineFirstNonWhitespaceColumn(issue.getLineNum());
@@ -5229,7 +5223,7 @@ function IDEViewModel() {
           .map(function(file) {
             return file.path;
           });
-          __openScenes(selection, true);
+          __openFiles(selection, true);
       });
     }
   }
@@ -5246,9 +5240,9 @@ function IDEViewModel() {
     });
   }
 
-  function sceneExists(sceneName, project, callback) {
-    var scenePath = project.getPath() + sceneName + '.txt';
-    fh.stat(scenePath, function(err, stat) {
+  function fileExists(fileName, project, callback) {
+    var filePath = project.getPath() + fileName + '.txt';
+    fh.stat(filePath, function(err, stat) {
       if (err && err.code == 404) {
         callback(false);
       } else if (stat.isRemoved !== 'undefined' && stat.isRemoved == true) {
@@ -5268,9 +5262,9 @@ function IDEViewModel() {
         __getTab("game").href("");
       }
       // copy to avoid mutating array during iteration
-      var scenes = Array.from(project.getScenes());
-      scenes.forEach(function(s) {
-        s.close();
+      var files = Array.from(project.getFiles());
+      files.forEach(function(f) {
+        f.close();
       });
       projects.remove(project);
       __updatePersistenceList();
@@ -5278,7 +5272,7 @@ function IDEViewModel() {
     if (!project.isDirty()) {
       __commitCloseProject();
     } else {
-      bootbox.confirm("This project has unsaved scenes, are you sure you wish to close it?", function(result) {
+      bootbox.confirm("This project has unsaved files, are you sure you wish to close it?", function(result) {
         if (result) {
           __commitCloseProject();
         }
@@ -5341,7 +5335,7 @@ function IDEViewModel() {
       if (err) {
         console.log(err);
       } else {
-        __openScenes(filepaths.filter(function(filepath) {
+        __openFiles(filepaths.filter(function(filepath) {
             return (getFileExtension(filepath) === ".txt" && !filepath.match(CONST_IMG_PREFIX)); //only .txt files, ignore img scenes
           }, false)
           .map(function(filepath) {
@@ -5458,7 +5452,7 @@ function IDEViewModel() {
     }
 
     function addScene(fileName, data) {
-      var scene = new Scene();
+      var scene = new Scene(); // ChoiceScript's 'Scene'
       var sceneName = getFileName(fileName);
       try {
         scene.loadLines(data);
@@ -5476,7 +5470,6 @@ function IDEViewModel() {
             var block_size = 1;
             while (scene.getIndent(scene.lines[lineNum + block_size]) > scene.getIndent(scene.lines[lineNum]))
               block_size++;
-            //Array.prototype.splice.apply(scene.lines, [lineNum, block_size].concat(cse[command[1]].transpile(scene, command[2])));
             changes.push({
               targetLine: lineNum,
               targetLength: block_size,
@@ -5624,12 +5617,12 @@ function IDEViewModel() {
         "openScenes": []
       };
       var thisScene;
-      for (var n = 0; n < projects()[i].getScenes().length; n++) {
+      for (var n = 0; n < projects()[i].getFiles().length; n++) {
         thisScene = {
-          "path": projects()[i].getScenes()[n].getPath(),
-          "source": projects()[i].getScenes()[n].getSource(),
-          //"readOnly": projects()[i].getScenes()[n].isReadOnly(),
-          "color": projects()[i].getScenes()[n].getMarkColour()
+          "path": projects()[i].getFiles()[n].getPath(),
+          "source": projects()[i].getFiles()[n].getSource(),
+          //"readOnly": projects()[i].getFiles()[n].isReadOnly(),
+          "color": projects()[i].getFiles()[n].getMarkColour()
         }
         thisProject.openScenes.push(thisScene);
       }
@@ -5638,8 +5631,8 @@ function IDEViewModel() {
     for (var e = 0; e < self.tabs().length; e++) {
       config.tabs[e] = self.tabs()[e].id;
     }
-    for (var c = 0; c < recentSceneColours().length; c++) {
-      config.recentColours.push(recentSceneColours()[c]);
+    for (var c = 0; c < recentFileColours().length; c++) {
+      config.recentColours.push(recentFileColours()[c]);
     }
     __updateConfig();
   }
@@ -5669,23 +5662,23 @@ function IDEViewModel() {
         }
         break;
       case "focusLine":
-        __openScene(event.data.project.path + event.data.scene.name + ".txt", function(err, scene) {
+        __openScene(event.data.project.path + event.data.file.name + ".txt", function(err, file) {
           if (!err) {
             try {
-              var lineNum = parseInt(event.data.scene.lineNum); scene.focusLine(lineNum);
+              var lineNum = parseInt(event.data.file.lineNum); file.focusLine(lineNum);
             } catch (e) {
-              // no line number, but we can still show the scene
-              scene.viewInEditor();
+              // no line number, but we can still show the file
+              file.viewInEditor();
             }
           }
         });
         break;
       case "logIssue":
-        var issueData = { project: eventProject, scene: null, desc: event.data.error.message, lineNum: event.data.error.lineNumber };
-        if (event.data.scene) {
-          __openScene(event.data.project.path + event.data.scene.name + ".txt", function(err, scene) {
+        var issueData = { project: eventProject, file: null, desc: event.data.error.message, lineNum: event.data.error.lineNumber };
+        if (event.data.file) {
+          __openScene(event.data.project.path + event.data.file.name + ".txt", function(err, file) {
             if (!err) {
-              issueData.scene = scene;
+              issueData.file = file;
               var issue = new CSIDEIssue(issueData);
               issueData.project.logIssue(issue);
             }
@@ -5725,27 +5718,27 @@ function IDEViewModel() {
     arg.targetParent - the destination observableArray
     arg.cancelDrop - this defaults to false and can be set to true to indicate that the drop should be cancelled.
   */
-  function dragSceneEvent(arg, event, ui) {
+  function dragFileEvent(arg, event, ui) {
     if (arg.sourceParent == arg.targetParent)
       return;
 
     var targetProject = ko.dataFor(event.target);
-    var movingScene = arg.item;
+    var movingFile = arg.item;
     arg.cancelDrop = true;
 
     function execute(action) {
-      sceneExists(arg.item.getName(), targetProject, function(exists) {
+      fileExists(arg.item.getName(), targetProject, function(exists) {
         if (exists) {
           $(ui.sender).sortable('cancel');
           arg.cancelDrop = true;
-          bootbox.alert("This project already has a scene by that name.");
+          bootbox.alert("This project already has a file by that name.");
         } else {
           action();
         }
       });
     }
     bootbox.dialog({
-      message: "Would you like to <b>move</b> or <b>copy</b> this scene to this project?",
+      message: "Would you like to <b>move</b> or <b>copy</b> this file to this project?",
       title: "What would you like to do?",
       buttons: {
         copy: {
@@ -5753,7 +5746,7 @@ function IDEViewModel() {
           className: "btn-primary",
           callback: function() {
             execute(function() {
-              movingScene.copyTo(targetProject);
+              movingFile.copyTo(targetProject);
             });
           }
         },
@@ -5761,7 +5754,7 @@ function IDEViewModel() {
           label: "Move",
           callback: function() {
             execute(function() {
-              movingScene.moveTo(targetProject);
+              movingFile.moveTo(targetProject);
             });
           }
         },
@@ -5774,7 +5767,7 @@ function IDEViewModel() {
     });
   }
 
-  self.dragSceneEvent = dragSceneEvent;
+  self.dragFileEvent = dragFileEvent;
 
   ko.bindingHandlers.bindIframe = {
     init: function(element, valueAccessor) {
@@ -5944,7 +5937,7 @@ function IDEViewModel() {
       var loading = ko.observable(false);
       var curPath = ko.observable("");
       var buttonText = ko.observable("Open");
-      var browserTitle = ko.observable("Open scenes");
+      var browserTitle = ko.observable("Open files");
       var stateDesc = ko.observable("");
       var error = ko.observable(false);
       self.getButtonText = ko.computed(function() {
@@ -6089,7 +6082,7 @@ function IDEViewModel() {
           } else {
             self.extensions = [".txt", ".log"];
             buttonText("Open");
-            browserTitle("Open scenes");
+            browserTitle("Open files");
           }
         }
         self.callback = callback;
@@ -6193,12 +6186,12 @@ function IDEViewModel() {
     }
     self.doAction = action;
   }
-  var fileMenuOptions = ko.observableArray([
+  var fileBrowserSceneMenuOptions = ko.observableArray([
     new menuOption("Open Scene", function(menu) {
       menu.getTarget().open();
     })
   ]);
-  var folderMenuOptions = ko.observableArray([
+  var fileBrowserFolderMenuOptions = ko.observableArray([
     new menuOption("Open Folder", function(menu) {
       menu.getTarget().open();
     })
@@ -6247,12 +6240,12 @@ function IDEViewModel() {
         }),
         new toolbarMenu({
           title: "<span title='Scene' class='fa fa-file-text-o'>",
-          active: self.getActiveScene,
+          active: self.getActiveFile,
           options: ko.computed(function() {
-            return (new contextMenu(activeScene(), sceneMenuOptions).getOptions())
+            return (new contextMenu(activeFile(), fileMenuOptions).getOptions())
           }, this),
           target: ko.computed(function() {
-            return activeScene()
+            return activeFile()
           }, this)
         })
       ]
@@ -6272,7 +6265,7 @@ function IDEViewModel() {
     self.getContextMenu = ko.computed(function() {
       return menu();
     }, this);
-    //project & scene context menus
+    //project & file context menus
     $(function() {
       $('#sidebar').contextmenu({
         target: '#context-menu',
@@ -6287,10 +6280,10 @@ function IDEViewModel() {
         target: '#context-menu',
         scopes: '.scene',
         before: function(event, element) {
-          var scene = ko.dataFor(element.get(0));
-          if (scene.getErrState() || !scene.hasLoaded() || scene.isSaving() || scene.isLocked()) //disallow allow context-menus for unloaded scenes etc
+          var file = ko.dataFor(element.get(0));
+          if (file.getErrState() || !file.hasLoaded() || file.isSaving() || file.isLocked()) //disallow allow context-menus for unloaded files etc
             return false;
-          menu(new contextMenu(scene, sceneMenuOptions));
+          menu(new contextMenu(file, fileMenuOptions));
           return true;
         }
       });
@@ -6310,9 +6303,9 @@ function IDEViewModel() {
         before: function(event, element) {
           var fileFolder = ko.dataFor(element.get(0));
           if (fileFolder.isFolder())
-            menu(new contextMenu(fileFolder, folderMenuOptions));
+            menu(new contextMenu(fileFolder, fileBrowserFolderMenuOptions));
           else
-            menu(new contextMenu(fileFolder, fileMenuOptions));
+            menu(new contextMenu(fileFolder, fileBrowserSceneMenuOptions));
           return true;
         }
       });
@@ -6331,4 +6324,3 @@ amdRequire(['vs/editor/editor.main'], function() {
   window.monaco = monaco;
   cside.init();
 });
-//label finding regex: cside.projects()[0].scenes()[0].document.getValue().match(/\^*label.+$/gm,"");

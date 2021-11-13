@@ -106,7 +106,7 @@
                 <div id="sidebar-header" data-bind="style: { backgroundColor: getUIColour(-8) }" class="col-anim">
                     <span id="projects-header-title">Scenes & Projects</span>
                     <button title="Create a new project" class="create-project-btn col-anim" data-bind="click: createProject, style: { backgroundColor: getUIColour(-12) }"><i class="fa fa-plus col-anim"></i></button>
-                    <button title="Open new scene files" class="open-scenes-btn col-anim" data-bind="click: openFileBrowser, style: { backgroundColor: getUIColour(-12) }"><i class="fa fa-folder-open col-anim"></i></button>
+                    <button title="Open new files" class="open-scenes-btn col-anim" data-bind="click: openFileBrowser, style: { backgroundColor: getUIColour(-12) }"><i class="fa fa-folder-open col-anim"></i></button>
                 </div>
                 <ul id="main-project-wrap" data-bind="sortable: { data: getProjects, allowDrop: false, connectClass: 'null', afterMove: cside.updatePersistenceList, options: { axis: 'y', cancel: 'input:not([readonly]), button, .scene', items: '.project-wrapper', containment: $('#main-project-wrap') } }">
                     <li class="project-wrapper">
@@ -118,11 +118,11 @@
                             <button class="run-project-btn col-anim" title="" data-bind="attr: { title: 'Run project ' + getName() }, click: run, clickBubble: false"><i class="fa fa-play"></i></button>
                             <!-- ko ifnot: isReadOnly() -->
                             <button class="add-scene-btn col-anim" data-bind="attr: { title: 'Add a new scene to project ' + getName() }, click: addNewScene, clickBubble: false"><i class="fa fa-plus"></i></button>
-                            <button class="save-project-btn col-anim" data-bind="attr: { title: 'Save all scenes in project ' + getName() }, click: save, clickBubble: false"><i class="fa fa-save"></i></button>
+                            <button class="save-project-btn col-anim" data-bind="attr: { title: 'Save all files in project ' + getName() }, click: save, clickBubble: false"><i class="fa fa-save"></i></button>
                             <!-- /ko -->
                         </div>
-                        <ul class="project" data-bind="fadeAndSlideVisible: isExpanded, css: { 'project-collapsed': isExpanded() != true }, sortable: { data: getScenes, beforeMove: cside.dragSceneEvent, afterMove: cside.updatePersistenceList, options: { axis: 'y', cancel: 'input:not([readonly]), button', items: '.scene', connectWith: '#main-project-wrap > .project-wrapper > .project', placeholder: 'project-hover', containment: $('#main-project-wrap')} }">
-                            <li class="scene" role="button" data-bind="click: getErrState() ? load : $root.selectSceneClick, css: { 'scene-selected':  isSelected() }">
+                        <ul class="project" data-bind="fadeAndSlideVisible: isExpanded, css: { 'project-collapsed': isExpanded() != true }, sortable: { data: getFiles, beforeMove: cside.dragFileEvent, afterMove: cside.updatePersistenceList, options: { axis: 'y', cancel: 'input:not([readonly]), button', items: '.scene', connectWith: '#main-project-wrap > .project-wrapper > .project', placeholder: 'project-hover', containment: $('#main-project-wrap')} }">
+                            <li class="scene" role="button" data-bind="click: getErrState() ? load : $root.selectFileClick, css: { 'scene-selected':  isSelected() }">
                                 <button class="save-scene" data-bind="click: getErrState() ? close : save, clickBubble: false, attr: { title: getErrState() ? getErrStateMsg : isReadOnly() ? 'Read-only' : 'Save ' + getName() + '.txt' }"><i data-bind="css: getState"></i></button>
                                 <button class="colour-marker handle" data-bind="attr: { title: 'Click to colour project ' + getName() }, click: showColours, clickBubble: false, style: { backgroundColor: getMarkColour }"></button>
                                 <!-- <span data-bind="text: getName(), event: { dblclick: rename }, attr: { title: getName }, fadeVisible: beingEdited() ? false : true"></span> -->
@@ -131,7 +131,7 @@
                                     <span data-bind="text: getNameErrorMsg"></span>
                                 </div>
                                 <ul class="colour-picker" id="colour-picker" data-bind="fadeVisible: beingColoured, event: { mouseleave: showColours }">
-                                    <!-- ko foreach: $root.getRecentSceneColours -->
+                                    <!-- ko foreach: $root.getRecentFileColours -->
                                     <li class="colour-selector" role="button" data-bind="style: { backgroundColor: $data }, click: $parent.recolour.bind($data, $data), clickBubble: false"></li>
                                     <!-- /ko -->
                                     <!-- ko if: $root.getPlatform() != "web-dropbox" -->
@@ -153,7 +153,7 @@
                         <li class="editor-tag" data-bind="click: makeActive, attr: { id: 'editor-tag-' + $index(), title: getName() }, style: { backgroundColor: $root.getUIColour(isActive() ? 0 : -8), borderColor: $root.getUIColour(-30) }">
                             <button data-bind="click: close, style: { color: $root.getUIColour(-40) }, attr: { class: getFileStateCSS() }" class="codicon codicon-close" title="Close editor"></button>
                             <span data-bind="text: getName()"></span>
-                            <div class="tag-colour-marker" data-bind="visible: !$root.isPanelOpen.bind(null, 'scene')(), style: { backgroundColor: $data.getScene().getMarkColour }"></div>
+                            <div class="tag-colour-marker" data-bind="visible: !$root.isPanelOpen.bind(null, 'scene')(), style: { backgroundColor: $data.getFile().getMarkColour }"></div>
                         </li>
                     </ul>
                     <!-- /ko -->
@@ -204,10 +204,10 @@
                                     <span>
                                                             Project: <span data-bind='text: $parent.getName' > </span>
                                     </span>
-                                    <!-- ko if: getScene() -->
+                                    <!-- ko if: getFile() -->
                                     <br>
                                     <span>
-                                                                Scene: <span data-bind='text: getScene().getName'></span>
+                                                                Scene: <span data-bind='text: getFile().getName'></span>
                                     </span>
                                     <!-- /ko -->
                                     <br>
@@ -305,9 +305,9 @@
                             <ul id="search-result-scenelist" data-bind="foreach: $root.getActiveProject().getSearchResults()">
                                 <li class="search-result-scene">
                                     <div class="no-select tab-panel-header col-anim" data-bind="style: { backgroundColor: $root.getUIColour(-25) }">
-                                        <button class="search-expand-btn" data-bind="click: $data.expand.bind($root, !$data.isExpanded(), true), css: $data.isExpanded() ? 'fa fa-angle-down' : 'fa fa-angle-right'"></button><span data-bind="text: $data.getScene().getName()"></span>
+                                        <button class="search-expand-btn" data-bind="click: $data.expand.bind($root, !$data.isExpanded(), true), css: $data.isExpanded() ? 'fa fa-angle-down' : 'fa fa-angle-right'"></button><span data-bind="text: $data.getFile().getName()"></span>
                                     <!-- ko if: $root.inReplaceMode() -->
-                                        <button class="btn search-replace-all-btn" data-bind="text: 'Replace All' + ' (' + $data.getLengthString() + ')', style: { backgroundColor: $root.getUIColour() }, click: $data.getScene().replaceAllSearchResults.bind()"></button>
+                                        <button class="btn search-replace-all-btn" data-bind="text: 'Replace All' + ' (' + $data.getLengthString() + ')', style: { backgroundColor: $root.getUIColour() }, click: $data.getFile().replaceAllSearchResults.bind()"></button>
                                     <!-- /ko -->
                                     <!-- ko if: !$root.inReplaceMode() -->
                                         <span class="search-result-badge" data-bind="text: $data.getLengthString(), style: { backgroundColor: $root.getUIColour() }"></span>
@@ -318,9 +318,9 @@
                                         <li class="search-max-length-alert" data-bind="style: { backgroundColor: $root.getUIColour(-80) }"><i class="fa fa-warning"></i>The results for this scene have been truncated to the first 999.</li>
                                         <!-- /ko -->
                                         <!-- ko foreach: $data.getResults -->
-                                            <li data-bind="click: $parent.getScene().showSearchResult.bind($data, $index())" class="search-result-item">
+                                            <li data-bind="click: $parent.getFile().showSearchResult.bind($data, $index())" class="search-result-item">
                                                 <span data-bind="text: ' (Line '+ $data.range.startLineNumber + ')'" class="search-result-line-info"></span>
-                                                <span data-bind="text: $data.preText"></span><span class="search-result-highlight" data-bind="text: $data.matches[0], style: { backgroundColor: $root.getUIColour(0), textDecoration: ($root.inReplaceMode()) ? 'line-through' : 'none' }" style="color: white;"></span><!-- ko if: $root.inReplaceMode() --><span class="search-result-highlight" data-bind="text: $data.replaceText, style: { backgroundColor: $root.getUIColour(20) }"></span><!-- /ko --><span data-bind="text: $data.postText"></span><button data-bind="visible: $root.inReplaceMode(), click: $parent.getScene().replaceSearchResult.bind($data, $index())" class="search-replace-item-btn btn btn-default fa fa-search-minus"></button>
+                                                <span data-bind="text: $data.preText"></span><span class="search-result-highlight" data-bind="text: $data.matches[0], style: { backgroundColor: $root.getUIColour(0), textDecoration: ($root.inReplaceMode()) ? 'line-through' : 'none' }" style="color: white;"></span><!-- ko if: $root.inReplaceMode() --><span class="search-result-highlight" data-bind="text: $data.replaceText, style: { backgroundColor: $root.getUIColour(20) }"></span><!-- /ko --><span data-bind="text: $data.postText"></span><button data-bind="visible: $root.inReplaceMode(), click: $parent.getFile().replaceSearchResult.bind($data, $index())" class="search-replace-item-btn btn btn-default fa fa-search-minus"></button>
                                             </li>
                                         <!-- /ko -->
                                     </ul>
@@ -354,7 +354,7 @@
             <!-- /ko -->
             <div id="monaco-console-input"></div>
         </div>
-        <div id="code-footer" data-bind="if: getActiveEditor() && getActiveScene(), style: { backgroundColor: getUIColour(), borderColor: getUIColour(-30) }">
+        <div id="code-footer" data-bind="if: getActiveEditor() && getActiveFile(), style: { backgroundColor: getUIColour(), borderColor: getUIColour(-30) }">
             <button class="console-btn col-anim" data-bind="click: getActiveProject().toggleConsole">
                     <span class="fa fa-terminal"></span>
                     <span class="console-indicator" data-bind="fadeVisible: getActiveProject() && getActiveProject().getUnreadLogCount(), text: getActiveProject() ? getActiveProject().getUnreadLogCount() : ''" ></span>
@@ -362,7 +362,7 @@
             <span data-bind="text: getActiveEditor().getCursorPositionString()"></span>
             <span data-bind="visible: wordCountOn()">Char Count: <span data-bind="text: getActiveEditor().getCharCountString()"></span></span>
             <span data-bind="visible: wordCountOn()">Word Count: <span data-bind="text: getActiveEditor().getWordCountString()"></span></span>
-            <button title="Change scene indentation" id="scene-indentation-btn" data-bind="event: { mouseover: footerBtnHover, mouseout: footerBtnHover, mousedown: footerBtnHover, mouseup: footerBtnHover }, text: getActiveScene().getIndentDesc(), click: $root.promptForSceneIndentation"></button>
+            <button title="Change scene indentation" id="scene-indentation-btn" data-bind="event: { mouseover: footerBtnHover, mouseout: footerBtnHover, mousedown: footerBtnHover, mouseup: footerBtnHover }, text: getActiveFile().getIndentDesc(), click: $root.promptForFileIndentation"></button>
         </div>
     </div>
 
@@ -370,7 +370,7 @@
     <input style="display:none;" id="selectFolder" type="file" nwdirectory />
     <input style="display:none;" id="getFilePaths" type="file" multiple accept=".txt,.log" />
     <input style="display:none;" id="getImagePaths" type="file" accept=".png,.jpeg,.jpg,.gif" />
-    <input style="display:none;" id="saveSceneTo" type="file" nwsaveas=".txt" />
+    <input style="display:none;" id="saveFileTo" type="file" nwsaveas=".txt" />
     <input style="display:none;" id="selectColor" type="color">
 
     <!-- CSIDE Code -->

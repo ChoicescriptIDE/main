@@ -47,7 +47,7 @@ window.onerror = function(msg, file, line, stack) {
     }
     //window.onerror(e.message, e.fileName, e.lineNumber, e.stack); avoid pop-ups if we can
     e.message.match(/line [0-9]+/) ? e.lineNumber = parseInt(e.message.match(/line ([0-9]+)/)[1]) : e.lineNumber = "undefined"; //attempt to source a line number (!e.lineNumber && e.message.match(/[0-9]+/))
-    cside.parent.postMessage({type: "logIssue", error: e, project: cside.project, scene: { name: stats.sceneName }});
+    cside.parent.postMessage({type: "logIssue", error: e, project: cside.project, file: { name: stats.sceneName }});
   }
 }
 
