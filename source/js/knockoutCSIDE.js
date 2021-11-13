@@ -472,7 +472,7 @@ function IDEViewModel() {
       }
       var editors = file.getEditors();
       for (var i = 0; i < editors.length; i++) {
-        editor[i].close();
+        editors[i].close();
       }
       files.remove(file);
       if (files().length < 1) {
