@@ -460,7 +460,7 @@ function IDEViewModel() {
     self.addNewScene = function(project, event) {
       if (readOnly()) return;
       if (event) event.stopPropagation();
-      addNewScene(self);
+      addNewScene(self, "untitled");
     }
     self.addFile = function(file) {
       if (file.getProject() !== self && file.getProject() !== false) return; //invalid call (only at file creation or via file.move())
@@ -716,11 +716,10 @@ function IDEViewModel() {
         }
       }
     });
-    var name = ko.observable("").extend({
-      lowerCase: ""
-    });
-    name(getFileName(path()));
-    var isImportant = name().toUpperCase().match(reservedSceneNames);
+    self.getName = ko.computed(function() {
+      return getFileName(path());
+    }, this);
+    var isImportant = self.getName().toUpperCase().match(reservedSceneNames);
     var source = fileData.source || platform; //won't change - so doesn't need to be an observable?
     var loaded = ko.observable(false);
     var locked = ko.observable(false);
@@ -788,9 +787,6 @@ function IDEViewModel() {
 
     //GETTER METHODS
     self.decorations = [];
-    self.getName = ko.computed(function() {
-      return name();
-    }, this);
     self.getPath = ko.computed(function() {
       return path();
     }, this);
@@ -905,7 +901,7 @@ function IDEViewModel() {
       if (invalidName())
         return;
       saving(true);
-      var newPath = self.getProject().getPath() + newName + '.txt';
+      var newPath = self.getProject().getPath() + newName;
       fh.renameFile(path(), newPath, function(err) {
         executeRename(err);
       });
@@ -917,14 +913,14 @@ function IDEViewModel() {
         } else {
           fileStats.mtime ? fileStats.mtime = new Date() : fileStats.modifiedAt = new Date();
           path(newPath);
-          name(newName);
           __updatePersistenceList();
         }
       }
     }
     self.nameInterface = ko.pureComputed({
       read: function() {
-        return name();
+        var name = self.getName();
+        return editing() ? name.substring(0, name.length - getFileExtension(name).length) : self.getName();
       },
       write: function(newValue) {
         validName(newValue, false, function(valid, errMsg) {
@@ -942,6 +938,9 @@ function IDEViewModel() {
       if (inErrState() || !loaded() || saving() || readOnly()) {
         return;
       }
+      if (event.type == "blur" && !editing()) {
+        return;
+      }
       if (event.type == "keyup" && (event.keyCode != 13 && event.keyCode != 27)) {
         return;
       }
@@ -950,16 +949,16 @@ function IDEViewModel() {
           $(event.target).fadeOut("fast").fadeIn("fast").focus();
           return;
         } else {
-          var newName = event.target.value.trim();
-          if (newName != name()) {
-            fileExists(newName, self.getProject(), function(exists) {
+          var newName = event.target.value.trim() + getFileExtension(path());
+          if (newName != self.getName()) {
+            pathExists(self.getProject() + newName, function(exists) {
               if (!exists) {
                 renameFile(newName);
               } else {
                 notification("Failed to Rename File", "File '" + event.target.value.toLowerCase() + "' already exists in this Project", {
                   type: "error"
                 });
-                event.target.value = name();
+                event.target.value = self.getName();
               }
             });
           }
@@ -1173,7 +1172,7 @@ function IDEViewModel() {
         } else if (err) {
           console.log(err);
           saving(false);
-          bootbox.alert("<h3>Warning</h3><p>Unable to save <b>" + name() + "</b> of <b>" + self.getProject().getName() + "</b>: " + err.message + ".</p> \
+          bootbox.alert("<h3>Warning</h3><p>Unable to save <b>" + self.getName() + "</b> of <b>" + self.getProject().getName() + "</b>: " + err.message + ".</p> \
 						<p>Check your internet connection.</p>");
         } else {
           checkDate(newfileStats);
@@ -1184,7 +1183,7 @@ function IDEViewModel() {
         var newlyModifiedAt = newfileStats.mtime || newfileStats.modifiedAt;
         if (newlyModifiedAt.getTime() > (lastModifiedAt.getTime() + 1000)) {
           bootbox.dialog({
-            message: "'" + name() + ".txt' of <b>" + self.getProject().getName() + "</b> appears to have been modified by another program or process \
+            message: "'" + self.getName() + ".txt' of <b>" + self.getProject().getName() + "</b> appears to have been modified by another program or process \
 						since it was last saved. Are you sure you wish to save it?",
             title: "Conflict Warning",
             buttons: {
@@ -1312,7 +1311,7 @@ function IDEViewModel() {
         });
         return;
       }
-      var newPath = targetProject.getPath() + name() + '.txt';
+      var newPath = targetProject.getPath() + self.getName();
       fh.copyFile(path(), newPath, function(err, fileStat) {
         executeCopy(err);
       });
@@ -1351,7 +1350,7 @@ function IDEViewModel() {
       }
       var currentProject = self.getProject();
       if (targetProject === currentProject) return;
-      var newPath = targetProject.getPath() + name() + '.txt';
+      var newPath = targetProject.getPath() + self.getName();
       fh.renameFile(path(), newPath, function(err) {
         executeMove(err);
       });
@@ -1383,7 +1382,7 @@ function IDEViewModel() {
           });
           return;
         } else {
-          bootbox.confirm("<h3>Confirm</h3><p>Are you sure you want to permanently delete '" + name() + ".txt'?</p>" + "<p style='font-size:12px;'>" + path() + "<p>",
+          bootbox.confirm("<h3>Confirm</h3><p>Are you sure you want to permanently delete '" + self.getName() + "'?</p>" + "<p style='font-size:12px;'>" + path() + "<p>",
             function(result) {
               if (result) {
                 executeDeletion();
@@ -1807,7 +1806,7 @@ function IDEViewModel() {
 
   var projectMenuOptions = ko.observableArray([
     new menuOption("Add new scene", function(menu) {
-      menu.getTarget().addNewScene();
+      menu.getTarget().addNewScene(menu.getTarget(), "untitled");
     }),
     new menuOption("Open all scenes", function(menu) {
       menu.getTarget().openAllScenes();
@@ -1931,7 +1930,7 @@ function IDEViewModel() {
               bootbox.confirm("<h3>Warning</h3><p>This will <b>overwrite</b> any file with the same name in '<i>" + newPath + "</i>'.<br>Are you sure you wish to continue?</p>",
                 function(result) {
                   if (result) {
-                    fh.copyFile(file.getPath(), newPath + file.getName() + ".txt", function(err, data) {
+                    fh.copyFile(file.getPath(), newPath + file.getName(), function(err, data) {
                       if (err) {
                         notification("Export Failed", err.message, {
                           type: "error"
@@ -2225,7 +2224,7 @@ function IDEViewModel() {
     }
   }
 
-  var reservedSceneNames = "(STARTUP|CHOICESCRIPT_STATS)"; //Should be in upper case
+  var reservedSceneNames = "(STARTUP.TXT|CHOICESCRIPT_STATS.TXT)"; //Should be in upper case
   var recentFileColours = ko.observableArray(["#72c374", "#7797ec", "#d9534f", "#a5937a", "#ff8d2b", "#e079f5", "#00a8c3", "#777777"]);
   var uiColour = ko.observable().extend({
     notify: 'always',
@@ -3000,7 +2999,8 @@ function IDEViewModel() {
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        cside.getActiveProject().addNewScene();
+        var project = cside.getActiveProject();
+        project.addNewScene(project, "untitled");
         return null;
       }
     });
@@ -4731,7 +4731,7 @@ function IDEViewModel() {
         return;
       }
       canvas.getContext('2d').drawImage(image, 0, 0);
-      fileExists(imgSceneName, project, function(exists) {
+      pathExists(project + imgSceneName, function(exists) {
         if (exists) {
           bootbox.prompt({
             title: "That Image Already Exists - Copy & Paste Code Below",
@@ -4909,12 +4909,12 @@ function IDEViewModel() {
   // ╩  ┴└─┴ └┘ ┴ ┴ ┴ └─┘  ╚═╝└─┘└─┘┴  └─┘
 
   function addNewScene(project, name) {
-    if (typeof project !== "object") return;
+    if (!(project instanceof CSIDEProject)) return;
     var sceneName = name || "untitled";
     generateName(sceneName);
 
     function generateName(newName) {
-      fileExists(newName, project, function(exists) {
+      pathExists(project.getPath() + newName + ".txt", function(exists) {
         if (exists) {
           var n = newName.substring(newName.lastIndexOf("_") + 1, newName.length);
           if (isNaN(n)) {
@@ -4922,7 +4922,7 @@ function IDEViewModel() {
           } else {
             n = (parseInt(n) + 1)
           };
-          generateName("untitled_" + n);
+          generateName(sceneName + "_" + n);
         } else {
           var scenePath = project.getPath() + newName + '.txt';
           var newScene = new CSIDEFile({
@@ -5022,7 +5022,7 @@ function IDEViewModel() {
 
   function __saveFileTo(file, callback) {
     var chooser = $('#saveFileTo');
-    chooser.attr("nwsaveas", file.getName() + ".txt."); //default name, no idea why it needs the trailing . but it does
+    chooser.attr("nwsaveas", file.getName());
     chooser.off().change(function(evt) {
       var savePath = $(this).val();
       if (!savePath) return;
@@ -5086,8 +5086,7 @@ function IDEViewModel() {
   }
 
   function getFileName(filePath) {
-    var fileName = getLastDirName(filePath);
-    return fileName.substring(0, fileName.length - getFileExtension(filePath).length);
+    return getLastDirName(filePath);
   }
 
   function getLastDirName(path) {
@@ -5245,8 +5244,7 @@ function IDEViewModel() {
     });
   }
 
-  function fileExists(fileName, project, callback) {
-    var filePath = project.getPath() + fileName + '.txt';
+  function pathExists(filePath, callback) {
     fh.stat(filePath, function(err, stat) {
       if (err && err.code == 404) {
         callback(false);
@@ -5732,7 +5730,7 @@ function IDEViewModel() {
     arg.cancelDrop = true;
 
     function execute(action) {
-      fileExists(arg.item.getName(), targetProject, function(exists) {
+      pathExists(targetProject + arg.item.getName(), function(exists) {
         if (exists) {
           $(ui.sender).sortable('cancel');
           arg.cancelDrop = true;
