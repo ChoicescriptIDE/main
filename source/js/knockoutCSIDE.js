@@ -5456,7 +5456,7 @@ function IDEViewModel() {
 
     function addScene(fileName, data) {
       var scene = new Scene(); // ChoiceScript's 'Scene'
-      var sceneName = getFileName(fileName);
+      var sceneName = fileName.substring(0, (fileName.length - ".txt".length));
       try {
         scene.loadLines(data);
       } catch (err) {
