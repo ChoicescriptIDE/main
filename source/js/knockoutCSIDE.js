@@ -3047,7 +3047,7 @@ function IDEViewModel() {
       id: 'toggle-scene-panel-project',
       label: 'Toggle Scene Panel',
       keybindings: [
-        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.US_COMMA,
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.Comma,
       ],
       precondition: null,
       keybindingContext: null,
@@ -3061,7 +3061,7 @@ function IDEViewModel() {
       id: 'toggle-tab-panel',
       label: 'Toggle Tab Panel',
       keybindings: [
-        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.US_DOT,
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.Period,
       ],
       precondition: null,
       keybindingContext: null,
@@ -3075,7 +3075,7 @@ function IDEViewModel() {
       id: 'increase-font-size',
       label: 'Increase Editor Font Size',
       keybindings: [
-        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.US_EQUAL
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.Equal
       ],
       precondition: null,
       keybindingContext: null,
@@ -3095,7 +3095,7 @@ function IDEViewModel() {
       id: 'decrease-font-size',
       label: 'Decrease Editor Font Size',
       keybindings: [
-        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.US_MINUS
+        monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd | monaco.KeyCode.Minus
       ],
       precondition: null,
       keybindingContext: null,
@@ -3182,7 +3182,7 @@ function IDEViewModel() {
       id: 'toggle-comment',
       label: 'Toggle Comment',
       keybindings: [
-        monaco.KeyMod.CtrlCmd | monaco.KeyCode.US_SLASH,
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.Slash,
       ],
       precondition: null,
       keybindingContext: null,
