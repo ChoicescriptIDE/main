@@ -743,38 +743,12 @@ body.night #left-wrap {
     float: right;
     color: darkgrey;
 }
-
-.tab-panel.search > .tab-panel-header:first-of-type {
-    position: sticky;
-    top: 0px;
-    z-index: 9;
-}
-
-.tab-panel.search #search-controls-wrap {
-    background: #f8f6fb;
-    top: 42px;
-    position: sticky;
-    border-bottom: 1px solid;
-    border-color: inherit;
-}
-
-body.night .tab-panel.search #search-controls-wrap {
-    background-color: #2b2b2b;
-}
-
 .tab-panel.search #search-btn {
     vertical-align: middle;
 }
 
 .tab-panel.search form {
 	padding: 5px;
-}
-
-.tab-panel.search #search-controls {
-    border-color: inherit;
-    display: block;
-    float: right;
-    padding: 5px;
 }
 
 .tab-panel.search #search-result-scenelist {
@@ -793,31 +767,6 @@ body.night .tab-panel.search #search-controls-wrap {
 	height: 20px;
 	border:none;
 	background: none;
-}
-
-.tab-panel.search textarea {
-	margin: 2.5px;
-	margin-top: 0px;
-	width: 50%;
-    height: 34px;
-	padding: 5px;
-    resize: none;
-    vertical-align: middle;
-}
-
-/* Override Monaco's codicon stylings */
-.tab-panel.search .monaco-custom-checkbox {
-    width: 25px;
-    height: 25px;
-    font-size: 20px;
-    color: grey;
-    border-radius: 4px;
-}
-
-.tab-panel.search .monaco-custom-checkbox.checked {
-    color: #d8d6d6;
-    border: 1px solid;
-    border-color: inherit;
 }
 
 .tab-panel.search li > span {
@@ -1101,6 +1050,58 @@ body.night .tab-panel li:nth-child(odd) {
 
 body.night .tab-panel li:nth-child(even) {
     background-color: #2b2b2b;
+}
+
+.tab-panel .search-controls-wrap {
+    background: #f8f6fb;
+    top: 42px;
+    position: sticky;
+    border-bottom: 1px solid;
+    border-color: inherit;
+    padding: 5px;
+    z-index: 9;
+}
+
+body.night .tab-panel .search-controls-wrap {
+    background-color: #2b2b2b;
+}
+
+.tab-panel .search-controls {
+    border-color: inherit;
+    display: block;
+    float: right;
+    padding: 5px;
+}
+
+.tab-panel textarea.search {
+	margin: 2.5px;
+	margin-top: 0px;
+	width: 50%;
+    height: 34px;
+	padding: 5px;
+    resize: none;
+    vertical-align: middle;
+}
+
+/* Override Monaco's codicon stylings */
+.tab-panel .monaco-custom-checkbox.codicon {
+    width: 25px;
+    height: 25px;
+    font-size: 20px;
+    color: grey;
+    border-radius: 4px;
+}
+
+.tab-panel .monaco-custom-checkbox.codicon.checked {
+    color: #d8d6d6;
+    border: 1px solid;
+    border-color: inherit;
+}
+
+.tab-panel.search > .tab-panel-header:first-of-type {
+    position: sticky;
+    top: 0px;
+    z-index: 9;
 }
 
 .save-name {

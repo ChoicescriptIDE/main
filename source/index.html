@@ -15,6 +15,13 @@
 </head>
 
 <body>
+
+    <!-- KO TEMPLATES  -->
+    <script type="text/html" id="template-search-toggles">
+        <div data-bind="style: { backgroundColor: value() ?  $root.getUIColour() : 'transparent' }, attr: { title: title, 'aria-label': title, 'aria-checked': value, class: 'monaco-custom-checkbox codicon ' + cssClass }, css: value() ? 'checked' : 'unchecked', click: value.bind($data, !value())" aria-disabled="false" role="checkbox" tabindex="0"></div>
+    </script>
+    <!-- /KO TEMPLATES-->
+
     <div id="context-menu" data-bind="with: getContextMenu">
         <ul class="dropdown-menu" role="menu" data-bind="foreach: getOptions()">
             <li data-bind="if: typeof getSubMenuOptions() == 'undefined'">
@@ -290,14 +297,12 @@
                             </ul>
                             <!-- /ko -->
                             <!-- ko if: id == 'search' && $root.getActiveProject -->
-                            <div id="search-controls-wrap" role="search">
-                                <div id="search-controls" data-bind="foreach: $root.searchToggles">
-                                    <div data-bind="style: { backgroundColor: value() ?  $root.getUIColour() : 'transparent' }, attr: { title: title, 'aria-label': title, 'aria-checked': value, class: 'monaco-custom-checkbox codicon ' + cssClass }, css: value() ? 'checked' : 'unchecked', click: value.bind($data, !value())" aria-disabled="false" role="checkbox" tabindex="0"></div>
-                                </div>
+                            <div class="search-controls-wrap" role="search">
+                                <div class="search-controls" data-bind="template: { name: 'template-search-toggles', foreach: $root.searchToggles }"></div>
                                 <form data-bind="submit: $root.getActiveProject().search" autocomplete="off">
                                     <button type="button" id="search-mode-btn" data-bind="style: { height: $root.inReplaceMode() ? '75px' : '32px' }, click: $root.toggleSearchMode, css: $root.inReplaceMode() ? 'fa fa-angle-down' : 'fa fa-angle-right'"></button>
-                                    <textarea id="searchBox" spellcheck="false" type="text" placeholder="Search" data-bind="event: { keydown: $root.getActiveProject().searchByEnterKey, keyup: $root.getActiveProject().searchByEnterKey }"></textarea>
-                                    <textarea id="replaceBox" spellcheck="false" type="text" placeholder="Replace" data-bind="visible: $root.inReplaceMode(), event: { keydown: $root.getActiveProject().searchByEnterKey, keyup: $root.getActiveProject().searchByEnterKey }"></textarea>
+                                    <textarea class="search" id="searchBox" spellcheck="false" type="text" placeholder="Search" data-bind="event: { keydown: $root.getActiveProject().searchByEnterKey, keyup: $root.getActiveProject().searchByEnterKey }"></textarea>
+                                    <textarea class="search" id="replaceBox" spellcheck="false" type="text" placeholder="Replace" data-bind="visible: $root.inReplaceMode(), event: { keydown: $root.getActiveProject().searchByEnterKey, keyup: $root.getActiveProject().searchByEnterKey }"></textarea>
                                     <button class="btn btn-default" id="search-btn" data-bind="text: $root.inReplaceMode() ? 'Replace' : 'Search'"></button>
                                 </form>
                                 <p data-bind="text: $root.getActiveProject().getSearchResultDesc()" style="margin-bottom: 0;"></p>
