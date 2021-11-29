@@ -106,6 +106,11 @@ function IDEViewModel() {
     __checkRender();
   }
 
+  function __elementIsInView(element) {
+    var rect = element.getBoundingClientRect();
+    return rect.top >= 0 && rect.bottom <= window.innerHeight;
+  }
+
   // Limit execution of a given function to every *limit* milliseconds
   // inspired by: https://davidwalsh.name/javascript-debounce-function
   function __limitExecution(func, limit) {
@@ -5887,6 +5892,14 @@ function IDEViewModel() {
         queue: false,
         duration: 350
       });
+    }
+  };
+  ko.bindingHandlers.autoScroll = {
+    update: function (element, valueAccessor) {
+      var value = valueAccessor();
+      if (ko.unwrap(value) && !__elementIsInView(element)) {
+        element.scrollIntoView(false /* alignToTop */);
+      }
     }
   };
   ko.bindingHandlers.initFiles = {
