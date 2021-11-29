@@ -5548,29 +5548,42 @@ function IDEViewModel() {
   }
 
   function __fullCompile(project, path) {
+    function _compileFailed(message) {
+      notification("Game Export Failed", message, {
+        type: "error"
+      });
+    }
     __shortCompile(project, function(err, allScenes) {
-      fh.readFile("compile_head.txt", function(err, headContents) {
-        fh.readFile("compile_tail.txt", function(err, tailContents) {
-          fh.writeFile(path + project.getName() + ".html", headContents + "<script>allScenes = " + JSON.stringify(allScenes) + "</script>" + tailContents, function(err) {
-            if (err) {
-              throw new Error("Export failed!");
-            } else {
-              var buttons = [{
-                addClass: 'btn',
-                text: 'Show Folder',
-                onClick: function(note) {
-                  __openFolder(path);
-                  note.close();
+      var cwd = process.cwd();
+      fh.readFile(cwd + "/compile_head.txt", function(err, headContents) {
+        if (!err) {
+          fh.readFile(cwd + "/compile_tail.txt", function(err, tailContents) {
+            if (!err) {
+              fh.writeFile(path + project.getName() + ".html", headContents + "<script>allScenes = " + JSON.stringify(allScenes) + "</script>" + tailContents, function(err) {
+                if (err) {
+                  _compileFailed("Couldn't write html file");
+                } else {
+                  var n = notification("Game Exported Successfully", project.getName(), {
+                    type: "success",
+                    buttons: [{
+                      addClass: 'btn',
+                      text: 'Show Folder',
+                      onClick: function(note) {
+                        __openFolder(path);
+                        note.close();
+                      }
+                    }]
+                  });
+                  n.setTimeout(10000);
                 }
-              }]
-              var n = notification("Game Exported Successfully", project.getName(), {
-                type: "success",
-                buttons: buttons
               });
-              n.setTimeout(10000);
+            } else {
+              _compileFailed("Couldn't read compile_tail.txt");
             }
           });
-        });
+        } else {
+          _compileFailed("Couldn't read compile_head.txt");
+        }
       });
     });
   }
