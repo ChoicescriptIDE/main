@@ -2,18 +2,13 @@
 This repository contains the main source code for the ChoiceScript IDE.
 
 ## Status
-Overview of the health of the many components that make up the ChoiceScript IDE.
-| Component | upstream-merge | build + test |
+Overview of the health of the components that make up the ChoiceScript IDE.
+| Component | upstream-merge | build / test |
 |-----------|----------------|--------|
-| [ChoiceScript](https://github.com/ChoicescriptIDE/choicescript) | ![merge-upstream](https://github.com/ChoicescriptIDE/choicescript/workflows/merge-upstream/badge.svg)                       | ![test](https://github.com/ChoicescriptIDE/choicescript/workflows/test/badge.svg) |
-| [monaco-choicescript](https://github.com/ChoicescriptIDE/monaco-choicescript) | ![merge-upstream](https://github.com/ChoicescriptIDE/monaco-choicescript/workflows/merge-upstream/badge.svg)        | ![build](https://github.com/ChoicescriptIDE/monaco-choicescript/workflows/build/badge.svg) |
-| [vscode-choicescript-languageservice](https://github.com/ChoicescriptIDE/vscode-choicescript-languageservice) | ![merge-upstream](https://github.com/ChoicescriptIDE/vscode-choicescript-languageservice/workflows/merge-upstream/badge.svg) | ![test](https://github.com/ChoicescriptIDE/vscode-choicescript-languageservice/workflows/test/badge.svg) |
-| [monaco-json](https://github.com/ChoicescriptIDE/monaco-json) | ![merge-upstream](https://github.com/ChoicescriptIDE/monaco-json/workflows/merge-upstream/badge.svg)                | ![build](https://github.com/ChoicescriptIDE/monaco-json/workflows/build/badge.svg) |
-| [vscode-json-languageservice](https://github.com/ChoicescriptIDE/vscode-json-languageservice) | ![merge-upstream](https://github.com/ChoicescriptIDE/vscode-json-languageservice/workflows/merge-upstream/badge.svg)| ![test](https://github.com/ChoicescriptIDE/vscode-json-languageservice/workflows/test/badge.svg) |
-| [monaco-languages](https://github.com/ChoicescriptIDE/monaco-languages) | ![merge-upstream](https://github.com/ChoicescriptIDE/monaco-languages/workflows/merge-upstream/badge.svg)  | ![test](https://github.com/ChoicescriptIDE/monaco-languages/workflows/test/badge.svg) |
-| [monaco-editor](https://github.com/ChoicescriptIDE/monaco-editor) | ![merge-upstream](https://github.com/ChoicescriptIDE/monaco-editor/workflows/merge-upstream/badge.svg)              | ![build](https://github.com/ChoicescriptIDE/monaco-editor/workflows/build/badge.svg) ![Upstream Editor CI](https://github.com/ChoicescriptIDE/monaco-editor/workflows/Upstream%20Editor%20CI/badge.svg) |
 | CSIDE/main                          | N/A              | ![build](https://github.com/ChoicescriptIDE/main/workflows/build/badge.svg) |
-
+| [ChoiceScript](https://github.com/ChoicescriptIDE/choicescript)                                               | [![merge-upstream](https://github.com/ChoicescriptIDE/choicescript/actions/workflows/merge-upstream.yml/badge.svg)](https://github.com/ChoicescriptIDE/choicescript/actions/workflows/merge-upstream.yml)   | [![test](https://github.com/ChoicescriptIDE/choicescript/actions/workflows/test.yml/badge.svg)](https://github.com/ChoicescriptIDE/choicescript/actions/workflows/test.yml) |
+| [monaco-editor](https://github.com/ChoicescriptIDE/monaco-editor)                                             | [![merge-upstream](https://github.com/ChoicescriptIDE/monaco-editor/actions/workflows/merge-upstream.yml/badge.svg)](https://github.com/ChoicescriptIDE/monaco-editor/actions/workflows/merge-upstream.yml) | [![CI](https://github.com/ChoicescriptIDE/monaco-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/ChoicescriptIDE/monaco-editor/actions/workflows/ci.yml)     |
+| [vscode-choicescript-languageservice](https://github.com/ChoicescriptIDE/vscode-choicescript-languageservice) |                                                                                           N/A                                                                                                               | [![test](https://github.com/ChoicescriptIDE/vscode-choicescript-languageservice/actions/workflows/test.yml/badge.svg)](https://github.com/ChoicescriptIDE/vscode-choicescript-languageservice/actions/workflows/test.yml) |
 ## Building
 
 ### Prerequisites
