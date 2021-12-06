@@ -462,10 +462,10 @@ function IDEViewModel() {
         });
       });
     }
-    self.addNewScene = function(project, event) {
+    self.addNewFile = function(project, event) {
       if (readOnly()) return;
       if (event) event.stopPropagation();
-      addNewScene(self, "untitled");
+      addNewFile(self, "untitled");
     }
     self.addFile = function(file) {
       if (file.getProject() !== self && file.getProject() !== false) return; //invalid call (only at file creation or via file.move())
@@ -1811,7 +1811,7 @@ function IDEViewModel() {
 
   var projectMenuOptions = ko.observableArray([
     new menuOption("Add new scene", function(menu) {
-      menu.getTarget().addNewScene(menu.getTarget(), "untitled");
+      menu.getTarget().addNewFile(menu.getTarget(), "untitled");
     }),
     new menuOption("Open all scenes", function(menu) {
       menu.getTarget().openAllScenes();
@@ -3009,7 +3009,7 @@ function IDEViewModel() {
       keybindingContext: null,
       run: function(ed) {
         var project = cside.getActiveProject();
-        project.addNewScene(project, "untitled");
+        project.addNewFile(project, "untitled");
         return null;
       }
     });
@@ -4946,13 +4946,14 @@ function IDEViewModel() {
   // ╠═╝├┬┘│└┐┌┘├─┤ │ ├┤   ╚═╗│  │ │├─┘├┤
   // ╩  ┴└─┴ └┘ ┴ ┴ ┴ └─┘  ╚═╝└─┘└─┘┴  └─┘
 
-  function addNewScene(project, name) {
+  function addNewFile(project, name, options) {
     if (!(project instanceof CSIDEProject)) return;
-    var sceneName = name || "untitled";
-    generateName(sceneName);
+    var fileName = name || "untitled";
+    var ext = options && options.fileExt ? options.fileExt : ".txt";
+    generateName(fileName);
 
     function generateName(newName) {
-      pathExists(project.getPath() + newName + ".txt", function(exists) {
+      pathExists(project.getPath() + newName + ext, function(exists) {
         if (exists) {
           var n = newName.substring(newName.lastIndexOf("_") + 1, newName.length);
           if (isNaN(n)) {
@@ -4960,21 +4961,21 @@ function IDEViewModel() {
           } else {
             n = (parseInt(n) + 1)
           };
-          generateName(sceneName + "_" + n);
+          generateName(fileName + "_" + n);
         } else {
-          var scenePath = project.getPath() + newName + '.txt';
-          var newScene = new CSIDEFile({
-            "path": scenePath,
+          var filePath = project.getPath() + newName + ext;
+          var newFile = new CSIDEFile(Object.assign({
+            "path": filePath,
             "source": platform,
             "readOnly": project.isReadOnly()
-          });
-          project.addFile(newScene);
-          newScene.save(null, null, function(err) {
+          }, options || {}));
+          project.addFile(newFile);
+          newFile.save(null, null, function(err) {
             if (err) {
               bootbox.alert(err.message);
             } else {
-              newScene.load(function(err, scene) {
-                if (!err) scene.viewInEditor();
+              newFile.load(function(err, file) {
+                if (!err) file.viewInEditor();
               });
             }
           });
