@@ -5399,8 +5399,10 @@ function IDEViewModel() {
   }
 
   function __runProject(project) {
-    mediaServer.setDir(project.getPath());
-    document.getElementById("game-tab-frame").terminate();
+    if (platform != "web-dropbox") {
+      mediaServer.setDir(project.getPath());
+      document.getElementById("game-tab-frame").terminate();
+    }
     __shortCompile(project, function(err, allScenes) {
       if (err) {
         bootbox.alert("<h3>Compilation Error</h3>" + err.message);
@@ -5434,7 +5436,7 @@ function IDEViewModel() {
               allScenes: allScenes,
               project: { path: project.getPath(), name: project.getName() },
               platform: platform,
-              server: mediaServer.getAddr(),
+              server: platform != "web-dropbox" ? mediaServer.getAddr() : null,
               allowScript: (platform !== "web-dropbox") && settings.byId("app", "allowscript").getValue(),
             }
           );
