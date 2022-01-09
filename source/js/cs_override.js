@@ -60,7 +60,17 @@ window.onerror = function(msg, file, line, stack) {
 //make image's sourced from the project directory
 function printImage(source, alignment, alt, invert) {
   var img = document.createElement("img");
-  img.src = source.match("data:image") ? source : "file://" + thisProject.getPath() + source; //interal image, don't add directory
+  if (parent && parent.cside && parent.cside.getPlatform() === "web-dropbox") {
+    parent.cside.getDropboxImageUrl("/" + source, function(err, path) {
+      if (!err)  {
+        img.src = path;
+      } else {
+        throw new Error(err.message);
+      }
+    });
+  } else {
+    img.src = source.match("data:image") ? source : cside.server + source; //interal image, don't add directory
+  }
   if (alt !== null && String(alt).length > 0) img.setAttribute("alt", alt);
   if (invert) {
     setClass(img, "invert align"+alignment);

@@ -1578,6 +1578,27 @@ function IDEViewModel() {
           });
       }
     },
+    "getDropboxImageUrl": function(path, callback) {
+      // Dropbox Only
+      switch (platform) {
+        case "web-dropbox":
+          db.filesDownload({path:path})
+            .then(function(response) {
+              try {
+                var url = window.URL.createObjectURL(response.fileBlob);
+                callback(null, url);
+              } catch (err) {
+                callback(normalizeError(err));
+              }
+            })
+          .catch(function(err) {
+            callback(normalizeError(err));
+          });
+          break;
+        default:
+          throw new Error("getDropboxImageUrl is a Dropbox only method!");
+      }
+    },
     "readFile": function(path, callback) {
       switch (platform) {
         //WRITE
@@ -1966,6 +1987,24 @@ function IDEViewModel() {
   };
   self.selectScene = function(scene) {
     scene.select();
+  }
+  self.getDropboxImageUrl = function(url, callback) {
+    fh.getDropboxImageUrl(url, callback);
+  };
+  self.selectFileClick = function(file, event) {
+    var aProject = activeProject();
+    var nProject = file.getProject();
+    var tProject = (aProject !== nProject) ? nProject : aProject;
+    if (file.isSelected()) {
+      file.viewInEditor();
+    } else if ((tProject.getEditors().length === 1) && !event.shiftKey) {
+      tProject.getEditors()[0].setFile(file);
+      file.viewInEditor();
+    } else {
+      self.openNewEditor(file, function(ed) {
+        if (ed) file.viewInEditor();
+      });
+    }
   }
   self.session = {
     "save": function(cb) {
