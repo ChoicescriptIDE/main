@@ -54,8 +54,8 @@ window.onerror = function(msg, file, line, stack) {
 //make image's sourced from the project directory
 function printImage(source, alignment, alt, invert) {
   var img = document.createElement("img");
-  if (parent && parent.cside && parent.cside.getPlatform() === "web-dropbox") {
-    parent.cside.getDropboxImageUrl("/" + source, function(err, path) {
+  if (scope.cside.getPlatform() === "web-dropbox") {
+    scope.cside.getDropboxImageUrl("/" + source, function(err, path) {
       if (!err)  {
         img.src = path;
       } else {
