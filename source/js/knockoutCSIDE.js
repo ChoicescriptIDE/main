@@ -2357,6 +2357,27 @@ function IDEViewModel() {
           });
       }
     },
+    "getDropboxImageUrl": function(path, callback) {
+      // Dropbox Only
+      switch (platform) {
+        case "web-dropbox":
+          db.filesDownload({path:path})
+            .then(function(response) {
+              try {
+                var url = window.URL.createObjectURL(response.fileBlob);
+                callback(null, url);
+              } catch (err) {
+                callback(normalizeError(err));
+              }
+            })
+          .catch(function(err) {
+            callback(normalizeError(err));
+          });
+          break;
+        default:
+          throw new Error("getDropboxImageUrl is a Dropbox only method!");
+      }
+    },
     "readFile": function(path, callback) {
       switch (platform) {
         //WRITE
@@ -2815,6 +2836,9 @@ function IDEViewModel() {
   //MISC METHODS
   self.readFile = function(url, callback) {
     fh.readFile(url, callback);
+  };
+  self.getDropboxImageUrl = function(url, callback) {
+    fh.getDropboxImageUrl(url, callback);
   };
   self.selectFileClick = function(file, event) {
     var aProject = activeProject();
