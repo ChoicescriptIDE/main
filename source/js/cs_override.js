@@ -55,10 +55,11 @@ window.onerror = function(msg, file, line, stack) {
 function printImage(source, alignment, alt, invert) {
   var img = document.createElement("img");
   if (scope.cside.getPlatform() === "web-dropbox") {
-    scope.cside.getDropboxImageUrl("/" + source, function(err, path) {
+    scope.cside.getDropboxImageUrl(thisProject.getPath()  + source, function(err, path) {
       if (!err)  {
         img.src = path;
       } else {
+        img.src = thisProject.getPath() + source;
         throw new Error(err.message);
       }
     });
