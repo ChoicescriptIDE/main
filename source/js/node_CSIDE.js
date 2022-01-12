@@ -26,7 +26,7 @@ if (usingNode) {
     if (!url.indexOf("https://choicescriptdev.wikia.com")) {
       policy.ignore();
     }
-    require('nw.gui').Shell.openExternal(url);
+    gui.Shell.openExternal(url);
     policy.ignore();
     return;
 	});
