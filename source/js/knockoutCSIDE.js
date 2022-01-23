@@ -5052,7 +5052,12 @@ function IDEViewModel() {
         'source': platform
       });
       __addProject(project);
-      var startupContents = "*title " + projectName + "\n*author " + user.name + "\n*comment your code goes here\n*finish";
+      var startupContents =
+        "*title " + projectName +
+        "\n*author " + user.name +
+        "\n*ifid " + uuidv4() +
+        "\n*comment your code goes here" +
+        "\n*finish\n";
       var scenes = blank ? [] : [
         new CSIDEFile({
           'path': projectPath + 'choicescript_stats.txt',
