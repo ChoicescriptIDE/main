@@ -147,6 +147,8 @@ module.exports = function(grunt) {
           "source/lib/bootstrap/bootstrap.min.js",
           "source/lib/bootstrap/bootstrap-contextmenu.js",
 
+          "source/lib/uuid/uuidv4.min.js",
+
           "node_modules/dropbox/dist/Dropbox-sdk.min.js",
 
           "node_modules/mousetrap/mousetrap.min.js",

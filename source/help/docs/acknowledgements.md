@@ -47,3 +47,4 @@ The CSIDE Team!
 <p><a rel="external" href="https://www.mkdocs.org">mkdocs</a></p>
 <p><a rel="external" href="https://squidfunk.github.io/mkdocs-material">mkdocs-material</a></p>
 <p><a rel="external" href="https://github.com/wilhelmer/mkdocs-localsearch">mkdocs-localsearch</a></p>
+<p><a rel="external" href="https://github.com/uuidjs/uuid">uuid</a></p>
