@@ -15,6 +15,7 @@ if (typeof nw === "object") {
   window.usingNode = true;
   //load our modules:
   var fs = require('fs');
+  var cp = require('child_process');
   var mkdirp = require('mkdirp');
   var trash = require('trash');
   var getDirName = require('path').dirname;
@@ -5880,43 +5881,36 @@ function IDEViewModel() {
   }
 
   function __fullCompile(project, path) {
-    function _compileFailed(message) {
-      notification("Game Export Failed", message, {
-        type: "error"
-      });
-    }
-    __shortCompile(project, function(err, allScenes) {
-      var cwd = process.cwd();
-      fh.readFile(cwd + "/compile_head.txt", function(err, headContents) {
-        if (!err) {
-          fh.readFile(cwd + "/compile_tail.txt", function(err, tailContents) {
-            if (!err) {
-              fh.writeFile(path + project.getName() + ".html", headContents + "<script>allScenes = " + JSON.stringify(allScenes) + "</script>" + tailContents, function(err) {
-                if (err) {
-                  _compileFailed("Couldn't write html file");
-                } else {
-                  var n = notification("Game Exported Successfully", project.getName(), {
-                    type: "success",
-                    buttons: [{
-                      addClass: 'btn',
-                      text: 'Show Folder',
-                      onClick: function(note) {
-                        __openFolder(path);
-                        note.close();
-                      }
-                    }]
-                  });
-                  n.setTimeout(10000);
-                }
-              });
-            } else {
-              _compileFailed("Couldn't read compile_tail.txt");
-            }
+    var compile_process = cp.fork("compile.js", [path + project.getName() + ".html", "web/", project.getPath()], {
+      cwd: "node_modules/cside-choicescript/"
+    });
+    var status = notification("Exporting Game", "Do not close the program", { progress: true, closeWith: false, timeout: false });
+
+    compile_process.on("message", function(log) {
+      if (log.type === "progress") {
+        status.setProgress(log.value);
+      } else if (log.type === "exitCode") {
+        if (log.value === 0) {
+          var n = notification("Game Exported Successfully", project.getName(), {
+            type: "success",
+            buttons: [{
+              addClass: 'btn',
+              text: 'Show Folder',
+              onClick: function(note) {
+                __openFolder(path);
+                note.close();
+              }
+            }]
           });
-        } else {
-          _compileFailed("Couldn't read compile_head.txt");
         }
-      });
+      } else if (log.type === "error") {
+        notification("Game Export Failed", log.value, {
+          type: "error"
+        });
+      }
+    });
+    compile_process.on('disconnect', function() {
+      status.close();
     });
   }
 
