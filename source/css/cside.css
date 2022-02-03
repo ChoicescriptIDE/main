@@ -684,8 +684,16 @@ body.night #left-wrap {
         border-color: inherit;
 }
 
-.editor-tag button.codicon:hover::before {
+.editor-tag button.codicon-circle-outline:hover::before {
     content: '\ea76';
+}
+
+.editor-tag button.codicon-pinned {
+    transition: transform linear .2s;
+}
+
+.editor-tag button.codicon-pinned:hover {
+    transform: translateY(-2.5px);
 }
 
 #editor-tab-list>li:first-child{

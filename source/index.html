@@ -162,8 +162,9 @@
                 <div id="editor-tab-list-event-wrapper">
                     <!-- ko if: $root.getActiveProject -->
                     <ul id="editor-tab-list" data-bind="sortable: { data: $root.getActiveProject().getEditors || [], beforeMove: $root.moveEditor, options: { axis: 'x', items: 'li', helper: 'clone' , containment: $('#editor-tab-list'), tolerance: 'pointer' } }">
-                        <li class="editor-tag" data-bind="click: makeActive, attr: { id: 'editor-tag-' + $index(), title: getName() }, style: { backgroundColor: $root.getUIColour(isActive() ? 0 : -8), borderColor: $root.getUIColour(-30) }">
+                        <li class="editor-tag" data-bind="click: makeActive, attr: { id: 'editor-tag-' + $index(), title: getName() }, style: { flexGrow: flexSize(), backgroundColor: $root.getUIColour(isActive() ? 0 : -8), borderColor: $root.getUIColour(-30) }">
                             <button data-bind="click: close, style: { color: $root.getUIColour(-40) }, attr: { class: getFileStateCSS() }" class="codicon codicon-close" title="Close editor"></button>
+                            <button data-bind="click: unpin, visible: isPinned(), style: { color: $root.getUIColour(-40) }, attr: { class: getPinStateCSS() }" class="codicon codicon-pinned" title="Unpin editor"></button>
                             <span data-bind="text: getName()"></span>
                             <div class="tag-colour-marker" data-bind="visible: !$root.isPanelOpen.bind(null, 'scene')(), style: { backgroundColor: $data.getFile().getMarkColour }"></div>
                         </li>

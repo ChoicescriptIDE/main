@@ -511,9 +511,17 @@ function IDEViewModel() {
       if (projectEditors.indexOf(ed) < 0) {
         projectEditors.push(ed);
       }
+      if (self === activeProject()) {
+        var aEd = activeEditor();
+        if (aEd) aEd.resize();
+      }
     }
     self.unsubscribeEditor = function(ed) {
       projectEditors.remove(ed);
+      if (self === activeProject()) {
+        var aEd = activeEditor();
+        if (aEd) aEd.resize();
+      }
     }
       /* callback(err, success_boolean) */
     self.exportFiles = function() {
@@ -1605,6 +1613,8 @@ function IDEViewModel() {
   var MIN_EDITOR_WIDTH = 400; /* (pixels) used to auto-inflate active editor size */
   function CSIDEEditor(data) {
     var self = this;
+    var _flexSize = ko.observable(1);
+    var _pinned = ko.observable(false);
     var _file = ko.observable(data.file || null);
     var _cursorPos = ko.observable({lineNumber: 0, column: 0});
     var _selectedChars = ko.observable(0);
@@ -1686,11 +1696,11 @@ function IDEViewModel() {
 
     self.setFile = function(newFile, diffFile) {
       var file = _file();
-      if (file !== newFile) {
+      if (file.getProject() !== newFile.getProject()) {
         file.getProject().unsubscribeEditor(self);
         newFile.getProject().subscribeEditor(self);
-        file.saveEditorViewState(self);
       }
+      file.saveEditorViewState(self);
       newFile.loadEditorViewState(self);
       _monacoEditor.setModel(newFile.getModel());
       _file(newFile);
@@ -1723,25 +1733,45 @@ function IDEViewModel() {
       file.getProject().unsubscribeEditor(self);
       file.saveEditorViewState(self);
       _dispose();
-      if (activeEditor() === self) activeEditor(null);
+      var aEd = activeEditor();
+      if (aEd === self) {
+        activeEditor(null);
+      }
+    }
+
+    self.pin = function() {
+      _pinned(true);
+    }
+
+    self.unpin = function() {
+      _pinned(false);
+    }
+
+    self.resize = function(flexSize, project) {
+      project = project || activeProject();
+      if (!flexSize) {
+        var edCount = project.getEditors().length;
+        if ((_editorDOMAnchor.parentElement.clientWidth / edCount) < MIN_EDITOR_WIDTH) {
+          flexSize = edCount;
+        } else {
+          flexSize = 1;
+        }
+      }
+      _editorDOMAnchor.style.flexGrow = flexSize;
+      _flexSize(flexSize);
     }
 
     self.makeActive = function() {
       var oldEd = null;
-      var activeEditors = activeProject().getEditors();
       var isNewProject = activeEditor() && (activeEditor().getFile().getProject() !== activeProject());
       /* TODO: Revisit manual resizing.
          For now this is a simple flexbox hack to keep
          the active editor from getting too small.
        */
-      if ((oldEd = activeEditor()) && !isNewProject) {
-        oldEd.getAnchor().style.flexGrow = 1;
-        document.getElementById("editor-tag-" + activeEditors.indexOf(oldEd)).style.flexGrow = 1;
+      if (oldEd = activeEditor()) {
+        oldEd.resize(1, oldEd.getFile().getProject());
       }
-      if (_editorDOMAnchor.clientWidth < MIN_EDITOR_WIDTH) {
-        _editorDOMAnchor.style.flexGrow = activeEditors.length;
-        document.getElementById("editor-tag-" + activeEditors.indexOf(self)).style.flexGrow = activeEditors.length;
-      }
+      self.resize();
       activeEditor(self);
       if (!_monacoEditor.hasTextFocus()) _monacoEditor.focus();
     }
@@ -1750,11 +1780,27 @@ function IDEViewModel() {
       return activeEditor() === self;
     }
 
+    self.isPinned = function() {
+      return _pinned();
+    }
+
+    self.flexSize = function() {
+      return _flexSize();
+    }
+
     self.getFileStateCSS = function() {
       if (_file().isDirty()) {
         return "codicon codicon-circle-outline";
       } else {
         return "codicon codicon-close";
+      }
+    }
+
+    self.getPinStateCSS = function() {
+      if (_pinned()) {
+        return "codicon codicon-pinned";
+      } else {
+        return "codicon codicon-pin";
       }
     }
 
@@ -2029,8 +2075,14 @@ function IDEViewModel() {
 
   self.togglePanel = function(panel, force) {
     // force is an optional boolean
+    var project;
     var isOpen = typeof force === "boolean" ? force : !panelStatus[panel]();
     panelStatus[panel](isOpen);
+    // resize editors automatically
+    var ed;
+    if (ed = activeEditor()) {
+      ed.resize();
+    }
   }
   self.isPanelOpen = function(panel) {
     return panelStatus[panel]();
@@ -2103,10 +2155,14 @@ function IDEViewModel() {
     var list = document.getElementById("editor-list");
     var movingLi = arg.targetParent()[arg.sourceIndex].getAnchor();
     var targetLi = arg.targetParent()[arg.targetIndex].getAnchor();
-    list.removeChild(movingLi);
     if (list.children.length <= arg.targetIndex) {
+      list.removeChild(movingLi);
       list.appendChild(movingLi, list.lastElementChild);
+    } else if (arg.targetIndex > arg.sourceIndex) {
+      list.removeChild(movingLi);
+      list.insertBefore(movingLi, targetLi.nextSibling);
     } else {
+      list.removeChild(movingLi);
       list.insertBefore(movingLi, targetLi);
     }
     /*var moving = g_editors.indexOf(arg.targetParent[arg.sourceIndex]);
@@ -2846,14 +2902,18 @@ function IDEViewModel() {
     var tProject = (aProject !== nProject) ? nProject : aProject;
     if (file.isSelected()) {
       file.viewInEditor();
-    } else if ((tProject.getEditors().length === 1) && !event.shiftKey) {
-      tProject.getEditors()[0].setFile(file);
-      file.viewInEditor();
-    } else {
-      self.openNewEditor(file, function(ed) {
-        if (ed) file.viewInEditor();
-      });
+      return;
+    } else if (!event.shiftKey) {
+      var editor = __getFreeEditor(tProject);
+      if (editor) {
+        editor.setFile(file);
+        file.viewInEditor();
+        return;
+      }
     }
+    self.openNewEditor(file, function(ed) {
+      if (ed) file.viewInEditor();
+    });
   }
   self.session = {
     "save": function(cb) {
@@ -3509,6 +3569,26 @@ function IDEViewModel() {
       }
     }
     return null;
+  }
+
+  /* Returns an unpinned editor if one is available,
+     preferring the currently active editor. */
+  function __getFreeEditor(project) {
+    var editor;
+    if (!project) {
+      project = activeProject();
+    }
+    if (project === activeProject()) {
+      editor = activeEditor();
+    }
+    if (!editor || editor.isPinned()) {
+      if (project) {
+        editor = project.getEditors().find(function(ed) {
+          return !ed.isPinned();
+        });
+      }
+    }
+    return editor;
   }
 
   // obtain CSIDEHelp object for interacting with help and information tab
@@ -6391,7 +6471,14 @@ function IDEViewModel() {
         scopes: '.editor-tag',
         before: function(event, element) {
           var editor = ko.dataFor(element.get(0));
-          menu(new contextMenu(editor, EditorTagOptions));
+          var pinOption =  new menuOption(editor.isPinned()? "Unpin" : "Pin" + " editor", function(menu) {
+            if (editor.isPinned()) {
+              editor.unpin();
+            } else {
+              editor.pin();
+            }
+          });
+          menu(new contextMenu(editor, [pinOption].concat(EditorTagOptions())));
           return true;
         }
       });
