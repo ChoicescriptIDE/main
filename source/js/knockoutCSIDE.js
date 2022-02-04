@@ -4624,6 +4624,10 @@ function IDEViewModel() {
         n.setTimeout(5000);
       }, 10000);
     }
+
+    // hide preload screen
+    document.getElementById("preload").style.opacity = 0;
+    document.getElementById("preload").style.visibility = "hidden";
   }
 
   //animations
