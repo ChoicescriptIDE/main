@@ -138,7 +138,7 @@
                                 <button class="save-scene" data-bind="click: getErrState() ? close : save, clickBubble: false, attr: { title: getErrState() ? getErrStateMsg : isReadOnly() ? 'Read-only' : 'Save ' + getName() + '.txt' }"><i data-bind="css: getState"></i></button>
                                 <button class="colour-marker handle" data-bind="attr: { title: 'Click to colour project ' + getName() }, click: showColours, clickBubble: false, style: { backgroundColor: getMarkColour }"></button>
                                 <!-- <span data-bind="text: getName(), event: { dblclick: rename }, attr: { title: getName }, fadeVisible: beingEdited() ? false : true"></span> -->
-                                <input data-bind="attr: { title: getName }, enableTextInput: beingEdited, textInput: nameInterface, event: { dblclick: rename, blur: rename, keyup: rename }, css: { 'name-error': nameInvalid }" class="col-anim"></input>
+                                <input data-bind="attr: { title: getName }, enableTextInput: beingEdited, textInput: nameInterface, event: { dblclick: rename, blur: rename, keyup: rename }, css: { 'name-error': nameInvalid, 'validation-error-text': hasErrors(), 'validation-warning-text': hasWarnings() }" class="col-anim"></input>
                                 <div class="scene-error validation-error-text" data-bind="fadeVisible: nameInvalid">
                                     <span data-bind="text: getNameErrorMsg"></span>
                                 </div>
@@ -181,7 +181,12 @@
                 <div id="tabs" data-bind="tabs: { refreshOn: tabs }">
                     <ul data-bind="style: { backgroundColor: getUIColour(-10) }, sortable: { data: tabs, allowDrop: false, connectClass: 'null', afterMove: cside.updatePersistenceList, options: { axis: 'x', items: 'li', containment: 'parent' } }" class="col-anim">
                         <li data-bind="attr: { 'aria-controls': id, title: title }, visible: visible, style: { backgroundColor: $root.getUIColour(-15) }">
-                            <a draggable="false" data-bind="attr: { title: title, href: '#' + id, class: 'ui-tabs-anchor ' + iconClass }, style: { color: $root.getUIColour(-65) }"></a>
+                            <a draggable="false" data-bind="attr: { title: title, href: '#' + id, class: 'ui-tabs-anchor ' + iconClass() }, style: { color: $root.getUIColour(-65) }"></a>
+                            <!-- ko if: id == 'issues' && $root.getActiveProject() -->
+                            <div draggable="false" class="notification-badge" data-bind="visible: $root.getActiveProject().issueCount, style: { borderColor: $root.getUIColour(-15) }, css: 'notification-badge ' + ($root.getActiveProject().hasErrors() ? 'error' : $root.getActiveProject().hasWarnings() ? 'warning' : 'info')">
+                                <span draggable="false" data-bind="text: notificationCount()"></span>
+                            </div>
+                            <!-- /ko -->
                         </li>
                     </ul>
                     <!-- ko foreach: tabs -->
@@ -198,47 +203,53 @@
                                 <!-- /ko -->
                             </div>
                             <!-- /ko -->
-                            <!-- ko if: id == 'issues' -->
-                            <!-- ko with: $root.getActiveProject -->
-                            <ul class="issueList">
-                                <!-- only show issues in selected project -->
-                                <!-- ko if: issueCount() <= 0 -->
-                                <li>There are no issues logged against this project.</li>
-                                <!-- /ko -->
-                                <!-- ko if: issueCount() > 0 -->
-                                <li class="dismiss-all">
-                                    <button data-bind="click: dismissAllIssues" class="btn btn-default">Dismiss All</button>
-                                </li>
-                                <!-- /ko -->
-                                <!-- ko foreach: getIssues -->
-                                <li class="issue">
-                                    <span class="issue-desc" data-bind="text: getDesc()"></span>
+                            <!-- ko if: id == 'issues' && $root.getActiveProject -->
+                            <div id="issue-controls-wrap" role="search">
+                                <div class="search-controls" data-bind="template: { name: 'template-search-toggles', foreach: $root.searchToggles }"></div>
+                                <form autocomplete="off" data-bind="submit: $root.getActiveProject().issueSearch">
+                                    <textarea spellcheck="false" type="text" data-bind="event: { keydown: $root.getActiveProject().issueSearch, keyup: $root.getActiveProject().issueSearch }" placeholder="Filter issues"></textarea>
+                                    <ul id="issue-filter-toggles" data-bind="foreach: $root.issueToggles">
+                                        <li data-bind="css: { 'checked': $data.state }">
+                                            <label>
+                                                <input type="checkbox" data-bind="checked: $data.state">
+                                                <span data-bind="css: $data.fa, style: { color: $data.state() ? $data.color : '' }"></span>
+                                                <span data-bind="text: $data.text"></span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </form>
+
+                                <p>
+                                    <span data-bind="text: $root.filterString.isErroneous() ? $root.filterString.errorMessage() : $root.getActiveProject().getFilteredIssueCountString(), css: { 'validation-error-text': $root.filterString.isErroneous }"></span>
                                     <br>
-                                    <span>
-                                                            Project: <span data-bind='text: $parent.getName' > </span>
-                                    </span>
-                                    <!-- ko if: getFile() -->
-                                    <br>
-                                    <span>
-                                                                Scene: <span data-bind='text: getFile().getName'></span>
-                                    </span>
-                                    <!-- /ko -->
-                                    <br>
-                                    <span>
-                                                            Date: <span data-bind='text: getDate()' > </span>
-                                    </span>
-                                    <br>
-                                    <span>
-                                                            Time: <span data-bind='text: getTime()' > </span>
-                                    </span>
-                                    <div class="issue-btn" title="Dismiss this issue" data-bind="click: dismiss"><i class="col-anim fa fa-check fa-lg"></i></div>
-                                    <!-- ko if: typeof getLineNum() === 'number' -->
-                                    <div class="issue-btn" title="Show this issue in the editor" data-bind="click: show"><i class="col-anim fa fa-search fa-lg"></i></div>
-                                    <!-- /ko -->
+                                    <span data-bind="text: $root.getActiveProject().getIssueCountString()"></span>
+                                </p>
+                            </div>
+                            <ul id="issue-scenelist" data-bind="foreach: $root.getActiveProject().getFiles()">
+                                <!-- ko if: $data.filteredIssueCount() > 0 -->
+                                <li class="search-result-scene">
+                                    <div class="no-select tab-panel-header col-anim" data-bind="style: { backgroundColor: $root.getUIColour(-25) }">
+                                        <button class="search-expand-btn" data-bind="click: $data.expandIssues.bind($root, !$data.expandIssues(), true), css: expandIssues() ? 'fa fa-angle-down' : 'fa fa-angle-right'"></button>
+                                        <span data-bind="text: $data.getName()"></span>
+                                        <span class="search-result-badge" data-bind="text: $data.filteredIssueCount(), style: { backgroundColor: $root.getUIColour() }"></span>
+                                    </div>
+                                    <ul data-bind="if: expandIssues()"> <!-- data expanded -->
+                                        <!-- ko foreach: $data.getFilteredIssues -->
+                                        <li data-bind="click: show, autoScroll: isActive()" class="tab-result-item">
+                                            <div style="width: calc(100% - 20px);display: inline-block;">
+                                                <span data-bind="text: ' (Line '+ $data.getLineNum() + ')'" class="tab-result-line-info"></span>
+                                                <i style="margin-right: 5px;" data-bind="css: getIconClasses()"></i>
+                                                <span data-bind="text: getDesc()"></span>
+                                            </div>
+                                            <button data-bind="visible: canDismiss(), click: dismiss" style="width: 20px;height: 20px;background: none;border: none;padding: 0px;float: right;">
+                                                <i class="fa fa-times" style="color:salmon;"></i>
+                                            </button>
+                                        </li>
+                                        <!-- /ko -->
+                                    </ul>
                                 </li>
                                 <!-- /ko -->
                             </ul>
-                            <!-- /ko -->
                             <!-- /ko -->
                             <!-- ko if: id == 'settings' -->
                             <script type="text/html" id="setting-option-template">
@@ -263,7 +274,7 @@
                                     <br>
                                     <input type="number" data-bind="attr: { 'min': min, 'max': max, 'step': step }, value: value ">
                                     <br>
-                                    <p class="validation-error-text" data-bind="fadeVisible: value.isErroneous, text: value.errorMessage"></p>
+                                    <p class="validation-error-text" data-bind="visible: value.isErroneous(), text: value.errorMessage()"></p>
                                     <!-- /ko -->
                                     <!-- ko if: getType() == "variable" || getType() == "custom" -->
                                     <ul data-bind="foreach: getOptions()">
@@ -329,8 +340,8 @@
                                         <li class="search-max-length-alert" data-bind="style: { backgroundColor: $root.getUIColour(-80) }"><i class="fa fa-warning"></i>The results for this scene have been truncated to the first 999.</li>
                                         <!-- /ko -->
                                         <!-- ko foreach: $data.getResults -->
-                                            <li data-bind="click: $parent.getFile().showSearchResult.bind($data, $index())" class="search-result-item">
-                                                <span data-bind="text: ' (Line '+ $data.range.startLineNumber + ')'" class="search-result-line-info"></span>
+                                            <li data-bind="click: $parent.getFile().showSearchResult.bind($data, $index())" class="tab-result-item">
+                                                <span data-bind="text: ' (Line '+ $data.range.startLineNumber + ')'" class="tab-result-line-info"></span>
                                                 <span data-bind="text: $data.preText"></span><span class="search-result-highlight" data-bind="text: $data.matches[0], style: { backgroundColor: $root.getUIColour(0), textDecoration: ($root.inReplaceMode()) ? 'line-through' : 'none' }" style="color: white;"></span><!-- ko if: $root.inReplaceMode() --><span class="search-result-highlight" data-bind="text: $data.replaceText, style: { backgroundColor: $root.getUIColour(20) }"></span><!-- /ko --><span data-bind="text: $data.postText"></span><button data-bind="visible: $root.inReplaceMode(), click: $parent.getFile().replaceSearchResult.bind($data, $index())" class="search-replace-item-btn btn btn-default fa fa-search-minus"></button>
                                             </li>
                                         <!-- /ko -->

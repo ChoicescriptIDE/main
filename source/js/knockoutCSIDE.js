@@ -92,6 +92,11 @@ function IDEViewModel() {
     path = path.replace(/\\/g, '/');
     return path;
   }
+  // @bobince: https://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript/3561711#3561711
+  var escapeRegex = new RegExp(/[-\/\\^$*+?.()|[\]{}]/g);
+  function __escapeRegexString(string) {
+    return string.replace(escapeRegex, '\\$&');
+  }
 
   function __onElementRender(elementSelector, callback) {
     var timeout = false;
@@ -144,7 +149,11 @@ function IDEViewModel() {
     }); //convert relative paths to direct paths and normalize slashes
     path(projectData.path);
     var files = ko.observableArray([]);
-    var issues = ko.observableArray([]);
+    var markerIssues = ko.observableArray([]);
+    var generalIssues = ko.observableArray([]);
+    var issues = ko.computed(function() {
+      return markerIssues().concat(generalIssues());
+    });
     var console_logs = ko.observableArray([])
       .extend({
         rateLimit: {
@@ -179,7 +188,14 @@ function IDEViewModel() {
     }, this);
     self.getFiles = files;
     self.getIssues = ko.computed(function() {
-      return issues();
+      return files().reduce(function(issues, file) {
+        return issues.concat(file.getIssues());
+      }, issues());
+    }, this);
+    self.getFilteredIssues = ko.computed(function() {
+      return files().reduce(function(issues, file) {
+        return issues.concat(file.getFilteredIssues());
+      }, issues());
     }, this);
     self.consoleOpen = ko.computed(function() {
       return consoleOpen();
@@ -191,8 +207,29 @@ function IDEViewModel() {
       return unreadLogs();
     }, this);
     self.issueCount = ko.computed(function() {
-      return issues().length;
+      return self.getIssues().length;
     }, this);
+    self.filteredIssueCount = ko.computed(function() {
+      return self.getFilteredIssues().length;
+    }, this);
+    self.hasErrors = ko.computed(function() {
+      return (files().some(function(scene) {
+        return scene.hasErrors();
+      }));
+    }, this);
+    self.hasWarnings = ko.computed(function() {
+      return (files().some(function(scene) {
+        return scene.hasWarnings();
+      }));
+    }, this);
+    self.getFilteredIssueCountString = function() {
+      var sceneCount = files().filter(function(f) { return f.filteredIssueCount() > 0 }).length;
+      return "Showing " + self.filteredIssueCount() + " issue(s) in " + sceneCount + " file(s).";
+    }
+    self.getIssueCountString = function() {
+      var sceneCount = files().filter(function(f) { return f.issueCount() > 0 }).length;
+      return "There are " + self.issueCount() + " issue(s) across " + sceneCount + " file(s) in total.";
+    }
     self.getSource = function() {
       return source;
     };
@@ -296,8 +333,20 @@ function IDEViewModel() {
       return consoleOpen();
     }
     self.clearConsole = function() {
-        console_logs.removeAll();
-      }
+      console_logs.removeAll();
+    }
+    self.addIssue = function(issue) {
+      // only for non-marker issue
+      generalIssues.push(issue);
+    }
+    self.removeIssue = function(issue) {
+      // only for non-marker issue
+      generalIssues.remove(issue);
+    }
+    self.purgeIssues = function() {
+      // only for non-marker issue
+      generalIssues([]);
+    }
       /* self.markConsoleRead = function() {
           unreadLogs(0);
       } */
@@ -343,6 +392,25 @@ function IDEViewModel() {
       },
       owner: this
     });
+    self.issueSearch = function(data, event, domObj) {
+      if (event.type == "keyup" && SEARCH.CONF.searchOnType()) {
+        cside.filterString(event.target.value);
+        return true; // allow the char input to take place
+      }
+      else if (event.type != "keydown") {
+        return true;
+      }
+      if (event.keyCode == 13) {
+        if (!event.ctrlKey) {
+          cside.filterString(event.target.value);
+          return false; // don't allow the Enter press to affect the textarea
+        } else { // match monaco's in-model search linebreak behaviour (ctrl+enter)
+          event.target.value += "\n";
+          event.target.scrollTop = event.target.scrollHeight;
+        }
+      }
+      return true;
+    }
     self.searchByEnterKey = function(data, event, domObj) {
       if (event.type == "keyup" && SEARCH.CONF.searchOnType())
         return self.search("", "", SEARCH.MODES.SEARCH) || true; // allow the char input to take place
@@ -580,34 +648,6 @@ function IDEViewModel() {
       for (var i = 0; i < files().length; i++)
         files()[i].load();
     }
-    self.logIssue = function(issue) {
-      issues.push(issue);
-      //visually notify
-      var buttons = [{
-        addClass: 'btn btn-danger',
-        text: 'Show',
-        onClick: function(note) {
-          note.close();
-          if (issue.getLineNum()) {
-            issue.show();
-          }
-          if (activeProject() == self) {
-            __selectTab("issues");
-          } else {
-            self.select();
-            __selectTab("issues");
-          }
-        }
-      }]
-      var n = notification("New Issue", "New issue with project " + name(), {
-        type: "error",
-        buttons: buttons
-      });
-      n.setTimeout(5000);
-    }
-    self.removeIssue = function(issue) {
-      issues.remove(issue);
-    }
     /* Display only this project and its editors */
     self.makeActive = function() {
       var oldProject = activeProject();
@@ -732,6 +772,7 @@ function IDEViewModel() {
     self.getName = ko.computed(function() {
       return getFileName(path());
     }, this);
+    self.expandIssues = ko.observable(false);
     var isImportant = self.getName().toUpperCase().match(reservedSceneNames);
     var source = fileData.source || platform; //won't change - so doesn't need to be an observable?
     var loaded = ko.observable(false);
@@ -781,11 +822,22 @@ function IDEViewModel() {
         }
       }
     });
-    var issues = ko.observableArray([]);
-    issues.subscribe(function(val) {
+    var markerIssues = ko.observableArray([]);
+    var generalIssues = ko.observableArray([]);
+    var issues = ko.computed(function() {
+      return markerIssues().concat(generalIssues());
+    });
+    generalIssues.subscribe(function(val) {
       if (self == activeFile()) {
         var ed = self.getEditors()[0];
         __updateEditorDecorations(ed, self);
+      }
+    });
+    issues.subscribe(function(val) {
+      if (val.length < SEARCH.CONF.collapseThreshold()) {
+        self.expandIssues(true);
+      } else {
+        self.expandIssues(false);
       }
     });
     var invalidName = ko.observable(false);
@@ -856,7 +908,60 @@ function IDEViewModel() {
     }, this);
     self.getIssues = ko.computed(function() {
       return issues();
+    });
+    self.getFilteredIssues = ko.computed(function() {
+      var issueList = issues();
+      if (cside.filterString.isErroneous()) // TODO: BROKEN
+        return issueList;
+      var activeIssueTypes = cside.getActiveIssueTypes();
+      issueList = issueList.filter(function(issue) {
+        return activeIssueTypes.includes(issue.getSeverity());
+      });
+      var matchCase = SEARCH.CONF.preserveCase();
+      var regex = SEARCH.CONF.useRegex();
+      var wholeWord = SEARCH.CONF.matchWholeWord();
+      return issueList.filter(function(i) {
+        var matchValue = matchCase ? i.getDesc() : i.getDesc().toLowerCase();
+        var filterString = matchCase ? cside.filterString() : cside.filterString().toLowerCase();
+        if (wholeWord) {
+          if (!regex) {
+            filterString = __escapeRegexString(filterString);
+          }
+          filterString = "\\b" + filterString + "\\b";
+          try {
+            return matchValue.match(new RegExp(filterString));
+          } catch(err) {
+            return false;
+          }
+        } else {
+          if (regex) {
+            try {
+              return matchValue.match(new RegExp(filterString));
+            } catch(err) {
+              return false;
+            }
+          } else {
+            return matchValue.includes(filterString);
+          }
+        }
+      });
     }, this);
+    self.issueCount = ko.computed(function() {
+      return issues().length;
+    }, this);
+    self.filteredIssueCount = ko.computed(function() {
+      return self.getFilteredIssues().length;
+    }, this);
+    self.hasErrors = function() {
+      return self.getIssues().some(function(i) {
+        return i.getSeverity() === monaco.MarkerSeverity.Error;
+      });
+    }
+    self.hasWarnings = function() {
+      return self.getIssues().some(function(i) {
+        return i.getSeverity() === monaco.MarkerSeverity.Warning;
+      });
+    }
     self.getContents = function() {
       return edModel().getValue();
     }
@@ -1111,11 +1216,35 @@ function IDEViewModel() {
       });
       // fail silently
     }
+    self.logIssue = function(issue) {
+      generalIssues.push(issue);
+      var buttons = [{
+        addClass: 'btn btn-danger',
+        text: 'Show',
+        onClick: function(note) {
+          note.close();
+          __selectTab("issues");
+          self.expandIssues(true);
+          activeIssue(issue);
+          if (issue.getLineNum()) {
+            issue.show();
+          }
+        }
+      }]
+      var n = notification("New Issue", "New issue with project " + self.getName(), {
+        type: "error",
+        buttons: buttons
+      });
+      n.setTimeout(5000);
+    }
+    self.setMarkerIssues = function(newIssues) {
+      markerIssues(newIssues);
+    }
     self.addIssue = function(issue) {
-      issues.push(issue);
+      generalIssues.push(issue);
     }
     self.removeIssue = function(issue) {
-      issues.remove(issue);
+      generalIssues.remove(issue);
     }
       //MISC METHODS
     self.load = function(callback) {
@@ -1439,11 +1568,17 @@ function IDEViewModel() {
     var file = issueData.file || null;
     var project = issueData.project || null;
     if (project === null) {
-      return null;
+      if (file) {
+        project = file.getProject();
+      } else {
+        throw new Error("A CSIDEIssue must have a valid project or scene!")
+      }
     }
     var desc = issueData.desc || "No description available";
     var lineHandle = null;
     var lineNum = ((typeof issueData.lineNum === "number") && (issueData.lineNum > -1)) ? issueData.lineNum : null;
+    var severity = issueData.severity || 2;
+    var canDismiss = issueData.canDismiss || false; // runtime errors can be dismissed
     var date, time;
 
     var d = new Date();
@@ -1466,6 +1601,27 @@ function IDEViewModel() {
     self.getLineNum = function() {
       return lineHandle ? lineHandle.lineNo() : lineNum;
     };
+    self.getSeverity = function() {
+      return severity;
+    }
+    self.getIconClasses = function() {
+      switch(severity) {
+        case monaco.MarkerSeverity.Error:
+          return "fa fa-bug error";
+        case monaco.MarkerSeverity.Warning:
+          return "fa fa-warning warning";
+        case monaco.MarkerSeverity.Info:
+          return "fa fa-info-circle info";
+        default:
+          return "fa fa-info-circle";
+      }
+    }
+    self.isActive = function() {
+      return activeIssue() === self;
+    }
+    self.canDismiss = function() {
+      return canDismiss;
+    }
     self.dismiss = function() {
       project.removeIssue(self);
       if (file) {
@@ -1481,10 +1637,6 @@ function IDEViewModel() {
       } else {
         file.viewInEditor();
       }
-    }
-
-    if (file) {
-      file.addIssue(self); //register issue with file
     }
   }
 
@@ -1850,7 +2002,7 @@ function IDEViewModel() {
 
   //INSTANCE VARIABLES
   var user = {
-    "name": usingNode ? require('username').sync() : 'Dropbox User',
+    "name": usingNode ? nodeRequire('username').sync() : 'Dropbox User',
     "path": "/"
   }
   user.name = user.name.charAt(0).toUpperCase() + user.name.slice(1);
@@ -2069,6 +2221,7 @@ function IDEViewModel() {
   // use in the following definitions (mac menu etc.)
   var activeProject = ko.observable(null);
   var activeEditor = ko.observable(null);
+  var activeIssue = ko.observable(null);
   var activeFile = ko.computed(function() {
     return activeEditor() ? activeEditor().getFile() : null;
   }, this);
@@ -2141,6 +2294,21 @@ function IDEViewModel() {
     { title: "Match Case", cssClass: 'codicon-case-sensitive', value: SEARCH.CONF.preserveCase },
     { title: "Search on Type", cssClass: 'codicon-record-keys', value: SEARCH.CONF.searchOnType }
   ]);
+
+  self.issueToggles = [
+    { 'text': 'Errors' , 'fa': 'fa fa-bug', 'color': 'salmon', 'state': ko.observable(true), severity: monaco.MarkerSeverity.Error },
+    { 'text': 'Warnings', 'fa': 'fa fa-warning', 'color': '#edc979', 'state': ko.observable(true), severity: monaco.MarkerSeverity.Warning },
+    { 'text': 'Infos', 'fa': 'fa fa-info-circle', 'color': '#799fed', 'state': ko.observable(true), severity: monaco.MarkerSeverity.Info },
+    { 'text': 'Hints', 'fa': 'fa fa-question-circle', 'color': '#b9b9b9', 'state': ko.observable(false), severity: monaco.MarkerSeverity.Hint }
+  ]
+
+  self.getActiveIssueTypes= ko.computed(function() {
+    var activeTypes = [];
+    for (var type = 0; type < self.issueToggles.length; type++) {
+      if (self.issueToggles[type].state()) activeTypes.push(self.issueToggles[type].severity);
+    }
+    return activeTypes;
+  });
 
   /*
   arg.item - the actual item being moved
@@ -3394,7 +3562,7 @@ function IDEViewModel() {
       "id": "game",
       "title": "Game",
       "showTitle": true,
-      "iconClass": "fa fa-cube",
+      "iconClass": function() { return "fa fa-cube" },
       "href": ko.observable(""),
       "content": "",
       "visible": ko.observable(true),
@@ -3406,10 +3574,18 @@ function IDEViewModel() {
       "id": "issues",
       "title": "Issues",
       "showTitle": true,
-      "iconClass": "fa fa-exclamation-triangle",
+      "iconClass": function() { return "fa fa-exclamation-triangle"; },
       "href": "",
       "content": "",
       "visible": ko.observable(true),
+      "notificationCount": ko.computed(function() {
+        var ap;
+        if (ap = activeProject()) {
+          var issueCount = ap.issueCount()
+          return (issueCount > 99) ? "99+" : issueCount;
+        }
+        return 0;
+      }),
       "getHeaderTitle": ko.computed(function() {
         return (activeProject() ? ("Issues with " + activeProject().getName()) : "Select a Project");
       }, this)
@@ -3418,7 +3594,7 @@ function IDEViewModel() {
       "id": "settings",
       "title": "Settings",
       "showTitle": false,
-      "iconClass": "fa fa-cog",
+      "iconClass": function() { return "fa fa-cog" },
       "href": "",
       "content": "",
       "visible": ko.observable(true),
@@ -3428,7 +3604,7 @@ function IDEViewModel() {
       "id": "help",
       "title": "Help & Information",
       "showTitle": true,
-      "iconClass": "fa fa-question-circle",
+      "iconClass": function() { return "fa fa-question-circle" },
       "href": ko.observable("help/site/index.html"),
       "onload": function() {
         //__csideTabs["help"].href(this.contentWindow.location);
@@ -3441,7 +3617,7 @@ function IDEViewModel() {
       "id": "search",
       "title": "Search and Replace",
       "showTitle": true,
-      "iconClass": "fa fa-search",
+      "iconClass": function() { return "fa fa-search" },
       "href": "",
       "content": "",
       "visible": ko.observable(true),
@@ -3453,7 +3629,7 @@ function IDEViewModel() {
       "id": "dictionary",
       "title": "User Dictionary",
       "showTitle": true,
-      "iconClass": "fa fa-book",
+      "iconClass": function() { return "fa fa-book" },
       "href": "",
       "content": "",
       "visible": ko.observable(true),
@@ -3463,7 +3639,7 @@ function IDEViewModel() {
       "id": "examples",
       "title": "Example Projects & Templates",
       "showTitle": true,
-      "iconClass": "fa fa-lightbulb-o",
+      "iconClass": function() { return "fa fa-lightbulb-o" },
       "href": "",
       "content": "",
       "visible": ko.observable(true),
@@ -4515,6 +4691,20 @@ function IDEViewModel() {
     });
   }
   self.dictWord = ko.observable("");
+  self.filterString = ko.observable("").extend({
+    notify: 'always',
+    validate: function(value) {
+      try {
+        if (SEARCH.CONF.useRegex()) {
+          new RegExp(value);
+        }
+        return { valid: true, message: "" };
+      }
+      catch(e) {
+        return { valid: false, message: "Error: Filter string is not a valid regular expression" };
+      }
+    }
+  });
   self.addToDictionary = function(obj, e) {
     if (e.type == "click" || e.type == "keyup" && e.keyCode == 13) {
       if (!userDictionary.validateWord(self.dictWord())) {
@@ -4535,6 +4725,22 @@ function IDEViewModel() {
   }, this);
 
   self.init = function() {
+
+    monaco.editor.onDidChangeMarkers(function(uri) {
+      for (var i = 0; i < uri.length; i++) {
+        var project = getProject(getProjectPath(uri[i].path));
+        if (project) {
+          var markers = monaco.editor.getModelMarkers({resource: uri[i], take: 500 });
+          var file = project.getFiles().find(function(f) {
+            return f.getPath() === uri[i].path;
+          });
+          var newIssues = markers.map(function(m) {
+            return new CSIDEIssue({ file: file, lineNum: m.startLineNumber, desc: m.message, severity: m.severity });
+          });
+          file.setMarkerIssues(newIssues);
+        }
+      }
+    });
 
     // Create the "console" input as a single-line Monaco Editor instance
     // to allow for more interactive behaviour in the future.
@@ -5319,7 +5525,7 @@ function IDEViewModel() {
     var issues = file.getIssues();
     additional = additional || [];
     file.decorations = meditor.deltaDecorations(file.decorations,
-      issues.filter(function(issue) { return typeof issue.getLineNum() === "number" })
+      issues.filter(function(issue) { return typeof issue.getLineNum() === "number" && issue.canDismiss() })
         .map(function(issue) {
           var col = meditor.getModel().getLineFirstNonWhitespaceColumn(issue.getLineNum());
           return {
@@ -5849,12 +6055,17 @@ function IDEViewModel() {
           __openScene(event.data.project.path + event.data.file.name + ".txt", function(err, file) {
             if (!err) {
               issueData.file = file;
-              var issue = new CSIDEIssue(issueData);
+              issueData.severity = monaco.MarkerSeverity.Error;
+              issueData.canDismiss = true; // runtime errors should be dismissable
+              file.logIssue(new CSIDEIssue(issueData));
+            } else {
+              var issue = new CSIDEIssue({ project: issueData.project, canDismiss: true, desc: "Failed to open '" + issueData.file + "' whilst handling another issue: " + issueData.desc});
               issueData.project.logIssue(issue);
             }
           });
         }
         else {
+          issueData.canDismiss = true; // runtime errors should be dismissable
           var issue = new CSIDEIssue(issueData);
           issueData.project.logIssue(issue);
         }
@@ -6014,7 +6225,7 @@ function IDEViewModel() {
     update: function (element, valueAccessor) {
       var value = valueAccessor();
       if (ko.unwrap(value) && !__elementIsInView(element)) {
-        element.scrollIntoView(false /* alignToTop */);
+        element.scrollIntoView({block: 'center'});
       }
     }
   };
@@ -6502,10 +6713,10 @@ function IDEViewModel() {
 
 }
 
-window.cside = new IDEViewModel();
-ko.applyBindings(cside, $('.main-wrap')[0]);
 require = amdRequire; // restore for monaco's lazy loading
 amdRequire(['vs/editor/editor.main'], function() {
+  window.cside = new IDEViewModel();
   window.monaco = monaco;
+  ko.applyBindings(cside, $('.main-wrap')[0]);
   cside.init();
 });

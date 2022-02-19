@@ -228,6 +228,7 @@ body.night #left-wrap {
 
 #tabs>ul>li>a {
     color: #383838;
+    transition: color .25s linear;
     font-size: 20px;
     height: 100%;
     padding: 5px;
@@ -804,24 +805,106 @@ body.night #left-wrap {
     float: right;
     color: darkgrey;
 }
+
+.tab-panel.search > .tab-panel-header:first-of-type, .tab-panel.issues > .tab-panel-header:first-of-type {
+    position: sticky;
+    top: 0px;
+    z-index: 9;
+}
+
+.tab-panel.search #search-controls-wrap, .tab-panel.issues #issue-controls-wrap  {
+    padding: 5px;
+    background: #f8f6fb;
+    top: 42px;
+    position: sticky;
+    border-bottom: 1px solid;
+    border-color: inherit;
+    z-index: 9;
+}
+
+#issue-controls-wrap ul > li {
+    display: inline-block;
+    padding: 5px 5px 0px 5px;
+    border: 1px solid #e2e2e2;
+    background: #f7f7fc;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity linear .25s;
+    opacity: 0.5;
+}
+
+#issue-controls-wrap ul > li:hover {
+    opacity: 1;
+}
+
+#issue-controls-wrap ul > li.checked {
+    box-shadow: rgb(181 181 181) 0 0 2px inset;
+    background: rgb(242 241 247);
+    border-color: #9c9c9c;
+    opacity: 1;
+}
+
+body.night #issue-controls-wrap ul > li {
+    background: #353535;
+    border-color: #1b1b1b;
+}
+
+body.night #issue-controls-wrap ul > li.checked {
+    background: #2b2b2b;
+    box-shadow: inset 0 0 2px #1b1b1b;
+
+}
+
+#issue-controls-wrap ul > li input[type=checkbox] {
+    position: absolute;
+    width: 0;
+    height: 0;
+    visibility: hidden;
+    cursor: pointer;
+}
+
+#issue-controls-wrap ul > li span {
+    cursor: pointer;
+}
+
+#issue-controls-wrap ul > li input[type=checkbox]:not(:checked) ~ span.fa {
+    color: #6f6f6f;
+}
+
+body.night #issue-controls-wrap ul > li input[type=checkbox]:not(:checked) ~ span.fa {
+    color: white;
+}
+
+body.night .tab-panel.search #search-controls-wrap, body.night .tab-panel.issues #issue-controls-wrap  {
+    background-color: #2b2b2b;
+}
+
 .tab-panel.search #search-btn {
     vertical-align: middle;
 }
 
-.tab-panel.search form {
+.tab-panel.search form, .tab-panel.issues form{
 	padding: 5px;
 }
 
-.tab-panel.search #search-result-scenelist {
+.tab-panel.search #search-controls, .tab-panel.issues #issue-controls {
+    border-color: inherit;
+    display: block;
+    float: right;
+    padding: 5px;
+}
+
+.tab-panel.search #search-result-scenelist, .tab-panel.issues #issue-result-scenelist {
     border-color: inherit;
 }
 
-.tab-panel.search .search-result-scene {
+.tab-panel.search .search-result-scene, .tab-panel.issues .search-result-scene {
     padding:0px;
     border-color: inherit;
 }
 
-.tab-panel.search .search-expand-btn {
+.tab-panel.search .search-expand-btn, .tab-panel.issues .search-expand-btn {
 	border-color: inherit;
 	font: normal normal normal 14px/1 FontAwesome !important;
 	width:20px;
@@ -834,7 +917,7 @@ body.night #left-wrap {
     white-space: pre-wrap;
 }
 
-.tab-panel.search .search-result-badge {
+.tab-panel.search .search-result-badge, .tab-panel.issues .search-result-badge {
 	float: right;
 	border-radius: 91px;
 	min-width: 50px;
@@ -846,7 +929,7 @@ body.night #left-wrap {
     color: white;
 }
 
-.tab-panel.search .search-result-line-info {
+.tab-panel .tab-result-line-info {
     display: block;
     font-family: monospace;
     font-weight: bold;
@@ -862,14 +945,14 @@ body.night #left-wrap {
     font-size: 18px;
 }
 
-.tab-panel.search li.search-result-item {
+.tab-panel li.tab-result-item {
 	padding: 10px;
 	transition: all .2s ease-in-out;
 	overflow-x: hidden;
 	text-overflow: ellipsis;
 }
 
-.tab-panel.search li.search-result-item > .search-result-highlight {
+.tab-panel.search li.tab-result-item > .search-result-highlight {
 	color: white;
 }
 
@@ -993,7 +1076,7 @@ body.night .setting-option-selected {
     opacity: 0.5;
 }
 
-.tab-panel.dictionary input {
+.tab-panel.dictionary input, .tab-panel.issues input {
     margin: 10px;
     width: 60%;
     padding: 5px;
@@ -1134,7 +1217,7 @@ body.night .tab-panel .search-controls-wrap {
     padding: 5px;
 }
 
-.tab-panel textarea.search {
+.tab-panel textarea {
 	margin: 2.5px;
 	margin-top: 0px;
 	width: 50%;
@@ -1566,17 +1649,25 @@ body.night .project-hover {
     color: rgb(249, 112, 112) !important;
 }
 
+.validation-warning-text {
+    color: #d8a020!important;
+}
+
+body.night .validation-warning-text {
+    color: #edc979 !important;
+}
+
 body.night .validation-error-text {
-    color: salmon;
+    color: salmon !important;
 }
 
 .validation-error-text {
-    color: #e80b0b;
-    font-size: 12px;
-    margin: 5px 0px 0px 0px;
+    color: #ff8181 !important;
 }
 
-#d00909
+.tab-panel.settings .validation-error-text {
+    margin: 5px 0px 0px 0px;
+}
 
 .project-header-selected {
     background-color: rgb(99, 99, 99);
@@ -1638,6 +1729,55 @@ body.night .validation-error-text {
     right: 3px;
 }
 
+#tabs > ul > li .notification-badge {
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    border: 1px solid;
+    border-color: #a04e60;
+    border-radius: 6px;
+    font-size: 8px;
+    font-family: monospace;
+    width: auto;
+    min-width: 12px;
+    transition: background-color .5s linear;
+}
+
+#tabs > ul > li .notification-badge > span {
+    margin: 0px 2px 0px 2px;
+}
+
+.notification-badge.error {
+    background-color: #de6e6e;
+    color: #313b4c;
+}
+
+.fa-bug.error {
+    color: #de6e6e;
+}
+
+.notification-badge.warning {
+    background-color: #e2b244;
+    color: #2d2d2d;
+}
+
+.fa-warning.warning {
+    color: #e2b244;
+}
+
+.notification-badge.info {
+    background-color: #799fed;
+    color: #2d2d2d;
+}
+
+.fa-info-circle.info {
+    color: #799fed;
+}
+
+#issue-scenelist {
+    border-color: inherit;
+}
+
 .issueList {
     margin: 0px;
     list-style: none;
@@ -1651,6 +1791,12 @@ body.night .validation-error-text {
     border-width: 0px 0px 1px 0px;
     padding: 8px 5px 8px 10px;
     position: relative;
+}
+
+.issue-result-item {
+    padding: 5px;
+    cursor: pointer;
+    font-size: 14px;
 }
 
 .issue-desc {
