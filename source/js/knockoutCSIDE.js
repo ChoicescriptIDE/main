@@ -987,6 +987,12 @@ function IDEViewModel() {
     self.getWordCount = function() {
       return wordCount();
     };
+    self.usingSpaces = function() {
+      return useSpaces();
+    }
+    self.getIndentSize = function() {
+      return indentSize();
+    }
     self.getIndentDesc = ko.computed(function() {
       return ((useSpaces() ? "Spaces: " : "Tabs: ") + indentSize());
     }, this);
@@ -1854,7 +1860,9 @@ function IDEViewModel() {
       }
       file.saveEditorViewState(self);
       newFile.loadEditorViewState(self);
-      _monacoEditor.setModel(newFile.getModel());
+      var model = newFile.getModel();
+      _monacoEditor.updateOptions(Object.assign(editorOptionStore, { insertSpaces: newFile.usingSpaces(), tabSize: newFile.getIndentSize(), indentSize: newFile.getIndentSize() }));
+      _monacoEditor.setModel(model);
       _file(newFile);
     }
 
