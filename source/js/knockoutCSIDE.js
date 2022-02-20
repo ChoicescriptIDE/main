@@ -3253,7 +3253,9 @@ function IDEViewModel() {
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        cside.getActiveEditor().close();
+        if (platform !== "mac_os") {
+          cside.getActiveEditor().close();
+        }
         return null;
       }
     });

@@ -14,12 +14,37 @@ if (usingNode) {
 		}
 	}
 
+	var macosKeyDown = false;
+	var wKeyDown = false;
+
+	window.addEventListener('keydown', function(event) {
+		if (event.key === "Meta") {
+			macosKeyDown = true;
+		}
+		return true;
+	});
+	window.addEventListener('keyup', function(event) {
+		if (event.key === "Meta") {
+			macosKeyDown = false;
+		}
+		return true;
+	});
 	win.on('close', function (event) {
-        if (cside.isUpdating()) {
-            updateClosure();
-        } else {
-            dirtyClosure(); //handles dirty saves/projects and calling win.close(true);
-        }
+		if (macosKeyDown || wKeyDown) {
+			// try to redirect anything that looks like a CMD+W quit
+			if (cside.getActiveFile()) cside.getActiveFile().close();
+			return;
+		}
+		if (["IFRAME", "WEBVIEW"].includes(document.activeElement.tagName)) {
+			// don't allow CMD+W in iframes to quit the app either
+			return;
+		}
+		console.log(event);
+		if (cside.isUpdating()) {
+			updateClosure();
+		} else {
+			dirtyClosure(); //handles dirty saves/projects and calling win.close(true);
+		}
 	});
 	win.on('new-win-policy', function(frame, url, policy) {
 		//disallow new windows (even via middle mouse button)
