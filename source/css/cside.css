@@ -111,16 +111,15 @@ body.night input:not([readonly]):not(.monaco-mouse-cursor-text), body.night text
     opacity: 1;
     visibility: visible;
     position: absolute;
-    top: 0px;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
+    top: 30px;
+    bottom: 0;
+    left: 0;
+    right: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100%;
-    z-index: 9;
+    z-index: 99;
     transition: all ease-in-out 1s;
 }
 
