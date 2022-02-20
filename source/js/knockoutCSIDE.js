@@ -554,10 +554,6 @@ function IDEViewModel() {
     }
     self.closeFile = function(file, callback) {
         function closeFile() {
-          if (activeFile() == file) {
-            cursorPos({lineNumber: 0, column: 0});
-            selectedChars(0);
-          }
           self.removeFile(file);
           __updatePersistenceList();
           if (typeof callback === 'function') callback(true);
@@ -1443,11 +1439,14 @@ function IDEViewModel() {
     }
     self.close = function() {
       if (self.isLocked()) return;
-      self.getEditors().forEach(function(ed) {
-        ed.close();
+      self.getProject().closeFile(self, function(closed) {
+        if (closed) {
+          self.getEditors().forEach(function(ed) {
+            ed.close();
+          });
+          edModel().dispose();
+        }
       });
-      edModel().dispose();
-      self.getProject().closeFile(self);
     }
     self.copyTo = function(targetProject) {
       if (typeof targetProject !== "object") return;
@@ -4377,10 +4376,6 @@ function IDEViewModel() {
     });
   });
 
-  self.getCursorPositionString = function() {
-    return "Ln " + (cursorPos().lineNumber) + ", Col " + cursorPos().column;
-  };
-
   var monacoConsole = null;
 
   var consoleCmdBuf = [];
@@ -4745,7 +4740,7 @@ function IDEViewModel() {
           var newIssues = markers.map(function(m) {
             return new CSIDEIssue({ file: file, lineNum: m.startLineNumber, desc: m.message, severity: m.severity });
           });
-          file.setMarkerIssues(newIssues);
+          if (file) file.setMarkerIssues(newIssues);
         }
       }
     });
