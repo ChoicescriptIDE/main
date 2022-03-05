@@ -1,5 +1,7 @@
 /* pause execution until CSIDE can pass the data */
 window.alreadyLoaded = true;
+var scope = window.opener ? window.opener.parent.window : parent.window;
+var thisProject = scope.cside.getActiveProject();
 
 nav = new SceneNavigator(["startup"]);
 stats = {};
