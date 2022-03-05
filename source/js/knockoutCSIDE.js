@@ -105,7 +105,7 @@ function IDEViewModel() {
       if (!document.querySelector(elementSelector) && timeout) {
         window.requestAnimationFrame(__checkRender);
       } else {
-              setTimeout(function(){ callback(); }, 0); // catch up 
+              setTimeout(function(){ callback(); }, 0); // catch up
       }
     };
     __checkRender();
@@ -2595,7 +2595,7 @@ function IDEViewModel() {
           db.filesDownload({path:path})
             .then(function(response) {
               try {
-                var url = window.URL.createObjectURL(response.fileBlob);
+                var url = window.URL.createObjectURL(response.result.fileBlob);
                 callback(null, url);
               } catch (err) {
                 callback(normalizeError(err));
@@ -2624,7 +2624,7 @@ function IDEViewModel() {
                   callback({}); // unlikely reader error?
                 }
               }); // fh.reader.result
-              reader.readAsArrayBuffer(fileData.fileBlob);
+              reader.readAsArrayBuffer(fileData.result.fileBlob);
             })
             .catch(function(err) {
               callback(normalizeError(err));
@@ -2706,10 +2706,10 @@ function IDEViewModel() {
             .then(function(response) {
               // extra db metadata for file explorer
               if (typeof dbMetaData != "undefined" && dbMetaData == true) // standardize path and folder properties
-                callback(null, response.entries.map(function(item) { item.path = item.path_lower; item.isFolder = (item[".tag"] == "folder"); return item; }));
+                callback(null, response.result.entries.map(function(item) { item.path = item.path_lower; item.isFolder = (item[".tag"] == "folder"); return item; }));
               // just return an array of paths for standard use
               else
-                callback(null, response.entries.map(function(item) { return getLastDirName(item.path_lower); }));
+                callback(null, response.result.entries.map(function(item) { return getLastDirName(item.path_lower); }));
             })
             .catch(function(err) {
               callback(normalizeError(err));
@@ -2985,13 +2985,13 @@ function IDEViewModel() {
   if (platform == "web-dropbox") {
 
     if (!!utils.parseQueryString(window.location.hash).access_token) {
-      var db = new Dropbox({ accessToken: utils.parseQueryString(window.location.hash).access_token });
-      db.setClientId("hnzfrguwoejpwbj");
+      var db = new Dropbox.Dropbox({ accessToken: utils.parseQueryString(window.location.hash).access_token });
     }
     else {
-      var db = new Dropbox({ clientId: "hnzfrguwoejpwbj" });
-      var authUrl = db.getAuthenticationUrl(window.location);
-      window.location = authUrl;
+      var db = new Dropbox.Dropbox({ clientId: "hnzfrguwoejpwbj" });
+      db.auth.getAuthenticationUrl(window.location).then((authUrl) => {
+        window.location = authUrl;
+      });
     }
 
     // try and source the DB username:
