@@ -1,0 +1,8 @@
+This is a stats screen!
+
+*stat_chart
+  percent Leadership
+  opposed_pair Strength
+    Weakness
+  text Leadership
+  text Strength

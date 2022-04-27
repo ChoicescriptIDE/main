@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title data-bind="text: version">ChoiceScript IDE</title>
+    <link rel="icon" type="image/vnd.microsoft.icon" href="img/cside.ico">
+    <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+
+    <link rel="stylesheet" href="css/all.min.css" type="text/css">
+
+    <!-- FONT AWESOME -->
+    <link rel="stylesheet" href="lib/font-awesome/css/font-awesome.min.css" type="text/css">
+
+</head>
+
+<body>
+    <!-- inline style to avoid initial transition -->
+    <div id="preload" style="background-color: #252526;">
+        <img src="img/cside.png">
+        <h1>ChoiceScript IDE</h1>
+    </div>
+
+    <!-- KO TEMPLATES  -->
+    <script type="text/html" id="template-search-toggles">
+        <div data-bind="style: { backgroundColor: value() ?  $root.getUIColour() : 'transparent' }, attr: { title: title, 'aria-label': title, 'aria-checked': value, class: 'monaco-custom-checkbox codicon ' + cssClass }, css: value() ? 'checked' : 'unchecked', click: value.bind($data, !value())" aria-disabled="false" role="checkbox" tabindex="0"></div>
+    </script>
+    <!-- /KO TEMPLATES-->
+
+    <div id="context-menu" data-bind="with: getContextMenu">
+        <ul class="dropdown-menu" role="menu" data-bind="foreach: getOptions()">
+            <li data-bind="if: typeof getSubMenuOptions() == 'undefined'">
+                <a tabindex="-1" href="#" draggable="false" data-bind="text: getLabel(), click: doAction.bind($data, $parent)"></a>
+            </li>
+            <li class="dropdown-submenu" data-bind="if: typeof getSubMenuOptions() != 'undefined'">
+                <a tabindex="-1" href="#" draggable="false" data-bind="text: getLabel(), click: doAction.bind($data, $parent)"></a>
+                <ul class="dropdown-menu" data-bind="foreach: getSubMenuOptions()">
+                    <li>
+                        <a tabindex="-1" href="#" draggable="false" data-bind="text: getLabel(), click: doAction.bind($data, $parents[1])"></a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <div id="text-context-menu">
+        <ul class="dropdown-menu" role="menu">
+            <li><a tabindex="-1" href="#" draggable="false">Cut</a></li>
+            <li><a tabindex="-1" href="#" draggable="false">Copy</a></li>
+            <li><a tabindex="-1" href="#" draggable="false">Paste</a></li>
+            <li><a tabindex="-1" href="#" draggable="false">Toggle block comment</a></li>
+        </ul>
+    </div>
+    <!-- DROPBOX/WEB FILE EXPLORER -->
+    <div data-bind="fadeVisible: isVisible" id="file-browser-canvas">
+        <div class="" id="file-browser-wrap" data-bind="initFileManager">
+            <div id="file-browser-header">
+                <div id="file-browser-title" data-bind="text: getBrowserTitle"></div>
+                <button class="close-window" title="Close" data-bind="click: cancel">
+                    <i href="#" class="fa fa-times fa-lg"></i>
+                    </button>
+            </div>
+            <div id="file-browser-locations">
+                <ul>
+                    <li data-bind="click: function() { this.redraw('/'); }">Dropbox</li>
+                </ul>
+            </div>
+            <div id="file-browser-list">
+                <ul id="file-browser-ul">
+                    <li data-bind="visible: isLoading() || hasErrored(), text: getStateDesc"></li>
+                    <!-- ko foreach: filesAndFolders -->
+                    <li class="file folder-ul" data-bind="event: { click: select, dblclick: open }, attr: { title: path }, initFiles, css: { folderSelected: selected }">
+                        <i title="Add a new scene to this project" data-bind="attr: { class: icon }"></i>
+                        <span class="file-name" data-bind="text: name"></span><span class="file-date" data-bind="text: dateModified"></span>
+                    </li>
+                    <!-- /ko -->
+                </ul>
+            </div>
+            <div id="file-browser-tray">
+                <button data-bind="click: executeTask, text: getButtonText"></button>
+            </div>
+        </div>
+    </div>
+    <!-- END OF DROPBOX/WEB FILE EXPLORER -->
+    <div class="main-wrap" data-bind="style: { borderColor: getUIColour(-30) }">
+        <div id="headbar" data-bind="style: { backgroundColor: getUIColour() }, event: { dblclick: getPlatform() === 'web-dropbox' ? null : session.win.toggleMaximize() }" class="col-anim">
+            <span class="title" data-bind="text: getActiveProject() ? getActiveProject().getName() : 'CSIDE'"></span>
+            <!-- ko if: getPlatform() != "mac_os" -->
+            <ul data-bind="foreach: getToolbarMenus" id="toolbar"><li data-bind="fadeVisible: (isActive() && ($root.getPlatform() != 'web-dropbox' || $root.webFileBrowserClosed)), style: { backgroundColor: $root.getUIColour(-20) }">
+                    <button data-bind="click: toggle, html: getTitle, style: { backgroundColor: $root.getUIColour(-12) }"></button>
+                    <div class="menu" data-bind="fadeVisible: isExpanded, style: { backgroundColor: $root.getUIColour(-20) }, event: { mouseleave: toggle.bind(null, false) }">
+                        <ul data-bind="foreach: getOptions"><li><button data-bind="text: getLabel(), click: $parent.doAction.bind($data), style: { backgroundColor: $root.getUIColour(-12) }"></button>
+                                <div class="sub-menu">
+                                    <ul data-bind="foreach: getSubMenuOptions()">
+                                        <li><button data-bind="text: getLabel(), click: doAction.bind($data, $parents[1]), style: { backgroundColor: $root.getUIColour(-16) }"></button>
+                                        </li></ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </li></ul>
+            <!-- /ko -->
+            <!-- ko if: getPlatform() != "web-dropbox" -->
+            <div id="win-controls" data-bind="css: getPlatform() == 'mac_os' ? 'mac_os' : 'windows'">
+                <button id="win-close" title="Quit CSIDE" data-bind="click: function() { win.close(); }">
+                    <i class="fa fa-close"></i>
+                </button>
+                <button id="win-min" title="Minimize CSIDE window" data-bind="click: function() { win.minimize(); }">
+                    <i class="fa fa-chevron-down"></i>
+                </button>
+                <button id="win-max" title="Maximize CSIDE window" data-bind="click: session.win.toggleMaximize">
+                    <i data-bind="css: session.win.isFullscreen() ? 'fa fa-compress' : 'fa fa-expand';"></i>
+                </button>
+            </div>
+            <!-- /ko -->
+        </div>
+        <div id="inner-wrap">
+            <div id="sidebar" data-bind="visible: isPanelOpen.bind(null, 'scene')()">
+                <div id="sidebar-header" data-bind="style: { backgroundColor: getUIColour(-8) }" class="col-anim">
+                    <span id="projects-header-title">Scenes & Projects</span>
+                    <button title="Create a new project" class="create-project-btn col-anim" data-bind="click: createProject, style: { backgroundColor: getUIColour(-12) }"><i class="fa fa-plus col-anim"></i></button>
+                    <button title="Open new files" class="open-scenes-btn col-anim" data-bind="click: openFileBrowser, style: { backgroundColor: getUIColour(-12) }"><i class="fa fa-folder-open col-anim"></i></button>
+                </div>
+                <ul id="main-project-wrap" data-bind="sortable: { data: getProjects, allowDrop: false, connectClass: 'null', afterMove: cside.updatePersistenceList, options: { axis: 'y', cancel: 'input:not([readonly]), button, .scene', items: '.project-wrapper', containment: $('#main-project-wrap') } }">
+                    <li class="project-wrapper">
+                        <div class="project-header" data-bind="css: { 'project-header-selected': $data == $root.getActiveProject(), 'collapsed': isExpanded() === false }, style: { backgroundColor: $root.getUIColour(-15), color: $root.getUIColour(100) }" class="col-anim">
+                            <button data-bind="attr: { title: 'Toggle visibility of project ' + getName() }, click: setExpand, css: isExpanded() ? 'fa fa-eye' : 'fa fa-eye-slash'" class="col-anim"></button>
+                            <!-- <span data-bind="fadeVisible: beingEdited() ? false : true, event: { dblclick: rename }, text: getName, attr: { title: getPath }"></span> -->
+                            <input data-bind="enableTextInput: beingEdited, textInput: nameInterface, event: { dblclick: rename, blur: rename, keyup: rename }, attr: { title: getPath }, style: { backgroundColor: beingEdited() ? $root.getUIColour(-15) : 'transparent' }, css: { 'name-error': nameInvalid }"
+                                class="col-anim"></input>
+                            <button class="run-project-btn col-anim" title="" data-bind="attr: { title: 'Run project ' + getName() }, click: run, clickBubble: false"><i class="fa fa-play"></i></button>
+                            <!-- ko ifnot: isReadOnly() -->
+                            <button class="add-scene-btn col-anim" data-bind="attr: { title: 'Add a new scene to project ' + getName() }, click: addNewFile, clickBubble: false"><i class="fa fa-plus"></i></button>
+                            <button class="save-project-btn col-anim" data-bind="attr: { title: 'Save all files in project ' + getName() }, click: save, clickBubble: false"><i class="fa fa-save"></i></button>
+                            <!-- /ko -->
+                        </div>
+                        <ul class="project" data-bind="fadeAndSlideVisible: isExpanded, css: { 'project-collapsed': isExpanded() != true }, sortable: { data: getFiles, beforeMove: cside.dragFileEvent, afterMove: cside.updatePersistenceList, options: { axis: 'y', cancel: 'input:not([readonly]), button', items: '.scene', connectWith: '#main-project-wrap > .project-wrapper > .project', placeholder: 'project-hover', containment: $('#main-project-wrap')} }">
+                            <li class="scene" role="button" data-bind="click: getErrState() ? load : $root.selectFileClick, css: { 'scene-selected':  isSelected() }, autoScroll: isActive()">
+                                <button class="save-scene" data-bind="click: getErrState() ? close : save, clickBubble: false, attr: { title: getErrState() ? getErrStateMsg : isReadOnly() ? 'Read-only' : 'Save ' + getName() + '.txt' }"><i data-bind="css: getState"></i></button>
+                                <button class="colour-marker handle" data-bind="attr: { title: 'Click to colour project ' + getName() }, click: showColours, clickBubble: false, style: { backgroundColor: getMarkColour }"></button>
+                                <!-- <span data-bind="text: getName(), event: { dblclick: rename }, attr: { title: getName }, fadeVisible: beingEdited() ? false : true"></span> -->
+                                <input data-bind="attr: { title: getName }, enableTextInput: beingEdited, textInput: nameInterface, event: { dblclick: rename, blur: rename, keyup: rename }, css: { 'name-error': nameInvalid, 'validation-error-text': hasErrors(), 'validation-warning-text': hasWarnings() }" class="col-anim"></input>
+                                <div class="scene-error validation-error-text" data-bind="fadeVisible: nameInvalid">
+                                    <span data-bind="text: getNameErrorMsg"></span>
+                                </div>
+                                <ul class="colour-picker" id="colour-picker" data-bind="fadeVisible: beingColoured, event: { mouseleave: showColours }">
+                                    <!-- ko foreach: $root.getRecentFileColours -->
+                                    <li class="colour-selector" role="button" data-bind="style: { backgroundColor: $data }, click: $parent.recolour.bind($data, $data), clickBubble: false"></li>
+                                    <!-- /ko -->
+                                    <!-- ko if: $root.getPlatform() != "web-dropbox" -->
+                                    <li class="colour-selector new-colour-selector" role="button" data-bind="click: newColour, clickBubble: false" style="border: none;"><i class="fa fa-plus-circle"></i></li>
+                                    <!-- /ko -->
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="resize-bar" data-bind="click: togglePanel.bind(null, 'scene'), style: { backgroundColor: getUIColour(0) }" style="border-right: 1px solid; border-color: inherit;">
+                <i class="fa" data-bind="css: !isPanelOpen.bind(null, 'scene')() ? 'fa-chevron-right' : 'fa-chevron-left'"></i>
+            </div>
+            <div id="left-wrap" data-bind="style: { backgroundColor: $root.getUIColour(-10) }">
+                <div id="editor-tab-list-event-wrapper">
+                    <!-- ko if: $root.getActiveProject -->
+                    <ul id="editor-tab-list" data-bind="sortable: { data: $root.getActiveProject().getEditors || [], beforeMove: $root.moveEditor, options: { axis: 'x', items: 'li', helper: 'clone' , containment: $('#editor-tab-list'), tolerance: 'pointer' } }">
+                        <li class="editor-tag" data-bind="click: makeActive, attr: { id: 'editor-tag-' + $index(), title: getName() }, style: { flexGrow: flexSize(), backgroundColor: $root.getUIColour(isActive() ? 0 : -8), borderColor: $root.getUIColour(-30) }">
+                            <button data-bind="click: close, style: { color: $root.getUIColour(-40) }, attr: { class: getFileStateCSS() }" class="codicon codicon-close" title="Close editor"></button>
+                            <button data-bind="click: unpin, visible: isPinned(), style: { color: $root.getUIColour(-40) }, attr: { class: getPinStateCSS() }" class="codicon codicon-pinned" title="Unpin editor"></button>
+                            <span data-bind="text: getName()"></span>
+                            <div class="tag-colour-marker" data-bind="visible: !$root.isPanelOpen.bind(null, 'scene')(), style: { backgroundColor: $data.getFile().getMarkColour }"></div>
+                        </li>
+                    </ul>
+                    <!-- /ko -->
+                </div>
+                <!-- editor instances should be retained between projects: -->
+                <ul class="editor-list" id="editor-list"></ul>
+            </div>
+            <div class="resize-bar" data-bind="click: togglePanel.bind(null, 'tab'), style: { backgroundColor: getUIColour(0) }" style="border-left: 1px solid; border-color: inherit;">
+                <i class="fa" data-bind="css: !isPanelOpen.bind(null, 'tab')() ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
+            </div>
+            <div id="right-wrap" data-bind="visible: isPanelOpen.bind(null, 'tab')()">
+                <div id="tabs" data-bind="tabs: { refreshOn: tabs }">
+                    <ul data-bind="style: { backgroundColor: getUIColour(-10) }, sortable: { data: tabs, allowDrop: false, connectClass: 'null', afterMove: cside.updatePersistenceList, options: { axis: 'x', items: 'li', containment: 'parent' } }" class="col-anim">
+                        <li data-bind="attr: { 'aria-controls': id, title: title }, visible: visible, style: { backgroundColor: $root.getUIColour(-15) }">
+                            <a draggable="false" data-bind="attr: { title: title, href: '#' + id, class: 'ui-tabs-anchor ' + iconClass() }, style: { color: $root.getUIColour(-65) }"></a>
+                            <!-- ko if: id == 'issues' && $root.getActiveProject() -->
+                            <div draggable="false" class="notification-badge" data-bind="visible: $root.getActiveProject().issueCount, style: { borderColor: $root.getUIColour(-15) }, css: 'notification-badge ' + ($root.getActiveProject().hasErrors() ? 'error' : $root.getActiveProject().hasWarnings() ? 'warning' : 'info')">
+                                <span draggable="false" data-bind="text: notificationCount()"></span>
+                            </div>
+                            <!-- /ko -->
+                        </li>
+                    </ul>
+                    <!-- ko foreach: tabs -->
+                    <div class='tab-wrap' data-bind="attr: { id: id }, visible: visible">
+                        <div data-bind="css: 'tab-panel ' + id">
+                            <div class="no-select tab-panel-header col-anim" data-bind="visible: showTitle, text: getHeaderTitle, style: { backgroundColor: $root.getUIColour(-8) }"></div>
+                            <!-- ko if: href != '' -->
+                            <div class="iframe-wrap">
+                                <!-- ko if: ($root.getPlatform() != "web-dropbox") && (id == 'game')  -->
+                                <webview partition="untrusted-game" data-bind="attr { src: href, title: title, name: title, visible: href, id: id + '-tab-frame' }"></webview>
+                                <!-- /ko -->
+                                <!-- ko if: ($root.getPlatform() == "web-dropbox") || (id == 'help') -->
+                                <iframe data-bind="attr { src: href, title: title, name: title, visible: href, id: id + '-tab-frame' }, event: { load: onload }"></iframe>
+                                <!-- /ko -->
+                            </div>
+                            <!-- /ko -->
+                            <!-- ko if: id == 'issues' && $root.getActiveProject -->
+                            <div id="issue-controls-wrap" role="search">
+                                <div class="search-controls" data-bind="template: { name: 'template-search-toggles', foreach: $root.searchToggles }"></div>
+                                <form autocomplete="off" data-bind="submit: $root.getActiveProject().issueSearch">
+                                    <textarea spellcheck="false" type="text" data-bind="event: { keydown: $root.getActiveProject().issueSearch, keyup: $root.getActiveProject().issueSearch }" placeholder="Filter issues"></textarea>
+                                    <ul id="issue-filter-toggles" data-bind="foreach: $root.issueToggles">
+                                        <li data-bind="css: { 'checked': $data.state }">
+                                            <label>
+                                                <input type="checkbox" data-bind="checked: $data.state">
+                                                <span data-bind="css: $data.fa, style: { color: $data.state() ? $data.color : '' }"></span>
+                                                <span data-bind="text: $data.text"></span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </form>
+
+                                <p>
+                                    <span data-bind="text: $root.filterString.isErroneous() ? $root.filterString.errorMessage() : $root.getActiveProject().getFilteredIssueCountString(), css: { 'validation-error-text': $root.filterString.isErroneous }"></span>
+                                    <br>
+                                    <span data-bind="text: $root.getActiveProject().getIssueCountString()"></span>
+                                </p>
+                            </div>
+                            <ul id="issue-scenelist" data-bind="foreach: $root.getActiveProject().getFiles()">
+                                <!-- ko if: $data.filteredIssueCount() > 0 -->
+                                <li class="search-result-scene">
+                                    <div class="no-select tab-panel-header col-anim" data-bind="style: { backgroundColor: $root.getUIColour(-25) }">
+                                        <button class="search-expand-btn" data-bind="click: $data.expandIssues.bind($root, !$data.expandIssues(), true), css: expandIssues() ? 'fa fa-angle-down' : 'fa fa-angle-right'"></button>
+                                        <span data-bind="text: $data.getName()"></span>
+                                        <span class="search-result-badge" data-bind="text: $data.filteredIssueCount(), style: { backgroundColor: $root.getUIColour() }"></span>
+                                    </div>
+                                    <ul data-bind="if: expandIssues()"> <!-- data expanded -->
+                                        <!-- ko foreach: $data.getFilteredIssues -->
+                                        <li data-bind="click: show, autoScroll: isActive()" class="tab-result-item">
+                                            <div style="width: calc(100% - 20px);display: inline-block;">
+                                                <span data-bind="text: ' (Line '+ $data.getLineNum() + ')'" class="tab-result-line-info"></span>
+                                                <i style="margin-right: 5px;" data-bind="css: getIconClasses()"></i>
+                                                <span data-bind="text: getDesc()"></span>
+                                            </div>
+                                            <button data-bind="visible: canDismiss(), click: dismiss" style="width: 20px;height: 20px;background: none;border: none;padding: 0px;float: right;">
+                                                <i class="fa fa-times" style="color:salmon;"></i>
+                                            </button>
+                                        </li>
+                                        <!-- /ko -->
+                                    </ul>
+                                </li>
+                                <!-- /ko -->
+                            </ul>
+                            <!-- /ko -->
+                            <!-- ko if: id == 'settings' -->
+                            <script type="text/html" id="setting-option-template">
+                                <!-- ko if: getType() == "binary" -->
+                                <li data-bind="click: toggle, visible: isVisible">
+                                    <i data-bind="css: getValue() ? 'fa fa-check-square-o fa-lg fa-fw setting-on' : 'fa fa-square-o fa-lg fa-fw setting-off'"></i>
+                                    <span class="setting-name" data-bind="text: getName()"></span>
+                                    <br>
+                                    <span class="desc" data-bind="text: getDesc()"></span>
+                                </li>
+                                <!-- /ko -->
+                                <!-- ko if: getType() != "binary" -->
+                                <li data-bind="visible: isVisible">
+                                    <span class="setting-name" data-bind="text: getName()"></span>
+                                    <br>
+                                    <span class="desc" data-bind="text: getDesc()"></span>
+                                    <!-- ko if: getType() == "dropdown" -->
+                                    <br>
+                                    <select data-bind="options: getOptions(), optionsText: 'desc', optionsValue: 'value', value: value"></select>
+                                    <!-- /ko -->
+                                    <!-- ko if: getType() == "number" -->
+                                    <br>
+                                    <input type="number" data-bind="attr: { 'min': min, 'max': max, 'step': step }, value: value ">
+                                    <br>
+                                    <p class="validation-error-text" data-bind="visible: value.isErroneous(), text: value.errorMessage()"></p>
+                                    <!-- /ko -->
+                                    <!-- ko if: getType() == "variable" || getType() == "custom" -->
+                                    <ul data-bind="foreach: getOptions()">
+                                        <li class="setting-option" data-bind="css: { 'setting-option-selected': $parent.getValue() == value }, click: $parent.toggle">
+                                            <div data-bind="html: desc"></div>
+                                        </li>
+                                    </ul>
+                                    <!-- /ko -->
+                                </li>
+                                <!-- /ko -->
+                            </script>
+                            <div data-bind="style: { backgroundColor: $root.getUIColour(-8) }" class="no-select tab-panel-header col-anim">Editor Settings</div>
+                            <ul data-bind="template: { name: 'setting-option-template', foreach: $root.getEditorSettings }"></ul>
+                            <div data-bind="style: { backgroundColor: $root.getUIColour(-8) }" class="no-select tab-panel-header col-anim">App Settings</div>
+                            <ul data-bind="template: { name: 'setting-option-template', foreach: $root.getAppSettings }"></ul>
+                            <!-- /ko -->
+                            <!-- ko if: id == 'dictionary' -->
+                            <ul>
+                                <li>
+                                    <input spellcheck="false" type="text" data-bind="textInput: $root.dictWord, event: { 'keyup': $root.addToDictionary }" placeholder="Type to search or add..."></input>
+                                    <button class="btn btn-default" data-bind="click: $root.addToDictionary">Add Word</button>
+                                    <div>
+                                        <button id="dict-btn-import" data-bind="click: $root.importDictionary" title="Import dictionary" class="btn btn-default fa fa-upload"></button>
+                                        <button id="dict-btn-export" data-bind="click: $root.exportDictionary" title="Export dictionary" class="btn btn-default fa fa-download"></button>
+                                        <button id="dict-btn-clear" data-bind="click: $root.clearDictionary" title="Clear dictionary" class="btn btn-default fa fa-trash"></button>
+                                    </div>
+                                </li>
+                                <li data-bind="visible: $root.getDictionaryArray().length == 0">
+                                    <span>Words escape me.</span>
+                                </li>
+                            </ul>
+                            <ul data-bind="foreach: $root.getDictionaryArray">
+                                <li>
+                                    <span data-bind="text: $data, attr: { title: $data }"></span>
+                                    <i data-bind="click: $root.removeFromDictionary" class="fa fa-times" title="Remove word"></i>
+                                </li>
+                            </ul>
+                            <!-- /ko -->
+                            <!-- ko if: id == 'search' && $root.getActiveProject -->
+                            <div class="search-controls-wrap" role="search">
+                                <div class="search-controls" data-bind="template: { name: 'template-search-toggles', foreach: $root.searchToggles }"></div>
+                                <form data-bind="submit: $root.getActiveProject().search" autocomplete="off">
+                                    <button type="button" id="search-mode-btn" data-bind="style: { height: $root.inReplaceMode() ? '75px' : '32px' }, click: $root.toggleSearchMode, css: $root.inReplaceMode() ? 'fa fa-angle-down' : 'fa fa-angle-right'"></button>
+                                    <textarea class="search" id="searchBox" spellcheck="false" type="text" placeholder="Search" data-bind="event: { keydown: $root.getActiveProject().searchByEnterKey, keyup: $root.getActiveProject().searchByEnterKey }"></textarea>
+                                    <textarea class="search" id="replaceBox" spellcheck="false" type="text" placeholder="Replace" data-bind="visible: $root.inReplaceMode(), event: { keydown: $root.getActiveProject().searchByEnterKey, keyup: $root.getActiveProject().searchByEnterKey }"></textarea>
+                                    <button class="btn btn-default" id="search-btn" data-bind="text: $root.inReplaceMode() ? 'Replace' : 'Search'"></button>
+                                </form>
+                                <p data-bind="text: $root.getActiveProject().getSearchResultDesc()" style="margin-bottom: 0;"></p>
+                            </div>
+                            <ul id="search-result-scenelist" data-bind="foreach: $root.getActiveProject().getSearchResults()">
+                                <li class="search-result-scene">
+                                    <div class="no-select tab-panel-header col-anim" data-bind="style: { backgroundColor: $root.getUIColour(-25) }">
+                                        <button class="search-expand-btn" data-bind="click: $data.expand.bind($root, !$data.isExpanded(), true), css: $data.isExpanded() ? 'fa fa-angle-down' : 'fa fa-angle-right'"></button><span data-bind="text: $data.getFile().getName()"></span>
+                                    <!-- ko if: $root.inReplaceMode() -->
+                                        <button class="btn search-replace-all-btn" data-bind="text: 'Replace All' + ' (' + $data.getLengthString() + ')', style: { backgroundColor: $root.getUIColour() }, click: $data.getFile().replaceAllSearchResults.bind()"></button>
+                                    <!-- /ko -->
+                                    <!-- ko if: !$root.inReplaceMode() -->
+                                        <span class="search-result-badge" data-bind="text: $data.getLengthString(), style: { backgroundColor: $root.getUIColour() }"></span>
+                                    <!-- /ko -->
+                                    </div>
+                                    <ul data-bind="if: $data.isExpanded">
+                                        <!-- ko if: $data.getLength() >= 999 -->
+                                        <li class="search-max-length-alert" data-bind="style: { backgroundColor: $root.getUIColour(-80) }"><i class="fa fa-warning"></i>The results for this scene have been truncated to the first 999.</li>
+                                        <!-- /ko -->
+                                        <!-- ko foreach: $data.getResults -->
+                                            <li data-bind="click: $parent.getFile().showSearchResult.bind($data, $index())" class="tab-result-item">
+                                                <span data-bind="text: ' (Line '+ $data.range.startLineNumber + ')'" class="tab-result-line-info"></span>
+                                                <span data-bind="text: $data.preText"></span><span class="search-result-highlight" data-bind="text: $data.matches[0], style: { backgroundColor: $root.getUIColour(0), textDecoration: ($root.inReplaceMode()) ? 'line-through' : 'none' }" style="color: white;"></span><!-- ko if: $root.inReplaceMode() --><span class="search-result-highlight" data-bind="text: $data.replaceText, style: { backgroundColor: $root.getUIColour(20) }"></span><!-- /ko --><span data-bind="text: $data.postText"></span><button data-bind="visible: $root.inReplaceMode(), click: $parent.getFile().replaceSearchResult.bind($data, $index())" class="search-replace-item-btn btn btn-default fa fa-search-minus"></button>
+                                            </li>
+                                        <!-- /ko -->
+                                    </ul>
+                                </li>
+                            </ul>
+                            <!-- /ko -->
+                            <!-- ko if: id == 'examples' -->
+                            <ul data-bind="foreach: $root.cs_examples">
+                                <li>
+                                    <h5 style="margin:5px;" data-bind="text: title, attr: { title: title }"></h5>
+                                    <p class="desc" data-bind="text: desc"></p>
+                                    <button class="btn btn-default" data-bind="click: $root.cloneExample"><span class="fa fa-download"></span> Import Project</button>
+                                    <button class="btn btn-default" data-bind="click: $root.runExample"><span class="fa fa-play"></span> Run Project</button>
+                                </li>
+                            </ul>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                </div>
+            </div>
+        </div>
+        <div data-bind="style: { display: getActiveProject() && getActiveProject().consoleOpen() ? 'flex' : 'none' }" id="cs-console" class="monaco-editor-background">
+            <div id="console-header" data-bind="style: { backgroundColor: getUIColour(), borderColor: getUIColour(-30) }"></div>
+            <!-- ko if: getActiveProject -->
+            <ul data-bind="foreach: getActiveProject().getLogs">
+                <li data-bind="html: $data.value"></li>
+                <span class="meta" data-bind="visible: ($data.scene && $data.line), text: $data.scene + $data.line"></span>
+                </li>
+            </ul>
+            <!-- /ko -->
+            <div id="monaco-console-input"></div>
+        </div>
+        <div id="code-footer" data-bind="if: getActiveEditor() && getActiveFile(), style: { backgroundColor: getUIColour(), borderColor: getUIColour(-30) }">
+            <button class="console-btn col-anim" data-bind="click: getActiveProject().toggleConsole">
+                    <span class="fa fa-terminal"></span>
+                    <span class="console-indicator" data-bind="fadeVisible: getActiveProject() && getActiveProject().getUnreadLogCount(), text: getActiveProject() ? getActiveProject().getUnreadLogCount() : ''" ></span>
+                </button>
+            <span data-bind="text: getActiveEditor().getCursorPositionString()"></span>
+            <span data-bind="visible: wordCountOn()">Char Count: <span data-bind="text: getActiveEditor().getCharCountString()"></span></span>
+            <span data-bind="visible: wordCountOn()">Word Count: <span data-bind="text: getActiveEditor().getWordCountString()"></span></span>
+            <button title="Change scene indentation" id="scene-indentation-btn" data-bind="event: { mouseover: footerBtnHover, mouseout: footerBtnHover, mousedown: footerBtnHover, mouseup: footerBtnHover }, text: getActiveFile().getIndentDesc(), click: $root.promptForFileIndentation"></button>
+        </div>
+    </div>
+
+    <!-- input elements for desktop app -->
+    <input style="display:none;" id="selectFolder" type="file" nwdirectory />
+    <input style="display:none;" id="getFilePaths" type="file" multiple accept=".txt,.log" />
+    <input style="display:none;" id="getImagePaths" type="file" accept=".png,.jpeg,.jpg,.gif" />
+    <input style="display:none;" id="saveFileTo" type="file" nwsaveas=".txt" />
+    <input style="display:none;" id="selectColor" type="color">
+
+    <!-- CSIDE Code -->
+    <script type="text/javascript">
+        (function(window) {
+            window.utils = {
+                parseQueryString: function(str) {
+                    var ret = Object.create(null);
+
+                    if (typeof str !== 'string') {
+                        return ret;
+                    }
+
+                    str = str.trim().replace(/^(\?|#|&)/, '');
+
+                    if (!str) {
+                        return ret;
+                    }
+
+                    str.split('&').forEach(function(param) {
+                        var parts = param.replace(/\+/g, ' ').split('=');
+                        // Firefox (pre 40) decodes `%3D` to `=`
+                        // https://github.com/sindresorhus/query-string/pull/37
+                        var key = parts.shift();
+                        var val = parts.length > 0 ? parts.join('=') : undefined;
+
+                        key = decodeURIComponent(key);
+
+                        // missing `=` should be `null`:
+                        // http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
+                        val = val === undefined ? null : decodeURIComponent(val);
+
+                        if (ret[key] === undefined) {
+                            ret[key] = val;
+                        } else if (Array.isArray(ret[key])) {
+                            ret[key].push(val);
+                        } else {
+                            ret[key] = [ret[key], val];
+                        }
+                    });
+
+                    return ret;
+                }
+            };
+        })(window);
+    </script>
+    <script>
+        // Monaco uses a custom amd loader that over-rides node's require.
+        // Keep a reference to node's require so we can restore it after executing the amd loader file.
+        if (typeof nw === "object")
+            var nodeRequire = require;
+    </script>
+    <script type="text/javascript" src="js/all.min.js"></script>
+    <script type="text/javascript">
+        if (usingNode) {
+            var head = document.getElementsByTagName("head")[0];
+            if (head) {
+                // we override the define twice, else it just edits the existing DOM element
+                var script = document.createElement("script");
+                script.type = "text/javascript";
+                script.src = "js/win_state.min.js";
+                head.appendChild(script);
+                var script = document.createElement("script");
+                script.type = "text/javascript";
+                script.src = "js/node_CSIDE.min.js";
+                head.appendChild(script);
+            }
+        }
+    </script>
+</body>
+
+</html>

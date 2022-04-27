@@ -1,0 +1,120 @@
+
+*comment NEW TO CHOICESCRIPT? CLICK THE > 'Run project CSTutorial' BUTTON TO START TUTORIAL
+
+[b]Lesson 2[/b] - [b][i]The Startup File[/i][/b]
+
+Left-click to select the Tutorial's [b]startup[/b] file, displaying the contents of that file in the [i]Code Editor[/i] in order to better understand the following explanation.
+
+The first line of text uses the [b]${cmd1}[/b] command to leave reminder 'scripting notes' for ourselves which do not appear in-game: anything on a ${cmd1} line can be seen only when viewing the actual text file—as we are in the [i]Code Editor[/i]—and never appear in-game for the player. We'll touch upon this subject again later in the tutorial.
+
+The next three commands in the startup file—[b]${cmd20}[/b], [b]${cmd21}[/b] and [b]${cmd5}[/b]—are reserved for the startup file and are not needed (nor are they allowed) anywhere else in our scripting.
+
+[b]${cmd20}[/b] allows you to name your game, which is then displayed in-game at the top of every page the player sees - as shown above, here in the [i]Game Tab[/i] panel.
+
+[b]${cmd21}[/b] is also displayed on every page, and appears below the game title as shown above.
+
+[b]${cmd5}[/b] is the first command requiring the use of [i]indentation[/i] (blocks of space at the start of the line) for following, associated lines. Immediately below this command, and [i]indented[/i] accordingly, is a list of all the [i]Scene file names[/i] used in the game (or in our case, this Tutorial), listed in [i]sequential[/i] order, i.e. the order in which they are intended to be played through.
+
+When CS reaches the last line of a particular Scene file—or hits a [b]${cmd4}[/b] command—it consults the [b]${cmd5}[/b] in the startup file to determine which Scene to load next for the player, thereby ensuring that the game / story narrative flows smoothly and in the order intended. For example, you are currently reading text from the Scene file called '[b]lesson02[/b]'. When you reach the end of this file 'in-game', CS will use [b]${cmd5}[/b] to immediately load the Scene named '[b]lesson03[/b]'.
+
+*page_break
+
+Below the ${cmd5}'s file names, we begin "declaring" the [i]Permanent Variables[/i] intended to be used throughout the game for storing and updating essential information, using the [b]${cmd2}[/b] command for each individual variable. As with the previous three commands, the [b]${cmd2}[/b] command may also be used [i]only[/i] in the [b]startup[/b] file itself. There is however no real limit to the number of different variables you can [b]${cmd2}[/b] at the start of a game.
+
+The main part of each [b]${cmd2}[/b] command is the [i]name[/i] of the Variable (e.g. [b]pcname[/b], [b]class[/b], [b]race[/b], [b]str[/b], [b]int[/b], [b]dex[/b], etc.), each of which, you may recall, must be unique as it will be used as the exact [i]reference[/i] for that variable within our scripting.
+
+The final segment of each [b]${cmd2}[/b] command is the new variable's default (starting) [i]Value[/i], which also determines its [i]Data Type[/i]. Among the Example Character Stats shown here, you can see examples of all three [i]Data Types[/i] in use for a variable's stored [i]Value[/i]. Some are using a number ([i]numeric[/i] variables), some have "some text" (quote marks are essential for [i]string[/i] variables) and some have simply [i]true[/i] or [i]false[/i] (without any quotes, known as [i]boolean[/i] variables). The latter type is used exclusively for [i]conditional[/i]—[i]Yes[/i] or [i]No[/i]—purposes.
+
+In many cases the starting [i]Value[/i] seems to make little sense. What's the point of "Unknown" names or indeed, zero [b]str[/b]ength or [b]int[/b]elligence, you may ask?  
+
+The important point to grasp here is that all of the variables we [b]${cmd2}[/b] at the very start of the game are intended to be [i]Permanent[/i]—to persist throughout the game—regardless of when they are first actually referenced in our scripting or displayed in the game for the player to see. They must exist from the very start, and therefore must have a 'default' value simply to define the starting [i]Data Type[/i] for each—i.e. whether it's [i]numeric[/i], a "[i]string[/i]", or a true / false [i]boolean[/i].
+
+Let's take a closer look at some of these example variables, for further clarity:
+
+*page_break
+
+[b]pcname[/b] is the [i]string[/i] variable name used to store (and by which we will [i]reference[/i], for such as display purposes) the player-character's own name in the game. The player will be allowed to choose their own name early in the game so at the start it is simply "Unknown".
+
+[b]str[/b] is the abbreviated variable name we will use for storing the character's [i]numeric[/i] Strength stat. As the [i]actual[/i] starting value will be based on an early [b]class[/b] choice by the player (Warrior, Mage, etc.) and modified by a [b]race[/b] choice, [b]str[/b] and similar character stats start out at zero.
+
+The [b]backpack[/b] variable is the first [i]boolean[/i] we are using, starting out with a value of [i]false[/i] as the protagonist does not begin the story owning a backpack; they must first find or buy one before this variable will be [b]${cmd11}[/b] to [i]true[/i] using the command for that purpose (more on [b]${cmd11}[/b] later).
+
+Conversely, our protagonist does always start out in the story with a family [b]heirloom[/b] in their possession, so that variable is marked with a default value of [i]true[/i] to record this fact. If they later lose or perhaps choose to sell this valuable artifact, it would at [i]that[/i] point be [b]${cmd11}[/b] to [i]false[/i].
+
+Our protagonist also has some other items at the very start—a [b]weapon[/b], some body [b]armour[/b], and basic [b]helm[/b]—for which we are using "[i]string[/i]" variables to name these items precisely for display purposes (as better stuff will be acquired later in the game to replace these). From this we have also decided on some starting [b]att[/b]ack and [b]def[/b]end values for combat purposes.
+
+Note that the protagonist does not, however, [i]start[/i] with a [b]shield[/b]. The variable itself still needs to be created now for later use, of course, so we are using a default starting value of double quotes— "" —with no actual text, to indicate a "blank" [i]string[/i] value. This is perfectly valid.
+
+We also have nine blank [b]eq#[/b] [i]string[/i] variables, uniquely numbered for [i]reference[/i] purposes, to allow for miscellaneous equipment items not included among the main equipment. It could be scripted so that a [b]backpack[/b] will be needed ([i]true[/i]) to carry more than two or three extra items. 
+
+*page_break
+
+[i]Scroll down the Code Editor window to continue following these examples.[/i]
+
+Below our Example Character 'Stats' (variables whose [i]Values[/i] are intended to be displayed for the player, either on the 'Show Stats' screen or within story narrative) we also have some 'Hidden' variables being created, beginning with one called 'found_black_iron_hills'.
+
+Although in our example here we are using only two types of hidden variables, a typical game will often use many hidden variables to record a whole range of information—limited only by the author's creativity. In the first instance we are using a range of [i]boolean[/i] variables to record if our protagonist has yet encountered particular regions in the game, so all are set [i]false[/i] to begin with.
+
+In the second instance, we are planning to use a number of [i]numeric[/i] values to represent the protagonist's relationship with the three main races encountered in the game. We start them all at 50 to indicate neutrality, but the intention is that this hidden rating will go up or down (say, 0-100) according to the player's choices and actions, so future encounters with members of each race will better reflect, or at least take into account, choices made earlier in the story.
+
+While these examples demonstrate just how descriptive and self-explanatory variable names can be (provided we use under_scores, as [i]spaces[/i] are not allowed in variable names), bear in mind that when developing your game you will sometimes find yourself having to type some variable names over and over again throughout various scenes.
+
+For names you expect to [i]reference[/i] a lot, consider instead the next set of examples, using [b]loc#[/b] and [b]rep#[/b] instead. These are simply alternate forms of the previous 'hidden' variables list, and also store a value for six game locations and three reputation ratings, but it's much easier / quicker to reference 'loc4' than it is to type 'found_dale_of_shadows'. In short, don't be afraid to keep your variable names easier to use in your actual scripting, even if it means keeping a separate record of what they all actually mean… (a handy use of ${cmd1} lines, for instance).
+
+*page_break Startup file Summary
+
+[b]To recap -[/b]
+*line_break
+- ChoiceScript always loads and runs a game's [i]startup[/i] file first of all, using this to set the game's [b]${cmd20}[/b], [b]${cmd21}[/b], subsequent [b]${cmd5}[/b], and the starting [i]Values[/i] of all [i]Permanent Variables[/i]. 
+
+- When you add new [i]Scene[/i] files to your game, you should also edit the startup file to include the new scene name in the [b]${cmd5}[/b], in sequential order.
+
+- The startup file is also used to define, name and provide a default ([i]starting[/i]) [i]Value[/i] for all of a game's [i]Permanent Variables[/i], using one [b]${cmd2}[/b] command for each.
+
+- New [i]Permanent Variables[/i] may be added to your game [i]at any point[/i] during development simply by editing the startup file and adding (or inserting) a new [b]${cmd2}[/b] command.
+
+- Each variable must be uniquely named, must [i]begin[/i] with a letter a-z (not a number or any other character), and must not have any actual spaces in the name; under_scores are fine, however, as are numbers used elsewhere in the name (typically at the end, e.g. [b]loc4[/b]).
+
+- You should ideally aim to keep variable names relatively short and all in lower case, to make their use more efficient and less prone to typing errors when scripting your game.
+
+- If required, keep a separate record of what abbreviated or abstract variable names actually mean, or perhaps simply add a [b]${cmd1}[/b] line for each in the startup file.
+
+- All variables must also have a default starting Value, either [i]numeric[/i] (a number), a [i]string[/i] ("some text" in quotes) or a simple [i]boolean[/i] (either [b]true[/b] or [b]false[/b], without quotes).
+
+- Immediately after running the startup file, ChoiceScript will automatically load & run the first [i]Scene[/i] file listed in the [b]${cmd5}[/b], so that is where I recommend starting your actual story.
+
+*page_break Startup - Test Project
+
+[i]Now left-click to select & view the [b]startup[/b] file for your [b]Test Project[/b][/i]. It will already have a [b]${cmd20}[/b] command listed but will otherwise mostly still be empty. Time to add some content!
+
+[i][b]~~Exercise 4[/b] - Add your own name beside the [b]${cmd21}[/b] command, then hit enter[/i].
+
+Note that [i]Choice of Games[/i] do not require you to identify your published games by name. You may if you wish use a unique alias (a [i]pen name[/i], or [i]nom de plume[/i]).
+
+[i][b]~~Exercise 5[/b] - On the next line, add the vital [b]${cmd5}[/b] command, then hit enter[/i].
+
+This time when you hit enter you should find that CSIDE's [i]Smart Indentation[/i] function has kicked in to automatically [i]indent[/i] the following line by one 'level' (four spaces, at the default setting). This is because CSIDE knows that the lines immediately following this command must always be indented. (You may, however, toggle this function [i]Off[/i] under [i]Settings[/i], but will then have to do all of the required indentation manually using the Tab key or space bar.)
+
+[i][b]~~Exercise 6[/b] - Now add your three scene file names below ${cmd5}, each on a line of its own and indented one level, and in sequential order: scene01, scene02, scene03[/i].
+
+You will notice that smart indentation continues to automatically indent each successive line, ready to just type the next scene name. However, since it has no way of knowing how many scene names you are entering, it cannot automatically [i]dedent[/i] (i.e. return the cursor back to the very start of a line). When you are done entering scene names, simply use [i]Backspace[/i] (one space back) or [i]Shift-Tab[/i] (one [i]level[/i] back—i.e. four spaces at the default setting) to dedent. Note that [i]Shift-Enter[/i] will temporarily override Smart Indent and return to the start of the next line.
+
+Do blank lines between commands make any difference, you may ask? No, not at all, is the simple answer. Feel free to use blank lines to space the startup file as you wish for neatness / ease of use, but it's probably best to make sure they do not contain any lingering indentation.
+
+*page_break
+
+The next step in laying out your game's [b]startup[/b] file is to [b]${cmd2}[/b] all the [i]Permanent Variables[/i] intended to be used. While it's entirely possible to just start writing your story in the first [i]scene[/i] file and simply add [b]${cmd2}[/b] commands to your [i]startup[/i] file as & when the need arises, most experienced authors agree that it's probably best to first plan things out a little. At the very least give some thought to the basic character stats you intend to use in the game, and perhaps consult the 'Show Stats' page of existing Choice Games for some ideas & inspiration.
+
+For the purposes of this Tutorial, however, our [i]Test Project[/i] will be a very simple fantasy adventure game in traditional 'hack & slash' style. The variables we will use for this have already been listed for example purposes in the Tutorial's own [i]startup[/i] file, so we will simply use those:
+
+[i][b]~~Exercise 7[/b] - Click to view the Tutorial's [b]startup[/b] file. Use your mouse to select lines [b]21-84[/b] inclusive, then right-click and select [b]Copy[/b]. Switch back to the startup file for Test Project, left-click to place your cursor above the [b]${cmd4}[/b] command there, then right-click and select [b]Paste[/b][/i].
+
+Note that CSIDE's [i]Code Editor[/i] is a fully-functional text editor, so standard keyboard shortcuts such as Ctrl-C (copy) and Ctrl-V (paste)—CMD-C/V for Macs—will also work just fine.
+
+You may recall from earlier that we actually have some duplicate 'Hidden' variables in there - both long and shorthand versions. As we will be using only the shortened version of those variables for our purposes, we have one final Exercise for our Test Project's [i]startup[/i] file:
+
+[i][b]~~Exercise 8[/b] - Use Shift-Up/Down arrows on your keyboard to select and then [b]delete[/b] all the [b]${cmd2} found_[/b] and [b]${cmd2} reputation_[/b] lines, plus all unneeded [b]${cmd1}[/b] lines.[/i]
+
+When done, your Test Project's [i]startup[/i] file should look very similar to the Tutorial file called [b]example01[/b]. Switch between them to double-check! When you are satisfied everything looks okay, save your [i]startup[/i] file (click the red disk icon) and continue on to the next Lesson.
+
+*finish Lesson #3 - [i]Game Narrative[/i]
