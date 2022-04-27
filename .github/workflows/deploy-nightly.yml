@@ -1,6 +1,7 @@
 name: deploy-nightly
 
 on:
+  pull_request:
   workflow_dispatch:
   schedule:
     - cron:  '30 1 * * *'
