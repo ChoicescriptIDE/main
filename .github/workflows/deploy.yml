@@ -1,4 +1,4 @@
-name: deploy
+name: deployt
 
 on:
   pull_request:
