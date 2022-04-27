@@ -32,7 +32,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@4.1.1
         with:
           branch: preview
-          folder: inno
+          folder: build
           target-folder: rex
       - name: Comment link
         uses: actions/github-script@v6
