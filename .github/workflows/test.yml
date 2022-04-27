@@ -1,0 +1,43 @@
+name: deploy-nightly
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron:  '30 1 * * *'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v1.4.4
+        with:
+          # Version Spec of the version to use.  Examples: 10.x, 10.15.1, >=10.15.0
+          node-version: 10.x
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup Python dependencies
+        run: |
+          pip3 install mkdocs
+          pip3 install mkdocs-material
+          pip3 install mkdocs-localsearch
+      - name: Build
+        run: |
+          npm install grunt-cli -g
+          npm ci .
+          grunt
+      - name: Get Date
+        id: date
+        run: echo "::set-output name=date::$(date +'%D')"
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@4.1.1
+        with:
+          repository-name: ChoiceScriptIDE/web
+          branch: gh-pages
+          folder: build
+          target-folder: nightly
+          git-config-name: 'CSIDE-Shell'
+          git-config-email: '32689095+CSIDE-Shell@users.noreply.github.com'
+          commit-message: 'Nightly deployment (${{ steps.date.outputs.date }})'
+          token: ${{ secrets.CSIDESHELL }}
