@@ -33,7 +33,7 @@ jobs:
         with:
           branch: preview
           folder: build
-          target-folder: rex
+          target-folder: deployments/rex
       - name: Comment link
         uses: actions/github-script@v6
         with:
