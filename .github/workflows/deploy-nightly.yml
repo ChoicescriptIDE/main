@@ -27,9 +27,17 @@ jobs:
           npm install grunt-cli -g
           npm ci .
           grunt
+      - name: Get Date
+        id: date
+        run: echo "::set-output name=date::$(date +'%D')"
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@4.1.1
         with:
-          branch: preview
+          repository-name: ChoiceScriptIDE/web
+          branch: gh-pages
           folder: build
-          target-folder: deployments/nightly
+          target-folder: nightly
+          git-config-name: 'CSIDE-Shell'
+          git-config-email: '32689095+CSIDE-Shell@users.noreply.github.com'
+          commit-message: 'Nightly deployment (${{ steps.date.outputs.date }})'
+          token: ${{ secrets.CSIDESHELL }}
