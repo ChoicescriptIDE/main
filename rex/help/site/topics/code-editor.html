@@ -1,0 +1,905 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.2.11">
+    
+    
+      
+        <title>Code editor - Help & Information</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.8c5ef100.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.9647289d.min.css">
+        
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/css/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="light-blue" data-md-color-accent="blue">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#general-functionality" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="Help &amp; Information" class="md-header__button md-logo" aria-label="Help & Information" data-md-component="logo">
+      
+  <img src="../assets/img/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Help & Information
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Code editor
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="light-blue" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3 3.19.09m3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95 2.06.05m-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31Z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="light-blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5c-.84 0-1.65.15-2.39.42L12 2M3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29L3.34 7m.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14L3.36 17M20.65 7l-1.77 3.79a7.023 7.023 0 0 0-2.38-4.15l4.15.36m-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29L20.64 17M12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44L12 22Z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="Help &amp; Information" class="md-nav__button md-logo" aria-label="Help & Information" data-md-component="logo">
+      
+  <img src="../assets/img/logo.png" alt="logo">
+
+    </a>
+    Help & Information
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../acknowledgements.html" class="md-nav__link">
+        Acknowledgements
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../advanced-topics.html" class="md-nav__link">
+        Advanced topics
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../basic-topics.html" class="md-nav__link">
+        Basic topics
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog.html" class="md-nav__link">
+        Changelog
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../terms-and-conditions.html" class="md-nav__link">
+        Terms and conditions
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7" type="checkbox" id="__nav_7" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_7">
+          Getting started
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Getting started" data-md-level="1">
+        <label class="md-nav__title" for="__nav_7">
+          <span class="md-nav__icon md-icon"></span>
+          Getting started
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/adding-scenes.html" class="md-nav__link">
+        Adding scenes
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/creating-projects.html" class="md-nav__link">
+        Creating or Importing a Project
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/setting-up.html" class="md-nav__link">
+        Setting up
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/user-interface.html" class="md-nav__link">
+        User interface
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/what-is-cside.html" class="md-nav__link">
+        What is CSIDE?
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8">
+          Topics
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Topics" data-md-level="1">
+        <label class="md-nav__title" for="__nav_8">
+          <span class="md-nav__icon md-icon"></span>
+          Topics
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="about.html" class="md-nav__link">
+        About
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Code editor
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="code-editor.html" class="md-nav__link md-nav__link--active">
+        Code editor
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#general-functionality" class="md-nav__link">
+    General Functionality
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#block-selection" class="md-nav__link">
+    Block Selection
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-editor-context-menu" class="md-nav__link">
+    Code Editor Context Menu
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multiple-cursors" class="md-nav__link">
+    Multiple Cursors
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-editor-usability-tip" class="md-nav__link">
+    Code Editor Usability Tip
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="console.html" class="md-nav__link">
+        Console
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="further-reading.html" class="md-nav__link">
+        Further reading
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="image-scenes.html" class="md-nav__link">
+        Image scenes
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="issues.html" class="md-nav__link">
+        Issues
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="keyboard-shortcuts.html" class="md-nav__link">
+        Keyboard shortcuts
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="project-options.html" class="md-nav__link">
+        Project options
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="projects.html" class="md-nav__link">
+        Projects
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="publishing-and-exporting.html" class="md-nav__link">
+        Publishing and exporting
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="quicktest-and-randomtest.html" class="md-nav__link">
+        Quicktest & Randomtest
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="scene-options.html" class="md-nav__link">
+        Scene options
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="scenes.html" class="md-nav__link">
+        Scenes
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="stepping.html" class="md-nav__link">
+        Stepping
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="tab-panels.html" class="md-nav__link">
+        Tab panels
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="testing-and-debugging.html" class="md-nav__link">
+        Testing and debugging
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#general-functionality" class="md-nav__link">
+    General Functionality
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#block-selection" class="md-nav__link">
+    Block Selection
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-editor-context-menu" class="md-nav__link">
+    Code Editor Context Menu
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multiple-cursors" class="md-nav__link">
+    Multiple Cursors
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-editor-usability-tip" class="md-nav__link">
+    Code Editor Usability Tip
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+
+
+  <h1>Code editor</h1>
+
+<p>The Code Editor is the 'business end' of CSIDE, where you'll be creating your game. It combines the most useful functions of standard text editors with unique features designed specifically for ChoiceScript writers.</p>
+<p>Many of the <a href="#" rel="cside" title="settings" onclick="CSIDE(parent.cside.selectTab.bind(null, 'settings'));">Settings</a> in CSIDE are directly related to the functionality and appearance of the Code Editor. If a particular feature does not appear to be working for you as described, check your Settings to confirm that feature is enabled.</p>
+<h2 id="general-functionality">General Functionality</h2>
+<ul>
+<li>
+<p><strong>Editor Display</strong>: Selecting a scene from the Scenes &amp; Projects Panel displays the contents of that file in the Code Editor. The current project and scene name will appear on the header bar at the top of the Editor.</p>
+</li>
+<li>
+<p><strong>Hotkeys</strong>: The Code Editor is a fully functional text editor with standard keyboard shortcuts enabled, for instance: undo, select, cut, paste, and more. A full list of keyboard shortcuts can be found <a href="keyboard-shortcuts.html" title="Keyboard Shortcuts">here</a>.</p>
+</li>
+<li>
+<p><strong>Resizing</strong>: Clicking the double arrow icons above the top two corners of the Code Editor window toggle the adjoining Scenes &amp; Projects Panel or Tab Panel open or closed. This enlarges the Editor window, allowing for more working space.</p>
+</li>
+<li>
+<p><strong>Full Window</strong>: The ESC key (or F11) provides a handy 'full-window' on/off toggle for the Code Editor. This temporarily removes the Scenes &amp; Projects and Tab Panels and all headers from view. The Code Editor must be in focus (that is, with a blinking text cursor) in order to use the full-window toggle.</p>
+</li>
+<li>
+<p><strong>Auto Line-Wrapping</strong>: When enabled in Settings, the Code Editor will automatically wrap longer lines, such as narrative paragraphs, to fit the display width of the editor. The line wrap will automatically adjust if the editor window is resized.</p>
+</li>
+<li>
+<p><strong>Spellchecking</strong>: CSIDE offers US and UK dictionaries in Settings. Words underlined in red in the Code Editor window indicate that those words are not in the current dictionary nor the User Dictionary. Right-clicking on an underlined word presents a menu with options to choose an alternative spelling, ignore the spelling for the current session, or add the word to the User Dictionary.</p>
+<p>The User Dictionary is accessible through the <a href="tab-panels.html" title="Tabs Panel">Tabs Panel</a>. It is possible to both manually add and remove words via the dictionary's interface. Any words added to the User Dictionary will not be underlined as misspellings in the Code Editor. For more information, please see the <a href="#" rel="cside" title="User dictionary" onclick="CSIDE(parent.cside.selectTab.bind(null, 'dictionary'));">User Dictionary tab</a>.</p>
+</li>
+<li>
+<p><strong>Code Highlighting</strong>: The Code Editor incorporates automatic colour-coded highlighting of ChoiceScript commands. This highlighting helps distinguish between script and narrative at a glance; it also makes possible coding errors and typos immediately obvious. For instance, *page_break will change colour the instant the command is completed, but only when spelled correctly and recognised as a legitimate command. Each category of code—#options, *set/{variable}, *goto/*label, and *comment—is highlighted in a different colour for ease of differentiation.</p>
+<p>It is not possible to change the highlighting colours used, but they do vary according to the Dark, Light, or Dichromatic Code Editor themes (selectable in <a href="#" rel="cside" title="settings" onclick="CSIDE(parent.cside.selectTab.bind(null, 'settings'));">Settings</a>).</p>
+</li>
+<li>
+<p><strong>Command Help</strong>: When enabled under Settings, double-clicking a legitimate ChoiceScript command typed in the Code Editor (for instance, *choice) opens your default browser and automatically navigates to the Help page for that command on the <a href="http://www.choicescriptdev.wikia.com/" title="ChoiceScriptDev Wikia">ChoiceScriptDev Wikia</a>. If your default browser is already running in the background, the Help page will load in a new tab.</p>
+</li>
+<li>
+<p><strong>Text Formatting</strong>: ChoiceScript supports both bold and italic formatting, using start and end tags in the game files to mark formatted words or phrases. The CTRL-I and CTRL-B hotkeys (CMD-I and CMD-B) will wrap selected text with the formatting tags for italics and bold, respectively. If no text is currently selected, the hotkeys place the start and end tags on either side of the cursor. You can also quickly remove matching tags by repeating the same process.</p>
+</li>
+<li>
+<p><strong>Displaying Variables in Narrative</strong>: Using CTRL-D/CMD-D wraps the selected text with the scripting to display a variable's value. If no text is currently selected, the hotkeys place the start and end braces on either side of the cursor.</p>
+</li>
+<li>
+<p><strong>Tab Indentation</strong>: Indentation in ChoiceScript uses either spaces or tabs. The default indentation can be changed in <a href="#" rel="cside" title="settings" onclick="CSIDE(parent.cside.selectTab.bind(null, 'settings'));">Settings</a>. In addition when using spaces, pressing the TAB key will insert the correct number of spaces for a single indentation level (2, 4, 6, or 8). SHIFT-TAB will dedent by one level. TAB and SHIFT-TAB also work with selected blocks of text.</p>
+</li>
+<li>
+<p><strong>Smart Indentation</strong>: This optional function streamlines game scripting by automatically indenting—and where possible, also dedenting—according to ChoiceScript's requirements. When Smart Indentation is active, the Code Editor will move the cursor to the correct indentation on each new line. Holding down SHIFT while pressing ENTER temporarily overrides Smart Indentation, placing the cursor at the very start of the next line.</p>
+<p>Although Smart Indentation is especially useful for new authors who are still learning ChoiceScript's indentation hierarchy, we encourage experienced ChoiceScript coders to give this function a try. It is our belief that most users can easily adjust to this simpler, more streamlined method of coding and, over time, will find it to be a distinct benefit for ease of coding and reduction of casual indentation errors.</p>
+</li>
+</ul>
+<h2 id="block-selection">Block Selection</h2>
+<p>A number of Code Editor features work well when using Block Selection (i.e. when selecting multiple lines of code or narrative using the mouse or SHIFT-UP/DOWN).</p>
+<ul>
+<li>
+<p><strong>Automatic Word Count</strong>: When activated under Settings, the bar immediately below the Code Editor displays the word count of the selected block, or the word count of the entire scene if no text is selected. This can include or exclude command lines according to the preference indicated in Settings.</p>
+</li>
+<li>
+<p><strong>Review - Word Count</strong>: Selecting 'Review - Word Count' from the context menu of the active scene will also detail the word count of any selected text in that scene.</p>
+</li>
+<li>
+<p><strong>Text Formatting</strong>: The CTRL-I or CTRL-B hotkeys (CMD-I or CMD-B) apply start and end formatting tags for italics or bold to all selected lines. The formatting will automatically exclude *command and #option lines, and then #option text can be individually formatted if desired.</p>
+</li>
+<li>
+<p><strong>Block Indent/Dedent</strong>: The TAB/SHIFT-TAB keys automatically indent or dedent all selected text by one level.</p>
+</li>
+<li>
+<p><strong>Block Move</strong>: CTRL-SHIFT-UP/DOWN moves an entire block of text up or down by one line at a time. This essentially achieves the same effect as cutting and pasting, but it allows for more fluid and efficient local editing, especially when used in combination with block indent/dedent.</p>
+</li>
+<li>
+<p><strong>Block Comment</strong>: Toggles selected text to or from *comment mode by adding *comment at the beginning of each selected line. Right-click in the numbered line area of the Code Editor and select 'Toggle Block Comment' to use. This is especially useful for testing, debugging, and publishing purposes; it's a quick and simple way to temporarily disable an entire block of code prior to running a game test. It can also be useful for hiding in-progress material when sharing beta versions of the game.</p>
+</li>
+<li>
+<p><strong>Stats Listing</strong>: Typing a list of variable names, selecting them all, and hitting CTRL-D/CMD-D will wrap each individual variable name with the scripting to display its value, while ignoring any command lines (e.g. *line_break) included in the selection block. The 'stats listing' function is particularly useful when building or editing the Stats Screen.</p>
+</li>
+</ul>
+<h2 id="code-editor-context-menu">Code Editor Context Menu</h2>
+<p>Right-clicking in a blank section of the Code Editor will open a context menu with additional options, primarily offering mouse alternatives to standard keyboard shortcuts such as cut, copy, and paste. However, there are two additional options not currently accessible through other means:</p>
+<ul>
+<li>
+<p><strong>Insert Double Line Break</strong>: Inserts two successive *line_break commands with a single click, causing ChoiceScript to insert a completely blank line in-game at this point. For preserving spacing in *if statements, #option sequences, and so forth, a blank line followed by *comment end_if is recommended instead. This informs editors or proofreaders of the author's intentions with paragraph and line layouts.</p>
+</li>
+<li>
+<p><strong>Toggle Block Comment</strong>: See 'Block Comment' in the section above.</p>
+</li>
+</ul>
+<h2 id="multiple-cursors">Multiple Cursors</h2>
+<p>New text cursors can be created by holding down CTRL/CMD and clicking on a new location in the editor. When typing or navigating through the Code Editor, all cursor points will move and receive keyboard input. This allows for easy multi-line deletion, quick creation of commonly-named variables, selecting and moving several disparate sections of text, etc.. Clicking anywhere in the editor without holding down CTRL/CMD will remove all additional cursors. Individual cursors can be removed by CTRL/CMD clicking within the line in which the cursor currently resides.</p>
+<h2 id="code-editor-usability-tip">Code Editor Usability Tip</h2>
+<p>Double-clicking the CSIDE main header bar toggles between your normal window size and position and fullscreen mode. For widescreen users, it may be more comfortable to resize or position the CSIDE window in the middle of the screen when using the Code Editor. Then you can slide the Tabs Panel out of view, focusing on the Code Editor, with the Scenes &amp; Projects Panel open for ease of switching between files. Then if you want to run a play-test game or access Help files, simply toggle back to Full Screen and slide open the Tabs panel.</p>
+<p><strong>Next Topic</strong>: <a href="tab-panels.html" title="Tab Panels">Tab Panels</a></p>
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+<script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.2a1c317c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+
+<script src="../assets/js/iframe-worker.js"></script>
+<script src="../search/search_index.js"></script>
+
+
+    
+      <script src="../assets/javascripts/bundle.748e2769.min.js"></script>
+      
+        <script src="../assets/js/extra.js"></script>
+      
+    
+  </body>
+</html>

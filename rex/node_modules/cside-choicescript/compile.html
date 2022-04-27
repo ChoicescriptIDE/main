@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src=web/scene.js></script>
+  <script src=web/navigator.js></script>
+  <script src=web/util.js></script>
+  <script src=web/mygame/mygame.js></script>
+<script>
+var oldLog = console.log;
+console.log = function() {
+  var msg = arguments[0];
+  printBody(msg);
+  var br = document.createElement("br");
+  document.body.appendChild(br);
+  br.scrollIntoView();
+  oldLog.apply(this, arguments);
+}
+
+function printBody(msg, parent) {
+    if (msg === null || msg === undefined || msg === "") return;
+    if (!parent) parent = document.body;
+    if (msg == " ") {
+      // IE7 doesn't like innerHTML that's nothing but " "
+      parent.appendChild(document.createTextNode(" "));
+      return;
+    }
+    msg = (msg+"").replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/\[b\]/g, '<b>')
+      .replace(/\[\/b\]/g, '</b>')
+      .replace(/\[i\]/g, '<i>')
+      .replace(/\[\/i\]/g, '</i>');
+    var frag = document.createDocumentFragment();
+    temp = document.createElement('div');
+    temp.innerHTML = msg;
+    while (temp.firstChild) {
+        frag.appendChild(temp.firstChild);
+    }
+    parent.appendChild(frag);
+
+}
+
+
+function slurpFile(url, throwOnError) {
+	xhr = new XMLHttpRequest();
+  var loadFailed = false;
+	try {
+		xhr.open("GET", url, false); //IE errors on xhr.open
+		xhr.send();
+	}
+	catch (x) {
+		if (window.location.protocol == "file:" && /Chrome/.test(navigator.userAgent)) {
+			doneLoading();
+			console.log("We're sorry, Google Chrome has blocked ChoiceScript from functioning.  (\"file:\" URLs cannot "+
+			  "load files in Chrome.)  ChoiceScript works just fine in Chrome, but only on a published website like "+
+			  "choiceofgames.com.  For the time being, please try another browser like Mozilla Firefox.");
+			success = false;
+		  }
+		  loadFailed = true;
+	}
+	
+	if (xhr.status && xhr.status != 200) {
+		loadFailed = true;
+	}
+	
+	if (loadFailed && throwOnError) {
+		doneLoading();
+		console.log("EXPORT FAILED");
+		console.log("Error: Could not open " + url);
+		success = false;
+		//only Firefox:
+		if (typeof InstallTrigger == 'undefined') {
+			console.log("Your browser may not be supported. We recommend using Mozilla Firefox with compile.html.");
+		}
+		throw new Error("Error: Could not open " + url);
+	}
+	
+	if (success) {
+		return loadFailed ? "" : xhr.responseText;
+	}
+	else {
+		console.log("An unknown error occurred, please email dan at fabulich.com with details");
+		exit();
+	}
+}
+
+function doneLoading() {
+    var loading = document.getElementById('loading');
+    if (loading) loading.parentNode.removeChild(loading);
+    // TODO update header?
+}
+
+</script>
+</head>
+<body>
+<div id="loading">Loading...</div>
+<script src=compile.js></script>
+<script>
+function finish(compiledResult) {
+	var blob = new Blob([compiledResult], {type: "text/html"});
+	var bloburl = URL.createObjectURL(blob);
+	console.log("Export Complete!");
+	document.write("Click <a download='mygame_complete.html' href='" + bloburl + "'>here</a> to download your compiled game.");
+}
+var compiledResult = compile();
+if (compiledResult) finish(compiledResult);
+</script>
+</body>
+</html>

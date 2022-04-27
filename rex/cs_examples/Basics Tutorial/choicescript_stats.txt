@@ -1,0 +1,20 @@
+*comment ==================================================================
+*comment Here's a very basic example of using a stat_chart to display variable values and *if statements to control bigger blocks of text on the stats screen.
+*comment ==================================================================
+
+*stat_chart
+    text name [b]Name[/b]
+    text surname [b]Last Name[/b]
+    text gender [b]Gender[/b]
+    
+*if (orientation = "bisexual")
+    You're quite open with your loving!
+    
+*if (orientation = "gay")
+    You prefer your partners to be of the ${gender} variety!
+    
+*if (orientation = "asexual")
+    You're not particularly interested in any gender.
+    
+*if (orientation = "straight")
+    You prefer members of the opposite sex.

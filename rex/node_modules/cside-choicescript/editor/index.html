@@ -1,0 +1,218 @@
+<html>
+<!-- TODO
+
+Test plan
+scroll width/height
+  copy/paste
+  typomatic
+tab insert
+multiline tab insert
+undo tab insert
+error handling
+
+ -->
+<head><title>Basic ChoiceScript Editor</title>
+<script src="../web/util.js"></script>
+<script src="../headless.js"></script>
+<script src="../web/scene.js"></script>
+<script src="../web/navigator.js"></script>
+<script>window.version="DEVELOPMENT"</script>
+<script src="../web/mygame/mygame.js"></script>
+<script src="embeddable-autotester.js"></script>
+<script>
+function tryIt() {
+  window.highlight.style.display = "none";
+  try {
+    autotester(getContent(), null, "startup");
+    window.open("blankgame.html", "choicescript_testWindow");
+  } catch (e) {
+    console.log(e);
+    console.log(e.stack);
+    var x = e;
+    if (e.message) {
+      var match = e.message.match(/^line (\d+)/);
+      if (match) {
+        highlightLine(match[1]);
+      }
+    }
+    alert(x);
+  }
+}
+
+function highlightLine(num) {
+  window.highlight.style.display = "block";
+  highlight.style.top = (num*16+19) + "px";
+}
+function getContent() {
+  return text.value;
+}
+
+function changeTitle() {}
+</script>
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: monospace;
+  font-size: 10pt;
+  background-color: #f0f0f0;
+}
+#numbers {
+  background-image: url('line-numbers.png');
+  background-repeat:repeat-y;
+  padding: 12px 0 0 26px;
+}
+textarea {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  overflow: visible;
+  word-wrap: normal;
+  font-family: monospace;
+  font-size: 10pt;
+  line-height: 16px;
+}
+#highlight {
+  display: none;
+  position: absolute;
+  width: 25px;
+  left: 0;
+  top: 0;
+  background-color: red;
+  opacity: 0.5;
+}
+</style>
+<script>
+function keyDown(event) {
+  if (event.keyCode == 9) {
+    function moveSelection(i) {
+      if (document.selection) {
+        range.move('character', ss + i);
+        range.select();
+      } else {
+        text.selectionStart = ss + i;
+        text.selectionEnd = se + i;
+      }
+    }
+    if (event.preventDefault) event.preventDefault();
+    event.returnValue = false;
+    var tab = "    ";
+    // via http://ajaxian.com/archives/handling-tabs-in-textareas
+    var ss = text.selectionStart;
+    var se = text.selectionEnd;
+    if( document.selection ){
+        // The current selection
+        var range = document.selection.createRange();
+        // We'll use this as a 'dummy'
+        var stored_range = range.duplicate();
+        // Select all text
+        stored_range.moveToElementText( text );
+        // Now move 'dummy' end point to end point of original range
+        stored_range.setEndPoint( 'EndToEnd', range );
+        // Now we can calculate start and end points
+        ss = stored_range.text.length - range.text.length;
+        se = ss + range.text.length;
+    }
+    // Special case of multi line selection
+    if (ss != se && text.value.slice(ss,se).indexOf("\n") != -1) {
+        // In case selection was not of entire lines (e.g. selection begins in the middle of a line)
+        // we ought to tab at the beginning as well as at the start of every following line.
+        var pre = text.value.slice(0,ss);
+        var sel = text.value.slice(ss,se).replace(/\n/g,"\n"+tab);
+        var post = text.value.slice(se,text.value.length);
+        text.value = pre.concat(tab).concat(sel).concat(post);
+        
+        moveSelection(tab.length);
+    }
+           
+    // "Normal" case (no selection or selection on one line only)
+    else {
+        text.value = text.value.slice(0,ss).concat(tab).concat(text.value.slice(ss,text.value.length));
+        moveSelection(tab.length);
+    }
+  }
+}
+
+function change() {
+  var scrollHeight = text.scrollHeight;
+  var bodyHeight = document.body.clientHeight;
+  if (scrollHeight < bodyHeight) {
+    text.style.height = bodyHeight + "px";
+  } else {
+    text.style.height = scrollHeight + "px";
+  }
+  var scrollWidth = text.scrollWidth;
+  var bodyWidth = document.body.clientWidth;
+  if (scrollWidth < bodyWidth) {
+    text.style.width = bodyWidth + "px";
+  } else {
+    text.style.width = scrollWidth + "px";
+  }
+}
+
+function bindEvent(target, eventName, fun) {
+  if (target.addEventListener) {
+    target.addEventListener(eventName, fun, true);
+  } else {
+    target.attachEvent("on" + eventName, function(){ fun(event); });
+  } 
+}
+
+window.onload = function() {
+  window.text = document.getElementById("t");
+  window.highlight = document.getElementById("highlight");
+  bindEvent(text, "keydown", keyDown);
+  bindEvent(text, "change", change);
+  bindEvent(text, "keypress", change);
+  bindEvent(text, "keyup", change);
+  change();
+}
+</script>
+</head>
+<body>
+<div id="highlight">&nbsp;</div>
+<button onclick="tryIt();">try it!</button> <label for="debug"><input id="debug" type="checkbox" > Debug</label>
+</div><div id="numbers"><textarea nowrap wrap="off" id="t">*title My First ChoiceScript Game
+
+*create leadership 50
+*create strength 50
+
+Your majesty, your people are starving in the streets, and threaten revolution.
+Our enemies to the west are weak, but they threaten soon to invade.  What will you do?
+
+*choice
+  #Make pre-emptive war on the western lands.
+    If you can seize their territory, your kingdom will flourish.  But your army's
+    morale is low and the kingdom's armory is empty.  How will you win the war?
+    *choice
+      #Drive the peasants like slaves; if we work hard enough, we'll win.
+        Unfortunately, morale doesn't work like that.  Your army soon turns against you
+        and the kingdom falls to the western barbarians.
+        *finish
+      #Appoint charismatic knights and give them land, peasants, and resources.
+        Your majesty's people are eminently resourceful.  Your knights win the day,
+        but take care: they may soon demand a convention of parliament.
+        *finish
+      #Steal food and weapons from the enemy in the dead of night.
+        A cunning plan.  Soon your army is a match for the westerners; they choose
+        not to invade for now, but how long can your majesty postpone the inevitable?
+        *finish
+  #Beat swords to plowshares and trade food to the westerners for protection.
+    The westerners have you at the point of a sword.  They demand unfair terms
+    from you.
+    *choice
+      #Accept the terms for now.
+        Eventually, the barbarian westerners conquer you anyway, destroying their
+        bread basket, and the entire region starves.
+        *finish
+      #Threaten to salt our fields if they don't offer better terms.
+        They blink.  Your majesty gets a fair price for wheat.
+        *finish
+  #Abdicate the throne. I have clearly mismanaged this kingdom!
+    The kingdom descends into chaos, but you manage to escape with your own hide.
+    Perhaps in time you can return to restore order to this fair land.
+    *finish</textarea></div>
+</body>
+</html>

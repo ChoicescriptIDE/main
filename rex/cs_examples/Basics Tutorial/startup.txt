@@ -1,0 +1,292 @@
+*comment ==================================================================
+*comment The following code needs to go into your startup file. It creates all of the variables that will later be used. With variables you need to be careful of capitalisation.
+*comment ==================================================================
+
+*title Name, Relationships & Gender Variables
+*author FairyGodfeather
+
+*create gender "male"
+*create he "he"
+*create him "him"
+*create his "his"
+*create man "man"
+*create sir "sir"
+*create mr "Mr."
+
+*create name "name"
+*create surname "surname"
+*create fullname "fullname"
+
+*create orientation "yes"
+
+*create  valentine "Valentine"
+*create  boyfriend "boyfriend"
+*create  husband "husband"
+*create  val_he "he"
+*create  val_his "his"
+*create  handsome "handsome"
+*create  val_man "man"
+*create rel_val 50
+
+
+*comment ==================================================================
+*comment This section allows you to set your main character's gender.
+*comment ==================================================================
+
+*label gender
+
+What gender are you?
+
+*choice
+	#Male
+		*set gender "male"
+		*set he "he"
+		*set him "him"
+		*set his "his"
+		*set man "man"
+		*set sir "sir"
+		*set mr "Mr."
+		*goto gender_show
+		
+	#Female
+		*set gender "female"
+		*set he "she"
+		*set him "her"
+		*set his "her"
+		*set man "woman"
+		*set sir "ma'am"
+		*set mr "Ms."
+		*goto gender_show
+
+*comment ==================================================================
+*comment This is a very basic example of how how gender variables can be used in text. The exclamation mark is used to indicate the first letter of the 'he' variable should be capitalised.
+*comment ==================================================================
+		
+*label gender_show
+
+"$!{he}'s definitely a ${man}," the computer says. "Tell ${him} ${he} can collect ${his} prize."
+
+
+*comment ==================================================================
+*comment You can also use if statements to differentiate between the genders. 
+*comment ==================================================================
+
+You collect your prize and find that it is
+*if gender="male"
+	a huge, friendly, dog. How wonderful, man's best friend.
+
+*if gender="female"
+	a big, shiny, diamond. How wonderful, a girl's best friend.
+
+*comment ==================================================================
+*comment And sometimes you might want to use the goto command to write entire sections for one gender or the other.
+*comment Note that parenthesis aren't strictly needed around simple ifs, such as "*if (gender=male)" instead of "*if gender=male" however I'm using them from this point onward because CJW says it's good coding practice and makes things neater.
+*comment ==================================================================
+
+*label name
+	
+"What is your name?"
+
+*if (gender="male")
+	*goto male_name
+
+*if (gender="female")
+	*goto female_name
+
+	
+*comment ==================================================================
+*comment This section allows you to choose a first name from a list, or, if you don't like the options, to input your own name.
+*comment ==================================================================
+	
+*label male_name
+
+*fake_choice
+	#Adam
+		*set name "Adam"
+	#Boris
+		*set name "Boris"
+	#Carl
+		*set name "Carl"
+	#Dave
+		*set name "Dave"
+	#Let me input my name
+		*input_text name
+		
+*goto  surname
+
+*label female_name
+
+*fake_choice
+	#Anna
+		*set name "Anna"
+	#Betsy
+		*set name "Betsy"
+	#Caroline
+		*set name "Caroline"
+	#Denise
+		*set name "Denise"
+	#Let me input my own name
+		*input_text name
+
+*goto surname
+
+*label surname
+
+What is your surname?
+
+*fake_choice
+	#Smith
+		*set surname "Smith"
+	#Jones
+		*set surname "Jones"
+	#Brown
+		*set surname "Brown"
+	#Lee
+		*set surname "Lee"
+	#Let me input my own name
+		*input_text surname
+
+*goto hello_name
+
+*comment ==================================================================
+*comment If you want to display a character's full name, you can do it one of two ways. 
+*comment ==================================================================
+
+*label hello_name
+
+*comment The first way is
+
+"Hello ${mr} ${name} ${surname}. It is nice to meet you."
+
+*comment And the second is. Use it  if you have a lot of referring to a character by both names.  
+
+*set fullname (name&" ")&surname
+
+"Hello ${mr} ${fullname}. It is nice to meet you."
+
+		
+*comment ==================================================================
+*comment The following allows you to select your character's sexual orientation. 
+*comment ==================================================================
+
+*label orientation
+
+Who are you attracted to?
+
+*fake_choice
+	#Men.
+		*if (gender="male")
+			*set orientation "gay"
+		*if (gender="female")
+			*set orientation "straight"
+	
+	#Women.
+		*if (gender="female")
+			*set orientation "gay"
+		*if (gender="male")
+			*set orientation "straight"
+			
+	#Men and Women
+		*set orientation "bisexual"
+		
+	#I'm not interested in such things.
+		*set orientation "asexual"
+		
+*comment ==================================================================
+*comment Setting a character's orientation is most useful if you intend to have romantic interests whose gender flips according to the main character's orientation.
+*comment If you don't plan to include gender-flips there's no real need to ask orientation. I'd suggest just letting the player romance who they want.
+*comment I have code below so that if you're bisexual or asexual the game will just randomly select a gender for the gender-flipped characters.
+*comment ==================================================================
+
+*label meet_romance
+
+*if ((gender="male") and (orientation="gay"))
+	*gosub lover_male
+		
+*if ((gender="female") and (orientation="straight"))
+	*gosub lover_male
+	
+*if ((gender="male") and (orientation="straight"))
+	*gosub lover_female
+
+*if ((gender="female") and (orientation="gay"))
+	*gosub lover_female 
+
+*if ((orientation="bisexual") or (orientation="asexual"))
+	*temp random_gender
+	*rand random_gender 1 2
+	*if random_gender=1
+		*gosub lover_male
+	*if random_gender=2
+		*gosub lover_female
+
+*goto relationship_stat
+
+*comment ==================================================================
+*comment  The following code will set the gender and pronouns for the PC's lover.
+*comment  I find it easier to just use gender neutral names but here I'll switch names to show how it's done.
+*comment  You'll probably want more pronouns than those I've listed below.
+*comment ==================================================================
+		
+*label lover_female
+*set valentine "Valentina"
+*set boyfriend "girlfriend"
+*set husband "wife"
+*set val_he "she"
+*set val_his "her"
+*set val_man "woman"
+*set handsome "beautiful"
+*return
+
+*label lover_male
+*set valentine "Valentine"
+*set boyfriend "boyfriend"
+*set husband "husband"
+*set val_he "he"
+*set val_his "his"
+*set handsome "handsome"
+*set val_man "man"
+*return
+
+*comment ==================================================================
+*comment   With NPCs you may also want to deal with a relationship stat, to judge how they will react to you.
+*comment   I'm starting with a stat value of 50, which I've decided is neutral that's neutral.
+*comment ==================================================================
+*label relationship_stat 
+
+The most ${handsome} ${val_man} stands before you. "Hello, I'm ${Valentine}," ${val_he} says.
+
+*fake_choice
+	#"The ${valentine}? Wow, you're so much more ${handsome} in the flesh. I'm ${name}"
+		*set rel_val +20
+	#"Nice to meet you, I'm ${name}."
+		*set rel_val +10
+	#"Hello."
+	#"Sure. Whatever."
+		*set rel_val  -10
+	#"Get lost, creep."
+		*set rel_val -20
+	
+*comment ==================================================================
+*comment   In the above example the relationship stat can go as high as 70, or as low as 30. 
+*comment   I find it easiest if I keep track of how high or low a stat's likely to be at any certain point. 
+*comment   Here's a very brief example of how you can use the relationship score to change an NPCs reactions. 
+*comment ==================================================================
+
+*if (rel_val < 40)
+	${valentine} throws ${val_his} drink in your face and storms off.
+
+*if ((rel_val >= 40) and (rel_val <50))
+	${valentine} turns on ${val_his} heel and walks away, without another word.
+
+*if ((rel_val >=50) and (rel_val<70)) 
+	"It's been a pleasure, I'm sure. Unfortunately business calls," ${valentine} smiles, warmly, before walking off.
+	
+*if (rel_val >=70)
+	${valentine}'s fingers lightly brush your arm. "As much as I'd love to continue this conversation, I must be going. I'm sure we'll meet again." And off ${val_he} walks, casting one final, lingering, glance back at you.
+
+*comment ==================================================================
+*comment   And this concludes the tutorial for now. 
+*comment    
+*comment   
+*comment ==================================================================

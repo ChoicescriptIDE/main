@@ -1,0 +1,7 @@
+form[data-md-component='palette'] {
+    display: none;
+}
+
+header.md-header {
+    background-color: transparent;
+}
