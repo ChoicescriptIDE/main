@@ -1,8 +1,9 @@
-name: deployt
+name: deploy-nightly
 
 on:
-  pull_request:
   workflow_dispatch:
+  schedule:
+    - cron:  '30 1 * * *'
 
 jobs:
   deploy:
@@ -26,21 +27,9 @@ jobs:
           npm install grunt-cli -g
           npm install .
           grunt
-      - name: Generate UUID
-        run: echo '::set-output name=ID::$(cat /proc/sys/kernel/random/uuid)'
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@4.1.1
         with:
           branch: preview
           folder: build
-          target-folder: deployments/rex
-      - name: Comment link
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: 'Preview: http://choicescriptide.github.io/main/rex'
-            })
+          target-folder: deployments/nightly
