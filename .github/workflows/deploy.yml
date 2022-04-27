@@ -25,7 +25,7 @@ jobs:
         run: |
           npm install grunt-cli -g
           npm install .
-          grunt build
+          grunt
       - name: Generate UUID
         run: echo '::set-output name=ID::$(cat /proc/sys/kernel/random/uuid)'
       - name: Deploy
