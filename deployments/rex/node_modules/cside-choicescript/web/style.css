@@ -1,0 +1,478 @@
+body {
+  position: relative;
+  max-width: 80ch;
+  min-height: 100vh; /* keep iOS address bar from popping in and out */
+  font-size: 100%;  /* reset for CWS */
+  font: -apple-system-body; /* we'll override the font, but keep the size from iOS dynamic text sizing */
+  font-family: Georgia,"Times New Roman",serif;
+  background-color: #F7F4F1;
+  color: rgba(0, 0, 0, 0.85);
+  margin: 1ch auto;
+  padding: 0;
+  -webkit-user-select: text; /* selectable text for Chrome app support */
+  transition-property: background-color, color;
+  transition-duration: 2s;
+  -webkit-transition-property: background-color, color;
+  -webkit-transition-duration: 2s;
+}
+
+a {
+  /* colored underlined links for XULRunner support */
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+#main {
+	line-height: 1.5;
+}
+
+.container {
+  position: absolute; /* so containers can overlap */
+  left: 0;
+  right: 0;
+  margin: 0 1ch;
+  animation-duration: 0.5s;
+  -webkit-animation-duration: 0.5s;
+  transition-property: opacity;
+  transition-duration: 0.5s;
+  transition-timing-function: ease-in;
+  -webkit-transition-property: opacity;
+  -webkit-transition-duration: 0.5s;
+  -webkit-transition-timing-function: ease-in;
+}
+
+@keyframes containerslidein {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: none;
+  }
+}
+
+@-webkit-keyframes containerslidein {
+  from {
+    -webkit-transform: translateX(100%);
+  }
+
+  to {
+    -webkit-transform: none;
+  }
+}
+
+.tempfocus:focus {
+  outline: none;
+}
+
+#loading {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+}
+
+.frozen {
+  overflow-x: hidden;
+  pointer-events: none;
+}
+
+#text img {
+  max-width: 100%;
+}
+
+/*credits*/
+#main.container img {
+  max-width: 100%;
+}
+
+.statBar {
+  background-color: #949291;
+  height: 2em;
+  line-height: 2em;
+  margin: 0.5ch 0;
+  width: 35ch;
+  max-width: 100%;
+  color: #f7f4f1;
+  position: relative; /* to allow absolute positioned value */
+  z-index: 0;
+}
+.opposed {
+  background-color: #6D6DFC;
+}
+
+table {
+  margin-bottom: 1.5em;
+}
+
+.statText {
+  margin-left: 2ex;
+  text-indent: -1ex;
+}
+
+.statBar > span, .statLine > span {
+  position: relative;
+  z-index: 1; /* visible over stat value */
+  white-space: nowrap; /* remain on single line so we can resize font based on width */
+}
+.statValue {
+  background-color: #ff5955;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  z-index: -1;
+  /* width will be determined at runtime, 0-100% */
+}
+
+.choice {
+  margin: 1rem 0;
+}
+
+.choice > div {
+  position: relative; /* so the .shuttle can be positioned absolutely within it */
+  min-height: 1.25cm;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-color:#a9acaf;
+  border-style:solid;
+  border-width: 1px 1px 0px 1px;
+}
+
+.choice label{
+    transition-property: background-color, color;
+    transition-duration: 0.1s;
+    -webkit-transition-property: background-color, color;
+    -webkit-transition-duration: 0.1s;
+    -webkit-tap-highlight-color: transparent;
+    padding: 0.5em 1ch;
+    display:block;
+}
+
+.shuttle {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  width: 20%;
+  height: 100%;
+  background-color: #626160; /* match next */
+  opacity: 0.25;
+  transition-property: opacity;
+  transition-duration: 0.3s;
+  -webkit-transition-property: opacity;
+  -webkit-transition-duration: 0.3s;
+}
+
+.shuttle.discovery {
+  width: 20%;
+  animation-name: shuttlefadein, shuttleslide, shuttlefadeout;
+  animation-duration: 0.75s, 1s, 1s;
+  animation-delay: 0s, 0.75s, 1.75s;
+  -webkit-animation-name: shuttlefadein, shuttleslide, shuttlefadeout;
+  -webkit-animation-duration: 0.75s, 1s, 1s;
+  -webkit-animation-delay: 0s, 0.75s, 1.75s;
+}
+
+@keyframes shuttlefadein {
+  from {opacity: 0;}
+  to {opacity: 0.25;}
+}
+
+@keyframes shuttlefadeout {
+  from {opacity: 0.25; transform: translateX(-401%);} /* borders, maybe? */
+  to {opacity: 0; transform: translateX(-401%);}
+}
+
+@keyframes shuttleslide {
+  from { opacity: 0.25; transform: translateX(0);}
+  to { opacity: 0.25; transform: translateX(-401%); }
+}
+
+@-webkit-keyframes shuttlefadein {
+  from {opacity: 0;}
+  to {opacity: 0.25;}
+}
+
+@-webkit-keyframes shuttlefadeout {
+  from {opacity: 0.25; -webkit-transform: translateX(-401%);} /* borders, maybe? */
+  to {opacity: 0; -webkit-transform: translateX(-401%);}
+}
+
+@-webkit-keyframes shuttleslide {
+  from { opacity: 0.25; -webkit-transform: translateX(0);}
+  to { opacity: 0.25; -webkit-transform: translateX(-401%); }
+}
+
+.selected {
+  color: rgba(255,255,255,0.85);
+  background-color: #007AFF;
+}
+
+.choice>div:first-child{
+    border-top-width:1px;
+    -webkit-border-top-right-radius:1ch;
+    -webkit-border-top-left-radius:1ch;
+    border-top-right-radius:1ch;
+    border-top-left-radius:1ch;
+}
+/* IE doesn't support label:last-child */
+.choice>div:last-child{
+    border-bottom-width:1px;
+    -webkit-border-bottom-right-radius:1ch;
+    -webkit-border-bottom-left-radius:1ch;
+    border-bottom-right-radius:1ch;
+    border-bottom-left-radius:1ch;
+}
+
+.choice .noBorder {
+  border-width: 0;
+}
+
+input[type="radio"], input[type="checkbox"] {
+  margin-right: 1ch;
+}
+
+.saveGame>label {
+  display:block;
+}
+
+.choice .disabled {
+  color: gray;
+}
+
+input[type=password]:disabled {
+  background-color: lightgray;
+}
+
+/* Reset for Firefox vs. Chrome */
+input[type=email],input[type=password] {
+  padding: 1px;
+  margin: 2px 0;
+}
+
+button {
+  font-size: 100%;
+}
+
+.next {
+    clear: both;
+    display:block;
+    width:100%;
+    font-size:1.5em;
+    font-weight:bolder;
+    font-family: -apple-system, sans-serif; /* reset, for Android */
+    margin: 1rem 0; /* reset button margin */
+    -webkit-appearance: none; /* Safari, don't override my CSS styles */
+    color: #f7f4f1; /* Match background color */ 
+    background-color: #626160;
+    border: none;
+    -webkit-border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    border-radius: 0.5em;
+    padding: 6px;
+}
+
+.linkButton {
+  text-align: center;
+  text-decoration: none;
+}
+
+.next:hover {
+  color: #E4DED8;
+}
+
+h1 {
+  font-size: 1.5em;
+  font-weight: normal;
+}
+
+h2 {
+  font-size: 1.125em;
+  font-weight: normal;
+}
+
+#identity {
+  float: right;
+  display: none;
+}
+
+#identity > a {
+  display: block;
+  text-align: end;
+}
+
+#footer {
+  margin:10px 0px 75px 0px;
+}
+
+#mobileLinks a img {
+  border: 0;
+}
+
+.mobileBadges {
+  margin: 0;
+}
+
+.spacedLink {
+  margin-right:0.5em;
+}
+
+.spacedLink:last-child {
+  margin-right:0;
+}
+
+#sharelist {
+  margin: 0; /* Eliminate leading space before share links */
+}
+
+#sharelist li {
+  line-height: 1cm; /* Don't let the links bunch up */
+}
+
+.alertify-cover {
+  background-color: black;
+  filter:alpha(opacity=50);
+  opacity: 0.5;
+}
+
+#greybackground {
+    position: fixed;
+    width:100%;
+    height:100%;
+    background-color: black;
+    filter:alpha(opacity=50);
+    opacity: 0.5;
+    top:0;
+    left:0;
+}
+
+.savePassword {
+  font-family: monospace;
+  display: block;
+}
+
+.webOnly { /* We'll override this in JavaScript */
+  display: none;
+}
+
+.alignleft {
+  display: inline;
+  float: left;
+  margin-right: 1.625em;
+  margin-bottom: 1.5em;
+}
+.alignright {
+  display: inline;
+  float: right;
+  margin-left: 1.625em;
+  margin-bottom: 1.5em;
+}
+.aligncenter {
+  clear: both;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 1.5em;
+}
+
+#main form {
+  clear: both;
+}
+
+.paidOnly {
+  display: none;
+}
+
+.videoWrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  height: 0;
+}
+
+.videoWrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+body.nightmode {
+  background-color: #242424;
+  color: rgba(255,255,255,0.85);
+}
+
+body.nightmode a {
+  color: #7bc8fa;
+}
+
+body.nightmode .next {
+  color: #242424; /* Match background color */
+  background-color: #D9D9D9;
+}
+
+body.nightmode .shuttle {
+  background-color: #D9D9D9;
+}
+
+body.nightmode .next:hover {
+  color: #555;
+}
+
+body.nightmode .alertify {
+  color: black;
+}
+
+body.nightmode a.alertify-button {
+  color: white;
+}
+
+body.nightmode img.invert {
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
+}
+
+body.whitemode {
+  background-color: white;
+}
+
+body.whitemode .next {
+  color: white; /* Match background color */
+}
+
+body.whitemode .next:hover {
+  color: #ddd;
+}
+
+@media only screen and (max-width: 480px) {
+  .definition{
+    display: none;
+  }
+  
+  #headerLinks {
+    line-height: 2; /* For tapability */
+  }
+
+  .gameTitle {
+    display: none;
+  }
+
+  #advertisement {
+    margin: -8px;
+  }
+  
+  .mobileBadges {
+    float: none;
+  }
+  
+  #header {
+    margin-top: 30px;
+  }
+
+  /** Floating images should leave enough room for text */
+  #text .alignleft, #text .alignright {
+    max-width: 45%;
+  }
+  
+}

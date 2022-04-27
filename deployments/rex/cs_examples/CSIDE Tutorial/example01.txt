@@ -1,0 +1,56 @@
+*title Test Project
+*author Your Name Here
+*scene_list
+    scene01
+    scene02
+    scene03
+
+*create pcname "Unknown"
+*create class "Unknown"
+*create race "Unknown"
+*create str 0
+*create int 0
+*create dex 0
+
+*create backpack false
+*create torch false
+*create heirloom true
+*create gold 25
+*create weapon "Rusty Dagger"
+*create shield ""
+*create armour "Padded Jerkin"
+*create helm "Leather Skullcap"
+*create att 2
+*create def 5
+
+*create eq1 ""
+*create eq2 ""
+*create eq3 ""
+*create eq4 ""
+*create eq5 ""
+*create eq6 ""
+*create eq7 ""
+*create eq8 ""
+*create eq9 ""
+
+*comment Black Iron Hills
+*create loc1 false
+*comment The Troll Tunnels
+*create loc2 false
+*comment Whispering Wood
+*create loc3 false
+*comment Dale of Shadows
+*create loc4 false
+*comment The Woodcutter Hut
+*create loc5 false
+*comment Wicked Witch Cavern
+*create loc6 false
+
+*comment Reputation with Elves
+*create rep1 50
+*comment Reputation with Dwarves
+*create rep2 50
+*comment Reputation with Hobbits
+*create rep3 50
+
+*finish

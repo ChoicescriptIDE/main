@@ -1,0 +1,68 @@
+*comment Pronouns With Gender-Neutral Options
+
+
+*comment Players may be in a position to choose their own pronouns, or the pronouns for NPCs. Here's an example that sets and then uses gender pronouns. (Note that I prefer using ambiguous pronouns to avoid writing mistakes and catch programming errors, but feel free to write your pronouns however you like.)
+
+*title Pronouns with Gender-Neutral Options
+*author Lynnea Glasser
+
+*create friend_name "Alex"
+*comment This sets the character's name.
+*create friend_xhe "xhe"
+*comment This is the they/she/he pronoun.
+*create friend_xir "xir"
+*comment This is the them/her/him pronoun.
+*create friend_xirs "xirs"
+*comment This is the their/her/his pronoun.
+*create friend_xim "xim"
+*comment This is the theirs/hers/his pronoun.
+*create friend_ximself "ximself"
+*comment This is the themself/herself/himself pronoun.
+*create friend_s "s"
+*comment This is for the 's' on the ends of verbs, as in "they walk"/"she walks".
+*create friend_es "es"
+*comment This is for the 'es' on the ends of verbs, as in "they march"/"she marches".
+*create friend_re "'s"
+*create friend_ve "'s"
+*comment These two are for contractions. Note that all versions of them have an apostrophe: "they're"/"she's".
+*create friend_them false
+*comment This variable can be used in case there are any irregular verbs, as in "they are" / "she is".
+
+
+You look over at your best friend.
+*fake_choice
+	#An interesting man. (He / him / his)
+		*set friend_them false
+		*set friend_xhe "he"
+		*set friend_xir "his"
+		*set friend_xirs "his"
+		*set friend_xim "him"
+		*set friend_ximself "himself"
+		*set friend_s "s"
+		*set friend_es "es"
+		*set friend_re "'s"
+		*set friend_ve "'s"
+	#A fascinating woman. (She / her / hers)
+		*set friend_them false
+		*set friend_xhe "she"
+		*set friend_xir "her"
+		*set friend_xirs "hers"
+		*set friend_xim "her"
+		*set friend_ximself "herself"
+		*set friend_s "s"
+		*set friend_es "es"
+		*set friend_re "'s"
+		*set friend_ve "'s"
+	#A fascinating person. (They / them / their)
+		*set friend_them true
+		*set friend_xhe "they"
+		*set friend_xir "their"
+		*set friend_xim "them"
+		*set friend_ximself "themselves"
+		*set friend_s ""
+		*set friend_es ""
+		*set friend_re "'re"
+		*set friend_ve "'ve"
+
+
+$!{friend_xhe}${friend_re} beaming widely as ${friend_xhe} bow${friend_s} and gracefully offer${friend_s} you ${friend_xir} hand. You take it. You're lucky to have ${friend_xim} by your side.

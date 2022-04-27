@@ -1,0 +1,948 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.2.11">
+    
+    
+      
+        <title>Console - Help & Information</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.8c5ef100.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.9647289d.min.css">
+        
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/css/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="light-blue" data-md-color-accent="blue">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#what-is-a-logic-error" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="Help &amp; Information" class="md-header__button md-logo" aria-label="Help & Information" data-md-component="logo">
+      
+  <img src="../assets/img/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Help & Information
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Console
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="light-blue" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3 3.19.09m3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95 2.06.05m-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31Z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="light-blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5c-.84 0-1.65.15-2.39.42L12 2M3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29L3.34 7m.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14L3.36 17M20.65 7l-1.77 3.79a7.023 7.023 0 0 0-2.38-4.15l4.15.36m-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29L20.64 17M12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44L12 22Z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="Help &amp; Information" class="md-nav__button md-logo" aria-label="Help & Information" data-md-component="logo">
+      
+  <img src="../assets/img/logo.png" alt="logo">
+
+    </a>
+    Help & Information
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../acknowledgements.html" class="md-nav__link">
+        Acknowledgements
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../advanced-topics.html" class="md-nav__link">
+        Advanced topics
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../basic-topics.html" class="md-nav__link">
+        Basic topics
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog.html" class="md-nav__link">
+        Changelog
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../terms-and-conditions.html" class="md-nav__link">
+        Terms and conditions
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7" type="checkbox" id="__nav_7" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_7">
+          Getting started
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Getting started" data-md-level="1">
+        <label class="md-nav__title" for="__nav_7">
+          <span class="md-nav__icon md-icon"></span>
+          Getting started
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/adding-scenes.html" class="md-nav__link">
+        Adding scenes
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/creating-projects.html" class="md-nav__link">
+        Creating or Importing a Project
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/setting-up.html" class="md-nav__link">
+        Setting up
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/user-interface.html" class="md-nav__link">
+        User interface
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/what-is-cside.html" class="md-nav__link">
+        What is CSIDE?
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8">
+          Topics
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Topics" data-md-level="1">
+        <label class="md-nav__title" for="__nav_8">
+          <span class="md-nav__icon md-icon"></span>
+          Topics
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="about.html" class="md-nav__link">
+        About
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="code-editor.html" class="md-nav__link">
+        Code editor
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Console
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="console.html" class="md-nav__link md-nav__link--active">
+        Console
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-a-logic-error" class="md-nav__link">
+    What Is a Logic Error?
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#general-functionality" class="md-nav__link">
+    General Functionality
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supported-choicescript-commands" class="md-nav__link">
+    Supported ChoiceScript Commands
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#console-tracking-commands" class="md-nav__link">
+    Console Tracking Commands
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-console-commands-in-scene-files" class="md-nav__link">
+    Using Console Commands in Scene Files
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#important-notes-on-console_-commands" class="md-nav__link">
+    Important Notes on *console_ Commands:
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#still-cant-find-that-annoying-bug" class="md-nav__link">
+    Still can't find that annoying bug?
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="further-reading.html" class="md-nav__link">
+        Further reading
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="image-scenes.html" class="md-nav__link">
+        Image scenes
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="issues.html" class="md-nav__link">
+        Issues
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="keyboard-shortcuts.html" class="md-nav__link">
+        Keyboard shortcuts
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="project-options.html" class="md-nav__link">
+        Project options
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="projects.html" class="md-nav__link">
+        Projects
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="publishing-and-exporting.html" class="md-nav__link">
+        Publishing and exporting
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="quicktest-and-randomtest.html" class="md-nav__link">
+        Quicktest & Randomtest
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="scene-options.html" class="md-nav__link">
+        Scene options
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="scenes.html" class="md-nav__link">
+        Scenes
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="stepping.html" class="md-nav__link">
+        Stepping
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="tab-panels.html" class="md-nav__link">
+        Tab panels
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="testing-and-debugging.html" class="md-nav__link">
+        Testing and debugging
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-a-logic-error" class="md-nav__link">
+    What Is a Logic Error?
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#general-functionality" class="md-nav__link">
+    General Functionality
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supported-choicescript-commands" class="md-nav__link">
+    Supported ChoiceScript Commands
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#console-tracking-commands" class="md-nav__link">
+    Console Tracking Commands
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-console-commands-in-scene-files" class="md-nav__link">
+    Using Console Commands in Scene Files
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#important-notes-on-console_-commands" class="md-nav__link">
+    Important Notes on *console_ Commands:
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#still-cant-find-that-annoying-bug" class="md-nav__link">
+    Still can't find that annoying bug?
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+
+
+  <h1>Console</h1>
+
+<p>The CSIDE Console is a versatile monitoring, play-testing, and debugging tool, primarily designed to help hunt down 'logic errors' (see below) in your code. The Console, available by clicking the &gt;_ symbol below the Editor Window, will track, log, and display the changing value of your variables in real time as you play-test your game. your game within CSIDE.</p>
+<h2 id="what-is-a-logic-error">What Is a Logic Error?</h2>
+<p>A ChoiceScript interpretor error—that's to say, the standard 'scripting bug'—is a bug that always causes a game to crash at a particular point. Most of the time, locating and identify scripting bugs is a fairly straightforward task.</p>
+<p>The 'logic error' or 'game design bug' can be more elusive. Logic errors cause a game to behave strangely in a certain location, often only under particular circumstances, but they do not result in an actual game crash. This can make it much harder to isolate and understand the cause of the error, never mind fix it.</p>
+<p>Logic errors can be caused by a typo or oversight in otherwise valid syntax, such as using a 'greater than' operator instead of a 'lesser than', or using 'and' instead of 'or' between two conditions. Logic errors are often related to the current value of a variable referenced at the exact point in the game where the bug occurs.</p>
+<p>The basic idea behind the CSIDE Console tracking system is to allow you to monitor changes of specific variable values as you progress through your game. If you do find a game design bug, you can closely investigate what's happening to the variables behind the scenes, right up to that point in the game. Monitoring variable changes at every step of the way will help you find the faulty logic behind the bug.</p>
+<h2 id="general-functionality">General Functionality</h2>
+<p>In addition to tracking commands and variables, the Console also supports a range of additional features. You can obtain variable values, change them either directly or by using operators, and even jump to a different scene or label. Think of the Console as a textual way to directly interact with your game 'behind the scenes' in real time, as you play through it a page at a time.</p>
+<p>If you type a variable name into the Console, it returns the current value of that variable at this precise point in your play-test. This includes the values of 'hidden' variables not displayed on the stat screen. You can even use *set to overwrite or modify that value in your active game before continuing with your play-test, allowing you to avoid inconvenient restarts or experiment with variable values. The Console also supports *goto and *goto_scene to 'jump' your running play-test game to a specific point for easy, quick testing.</p>
+<p>Anything you put into the Console command line will not affect the actual scripting in your scene files. Using *set, *temp, *goto, and *rand will only change the temporary data being held in memory for the current running game, purely for play-testing and bug-hunting purposes.</p>
+<p>As you play-test your game, the Console logs entries relating to variable creation and changes in variable values. You control what the Console will log by entering instructions into the Console command line, at the bottom of the Console window. When the Console is closed, a small red indicator appears beside the icon as new entries are logged in the Console's display.</p>
+<blockquote>
+<p><strong>Note</strong>: If you make any changes to your game files, you must run the game again before those changes are reflected in the Console, even if the changes have been saved.</p>
+</blockquote>
+<p><strong>Reading the Logs</strong>: All variables created in the startup file are prefixed with 'stats'. Temp variables are prefixed with 'temps'. The name and line number of each value change is also logged for ease of reference.</p>
+<p><strong>General Console Commands</strong>: The Console will accept and log any correct command; an invalid command will return an error message. The command line buffers recent entries, so mistyped commands can be quickly corrected by pressing UP, making the necessary correction, and then pressing ENTER. Recent commands can be quickly cycled through by using UP/DOWN, allowing easy re-entry of common commands.</p>
+<p><strong>Using the *console_ Command in Game Files</strong>: For purposes of thorough repeat testing, you can also insert certain *console_ commands directly into your game's scene files. See below under 'Console Commands in Scene Files' for details.</p>
+<blockquote>
+<p><strong>Note</strong>: Commands entered into the Console only impact the main game running in the Game Tab Panel. The Console does not affect a game running in Popout. This can be useful for comparing your current game's output against a version where you have input different variables, or made other changes via Console.</p>
+</blockquote>
+<h2 id="supported-choicescript-commands">Supported ChoiceScript Commands</h2>
+<p><strong>Variable</strong>: Type any valid variable name into the Console to see the variable's current value. This will also work with 'hidden' variables not displayed on the stats screen.</p>
+<p><strong>Expression</strong>: Enter any valid ChoiceScript expression to see its current value. For example, (var1 and {var2}): If both var1 and {var2} are true, the Console would print back 'true'; if var1, {var2}, or both are false, the Console would print back 'false'. The same applies to strings: Entering firstname&amp;(" "&amp;lastname) would print out "John Doe" (assuming these variables existed, and were set to those values), and numbers: Entering 5+5 would print '10' back to the console.</p>
+<p><strong>*set [variable] [value]</strong>: All *set commands valid in ChoiceScript will also work in the Console (including modifiers and complex expressions). Using *set will overwrite or otherwise modify any variable value in memory at this precise point in the play-test game.</p>
+<p><strong>*temp [variable] [value]</strong>: Creates a temporary variable 'on the fly' while running a play-test game. Useful for tracking and testing new values without directly modifying the game's current state. Any *temp variables created in this way will be removed when the current play-test game is refreshed, if the scene is changed, or when the game has ended.</p>
+<p><strong>*goto [label]</strong>: Jumps to a specified *label within the current scene.</p>
+<p><strong>*goto_scene [scene] [label]</strong>: Jumps to the specified scene and label.</p>
+<blockquote>
+<p><strong>Caution When Using *goto</strong>: Using *goto commands from the Console can lead to errors that could not exist in a standard play-through of the game. For instance, if you were to *goto a section using a specific variable before visiting the section where that variable is created or defined, the game would then crash. Use *goto and *goto_scene with caution.</p>
+</blockquote>
+<p><strong>*rand [variable] [value1] [value2]</strong>: Generates a new random value within a specific range and assigns it to the named variable.</p>
+<p><strong>*achieve [codename]</strong>: Activates the named achievement as if that achievement had been earned/awarded in-game.</p>
+<p><strong>Curly brackets</strong>: Using the syntax *set {var} will indirectly refer to one variable via the value of a second variable. For instance, if the value of 'var' is "strength", *set {var} 5 will set the value of the variable 'strength' to 5; the value of 'var' would remain as "strength".</p>
+<p><strong>*restart</strong>: Restarts the main instance of the play-test game running in the Game Tab panel, using the game version currently held in memory. Any changes to scene files will not be acknowledged, but all current Console tracking settings will be preserved.</p>
+<h2 id="console-tracking-commands">Console Tracking Commands</h2>
+<p>You can use the following commands to choose which variable values the Console will log and display during play-testing.</p>
+<p><strong>*help</strong>: Displays useful reminders for interacting with the Console.</p>
+<p><strong>*help [command name]</strong>: Provides information about the named command. For instance, '*help track_all_on' would return information about the *track_all_on function.</p>
+<p><strong>*clear</strong>: Wipes all current logs, clearing the Console panel.</p>
+<p><strong>*track [var1] [var2] [var3] [etc]</strong>: Tracks the individually named variable(s), e.g. *track strength wisdom charity</p>
+<p><strong>*untrack [var1] [var2] [var3] [etc]</strong>: Stops tracking the individually named variable(s), e.g. *untrack strength wisdom charity</p>
+<p><strong>*untrack</strong>: Stops tracking all variables which the Console is currently set to individually track.</p>
+<p><strong>*track_list</strong>: Lists the names and current values of all variables being individually tracked. Returns 'Empty' if no variables are currently individually tracked.</p>
+<p><strong>*track_list [optional filter]</strong>: As above, but lists only those variables containing the filter text, e.g. stats, temps, or any combination of characters precisely matching any part of the variable name. For instance, typing '*track enemy1 enemy2 friend1' and then using '*track_list enemy' would return 'enemy1' and 'enemy2' but not 'friend1'.</p>
+<p><strong>*track_all_on</strong>: Overrides but does not remove the individual track variable list, and logs all variable changes.</p>
+<p><strong>*track_all_off</strong>: Turns off track_all. Individually-tracked variables will continue to be logged in the Console panel.</p>
+<p><strong>*run</strong>: Loads and runs the currently selected project as if you had refreshed the game with the 'Run project' icon on the project header bar.</p>
+<blockquote>
+<p><strong>Note</strong>: a fresh 'run' (for instance, after making and saving changes in one or more scene files) will deactivate the current Console tracking settings, meaning the required tracking commands must be entered again. Conversely, when restarting, either by using the *restart command in Console or clicking the 'restart' button in the Game Tab panel the game repeats from the start using the default data already held in memory. This preserves both the most recently run version of the game and the current Console tracking settings.</p>
+</blockquote>
+<p>It is also possible to make a list of variables you would like the Console to track and include that list in the text of your game. This can save considerable time and streamline repeat testing. For more information, see the section below.</p>
+<h2 id="using-console-commands-in-scene-files">Using Console Commands in Scene Files</h2>
+<p>You can also insert certain *console commands directly into the code of your scene files to help streamline your testing. This avoids having to manually enter the above commands into the Console each time you run the game for a new play-test. It is also useful when logging data or expressions only in a specific section of your game, such as inside a loop.</p>
+<p>The following commands may be used in the game code, and function as described above:</p>
+<p>*console_clear</p>
+<p>*console_track [var1] [var2] [etc.]</p>
+<p>*console_untrack [var1] [var2] [etc.]</p>
+<p>*console_untrack [no parameters -- untracks ALL track_list variables]</p>
+<p>*console_track_list [optional filter]</p>
+<p>*console_track_all_on</p>
+<p>*console_track_all_off</p>
+<p>*console_log [variable or expression]</p>
+<p>*console_log prints the value of a variable or valid expression into the Console at a particular point in your game. For instance, if your game reads:</p>
+<pre>
+ *console_log "Evaluation for *if check under option 1"
+ *console_log (((charisma > 50) and (unrest < 50)) and (enemy_speaker < 50)) or (ally != "Unknown")
+ *choice
+   #Talk the unruly townspeople into cooperating.
+     *if (((charisma > 50) and (unrest < 50)) and (enemy_speaker < 50)) or (ally != "Unknown")
+       The townspeople are wary at first, but you talk them round and they agree to give you a horse and supplies for your journey.
+       *goto ride_on
+     *else
+       The townspeople don't like you very much. They grab some pitchforks and tell you to move along—so you do.
+       *goto no_horse
+</pre>
+
+<p>Assuming the first expression is true, the Console log would read:</p>
+<p>Evaluation for *if check under option 1
+<br>True</p>
+<h2 id="important-notes-on-console_-commands">Important Notes on *console_ Commands:</h2>
+<p>It is possible to use *console_commands in your scene files for testing purposes within CSIDE without having to remove any of those commands from your public beta test version. This can be done by making all *console_commands conditional on a boolean variable being 'true'. When this value is 'false'—the default setting for the beta test version—those lines will be ignored by ChoiceScript and their presence will generate no errors.</p>
+<p>However, in order to run Quicktest or Randomtest, the *console commands must be removed, or hidden by using Find-Replace All and the *comment function. Otherwise, the automated tests will pick up *console commands as errors.</p>
+<p>We are working to address this incompatibility issue and will endeavour to keep users informed of our progress. Meanwhile, to hide *console commands, we recommend using 'Find-Replace All' to replace '*console' with '*comment console'. When you are ready to use the Console commands again, use 'Find-Replace All' to change all instances of '*comment console' back to '*console'.</p>
+<h2 id="still-cant-find-that-annoying-bug">Still can't find that annoying bug?</h2>
+<p>For those rare situations when even the standard Console log doesn't uncover the problem, you can also use the complementary Stepping function. This toggle can be turned off and on by clicking the 'Start Stepping' button on the main page of your play-test game.</p>
+<p>The Stepping function lets you 'step through' any part of your play test, one line at a time. This lets you closely analyse exactly what each line of code is doing during your play-test. Please see the <a href="stepping.html" title="Stepping">Stepping</a> topic for more details.</p>
+<p><strong>Next Topic</strong>: <a href="stepping.html" title="Stepping">Stepping</a></p>
+<p><strong>Related Topics</strong>:</p>
+<ul>
+<li>
+<p><a href="issues.html" title="Issues">Issues</a></p>
+</li>
+<li>
+<p><a href="quicktest-and-randomtest.html" title="Quicktest &amp; Randomtest">QuickTest &amp; RandomTest</a></p>
+</li>
+<li>
+<p><a href="testing-and-debugging.html" title="Testing &amp; Debugging">Testing &amp; Debugging</a></p>
+</li>
+</ul>
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+<script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.2a1c317c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+
+<script src="../assets/js/iframe-worker.js"></script>
+<script src="../search/search_index.js"></script>
+
+
+    
+      <script src="../assets/javascripts/bundle.748e2769.min.js"></script>
+      
+        <script src="../assets/js/extra.js"></script>
+      
+    
+  </body>
+</html>

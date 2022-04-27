@@ -1,0 +1,204 @@
+
+*comment NEW TO CHOICESCRIPT? CLICK THE > 'Run project CSTutorial' BUTTON TO START TUTORIAL
+
+*comment ----------Ignore------------
+*comment Tutorial code required in the event this Lesson has been accessed in a new session without the reader first having set crucial values earlier.
+*if pcname = "Unknown"
+    *goto revisit
+*else
+    *goto continue
+*comment ----------Ignore------------
+
+*label continue
+[b]Lesson 6[/b] - [b][i]Scripting Conditions[/i][/b]
+
+In the previous lesson, [i]Using Variables[/i], we discussed the distinct and important difference between [i]overwriting[/i] a variable (changing the value [i]regardless[/i] of what its current value might be) and [i]modifying[/i] it (taking its current value into account when making the change, such as by adding [i]to[/i] or subtracting [i]from[/i] a current numeric value, rather than completely overwriting it). 
+
+In [b]Example 18[/b] (below) we are once again making use of both [i]overwriting[/i] and [i]modifying[/i] variables. Should the player choose the first option, we are overwriting the value of [b]backpack[/b] while merely modifying the value of [b]gold[/b]; for the second and third options we are modifying the value of [b]rep2[/b] (Reputation with Dwarves), either increasing or reducing it by just 5 points. We are also making a specific response in each case, before continuing with general narrative.
+
+[i]Just as you settle down by the side of the trail to enjoy the last of your delicious-smelling coney stew—knowing full well that it's likely your last good meal before the next village—a shabby dwarf stumbles into your camp, calling out a weak hail. A torn tunic, leaking boots, rusty war-hammer and empty (if sturdy-looking) backpack speak volumes of his fortunes of late… He lights up at sight of your meal, licking his lips and drooling slightly in the manner of the truly hungry. His coin pouch is clearly as flat as his shrunken stomach.[/i]
+
+([b]NB:[/b] For the purpose of later Tutorial examples, please choose the [i]first[/i] Option below.)
+
+*comment Example 18 - Overwriting 'backpack' while Modifying 'gold' or 'rep2'
+
+*fake_choice
+    #I will offer to buy the backpack for 1 gold and a meal.
+        *set backpack true
+        *set gold -1
+        [i]"Beggars can't be choosers," he mutters, handing it over.[/i]
+
+        [i]You have acquired a sturdy backpack for only one gold piece![/i]
+
+    #I will take pity on the wanderer and offer to share my meager supplies.
+        *set rep2 +5
+        [i]You share your dwindling rations with the hungry dwarf.[/i]
+
+    #I cannot spare any food. Firmly suggest that he keeps walking.
+        *set rep2 -5
+        [i]You politely but firmly refuse to aid the poor hungry dwarf.[/i]
+        
+Although that example raises an immediate overall design point—should we use a new variable to keep track of just how miserly / charitable the main character proves to be, and what effects or consequences might this have later on in the story?—there are two more-specific issues here. Take another look at [b]Example 18[/b]… can you figure out what these might be?
+
+The first of these issues is that we are [i]assuming[/i] our protagonist doesn't yet possess a backpack and so may be interested in acquiring one, hence the first option. There's nothing wrong with this assumption if we [i]know[/i] it's the very first opportunity they've had to acquire one, but what if it's the second or indeed even later chance? Ideally, we don't want to keep repeating a particular option in cases where the player would no longer have any real interest in that option.
+
+Situations like this invariably call for proper use of one or more  [i]Conditions[/i], generally using the [b]${cmd13}[/b] command, sometimes in conjunction with [b]${cmd14}[/b], and occasionally also using [b]${cmd15}[/b].
+
+In [b]Example 19[/b] we are using a simple [b]${cmd13}[/b] command to check the current value of a variable and make the first option [i]conditional[/i], i.e. it will now only display that option if the protagonist does [i]not[/i] yet possess a backpack, as shown below. Compare it with the previous example: the only difference is that the [b]${cmd13}[/b] condition has been inserted at the start of the first Option line. You are not seeing the first Option below because your [b]backpack[/b] variable was recently set to [i]true[/i].
+
+*comment Example 19 - Making an Option conditional on the value of a variable
+
+*fake_choice
+    *if (backpack = false) #I will offer to buy the backpack for 1 gold and a meal.
+        *set backpack true
+        *set gold -1
+        [i]"Beggars can't be choosers," he mutters, handing it over.[/i]
+        
+        [i]You have acquired a sturdy backpack for only one gold piece![/i]
+            
+    #I will take pity on the wanderer and offer to share my meager supplies.
+        *set rep2 +5
+        [i]You share your dwindling rations with the hungry dwarf.[/i]
+        
+    #I cannot spare any food. Firmly suggest that he keeps walking.
+        *set rep2 -5
+        [i]You politely but firmly refuse to aid the poor hungry dwarf.[/i]
+
+Note that in this type of situation (applying a condition to an Option) the other Options must instead be in line with - i.e. [i]at the same indentation level as[/i] - the [b]${cmd13}[/b] command itself.  
+
+You may recall that CS essentially reads a file [i]line-by-line[/i], so consider what is happening in [b]Example 19[/b]: When CS reaches the [b]${cmd13}[/b] line it checks the value of the [b]backpack[/b] variable, determines that this condition has [i]not[/i] been met (because a backpack was bought in the previous Choice, making the value of that variable currently [b]true[/b]) and so [i]skips[/i] everything immediately following / indented below it. Therefore only the bottom two options were displayed in-game.
+
+The second issue referred to earlier concerns the [b]gold[/b] value: does our protagonist actually have enough gold at this moment in time to buy the backpack? In [b]Example 20[/b] we are adding a check for this condition to the same [b]${cmd13}[/b] line, using [b]and[/b] between the two conditions to say that [i]both[/i] conditions must be met for this Option to be displayed.
+
+As the backpack can be bought from the desperate dwarf for a single gold piece, all we need to do is make sure that our protagonist has [i]more than[/i] zero gold currently available, using one of the 
+*link http://choicescriptdev.wikia.com/wiki/If conditional operators
+possible in CS. (Note that for the purpose of the following example we are intentionally first resetting the value of [b]backpack[/b] back to [b]false[/b] so you don't now have one, allowing both conditions to be met here so the option is displayed again. Choose Option #1).
+
+*comment Resetting the value of backpack to 'false' purely for Tutorial purposes
+
+*set backpack false
+
+*comment Example 20 - Making an Option conditional on two different variables
+
+*fake_choice
+    *if (backpack = false) and (gold > 0)
+        #I will offer to buy the backpack for 1 gold and a meal.
+            *set backpack true
+            *set gold -1
+            [i]"Beggars can't be choosers," he mutters, handing it over.[/i]
+            
+            [i]You have acquired a sturdy backpack for only one gold piece![/i]
+            
+    #I will take pity on the wanderer and offer to share my meager supplies.
+        *set rep2 +5
+        [i]You share your dwindling rations with the hungry dwarf.[/i]
+        
+    #I cannot spare any food. Firmly suggest that he keeps walking.
+        *set rep2 -5
+        [i]You politely but firmly refuse to aid the poor hungry dwarf.[/i]
+
+You may have noticed that we used a slightly different format for the [b]${cmd13}[/b] line in [b]Example 20[/b] compared to [b]Example 19[/b], moving the Option text itself onto a new line of its own ([i]and indented another level[/i]). Either syntax is valid for an [b]${cmd13}[/b] command, with the second method simply making your code easier to read as the [i]conditions[/i] become more elaborate.
+
+This syntax is equally valid for the exact same reason as the first method - i.e. when CS reads the [b]${cmd13}[/b] line it checks the condition(s) and if not met in full it simply ignores anything else on the same line or [i]indented[/i] immediately below, so skipping that Option entirely. Only if [i]all[/i] the 'and' conditions are met will it properly display a conditional Option.
+
+We can also use [b]or[/b] in place of [b]and[/b] when checking two conditions. This would be used where only [i]one[/i] of the conditions needs to be met, rather than both, as shown in [b]Example 21[/b] below. (If you see only two Options, it's because you are neither a Hobbit nor a Thief of any race!)
+
+[i]"All you have to do," explains the scarred bandit leader patiently, as if speaking to a village dullard, "is go into that cavern there and bring me the old woman's cooking pot… This test will prove your ability as well as demonstrate your willingness to join our merry little band. Nothing could be simpler!"[/i]
+
+*comment Example 21 - Using 'or' to check if EITHER condition is valid
+
+*fake_choice
+    *if (race = "hobbit") or (class = "thief")
+        #Sneak into the cavern and steal the witch's cauldron.
+            [i]This would be the narrative response for the first option.[/i]
+            
+    #Head into the cavern and confront the witch.
+        [i]This would be the narrative response for the second option.[/i]
+        
+    #Refuse to accept the bandit leader's challenge.
+        [i]This would be the narrative response for the third option.[/i]
+
+In [b]Example 21[/b] the first option would be displayed only if the protagonist is a Hobbit (i.e. with a natural ability to sneak quietly) [b][i]or[/i][/b] a Thief of any race. If neither condition is true then the option will not be displayed at all.
+
+Had we used [b]and[/b] instead of [b]or[/b] for those two conditions, [i]only[/i] a [b]Hobbit Thief[/b] would be capable of sneaking into the cave, not any other Hobbit (e.g. a Hobbit Warrior or Mage) nor a Thief of any other race. Study that [b]${cmd13}[/b] statement until you fully appreciate why this would be.
+
+Conditions can be applied in other ways too, not only to specific options. They can be used to improve interaction, enhance and vary narrative responses, and provide additional replay value for players of your game—all of which subjects will be covered in more detail before the end of the Tutorial. For now, however:
+
+[i][b]~~Exercise 16[/b] - Switch to [b]scene01[/b]. Following the 'race' ${cmd7}, add an imaginative opening story scene for our protagonist leading to an encounter and a choice to make, and use [b]${cmd7}[/b] to prompt for a decision to be made. Use the [b]${cmd13}[/b] command and either [b]race[/b] or [b]class[/b] variable to make one or more of the options conditional. Follow with general narrative.[/i]
+
+The challenge of this particular exercise is not only to come up with a suitable situation requiring a good reason for having one or more [i]conditional[/i] Options, but also to do it in such a way that [i]regardless[/i] of the specific option chosen by / response given to the player, the following [i]general narrative[/i] still reads fine and makes sense in every case, for that is the limitation of the simple [b]${cmd7}[/b] command (i.e. it should only be used in those cases where the story can still simply "continue down the page" [i]sensibly[/i] in linear fashion). For anything more elaborate or involved than this, we should instead turn to the far more versatile [b]${cmd8}[/b] command.
+
+*finish Lesson #7 - [i]Improving Interaction[/i]
+
+
+*comment ----------Ignore------------
+*comment Tutorial code required in the event this Lesson has been accessed in a new session without the reader first having set critical values earlier.
+
+*label revisit
+
+As you have accessed this particular lesson in a new session without again "playing through" some of the earlier ones, the Tutorial is currently missing some information for example purposes. We'll quickly run through some missing choices before commencing the lesson…
+
+[i]Welcome, hero! By what name should lesser mortals address you?[/i]
+
+*fake_choice
+    #Xena.
+        *set pcname "Xena"
+    #Conan.
+        *set pcname "Conan"
+    #[i]None of the above[/i].
+        Please scribe your name, oh mighty hero!
+        *input_text pcname
+
+[i]Pray tell, noble hero, how do you foresee yourself being portrayed in legend?[/i]
+
+*fake_choice
+    #A fearsome Warrior.
+        *set class "warrior"
+        *set str 40
+        *set int 20
+        *set dex 30
+    #A powerful Mage.
+        *set class "mage"
+        *set str 20
+        *set int 40
+        *set dex 30
+    #A skillful Thief.
+        *set class "thief"
+        *set str 25
+        *set int 25
+        *set dex 40
+
+[i]Your ears are rather . . . pointy, great hero. Which proud people do you claim as your own?[/i]
+
+*fake_choice
+    #Humans.
+        *set race "human"
+        *set str +5
+        *set int +5
+        *set rep1 -5
+        *set rep3 +10
+        *set loc5 true
+    #Elves.
+        *set race "elf"
+        *set int +5
+        *set dex +5
+        *set rep1 +20
+        *set rep2 -10
+        *set loc3 true
+    #Dwarves.
+        *set race "dwarf"
+        *set str +15
+        *set dex -5
+        *set rep1 -10
+        *set rep2 +20
+        *set loc1 true
+    #Hobbits.
+        *set race "hobbit"
+        *set dex +10
+        *set str -10
+        *set rep1 +10
+        *set rep2 +5
+        *set rep3 +25
+        *set loc4 true
+*goto continue
+*comment ----------Ignore------------
