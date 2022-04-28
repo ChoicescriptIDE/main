@@ -5,7 +5,7 @@ on:
     branches: latest
   workflow_dispatch:
     inputs:
-      pre-release:
+      prerelease:
         type: boolean
       tag:
         type: string
@@ -64,5 +64,5 @@ jobs:
         with:
           name: 'Release (triggered) (${{ steps.date.outputs.date }})'
           tag_name: ${{ github.event.inputs.tag }}
-          prerelease: true
+          prerelease: ${{ github.event.inputs.prerelease }}
           files: package.nw
