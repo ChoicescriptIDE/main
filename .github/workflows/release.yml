@@ -64,7 +64,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: github.event_name == 'workflow_dispatch'
         with:
-          name: 'Release (triggered) (${{ steps.date.outputs.date }})'
+          name: '${{ github.event.inputs.tag }} Release (${{ steps.date.outputs.date }})'
           tag_name: ${{ github.event.inputs.tag }}
           prerelease: ${{ github.event.inputs.prerelease }}
           files: package.nw
