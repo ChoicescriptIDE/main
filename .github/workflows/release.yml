@@ -30,8 +30,20 @@ jobs:
           grunt
       - name: Archive
         run: zip -r package.nw build
-      - name: Release
+      - name: Get Date
+        id: date
+        run: echo "::set-output name=date::$(date +'%D')"
+      - name: Release Nightly
         uses: softprops/action-gh-release@v1
+        if: github.event_name == 'schedule'
         with:
+          name: 'Nightly Release (${{ steps.date.outputs.date }})'
+          draft: true
+          files: package.nw
+      - name: Triggered Release
+        uses: softprops/action-gh-release@v1
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          name: 'Release (triggered) (${{ steps.date.outputs.date }})'
           draft: true
           files: package.nw
