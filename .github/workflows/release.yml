@@ -50,7 +50,7 @@ jobs:
         if: github.event_name == 'pull_request'
         id: nightly_relnotes
         run: |
-          echo "::set-output name=relnotes::$(git log --since=yesterday --pretty=format:%s | awk 'NR>1{print "- "$0} NR==1{print "\n- "$0}'"
+          echo "::set-output name=relnotes::$(git log --since=yesterday --pretty=format:%s | awk 'NR>1{print "- "$0} NR==1{print "- "$0}'"
       - name: Tag Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/v')
