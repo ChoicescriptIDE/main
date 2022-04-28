@@ -35,7 +35,7 @@ jobs:
         run: echo "::set-output name=date::$(date +'%D')"
       - name: Release Nightly
         uses: softprops/action-gh-release@v1
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'pull_request'
         with:
           name: 'Nightly Release (${{ steps.date.outputs.date }})'
           draft: true
