@@ -41,6 +41,7 @@ jobs:
           prerelease: true
           draft: true
           files: package.nw
+          generate_release_notes: true
       - name: Triggered Release
         uses: softprops/action-gh-release@v1
         if: github.event_name == 'workflow_dispatch'
@@ -49,3 +50,4 @@ jobs:
           prerelease: true
           draft: true
           files: package.nw
+          generate_release_notes: true
