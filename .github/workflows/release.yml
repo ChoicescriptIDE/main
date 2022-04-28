@@ -38,6 +38,7 @@ jobs:
         if: github.event_name == 'pull_request'
         with:
           name: 'Nightly Release (${{ steps.date.outputs.date }})'
+          prerelease: true
           draft: true
           files: package.nw
       - name: Triggered Release
