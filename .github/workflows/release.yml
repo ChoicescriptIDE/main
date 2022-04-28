@@ -10,6 +10,7 @@ on:
       tag:
         type: string
         required: true
+  pull_request:
   schedule:
     - cron:  '00 2 * * *'
 
@@ -41,7 +42,7 @@ jobs:
         id: date
         run: echo "::set-output name=date::$(date +'%D')"
       - name: Generate nightly tag
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'pull_request'
         id: nightly_tag
         run: |
           echo "::set-output name=nightly_tag::Nightly_$(date +"%Y.%m.%d")"
@@ -52,7 +53,7 @@ jobs:
           files: package.nw
       - name: Release Nightly
         uses: softprops/action-gh-release@v1
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'pull_request'
         with:
           tag_name: ${{ steps.tag.outputs.nightly_tag }}
           name: 'Nightly Release (${{ steps.date.outputs.date }})'
