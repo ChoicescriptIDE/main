@@ -45,5 +45,6 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         with:
           name: 'Release (triggered) (${{ steps.date.outputs.date }})'
+          prerelease: true
           draft: true
           files: package.nw
