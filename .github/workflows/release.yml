@@ -45,7 +45,7 @@ jobs:
         if: github.event_name == 'pull_request'
         id: nightly_tag
         run: |
-          echo "::set-output name=nightly_tag::Nightly_$(date +"%Y.%m.%d")"
+          echo "::set-output name=tag::Nightly_$(date +"%Y.%m.%d")"
       - name: Tag Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/v')
@@ -55,7 +55,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: github.event_name == 'pull_request'
         with:
-          tag_name: ${{ steps.tag.outputs.nightly_tag }}
+          tag_name: ${{ steps.nightly_tag.outputs.tag }}
           name: 'Nightly Release (${{ steps.date.outputs.date }})'
           prerelease: true
           files: package.nw
