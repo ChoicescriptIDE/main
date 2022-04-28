@@ -5,7 +5,7 @@ on:
     branches: latest
   workflow_dispatch:
     inputs:
-      pre-release:
+      prerelease:
         type: boolean
       tag:
         type: string
@@ -45,12 +45,18 @@ jobs:
         if: github.event_name == 'pull_request'
         id: nightly_tag
         run: |
-          echo "::set-output name=tag::Nightly_$(date +"%Y.%m.%d")"
+          echo "::set-output name=tag::nightly_$(date +"%Y.%m.%d")"
+      - name: Generate nightly release notes
+        if: github.event_name == 'pull_request'
+        id: nightly_relnotes
+        run: |
+          echo "::set-output name=relnotes::$(git log --since="yesterday" --pretty=format:%s | awk 'NR>1{print "- "$0} NR==1{print "\n- "$0}'"
       - name: Tag Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           files: package.nw
+          token: ${{ secrets.CSIDESHELL }}
       - name: Release Nightly
         uses: softprops/action-gh-release@v1
         if: github.event_name == 'pull_request'
@@ -59,11 +65,15 @@ jobs:
           name: 'Nightly Release (${{ steps.date.outputs.date }})'
           prerelease: true
           files: package.nw
+          body: <h2>Commit Changelog</h2>${{ steps.nightly_relnotes.outputs.relnotes }}
+          token: ${{ secrets.CSIDESHELL }}
       - name: Triggered Release
         uses: softprops/action-gh-release@v1
         if: github.event_name == 'workflow_dispatch'
         with:
-          name: 'Release (triggered) (${{ steps.date.outputs.date }})'
+          name: '${{ github.event.inputs.tag }} Release (${{ steps.date.outputs.date }})'
           tag_name: ${{ github.event.inputs.tag }}
-          prerelease: true
+          prerelease: ${{ github.event.inputs.prerelease }}
           files: package.nw
+          token: ${{ secrets.CSIDESHELL }}
+
