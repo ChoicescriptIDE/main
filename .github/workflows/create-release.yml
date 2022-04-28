@@ -36,7 +36,7 @@ jobs:
           npm install .
           grunt
       - name: Archive
-        run: zip -r package.nw build
+        run: cd build && zip -r ../package.nw .
       - name: Get Date
         id: date
         run: echo "::set-output name=date::$(date +'%D')"
