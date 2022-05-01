@@ -19,15 +19,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]
         include:
           - os: ubuntu-latest
             platform: "linux"
             experimental: true # we don't actually ship CSIDE on Linux
           - os: macos-latest
             platform: "mac"
-          - os: windows-latest
-            platform: "windows"
     steps:
       - name: Setup Node.js environment
         uses: actions/setup-node@v1.4.4
@@ -87,6 +85,6 @@ jobs:
           name: '${{ github.event.inputs.tag }} Release (${{ steps.date.outputs.date }})'
           tag_name: ${{ github.event.inputs.tag }}
           prerelease: ${{ github.event.inputs.prerelease }}
-          files: package.nw
+          files: ${{matrix.platform}}-package.nw
           token: ${{ secrets.CSIDESHELL }}
 
