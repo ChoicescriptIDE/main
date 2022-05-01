@@ -10,6 +10,7 @@ on:
       tag:
         type: string
         required: true
+  pull_request:
   schedule:
     - cron:  '00 2 * * *'
 
@@ -26,18 +27,18 @@ jobs:
         with:
           fetch-depth: 0
       - name: Generate nightly release notes
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'pull_request'
         id: nightly_relnotes
         run: |
           echo "::set-output name=relnotes::$(git log --since=yesterday --pretty=format:%s | awk 'NR>1{print "- "$0} NR==1{print "- "$0}')"
       - name: Setup Python dependencies
-        if: github.event_name != 'schedule' || steps.nightly_relnotes.outputs.relnotes != ''
+        if: github.event_name != 'pull_request' || steps.nightly_relnotes.outputs.relnotes != ''
         run: |
           pip3 install mkdocs
           pip3 install mkdocs-material
           pip3 install mkdocs-localsearch
       - name: Build and Archive
-        if: github.event_name != 'schedule' || steps.nightly_relnotes.outputs.relnotes != ''
+        if: github.event_name != 'pull_request' || steps.nightly_relnotes.outputs.relnotes != ''
         run: |
           npm install grunt-cli -g
           npm install .
@@ -45,10 +46,10 @@ jobs:
           cd build && zip -r ../package.nw .
       - name: Get Date
         id: date
-        if: github.event_name != 'schedule' || steps.nightly_relnotes.outputs.relnotes != ''
+        if: github.event_name != 'pull_request' || steps.nightly_relnotes.outputs.relnotes != ''
         run: echo "::set-output name=date::$(date +'%D')"
       - name: Generate nightly tag
-        if: github.event_name != 'schedule' || steps.nightly_relnotes.outputs.relnotes != ''
+        if: github.event_name != 'pull_request' || steps.nightly_relnotes.outputs.relnotes != ''
         id: nightly_tag
         run: |
           echo "::set-output name=tag::nightly_$(date +"%Y.%m.%d")"
@@ -60,7 +61,7 @@ jobs:
           token: ${{ secrets.CSIDESHELL }}
       - name: Release Nightly
         uses: softprops/action-gh-release@v1
-        if: github.event_name == 'schedule' && steps.nightly_relnotes.outputs.relnotes != ''
+        if: github.event_name == 'pull_request' && steps.nightly_relnotes.outputs.relnotes != ''
         with:
           tag_name: ${{ steps.nightly_tag.outputs.tag }}
           name: 'Nightly Release (${{ steps.date.outputs.date }})'
