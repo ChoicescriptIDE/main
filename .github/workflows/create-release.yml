@@ -16,7 +16,18 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            platform: "linux"
+            experimental: true # we don't actually ship CSIDE on Linux
+          - os: macos-latest
+            platform: "mac"
+          - os: windows-latest
+            platform: "windows"
     steps:
       - name: Setup Node.js environment
         uses: actions/setup-node@v1.4.4
@@ -43,7 +54,7 @@ jobs:
           npm install grunt-cli -g
           npm install .
           grunt
-          cd build && zip -r ../package.nw .
+          cd build && zip -r ../${{matrix.platform}-package.nw .
       - name: Get Date
         id: date
         if: github.event_name != 'pull_request' || steps.nightly_relnotes.outputs.relnotes != ''
