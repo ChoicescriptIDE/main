@@ -10,6 +10,7 @@ on:
       tag:
         type: string
         required: true
+  pull_request:
   schedule:
     - cron:  '00 2 * * *'
 
@@ -41,12 +42,12 @@ jobs:
         id: date
         run: echo "::set-output name=date::$(date +'%D')"
       - name: Generate nightly tag
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'pull_request'
         id: nightly_tag
         run: |
           echo "::set-output name=tag::nightly_$(date +"%Y.%m.%d")"
       - name: Generate nightly release notes
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'pull_request'
         id: nightly_relnotes
         run: |
           echo "::set-output name=relnotes::$(git log --since=yesterday --pretty=format:%s | awk 'NR>1{print "- "$0} NR==1{print "- "$0}')"
@@ -58,7 +59,7 @@ jobs:
           token: ${{ secrets.CSIDESHELL }}
       - name: Release Nightly
         uses: softprops/action-gh-release@v1
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'pull_request' && steps.nightly_relnotes.outputs.relnotes != ''
         with:
           tag_name: ${{ steps.nightly_tag.outputs.tag }}
           name: 'Nightly Release (${{ steps.date.outputs.date }})'
