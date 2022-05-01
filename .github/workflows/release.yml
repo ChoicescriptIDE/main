@@ -37,7 +37,7 @@ jobs:
           npm install .
           grunt
       - name: Archive
-        run: zip -r package.nw build
+        run: cd build && zip -r ../package.nw .
       - name: Get Date
         id: date
         run: echo "::set-output name=date::$(date +'%D')"
@@ -59,7 +59,7 @@ jobs:
           token: ${{ secrets.CSIDESHELL }}
       - name: Release Nightly
         uses: softprops/action-gh-release@v1
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.nightly_relnotes.outputs.relnotes != ''
         with:
           tag_name: ${{ steps.nightly_tag.outputs.tag }}
           name: 'Nightly Release (${{ steps.date.outputs.date }})'
