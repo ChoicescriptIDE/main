@@ -21,7 +21,7 @@ jobs:
         if: github.event_name == 'schedule'
         id: detect_changes
         run: |
-          echo "::set-output name=changes::$(git log --since=yesterday)"
+          echo "::set-output name=changes::$(git log --since="24 hours ago")"
       - name: Setup Python dependencies
         if: github.event_name != 'schedule' || steps.detect_changes.outputs.changes != ''
         run: |

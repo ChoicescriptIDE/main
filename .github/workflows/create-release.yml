@@ -29,7 +29,7 @@ jobs:
         if: github.event_name == 'schedule'
         id: nightly_relnotes
         run: |
-          echo "::set-output name=relnotes::$(git log --since=yesterday --pretty=format:%s | awk 'NR>1{print "- "$0} NR==1{print "- "$0}')"
+          echo "::set-output name=relnotes::$(git log --since="24 hours ago" --pretty=format:%s | awk 'NR>1{print "- "$0} NR==1{print "- "$0}')"
       - name: Setup Python dependencies
         if: github.event_name != 'schedule' || steps.nightly_relnotes.outputs.relnotes != ''
         run: |
