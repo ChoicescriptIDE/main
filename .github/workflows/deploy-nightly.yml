@@ -17,20 +17,29 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: Detect changes
+        if: github.event_name == 'schedule'
+        id: detect_changes
+        run: |
+          echo "::set-output name=changes::$(git log --since=yesterday)"
       - name: Setup Python dependencies
+        if: github.event_name != 'schedule' || steps.detect_changes.outputs.changes != ''
         run: |
           pip3 install mkdocs
           pip3 install mkdocs-material
           pip3 install mkdocs-localsearch
       - name: Build
+        if: github.event_name != 'schedule' || steps.detect_changes.outputs.changes != ''
         run: |
           npm install grunt-cli -g
           npm install .
           grunt
       - name: Get Date
         id: date
+        if: github.event_name != 'schedule' || steps.detect_changes.outputs.changes != ''
         run: echo "::set-output name=date::$(date +'%D')"
       - name: Deploy
+        if: github.event_name != 'schedule' || steps.detect_changes.outputs.changes != ''
         uses: JamesIves/github-pages-deploy-action@4.1.1
         with:
           repository-name: ChoiceScriptIDE/web
