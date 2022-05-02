@@ -1,40 +1,11 @@
-//var ko = require('knockout');
-
-//var BootstrapMenu = require('bootstrap-menu');
-
-var amdRequire = require;
+const amdRequire = require;
 amdRequire.config({
   baseUrl: 'node_modules/monaco-editor/release/min'
 });
 
 //are we using node?
-if (typeof nw === "object") {
-  require = nodeRequire;
-  require.nodeRequire = require;
-
+if (window.electronAPI) {
   window.usingNode = true;
-  //load our modules:
-  var fs = require('fs');
-  var cp = require('child_process');
-  var mkdirp = require('mkdirp');
-  var trash = require('trash');
-  var getDirName = require('path').dirname;
-  var gui = require('nw.gui');
-  var resolvePath = require('path').resolve;
-  //var http = require('http');
-  //var stream = require('stream');
-  var updater = require('cside-updater');
-  var mediaServer = require('cside-server');
-  var win = gui.Window.get();
-  win.show();
-  process.on("uncaughtException", function(err) {
-    bootbox.alert("<h3>Uncaught Exception <span aria-hidden=\"true\">=(</span></h3><p>" + err.message + "\
-        </p><p>Something went (unexpectedly!) wrong.<br/>Please close \
-        and restart the application (then report this!).");
-    try {
-      fs.appendFileSync(gui.App.dataPath + '/cside-errors.txt', new Date(Date.now()) + ": " + err.message + "\n" + err.stack + "\n");
-    } catch (err) { /* Failed to write to error log */ }
-  });
 } else {
   window.usingNode = false;
   var getDirName = function(path) { return path.substring(0, path.lastIndexOf("/") + 1); }
@@ -51,7 +22,7 @@ if (typeof nw === "object") {
 }
 
 // Overall viewmodel for this screen, along with initial state
-function IDEViewModel() {
+function IDEViewModel(platform, versions, userDetails) {
 
   //EXTENDERS
   ko.extenders.normalizePaths = function(target, option) {
@@ -590,7 +561,7 @@ function IDEViewModel() {
     }
       /* callback(err, success_boolean) */
     self.exportFiles = function() {
-      fh.selectFolder(function(newPath) {
+      fh.selectFolder(function(error, newPath) {
         if (newPath) {
           bootbox.confirm("<h3>Warning</h3><p>This will <b>overwrite</b> any files with the same name in '<i>" + newPath + "</i>'.<br>Are you sure you wish to continue?</p>",
             function(result) {
@@ -623,7 +594,7 @@ function IDEViewModel() {
       });
     }
     self.compile = function() {
-      fh.selectFolder(function(newPath) {
+      fh.selectFolder(function(error, newPath) {
         if (newPath) {
           bootbox.confirm("<h3>Warning</h3><p>This will <b>overwrite</b> any file with the same name in '<i>" + newPath + "</i>'.<br>Are you sure you wish to continue?</p>",
             function(result) {
@@ -1262,18 +1233,13 @@ function IDEViewModel() {
         }
       }
 
-      fh.stat(path(), function(err, newfileStats) {
+      fh.stat(path(), async function(err, newfileStats) {
         if (err) {
           finishLoading(err);
         } else {
           fileStats = newfileStats;
-          fh.readFile(path(), function(err, data) {
-            if (err) {
-              finishLoading(err);
-            } else {
-              finishLoading(err, data);
-            }
-          });
+          const { error, result } = await window.electronAPI.readFile(path());
+          finishLoading(normalizeError(error), result);
         }
       });
 
@@ -1990,17 +1956,16 @@ function IDEViewModel() {
   var self = this;
 
   if (usingNode) {
-    var CSIDE_version = gui.App.manifest.version;
-    var nw_version = process.versions['node-webkit'];
-    var platform = (process.platform === "darwin" ? platform = "mac_os" : platform = process.platform);
-    var execPath = (platform === "mac_os") ? process.execPath.substring(0, process.execPath.lastIndexOf('/') + 1) : process.execPath.substring(0, process.execPath.lastIndexOf('\\') + 1);
+    var CSIDE_version = versions.cside;
+    var electron_version = versions.electron;
+    //var execPath = (platform === "mac_os") ? process.execPath.substring(0, process.execPath.lastIndexOf('/') + 1) : process.execPath.substring(0, process.execPath.lastIndexOf('\\') + 1);
     var updating = false;
     var autoSaveFn = null;
     var autoUpdateCheckFn = null;
-	var autoSuggestFn = null;
-    self.isUpdating = function() {
-      return updating;
-    }
+    var autoSuggestFn = null;
+      self.isUpdating = function() {
+        return updating;
+      }
   } else {
     var CSIDE_version = "Dropbox Alpha";
     var platform = "web-dropbox";
@@ -2009,12 +1974,6 @@ function IDEViewModel() {
   var CONST_IMG_PREFIX = "csideimg_";
 
   //INSTANCE VARIABLES
-  var user = {
-    "name": usingNode ? nodeRequire('username').sync() : 'Dropbox User',
-    "path": "/"
-  }
-  user.name = user.name.charAt(0).toUpperCase() + user.name.slice(1);
-
   var projectMenuOptions = ko.observableArray([
     new menuOption("Add new scene", function(menu) {
       menu.getTarget().addNewFile(menu.getTarget(), "untitled");
@@ -2136,7 +2095,7 @@ function IDEViewModel() {
       }, [
         new menuOption("Copy file to folder", function(menu) {
           var file = menu.getTarget();
-          fh.selectFolder(function(newPath) {
+          fh.selectFolder(function(error, newPath) {
             if (newPath) {
               bootbox.confirm("<h3>Warning</h3><p>This will <b>overwrite</b> any file with the same name in '<i>" + newPath + "</i>'.<br>Are you sure you wish to continue?</p>",
                 function(result) {
@@ -2170,7 +2129,7 @@ function IDEViewModel() {
           });
         }),
         new menuOption("Print file", function(menu) {
-          nw.Window.open("file://" + menu.getTarget().getPath(), {
+          window.open("file://" + menu.getTarget().getPath(), {
             focus: true,
             width: 800,
             height: 600
@@ -2189,7 +2148,7 @@ function IDEViewModel() {
           if (menu.getTarget().isReadOnly()) {
             return;
           }
-          fh.selectImage(function(path) {
+          fh.selectImage(function(error, path) {
             if (path) {
               __createImageScene(menu.getTarget(), path);
             }
@@ -2363,104 +2322,6 @@ function IDEViewModel() {
     if (typeof callback === "function") callback(ed);
   }
 
-  if (platform === "mac_os") {
-    var nativeMenuBar = new nw.Menu({
-      type: "menubar"
-    });
-    if (process.platform === "darwin") {
-      nativeMenuBar.createMacBuiltin("CSIDE");
-    }
-    win.menu = nativeMenuBar;
-    (function() {
-      var projectMenu = new nw.Menu();
-      projectMenu.getTarget = activeProject;
-      var subMenu;
-      var options = projectMenuOptions();
-      for (var i = 0; i < options.length; i++) {
-        if (options[i].getSubMenuOptions()) {
-          subMenu = new nw.Menu();
-          for (var o = 0; o < options[i].getSubMenuOptions().length; o++) {
-            subMenu.append(new nw.MenuItem({
-              label: options[i].getSubMenuOptions()[o].getLabel(),
-              click: options[i].getSubMenuOptions()[o].doAction.bind(null, projectMenu)
-            }));
-          }
-          projectMenu.append(new nw.MenuItem({
-            label: options[i].getLabel(),
-            click: options[i].doAction.bind(null, projectMenu),
-            submenu: subMenu
-          }));
-        } else {
-          projectMenu.append(new nw.MenuItem({
-            label: options[i].getLabel(),
-            click: options[i].doAction.bind(null, projectMenu)
-          }));
-        }
-      }
-      var index = ((platform === "mac_os") ? 3 : 1);
-      win.menu.insert(new nw.MenuItem({
-        label: "Project",
-        submenu: projectMenu
-      }), index);
-    })();
-
-    (function() {
-      var fileMenu = new nw.Menu();
-      fileMenu.getTarget = activeFile;
-      var subMenu;
-      var options = fileMenuOptions();
-      for (var i = 0; i < options.length; i++) {
-        if (options[i].getSubMenuOptions()) {
-          subMenu = new nw.Menu();
-          for (var o = 0; o < options[i].getSubMenuOptions().length; o++) {
-            subMenu.append(new nw.MenuItem({
-              label: options[i].getSubMenuOptions()[o].getLabel(),
-              click: options[i].getSubMenuOptions()[o].doAction.bind(null, fileMenu)
-            }));
-          }
-          fileMenu.append(new nw.MenuItem({
-            label: options[i].getLabel(),
-            click: options[i].doAction.bind(null, fileMenu),
-            submenu: subMenu
-          }));
-        } else {
-          fileMenu.append(new nw.MenuItem({
-            label: options[i].getLabel(),
-            click: options[i].doAction.bind(null, fileMenu)
-          }));
-        }
-      }
-      var index = ((platform === "mac_os") ? 4 : 2);
-      win.menu.insert(new nw.MenuItem({
-        label: "File",
-        submenu: fileMenu
-      }), index);
-    })();
-
-    if (platform != "mac_os") {
-      nw.Window.get().menu = win.menu; // display on Windows
-    }
-    else {
-      ko.extenders.updateMenuBarStates = function(target, option) {
-        target.subscribe(function(file) {
-          var b = file ? true : false;
-          var projectIndex = ((platform === "mac_os") ? 3 : 1);
-          var fileIndex = ((platform === "mac_os") ? 4 : 2);
-          win.menu = nw.Window.get().menu;
-          for (var index = projectIndex; index <= fileIndex; index++) {
-            for (var item = 0; item < win.menu.items[index].submenu.items.length; item++) {
-              win.menu.items[index].submenu.items[item].enabled = b;
-            }
-          }
-          nw.Window.get().menu = win.menu;
-        });
-        return target;
-      };
-      activeFile.extend({ updateMenuBarStates: "" });
-      activeEditor.valueHasMutated(); //force initialMenubarStates call
-    }
-  }
-
   var reservedSceneNames = "(STARTUP.TXT|CHOICESCRIPT_STATS.TXT)"; //Should be in upper case
   var recentFileColours = ko.observableArray(["#72c374", "#7797ec", "#d9534f", "#a5937a", "#ff8d2b", "#e079f5", "#00a8c3", "#777777"]);
   var uiColour = ko.observable().extend({
@@ -2563,7 +2424,7 @@ function IDEViewModel() {
   }
   var userDictionary = {};
   var fh = { //FILE HANDLER
-    "writeFile": function(path, data, callback) {
+    "writeFile": async function(path, data, callback) {
       switch (platform) {
         //WRITE
         case "web-dropbox":
@@ -2576,17 +2437,20 @@ function IDEViewModel() {
             });
           break;
         default:
-          mkdirp(getDirName(path), function(err) {
-            if (err) {
-              callback(normalizeError(err));
+            const { error, result: dirName } = await window.electronAPI.getDirName(path);
+            if (error) {
+              callback(normalizeError(error));
             } else {
-              fs.writeFile(path, data, {
-                encoding: 'utf8'
-              }, function(err) {
-                callback(normalizeError(err));
-              });
+              const { error: mkdirErr } = await window.electronAPI.mkdirp(dirName);
+              if (mkdirErr) {
+                callback(normalizeError(mkdirErr));
+              }
+              else {
+                const { error: writeErr } = await window.electronAPI.writeFile(path, data, { encoding: "utf8" });
+                callback(normalizeError(writeErr));
+              }
             }
-          });
+          break;
       }
     },
     "getDropboxImageUrl": function(path, callback) {
@@ -2610,7 +2474,7 @@ function IDEViewModel() {
           throw new Error("getDropboxImageUrl is a Dropbox only method!");
       }
     },
-    "readFile": function(path, callback) {
+    "readFile": async function(path, callback) {
       switch (platform) {
         //WRITE
         case "web-dropbox":
@@ -2632,14 +2496,11 @@ function IDEViewModel() {
             });
           break;
         default:
-          fs.readFile(path, {
-            encoding: 'utf8'
-          }, function(err, data) {
-            callback(normalizeError(err), data);
-          });
+          const { error, result } = await window.electronAPI.readFile(path, { encoding: 'utf8' });
+          callback(normalizeError(error), result);
       }
     },
-    "copyFile": function(oldPath, newPath, callback) {
+    "copyFile": async function(oldPath, newPath, callback) {
       switch (platform) {
         case "web-dropbox":
           db.filesCopy({from_path:oldPath, to_path:newPath})
@@ -2651,20 +2512,18 @@ function IDEViewModel() {
             });
           break;
         default:
-          fs.readFile(oldPath, {
-            encoding: 'utf8'
-          }, function(err, data) {
-            if (err) {
-              callback(normalizeError(err));
-            } else {
-              fs.writeFile(newPath, data, function(err) {
-                callback(normalizeError(err));
-              });
-            }
-          });
+          try {
+            const { error: readError, result: fileData } = await window.electronAPI.readFile(oldPath, { encoding: 'utf8' });
+            if (readError) throw _decodeError(readError);
+            const { error: writeError } = await window.electronAPI.writeFile(newPath, fileData, { encoding: 'utf8' });
+            if (writeError) throw _decodeError(writeError);
+            callback();
+          } catch (err) {
+            callback(normalizeError(err));
+          }
       }
     },
-    "renameFile": function(oldPath, newPath, callback) {
+    "renameFile": async function(oldPath, newPath, callback) {
       switch (platform) {
         case "web-dropbox":
           db.filesMove({from_path:oldPath, to_path:newPath})
@@ -2676,12 +2535,12 @@ function IDEViewModel() {
             });
           break;
         default:
-          fs.rename(oldPath, newPath, function(err) {
-            callback(normalizeError(err));
-          });
+          const { error } = await window.electronAPI.moveFile(oldPath, newPath);
+          callback(normalizeError(error));
+          break;
       }
     },
-    "deleteFile": function(path, callback) {
+    "deleteFile": async function(path, callback) {
       switch (platform) {
         case "web-dropbox":
           db.filesDelete({path:path})
@@ -2693,13 +2552,12 @@ function IDEViewModel() {
             });
           break;
         default:
-          trash([path], function(err) {
-            callback(normalizeError(err))
-          });
+          const { error } = await window.electronAPI.shell.trash(path);
+          callback(normalizeError(error));
           break;
       }
     },
-    "readDir": function(path, callback, dbMetaData) {
+    "readDir": async function(path, callback, dbMetaData) {
       switch (platform) {
         case "web-dropbox":
           path = (path == "/") ? "" : path;
@@ -2717,13 +2575,12 @@ function IDEViewModel() {
             });
           break;
         default:
-          fs.readdir(path, function(err, filePathArray) {
-            callback(normalizeError(err), filePathArray);
-          });
+          const { error, result } = await window.electronAPI.readDir(path);
+          callback(normalizeError(error), result);
           break;
       }
     },
-    "makeDir": function(path, callback) {
+    "makeDir": async function(path, callback) {
       switch (platform) {
         case "web-dropbox":
           if (path.slice(-1, path.length) == "/") {
@@ -2742,13 +2599,12 @@ function IDEViewModel() {
             });
           break;
         default:
-          mkdirp(path, function(err) {
-            callback(normalizeError(err));
-          });
+            const { error } = await window.electronAPI.mkdirp(path);
+            callback(normalizeError(error));
           break;
       }
     },
-    "stat": function(path, callback) {
+    "stat": async function(path, callback) {
       switch (platform) {
         case "web-dropbox":
           db.filesGetMetadata({path: path})
@@ -2760,65 +2616,51 @@ function IDEViewModel() {
           });
           break;
         default:
-          fs.stat(path, function(err, fileStats) {
-            callback(normalizeError(err), fileStats);
-          });
+          let { error, result: fileStats } = await window.electronAPI.statFile(path);
+          callback(normalizeError(error), fileStats);
           break;
       }
     },
-    "selectFolder": function(callback) {
+    "selectFolder": async function(callback) {
       switch (platform) {
         case "web-dropbox":
           fileBrowser.selectFolders(function(selection) {
             if (selection.length > 0) {
-              callback(selection[0].path + '/');
+              callback(null, selection[0].path + '/');
             } else {
-              callback(null);
+              callback(null, undefined);
             }
           });
           break;
         default:
-          var chooser = $("#selectFolder");
-          chooser.off().change(function(evt) {
-            callback($(this).val() + '/');
-            $(this).val("");
-          });
-          setTimeout(function() {
-            chooser.trigger("click");
-          }, 200);
+          let { error, result: path } = await window.electronAPI.selectDir(activeProject() ? activeProject().getPath() : userDetails.path);
+          if (path) path = path[0] + '/';
+          callback(normalizeError(error), path);
       }
     },
-    "selectImage": function(callback) {
+    "selectImage": async function(callback) {
       switch (platform) {
         case "web-dropbox":
           bootbox.alert("TODO: Image scene import not yet implemented on the web-version.")
           break;
         default:
-          var chooser = $("#getImagePaths");
-          chooser.off().change(function(evt) {
-            callback($(this).val());
-            $(this).val("");
-          });
-          setTimeout(function() {
-            chooser.trigger("click");
-          }, 200);
+          const { error, result: path } = await window.electronAPI.selectImage(activeProject() ? activeProject().getPath() : userDetails.path);
+          if (path) path = path[0] + '/';
+          callback(error, path);
       }
     },
-    "selectFiles": function(callback, options) {
+    "selectFiles": async function(callback, options) {
       options = options || {};
       if (usingNode) {
-        var extensions = options.extensions || [".txt", ".log"];
-        var chooser = $("#getFilePaths");
-        chooser.attr("accept", extensions.join(","));
-        chooser.off().change(function(evt) {
-          var selection = $(this).val().split(";");
-          if (selection.length === 1 && selection[0] === "") {
-            callback(null);
+        const { error, result: selection } = await window.electronAPI.openFile(activeProject() ? activeProject().getPath() : userDetails.path, {
+          options: {
+            properties: {
+              multiSelections: true,
+              filters: options.filters
+            }
           }
-          $(this).val("");
-          callback(selection);
         });
-        chooser.trigger("click");
+        callback(error, selection);
       } else {
         fileBrowser.open(function(selection) {
           if (selection.length < 1) {
@@ -2837,7 +2679,12 @@ function IDEViewModel() {
   }
 
   var normalizeError = function(err) {
-    if (!err) return null;
+    if (!err) {
+      return null;
+    } else if (!(err instanceof Error)) {
+      // Serialized from main prcoess, convert back into an error
+      err = _decodeError(err);
+    }
     if (typeof err.message == 'undefined') {
       try {
         err.message = JSON.parse(err.responseText).error;
@@ -2982,29 +2829,6 @@ function IDEViewModel() {
     }
   }
 
-  // initiate dropbox:
-  if (platform == "web-dropbox") {
-
-    if (!!utils.parseQueryString(window.location.hash).access_token) {
-      var db = new Dropbox.Dropbox({ accessToken: utils.parseQueryString(window.location.hash).access_token });
-    }
-    else {
-      var db = new Dropbox.Dropbox({ clientId: "hnzfrguwoejpwbj" });
-      db.auth.getAuthenticationUrl(window.location).then((authUrl) => {
-        window.location = authUrl;
-      });
-    }
-
-    // try and source the DB username:
-    db.usersGetCurrentAccount().then(function(acc) {
-      user.name = acc.name.display_name;
-    })
-    .catch(function(err) {}); // we don't mind errors, we'll just stick with the default name
-
-  }
-
-  window.db = db;
-
   var dropboxAuthorised = ko.observable(false);
 
   //GETTER METHODS
@@ -3122,19 +2946,57 @@ function IDEViewModel() {
 
   //frameless window control interface
   self.session.win = function() {
-    var fullScreen = ko.observable(true);
+    var fullScreen = ko.observable(false);
     return {
       "isFullscreen": ko.computed(function() {
         return fullScreen();
       }, this),
       "toggleMaximize": function() {
         if (fullScreen()) {
-          win.restore();
-          //platform === "mac_os" ? win.leaveFullscreen() : win.restore();
+          platform === "mac_os" ? window.electronAPI.window.setFullScreen(false) : window.electronAPI.window.restore();;
         } else {
-          platform === "mac_os" ? win.enterFullscreen() : win.maximize();
+          platform === "mac_os" ? window.electronAPI.window.setFullScreen(true) : window.electronAPI.window.maximize();
         }
         fullScreen(!fullScreen());
+      },
+      "close": function() {
+        if (cside.session.isDirty() || cside.getProjects().length === 0) {
+            bootbox.dialog({
+              message: "One or more scenes has unsaved changes, are you sure you want to quit?",
+              title: "Unsaved Changes",
+              buttons: {
+                yes: {
+                  label: "Don't save",
+                  className: "btn-primary",
+                  callback: function() {
+                    window.electronAPI.process.exit();
+                  }
+                },
+                saveandquit: {
+                  label: "Save & Quit",
+                  callback: function() {
+                    var n = cside.notification("", "<i aria-hidden=true class='fa fa-refresh fa-spin'></i> Saving files. Please do not close CSIDE.", { closeWith: false, timeout: false });
+                    cside.session.save(function(err) {
+                      n.close();
+                      if (!err) {
+                        window.electronAPI.process.exit();
+                      } else {
+                        cside.notification("Error", "Failed to save one or more files. App will not exit.", { type: "error" });
+                      }
+                    });
+                  }
+                },
+                no: {
+                  label: "Cancel",
+                  callback: function() {
+                    return;
+                  }
+                }
+              }
+          });
+        } else {
+          window.electronAPI.process.exit();
+        }
       }
     }
   }();
@@ -3254,9 +3116,7 @@ function IDEViewModel() {
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        if (platform !== "mac_os") {
-          cside.getActiveEditor().close();
-        }
+        cside.getActiveEditor().close();
         return null;
       }
     });
@@ -4190,28 +4050,31 @@ function IDEViewModel() {
         "apply": function(val) {
           var self = this;
           if (val == "default") {
-            var path = usingNode ? (userDetails.path + "/Documents/Choicescript Projects/") : ("/Choicescript Projects/");
+            if (usingNode) {
+              var userDir = '/Users/Carey';
+            }
+            var path = usingNode ? (userDir + "/Documents/Choicescript Projects/") : ("/Choicescript Projects/");
             self.setDesc(path);
-            user.path = path;
+            userDetails.path = path;
           } else if (val == "select") {
-            fh.selectFolder(function(path) {
+            fh.selectFolder(function(error, path) {
               if (path) {
                 /* this is a bit hacky, ideally I will improve settings management to allow for proper custom value settings CJW */
                 path = __normalizePath(path); //deal with Windows backslashes etc.
                 self.setValue(path);
                 self.setDesc(path);
-                user.path = path;
+                userDetails.path = path;
                 config.settings[self.getCat()][self.getId()] = path;
                 __updateConfig();
               }
             });
             //make sure 'select' isn't the option stored in config
-            self.setValue(user.path);
-            config.settings[self.getCat()][self.getId()] = user.path;
+            self.setValue(userDetails.path);
+            config.settings[self.getCat()][self.getId()] = userDetails.path;
             __updateConfig();
           } else {
             self.setDesc(val);
-            user.path = val;
+            userDetails.path = val;
           }
         }
       }),
@@ -4255,26 +4118,21 @@ function IDEViewModel() {
             clearInterval(autoUpdateCheckFn);
           }
           if (channel != "none" && usingNode) {
-            var autoUpdate = function() {
+            var autoUpdate = async function() {
               if (self.prompt && !self.prompt.closed) // prevent notification stacking
                 return;
               var n = notification("", "<i aria-hidden=true class='fa fa-refresh fa-spin'></i> Checking for updates...", { closeWith: false, timeout: false });
-              updater.checkForUpdates({
-                cside: CSIDE_version,
-                nw: nw_version
-              }, channel, function(err, update) {
-                n.close();
-                if (err) {
-                  notification("Connection Error", "Failed to obtain update data from server. " + err.message, { type: "error" });
-                } else if (update) {
-                  self.prompt = __showUpdatePrompt(channel, update);
-                }
-              });
+              const { error, result: updateDetails } = await window.electronAPI.updates.check(versions, channel);
+              n.close();
+              if (error) {
+                notification("Connection Error", "Failed to obtain update data from server. " + error.message, { type: "error" });
+              } else if (updateDetails) {
+                self.prompt = __showUpdatePrompt(channel, updateDetails);
+              }
             }
             autoUpdateCheckFn = setInterval(autoUpdate, 1000 * 60 * 60);
             autoUpdate();
           }
-          else {}
         }
       }),
       new CSIDESetting({
@@ -4467,11 +4325,15 @@ function IDEViewModel() {
       __openLogFile(path, callback);
     }
   }
-  self.openFileBrowser = function() {
-    fh.selectFiles(function(selection) {
-      if (selection && selection.length >= 1)
+  self.openFileBrowser = async function() {
+    fh.selectFiles(function(error, selection) {
+      if (error) {
+        bootbox.alert("<h3>Error</h3>" + error.message);
+        return;
+      } else if (selection && selection.length >= 1)  {
         __openFiles(selection, true);
-    });
+      }
+    }, { name: 'Scenes', extensions: ['txt', 'log'] });
   }
 
   function __openFiles(paths, selectLast) {
@@ -4595,10 +4457,13 @@ function IDEViewModel() {
         else if (userDictionary.persistentList[arr[i]] !== true)
           throw new Error("Error: Entry value should be 'true' for: " + arr[i])
     },
-    "import": function() {
+    "import": async function() {
       var path;
-      fh.selectFiles(function(selection) {
-        if (!selection || selection.length < 1) {
+      fh.selectFiles(async function(error, selection) {
+        if (error) {
+          bootbox.alert("<h3>Error</h3>" + error.message);
+          return;
+        } else if (!selection || selection.length < 1) {
           return;
         }
         path = selection[0];
@@ -4606,39 +4471,37 @@ function IDEViewModel() {
           bootbox.alert("<h3>Error</h3>Please select a single valid JSON file.");
           return;
         }
-        bootbox.confirm("Are you sure you wish to import this dictionary?<br>All words from the current dictionary will be lost.", function(result) {
+        bootbox.confirm("Are you sure you wish to import this dictionary?<br>All words from the current dictionary will be lost.", async function(result) {
           if (result) {
-            fh.readFile(path, function(err, data) {
-              if (err) {
-                notification("Failed to Read Dictionary", path, {
+            const { error, result: data } = await window.electronAPI.readFile(path);
+            if (error) {
+              notification("Failed to Read Dictionary", path, {
+                type: 'error'
+              });
+            } else {
+              try {
+                userDictionary.persistentList = JSON.parse(data);
+                userDictionary.sanitize();
+                userDictionary.update();
+                userDictionary.removeAll();
+                userDictionary.load();
+                notification("Dictionary Import Succesful", path, {
+                  type: 'success'
+                });
+              } catch(err) {
+                notification("Dictionary Import Failed", path, {
                   type: 'error'
                 });
+                throw err;
               }
-              else {
-                try {
-                  userDictionary.persistentList = JSON.parse(data);
-                  userDictionary.sanitize();
-                  userDictionary.update();
-                  userDictionary.removeAll();
-                  userDictionary.load();
-                  notification("Dictionary Import Succesful", path, {
-                    type: 'success'
-                  });
-                } catch(e) {
-                  notification("Dictionary Import Failed", path, {
-                    type: 'error'
-                  });
-                  throw e;
-                }
-              }
-            });
+            }
           }
         });
-      }, { extensions: [".json"]});
+      }, { name: 'JSON', extensions: ['json'] });
     },
     "export": function() {
       var path;
-      fh.selectFolder(function(url) {
+      fh.selectFolder(function(error, url) {
         if (!url) return;
         __promptForString(function(filename) {
           if (filename) {
@@ -4727,7 +4590,11 @@ function IDEViewModel() {
     return userDictionary.persistentListArray().filter(function(word) { return word.startsWith(query); } ).sort();
   }, this);
 
-  self.init = function() {
+  self.init = async function() {
+
+    window.electronAPI.handleNotification((event, message) => {
+      bootbox.alert(message);
+    });
 
     monaco.editor.onDidChangeMarkers(function(uri) {
       for (var i = 0; i < uri.length; i++) {
@@ -4800,33 +4667,44 @@ function IDEViewModel() {
 
     if (usingNode) {
       // Load user-themes for the editor
-      var themeDir = gui.App.dataPath + "/userThemes";
-      var themeData = __loadEditorCustomThemes(themeDir);
-      if (themeData.err && themeData.err.code === "ENOENT") {
-        try {
-          fs.mkdirSync(themeDir);
-          themeData = __loadEditorCustomThemes(themeDir);
-        } catch (err) { // give up
-          notification("Unable to Detect Custom Themes",
-            "CSIDE couldn't find or create a themes folder", {
-            type: "error",
-            layout: "bottomRight"
-          });
-        }
-      }
-      if (!themeData.err && themeData.themes.length > 0) {
-        themeData.themes.filter(function(theme) { return theme.err })
-          .forEach(function(theme) {
-            notification("Failed to Load Custom Theme: " + theme.name, theme.err.message || "", {
+      const { error, result: userPath } = await window.electronAPI.app.getPath('userData');
+      if (userPath) {
+        const themeDir = userPath + "/userThemes";
+        var themeData = await __loadEditorCustomThemes(themeDir);
+        if (themeData.err && themeData.err.code === "ENOENT") {
+          try {
+            const { error } = await window.electronAPI.mkdirp(themeDir);
+            if (error) throw normalizeError(error);
+            themeData = await __loadEditorCustomThemes(themeDir);
+          } catch (err) {
+            notification("Unable to Detect Custom Themes",
+              "CSIDE couldn't find or create a themes folder", {
               type: "error",
               layout: "bottomRight"
             });
-          });
+          }
+        }
+        if (!themeData.err && themeData.themes.length > 0) {
+          themeData.themes.filter(function(theme) { return theme.err })
+            .forEach(function(theme) {
+              notification("Failed to Load Custom Theme: " + theme.name, theme.err.message || "", {
+                type: "error",
+                layout: "bottomRight"
+              });
+            });
+        }
+      } else {
+        error = normalizeError(error);
+        notification("Unable to Get Custom Directory",
+          error.message, {
+          type: "error",
+          layout: "bottomRight"
+        });
       }
     }
 
     if (!usingNode) {
-      user.name = "dropbox-user";
+      userDetails.name = "dropbox-user";
     }
     if (config.settings.app.persist) {
 
@@ -4975,7 +4853,7 @@ function IDEViewModel() {
     monacoEditorInst.getContribution('editor.linkDetector').openerService._externalOpener = {
       openExternal: function(href) {
         if (usingNode) {
-          gui.Shell.openExternal(href);
+          // handled by electron/main.js
         } else if (matchesScheme(href, Schemas.http) || matchesScheme(href, Schemas.https)) {
           dom.windowOpenNoOpener(href);
         } else {
@@ -5199,31 +5077,33 @@ function IDEViewModel() {
   }
 
   // Returns: { err: err || null, themes: [ { name: string, err: err || null } ]};
-  function __loadEditorCustomThemes(themeDir) {
+  async function __loadEditorCustomThemes(themeDir) {
     var result = { err: null, themes: [] };
-    try {
-      var themes = fs.readdirSync(themeDir).filter(function(file) {
-        return getFileExtension(file) === ".json";
-      });
-      themes.forEach(function(theme) {
-        var themePath = themeDir + "/" + theme;
-        var themeName = getFileName(themePath);
-        var theme = { name: themeName, err: null };
-        try {
-          var themeData = JSON.parse(fs.readFileSync(themePath).toString());
-          var valErr = __validateEditorCustomThemes(themeData);
-          if (!valErr)
-            monaco.editor.defineTheme(themeName, themeData);
-          else
-            theme.err = valErr;
-        } catch(err) {
-          theme.err = err;
-        }
-        result.themes.push(theme);
-      });
-    } catch(err) {
-      result.err = err;
-    }
+      try {
+        const { error, result: themeFiles } = await window.electronAPI.readDir(themeDir).filter(function(file) {
+          return getFileExtension(file) === ".json";
+        });
+        if (error) throw _decodeError(err);
+        themeFiles.forEach(async function(theme) {
+          var themePath = themeDir + "/" + theme;
+          var themeName = getFileName(themePath);
+          var theme = { name: themeName, err: null };
+          try {
+            const { error, result: themeData } = await window.electronAPI.readFile(themePath);
+            if (error) throw _decodeError(err);
+            var valErr = __validateEditorCustomThemes(themeData);
+            if (!valErr)
+              monaco.editor.defineTheme(themeName, themeData);
+            else
+              theme.err = valErr;
+          } catch(err) {
+            theme.err = err;
+          }
+          result.themes.push(theme);
+        });
+      } catch (err) {
+        result.err = err;
+      }
     return result;
   }
 
@@ -5235,7 +5115,7 @@ function IDEViewModel() {
     function __create(projectName) {
       validName(projectName, true, function(valid, err) {
         if (valid) {
-          projectExists(user.path + projectName, function(exists) {
+          projectExists(userDetails.path + projectName, function(exists) {
             if (!exists) {
               __createProject(projectName, cb, blank);
             }
@@ -5322,7 +5202,7 @@ function IDEViewModel() {
   function __createProject(projectName, cb, blank) {
     blank = blank || false;
     function createProjectFolder(cpf_cb) {
-      var projectPath = user.path + (projectName + '/');
+      var projectPath = userDetails.path + (projectName + '/');
       fh.makeDir(projectPath, function(err) {
         if (err && err.code == "EEXIST") {
           bootbox.alert("Error: That Project folder could not be created because it already exists.");
@@ -5347,7 +5227,7 @@ function IDEViewModel() {
       __addProject(project);
       var startupContents =
         "*title " + projectName +
-        "\n*author " + user.name +
+        "\n*author " + userDetails.name +
         "\n*ifid " + uuidv4() +
         "\n*comment your code goes here" +
         "\n*finish\n";
@@ -5381,28 +5261,8 @@ function IDEViewModel() {
     });
   }
 
-  function __saveFileTo(file, callback) {
-    var chooser = $('#saveFileTo');
-    chooser.attr("nwsaveas", file.getName());
-    chooser.off().change(function(evt) {
-      var savePath = $(this).val();
-      if (!savePath) return;
-      fs.writeFile(savePath, file.document.getValue(), function(err) {
-        if (err) {
-          bootbox.alert(err.message);
-          return;
-        } else {
-          //success doesn't do anything (as our original version may still be dirty etc)
-        }
-      });
-    });
-    setTimeout(function() {
-      chooser.trigger('click');
-    }, 200);
-  }
-
   function __openLogFile(path, callback) {
-    nw.Window.open("file://" + path, {
+    window.open("file://" + path, {
       focus: true,
       width: 800,
       height: 600
@@ -5576,7 +5436,7 @@ function IDEViewModel() {
 
   function __openFolder(path) {
     if (usingNode) {
-      gui.Shell.openItem(path);
+      window.electronAPI.shell.openItem(path);
     } else {
       fileBrowser.open(path, function(selection) {
         if (selection.length < 1) {
@@ -5655,38 +5515,13 @@ function IDEViewModel() {
     }
     var path = ("node_modules/cside-choicescript/" + test + "test.html");
     activeProject(project);
-    if (platform === "web-dropbox") {
-      project.test_win = window.open(path, "Quicktest", "toolbar=0,location=0,status=0,menubar=0,scrollbars,resizable,width=500,height=400");
-      project.test_win.addEventListener("beforeunload", function(event) {
-        project.test_win = null;
-      });
-      setTimeout(function() {
-        project.test_win.title = test.toUpperCase() + "TEST - " + project.getName();
-      }, 200);
-    } else {
-      if (project.test_win) {
-        //re-run (open)
-        project.test_win.close();
-        project.test_win = null;
-        __testProject(project, test);
-      } else {
-        nw.Window.open(path, {
-          focus: true,
-          width: 500,
-          height: 500,
-          title: ""
-        }, function(test_win) {
-          project.test_win = test_win;
-          test_win.on("closed", function() {
-            //project.test_win.leaveFullscreen();
-            project.test_win.hide();
-            project.test_win.close(true);
-            project.test_win = null;
-          });
-        });
-      }
-    }
-    //__reloadTab(self.tabs()[0], "lib/choicescript/" + test + "test.html");
+    project.test_win = window.open(path, "Quicktest", "toolbar=0,location=0,status=0,menubar=0,scrollbars,resizable,width=500,height=400");
+    project.test_win.addEventListener("beforeunload", function(event) {
+      project.test_win = null;
+    });
+    setTimeout(function() {
+      project.test_win.title = test.toUpperCase() + "TEST - " + project.getName();
+    }, 200);
   }
 
   function __openAllProjectScenes(project) {
@@ -5720,10 +5555,16 @@ function IDEViewModel() {
     $("#tabs").tabs("option", "active", $("#" + id).index() - 1);
   }
 
-  function __runProject(project) {
+  async function __runProject(project) {
+    let serverAddress = null;
     if (platform != "web-dropbox") {
-      mediaServer.setDir(project.getPath());
-      document.getElementById("game-tab-frame").terminate();
+      await window.electronAPI.mediaServer.setDir(project.getPath());
+      try {
+        serverAddress = await window.electronAPI.mediaServer.getAddr().result;
+      } catch (err) {
+        bootbox.alert("<h3>Media Server Error</h3>" + "Cannot retrieve address of media/resource server. Please report this.");
+        return;
+      }
     }
     __shortCompile(project, function(err, allScenes) {
       if (err) {
@@ -5737,12 +5578,13 @@ function IDEViewModel() {
         __reloadTab(__getTab("game"), 'run_index.html?restart=true');
         cside.togglePanel("tab", true /* open */);
         __selectTab("game");
-        setTimeout(function() {
+        setTimeout(async function() {
+          const { result } = await window.electronAPI.mediaServer.getAddr();
           var webview = document.getElementById('game-tab-frame');
           webview.addEventListener("unresponsive", function(pid) {
             var buttons = [
               {
-                addClass: 'btn', text: 'Close', onClick: function(note) { webview.terminate(); note.close(); }
+                addClass: 'btn', text: 'Close', onClick: function(note) { /*webview.terminate();*/ note.close(); }
               },
               {
                 addClass: 'btn', text: 'Wait', onClick: function(note) { note.close(); }
@@ -5758,7 +5600,7 @@ function IDEViewModel() {
               allScenes: allScenes,
               project: { path: project.getPath(), name: project.getName() },
               platform: platform,
-              server: platform != "web-dropbox" ? mediaServer.getAddr() : null,
+              server: serverAddress || result,
               allowScript: (platform !== "web-dropbox") && settings.byId("app", "allowscript").getValue(),
             }
           );
@@ -5877,13 +5719,10 @@ function IDEViewModel() {
     }
   }
 
-  function __fullCompile(project, path) {
-    var compile_process = cp.fork("compile.js", [path + project.getName() + ".html", "web/", project.getPath()], {
-      cwd: "node_modules/cside-choicescript/"
-    });
-    var status = notification("Exporting Game", "Do not close the program", { progress: true, closeWith: false, timeout: false });
-
-    compile_process.on("message", function(log) {
+  async function __fullCompile(project, path) {
+    const channel = 'full-compile';
+    const status = notification("Exporting Game", "Do not close the program", { progress: true, closeWith: false, timeout: false });
+    const messageHandler = (event, log) => {
       if (log.type === "progress") {
         status.setProgress(log.value);
       } else if (log.type === "exitCode") {
@@ -5905,59 +5744,47 @@ function IDEViewModel() {
           type: "error"
         });
       }
-    });
-    compile_process.on('disconnect', function() {
+    };
+    const disconnectHandler = () => {
       status.close();
-    });
-  }
+      window.electronAPI.process.unregisterChannel(channel, messageHandler);
+      window.electronAPI.process.unregisterChannel(channel+'-disconnect', disconnectHandler);
+    };
 
-  function __rollbackUpdate() {
-    updater.restore(function(err) {
-      if (err) {
-        notification("Warning - Rollback failed: Package Corrupt", err.message, {
-          type: "error", timeout: 10000
-        });
-      } else {
-        notification("Rollback Succesful", "The previous app package has been restored");
-      }
-    });
-  }
+    window.electronAPI.process.registerChannel(channel, messageHandler);
+    window.electronAPI.process.registerChannel(channel+'-disconnect', disconnectHandler);
 
-  function __update(channel) {
-    if (updating) return; //don't allow simultaneous updates
-    var status = notification("Downloading Update", "Do not close the program", { progress: true, closeWith: false, timeout: false });
-    var eventHandlers = {
-      progress: function(val) {
-        if (!isNaN(val)) {
-         status.setProgress(val);
-        }
-      },
-      error: function(title, msg) {
-        notification(title, msg, { type: "error" });
-      }
+    const { error, result } = window.electronAPI.process.fork(channel, "compile.js", [path + project.getName() + ".html", "web/", project.getPath()], {
+      cwd: "node_modules/cside-choicescript/"
+    });
+    if (error) {
+      notification("Game Export Failed", error.message, {
+        type: "error"
+      });
     }
-    updating = true;
-    updater.update(channel, eventHandlers, function(err) {
-      status.close();
-      updating = false;
-      if (err) {
-        notification("Update Failed", err.message, { type: "error", timeout: 10000 });
-        __rollbackUpdate();
-      } else {
-        config.justUpdated = true;
-        __updateConfig();
-        notification("Update Complete", "Please restart the application.", { closeWith: false, timeout: false, type: "success" });
-      }
-    });
+  }
+
+  async function __rollbackUpdate() {
+    const { error } = await window.electronAPI.updates.restore();
+    if (error) {
+      notification("Warning - Rollback failed: Package Corrupt", error.message, {
+        type: "error", timeout: 10000
+      });
+    } else {
+      notification("Rollback Succesful", "The previous app package has been restored");
+    }
   }
 
   function __showUpdatePrompt(channel, update) {
     var buttons = [{
       addClass: 'btn',
       text: 'Download',
-      onClick: function(note) {
+      onClick: async function(note) {
         note.close();
-        __update(channel);
+        const { error } = await window.electronAPI.updates.download(channel);
+        if (error) {
+          notification("Update Error", error.message, { type: 'error' });
+        }
       }
     },
     {
@@ -6021,7 +5848,7 @@ function IDEViewModel() {
       eventProject = getProject(event.data.project.path);
     switch (event.data.type) {
       case "handleLink":
-        nw.Shell.openExternal(event.data.url);
+        window.electronAPI.shell.openExternal(event.data.url);
         break;
       case "console":
         switch(event.data.action) {
@@ -6067,7 +5894,7 @@ function IDEViewModel() {
         }
         break;
       case "popOut":
-        nw.Window.open("run_index.html?persistence=CSIDE", {focus: true, width: 500, height: 500, title: ""}, function(new_win) {
+        window.open("run_index.html?persistence=CSIDE", { focus: true, width: 500, height: 500, title: "" }, function(new_win) {
           cside.popout.window = new_win;
           // don't allow the popout window to overwrite the persistent store (allows popout testing of multiple choices etc)
           new_win.on("loaded", function() {
@@ -6707,11 +6534,55 @@ function IDEViewModel() {
   var myContextMenuViewModel = new CSIDE_ContextMenu();
   ko.applyBindings(myContextMenuViewModel, $('#context-menu')[0]);
 
-}
+};
+
+const _decodeError = (errObj) => {
+  const err = new Error(errObj.message);
+  err.code = errObj.code;
+  return err;
+};
+
+const _initDropbox = async () => {
+  let db;
+  if (!!utils.parseQueryString(window.location.hash).access_token) {
+    db = new Dropbox.Dropbox({ accessToken: utils.parseQueryString(window.location.hash).access_token });
+  }
+  else {
+    db = new Dropbox.Dropbox({ clientId: "hnzfrguwoejpwbj" });
+    const authUrl = await db.auth.getAuthenticationUrl(window.location);
+    window.location = authUrl;
+  }
+  return db;
+};
 
 require = amdRequire; // restore for monaco's lazy loading
-amdRequire(['vs/editor/editor.main'], function() {
-  window.cside = new IDEViewModel();
+amdRequire(['vs/editor/editor.main'], async function() {
+  if (usingNode) {
+    const initData = {
+      "platform": { error: pErr, result: platform } = await window.electronAPI.getPlatform(),
+      "versions": { error: vErr, result: versions }  = await window.electronAPI.getVersions(),
+      "userDetails": { error: uErr, result: userDetails } = await window.electronAPI.getUserDetails()
+    }
+
+    for (const item in initData) {
+      if (initData[item].error) {
+        throw _decodeError(initData[item].error);
+      }
+    }
+    
+    window.cside = new IDEViewModel(initData.platform.result, initData.versions.result, initData.userDetails.result);
+  } else {
+    const platform = "web-dropbox";
+    const userDetails = {
+      name: "Dropbox User",
+      path: "/"
+    }
+    window.db = await _initDropbox();
+    db.usersGetCurrentAccount().then(function(acc) {
+      userDetails.name = acc.name.display_name;
+    }).catch(function(err) {}); // we don't mind errors, we'll just stick with the default name
+    window.cside = new IDEViewModel(platform, { cside: "Dropbox Beta", electron: null }, userDetails);
+  }
   window.monaco = monaco;
   ko.applyBindings(cside, $('.main-wrap')[0]);
   cside.init();

@@ -280,6 +280,10 @@ body.night #left-wrap {
     top: 42px;
 }
 
+#game-tab-frame {
+    height: 100%;
+}
+
 #tabs iframe {
     width: 100%;
     height: 100%;

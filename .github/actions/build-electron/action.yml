@@ -1,0 +1,8 @@
+name: 'build-electron'
+description: 'Build CSIDE Electron Distributions'
+runs:
+  using: 'node16'
+  main: 'build-electron.js'
+outputs:
+  assets:
+    description: 'Line separated paths to built distributables'

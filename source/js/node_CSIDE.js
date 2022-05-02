@@ -1,18 +1,7 @@
-//var MouseTrap = require('mousetrap');
-//var Mousetrap = new MouseTrap(document.documentElement);
-
+var MouseTrap = require('mousetrap');
+var Mousetrap = new MouseTrap(document.documentElement);
+usingNode = true;
 if (usingNode) {
-	gui.App.on('open', function(path) {
-		if (path.substring(path.lastIndexOf("."), path.length) == ".txt") cside.openScene(path.replace("file://", ""));
-	});
-
-	if (gui.App.argv) {
-		var path = "";
-		for (var i = 0; i < gui.App.argv.length; i++) {
-			path = gui.App.argv[i];
-			if (path.substring(path.lastIndexOf("."), path.length) == ".txt") cside.openScene(path.replace("file://", ""));
-		}
-	}
 
 	var macosKeyDown = false;
 	var wKeyDown = false;
@@ -29,7 +18,7 @@ if (usingNode) {
 		}
 		return true;
 	});
-	win.on('close', function (event) {
+	window.addEventListener('close', function (event) {
 		if (macosKeyDown || wKeyDown) {
 			// try to redirect anything that looks like a CMD+W quit
 			if (cside.getActiveFile()) cside.getActiveFile().close();
@@ -46,16 +35,6 @@ if (usingNode) {
 			dirtyClosure(); //handles dirty saves/projects and calling win.close(true);
 		}
 	});
-	win.on('new-win-policy', function(frame, url, policy) {
-		//disallow new windows (even via middle mouse button)
-    if (!url.indexOf("https://choicescriptdev.wikia.com")) {
-      policy.ignore();
-    }
-    gui.Shell.openExternal(url);
-    policy.ignore();
-    return;
-	});
-
 }
 
 Mousetrap.bind(['command+s', 'ctrl+s'], function(e) {
@@ -121,8 +100,6 @@ Mousetrap.bind(['command+q', 'ctrl+shift+q'], function() {
 	return false;
 });
 
-
-
 function dirtyClosure() {
     function quit() {
         try {
@@ -137,8 +114,9 @@ function dirtyClosure() {
             win.close(true);
         }
     }
-	if (!cside.session.isDirty() || cside.getProjects().length === 0)
-        quit();
+	if (!cside.session.isDirty() || cside.getProjects().length === 0) {
+		window.electronAPI.process.exit();
+	}
 	bootbox.dialog({
 		message: "One or more scenes has unsaved changes, are you sure you want to quit?",
 		title: "Unsaved Changes",
@@ -247,67 +225,3 @@ document.getElementById("sidebar").ondrop = function(e) {
 		  }
 	  }
 };
-
-/* //EXPERIMENTAL MOBILE SUPPORT
-document.getElementById("headbar").addEventListener('touchstart', handleTouchStart, true);
-document.getElementById("headbar").addEventListener('touchmove', handleTouchMove, true);
-
-var xDown = null;
-var yDown = null;
-
-function handleTouchStart(evt) {
-    xDown = evt.touches[0].clientX;
-    yDown = evt.touches[0].clientY;
-};
-
-function handleTouchMove(evt) {
-    if ( ! xDown || ! yDown ) {
-        return;
-    }
-
-    var xUp = evt.touches[0].clientX;
-    var yUp = evt.touches[0].clientY;
-
-    var xDiff = xDown - xUp;
-    var yDiff = yDown - yUp;
-
-    if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {//most significant
-        if ( xDiff > 0 ) {
-			//left
-           if ($('#sidebar').width() == $('body').width() && $('#sidebar:visible').length > 0) {
-			   $('#sidebar').animate({ "left": $(this).width() * -1 }, 750, function() {
-				   $('#sidebar').hide();
-			   });
-		   }
-			else if ($('#sidebar').width() == $('body').width() && $('.left-wrap').css("left") === "0px") {
-			   $('.left-wrap').animate({ "left": $(this).outerWidth() * -1 }, 750, function() {
-				   //
-			   });
-			}
-        }
-		else {
-		   if ($('#sidebar').width() == $('body').width() && $('.left-wrap').css("left") != "0px") {
-			   $('.left-wrap').animate({ "left": 0 }, 750, function() {
-				   //
-			   });
-		   }
-           else if ($('#sidebar:visible').length == 0) {
-			    $('#sidebar').show();
-			   $('#sidebar').animate({ "left": 0 }, 750, function() {
-				   //
-			   });
-		   }
-		}
-    } else {
-        if ( yDiff > 0 ) {
-           //alert("up");
-        } else {
-           //alert("down");
-        }
-    }
-    // reset values
-    xDown = null;
-    yDown = null;
-}; */
-
-//setupResizerEvents();

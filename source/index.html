@@ -22,7 +22,7 @@
 <body>
     <!-- inline style to avoid initial transition -->
     <div id="preload" style="background-color: #252526;">
-        <img src="img/cside.png">
+        <img src="img/icon.png">
         <h1>ChoiceScript IDE</h1>
     </div>
 
@@ -87,7 +87,7 @@
     </div>
     <!-- END OF DROPBOX/WEB FILE EXPLORER -->
     <div class="main-wrap" data-bind="style: { borderColor: getUIColour(-30) }">
-        <div id="headbar" data-bind="style: { backgroundColor: getUIColour() }, event: { dblclick: getPlatform() === 'web-dropbox' ? null : session.win.toggleMaximize() }" class="col-anim">
+        <div id="headbar" data-bind="style: { backgroundColor: getUIColour() }" class="col-anim">
             <span class="title" data-bind="text: getActiveProject() ? getActiveProject().getName() : 'CSIDE'"></span>
             <!-- ko if: getPlatform() != "mac_os" -->
             <ul data-bind="foreach: getToolbarMenus" id="toolbar"><li data-bind="fadeVisible: (isActive() && ($root.getPlatform() != 'web-dropbox' || $root.webFileBrowserClosed)), style: { backgroundColor: $root.getUIColour(-20) }">
@@ -106,10 +106,10 @@
             <!-- /ko -->
             <!-- ko if: getPlatform() != "web-dropbox" -->
             <div id="win-controls" data-bind="css: getPlatform() == 'mac_os' ? 'mac_os' : 'windows'">
-                <button id="win-close" title="Quit CSIDE" data-bind="click: function() { win.close(); }">
+                <button id="win-close" title="Quit CSIDE" data-bind="click: session.win.close ">
                     <i class="fa fa-close"></i>
                 </button>
-                <button id="win-min" title="Minimize CSIDE window" data-bind="click: function() { win.minimize(); }">
+                <button id="win-min" title="Minimize CSIDE window" data-bind="click: function() { window.electronAPI.window.minimize(); }">
                     <i class="fa fa-chevron-down"></i>
                 </button>
                 <button id="win-max" title="Maximize CSIDE window" data-bind="click: session.win.toggleMaximize">
@@ -394,10 +394,6 @@
     </div>
 
     <!-- input elements for desktop app -->
-    <input style="display:none;" id="selectFolder" type="file" nwdirectory />
-    <input style="display:none;" id="getFilePaths" type="file" multiple accept=".txt,.log" />
-    <input style="display:none;" id="getImagePaths" type="file" accept=".png,.jpeg,.jpg,.gif" />
-    <input style="display:none;" id="saveFileTo" type="file" nwsaveas=".txt" />
     <input style="display:none;" id="selectColor" type="color">
 
     <!-- CSIDE Code -->
@@ -450,16 +446,12 @@
         if (typeof nw === "object")
             var nodeRequire = require;
     </script>
+    <script type="text/javascript" src="lib/jquery/jquery-1.11.3.min.js"></script>
     <script type="text/javascript" src="js/all.min.js"></script>
     <script type="text/javascript">
         if (usingNode) {
             var head = document.getElementsByTagName("head")[0];
             if (head) {
-                // we override the define twice, else it just edits the existing DOM element
-                var script = document.createElement("script");
-                script.type = "text/javascript";
-                script.src = "js/win_state.min.js";
-                head.appendChild(script);
                 var script = document.createElement("script");
                 script.type = "text/javascript";
                 script.src = "js/node_CSIDE.min.js";

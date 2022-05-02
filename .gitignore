@@ -1,7 +1,7 @@
+.vscode/*
 build/*
 release/*
-nwjsBuild/*
-nwjsCache/*
+dist/*
 /node_modules/*
 /source/help/site/*
 inno/*
@@ -9,3 +9,4 @@ inno/*
 compile_head.txt
 compile_tail.txt
 .DS_Store
+yarn-error.log

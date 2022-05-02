@@ -1,14 +1,19 @@
 /* pause execution until CSIDE can pass the data */
 window.alreadyLoaded = true;
-var scope = window.opener ? window.opener.parent.window : parent.window;
-var thisProject = scope.cside.getActiveProject();
+
+function getDropboxScope() {
+  var scope = window.opener ? window.opener.parent.window : parent.window;
+  return scope.cside;
+}
+
 
 nav = new SceneNavigator(["startup"]);
 stats = {};
 isHeadless = true;
-var cside = {
+var scope = getDropboxScope();
+var cside = scope ? scope : {
   project: {},
-  platform: null,
+  getPlatform: () => {},
   popout: { is: window.opener, window: null },
   server: null,
   parent: () => {}
@@ -24,7 +29,7 @@ window.addEventListener("message", (event) => {
       window.allScenes = event.data.allScenes;
       cside.project = event.data.project;
       cside.server = event.data.server;
-      window.CSIDEPlatform = event.data.platform;
+      cside.getPlatform = () => event.data.platform;
       if (!event.data.allowScript)
         Scene.prototype["script"] = function script(code) { throw new Error("\*script usage is disabled."); }
       window.alreadyLoaded = false;
@@ -56,12 +61,12 @@ window.onerror = function(msg, file, line, stack) {
 //make image's sourced from the project directory
 function printImage(source, alignment, alt, invert) {
   var img = document.createElement("img");
-  if (scope.cside.getPlatform() === "web-dropbox") {
-    scope.cside.getDropboxImageUrl(thisProject.getPath()  + source, function(err, path) {
+  if (cside.getPlatform() === "web-dropbox") {
+    cside.getDropboxImageUrl(cside.getActiveProject().getPath()  + source, function(err, path) {
       if (!err)  {
         img.src = path;
       } else {
-        img.src = thisProject.getPath() + source;
+        img.src = cside.getActiveProject().getPath() + source;
         throw new Error(err.message);
       }
     });

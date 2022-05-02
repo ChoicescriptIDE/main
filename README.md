@@ -23,11 +23,12 @@ This is what the CLI runs with. Other versions/combinations *may* work but pleas
 ### Process
   1. Clone this repo
   2. cd main
-  3. npm install
+  3. yarn
   4. grunt
-
-Optionally you can do "grunt" + build-with-mac, or, build-with-windows, or, build-with-nwjs (both).
-Otherwise the /build folder will contain the build and the /release folder will contain an nwjs .nw file.
+  5. yarn
+  6. yarn start
+   
+ The /build folder will contain the build and the /release folder will contain an electron .asar file.
 
 ## License
 CSIDE specific code is Copyright 2017 by Carey Williams.

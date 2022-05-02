@@ -1,0 +1,32 @@
+name: 'release'
+description: 'Releases CSIDE'
+runs:
+  using: 'node16'
+  main: 'release.js'
+inputs:
+  github_token:
+    description: 'A GitHub access token'
+    required: true
+  owner:
+    description: 'The owner (user or org) of the repository'
+    required: true
+  repo:
+    description: 'The repository'
+    required: true
+  tag:
+    description: 'The name of a tag to use'
+    required: false
+  time_period_hours:
+    description: 'The time period in which to check for new commits'
+    required: false
+  draft:
+    description: 'Determines if the release is a draft'
+    required: false
+    default: true
+  prerelease:
+    description: 'Determines if the release is a prerelease'
+    required: false
+    default: false
+  assets:
+    description: 'Asset files to upload'
+    required: false

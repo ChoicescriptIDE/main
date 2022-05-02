@@ -1,0 +1,72 @@
+name: build-release
+
+on:
+  pull_request:
+    branches: latest
+  create:
+    branches: latest
+  workflow_dispatch:
+    inputs:
+      prerelease:
+        type: boolean
+      tag:
+        type: string
+        required: true
+  schedule:
+    - cron:  '00 2 * * *'
+
+env:
+  USE_HARD_LINKS: false
+
+jobs:
+  release:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v1.4.4
+        with:
+          # Version Spec of the version to use.  Examples: 10.x, 10.15.1, >=10.15.0
+          node-version: 14.x
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Install JS dependencies
+        run: |
+          npm install grunt-cli -g
+          yarn
+      - name: Install Python dependencies
+        run: |
+          pip3 install mkdocs
+          pip3 install mkdocs-material
+          pip3 install mkdocs-localsearch
+      - name: Build Package
+        run: grunt
+      - name: Build Desktop
+        uses: ./.github/actions/build-electron
+        id: build-electron
+        if: ${{ matrix.os != 'ubuntu-latest' }}
+      - name: Release Package
+        uses: ./.github/actions/release
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        with:
+          github_token: ${{ secrets.ME }}
+          assets: |
+            ./release/app.asar
+          owner: 'ChoiceScriptIDE'
+          repo: 'main'
+          time_period_hours: 1000
+      - name: Release Desktop
+        uses: ./.github/actions/release
+        if: ${{ matrix.os != 'ubuntu-latest' }}
+        with:
+          github_token: ${{ secrets.ME }}
+          assets: |
+            ${{ steps.build-electron.outputs.assets }}
+          owner: 'ChoiceScriptIDE'
+          repo: 'main'
+          time_period_hours: 1000
