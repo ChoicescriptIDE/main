@@ -143,9 +143,11 @@ async function handleMediaServerGetAddr(_: Electron.IpcMainInvokeEvent) {
     return mediaServer.getAddr();
 }
 
-async function handleGetAppPath(event: Electron.IpcMainInvokeEvent, name: 'app' | 'userData') {
+async function handleGetAppPath(event: Electron.IpcMainInvokeEvent, name: 'app' | 'userData' | 'cwd') {
     if (name === 'app') {
         return app.getAppPath();
+    } else if (name ==='cwd') {
+        return process.cwd();
     } else {
         return app.getPath(name);
     }

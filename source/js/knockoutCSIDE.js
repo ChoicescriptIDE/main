@@ -22,7 +22,7 @@ if (window.electronAPI) {
 }
 
 // Overall viewmodel for this screen, along with initial state
-function IDEViewModel(platform, versions, userDetails) {
+function IDEViewModel(platform, versions, userDetails, appPath, db) {
 
   //EXTENDERS
   ko.extenders.normalizePaths = function(target, option) {
@@ -3525,22 +3525,23 @@ function IDEViewModel(platform, versions, userDetails) {
   });
 
   if (usingNode) {
-
+    const examplesPath = `${appPath}/cs_examples/`;
     self.cs_examples = [
       {
         title: "Interactive CSIDE Tutorial",
         desc: "A great starting point tutorial - developed by Vendetta. Useful for those new to both Choicescript and the Choicescript IDE.",
-        path: "cs_examples/CSIDE Tutorial/"
+        path: `${examplesPath}CSIDE Tutorial/`
       },
       {
         title: "ChoiceScript Basics Tutorial",
         desc: "A simple tutorial template by FairyGodfeather. This example project is designed to get you started with handling name, gender and relationship stats in your ChoiceScript games. A great starting point for any new project!",
-        path: "cs_examples/Basics Tutorial/"
+        path: `${examplesPath}Basics Tutorial/`
+
       },
       {
         title: "Pronouns with Gender-Neutral Options Template",
         desc: "A template for including gender neutral pronouns in your game (they/them), created by Lynnea Glasser. This includes a variable system to make sure your verbs and pronouns will match (\"They go on ahead\"/\"She goes on ahead\").",
-        path: "cs_examples/GNO Pronoun Template/"
+        path: `${examplesPath}GNO Pronoun Template/`
       }
     ];
 
@@ -4592,9 +4593,11 @@ function IDEViewModel(platform, versions, userDetails) {
 
   self.init = async function() {
 
-    window.electronAPI.handleNotification((event, message) => {
-      bootbox.alert(message);
-    });
+    if (usingNode) {
+      window.electronAPI.handleNotification((event, message) => {
+        bootbox.alert(message);
+      });
+    }
 
     monaco.editor.onDidChangeMarkers(function(uri) {
       for (var i = 0; i < uri.length; i++) {
@@ -6561,7 +6564,8 @@ amdRequire(['vs/editor/editor.main'], async function() {
     const initData = {
       "platform": { error: pErr, result: platform } = await window.electronAPI.getPlatform(),
       "versions": { error: vErr, result: versions }  = await window.electronAPI.getVersions(),
-      "userDetails": { error: uErr, result: userDetails } = await window.electronAPI.getUserDetails()
+      "userDetails": { error: uErr, result: userDetails } = await window.electronAPI.getUserDetails(),
+      "appPath": {error: apErr, result: appPath } = await window.electronAPI.getAppPath()
     }
 
     for (const item in initData) {
@@ -6570,7 +6574,7 @@ amdRequire(['vs/editor/editor.main'], async function() {
       }
     }
     
-    window.cside = new IDEViewModel(initData.platform.result, initData.versions.result, initData.userDetails.result);
+    window.cside = new IDEViewModel(initData.platform.result, initData.versions.result, initData.userDetails.result, initData.appPath.result);
   } else {
     const platform = "web-dropbox";
     const userDetails = {
@@ -6581,7 +6585,7 @@ amdRequire(['vs/editor/editor.main'], async function() {
     db.usersGetCurrentAccount().then(function(acc) {
       userDetails.name = acc.name.display_name;
     }).catch(function(err) {}); // we don't mind errors, we'll just stick with the default name
-    window.cside = new IDEViewModel(platform, { cside: "Dropbox Beta", electron: null }, userDetails);
+    window.cside = new IDEViewModel(platform, { cside: "Dropbox Beta", electron: null }, userDetails, '/', db);
   }
   window.monaco = monaco;
   ko.applyBindings(cside, $('.main-wrap')[0]);
