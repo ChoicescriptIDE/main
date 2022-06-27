@@ -1,3 +1,12 @@
+## v1.3.2 - 21/06/2019
+
+Patch release. Upgrades ChoiceScript to fix some issues.
+
+### Fixes
+- Miscellaneous ChoiceScript issues
+
+### Changes
+- Updated to the latest version of ChoiceScript
 
 ## v1.3.1 - 21/06/2019
 
