@@ -4794,7 +4794,7 @@ function IDEViewModel() {
     monaco.cside = {};
 
     // Patch in replace pattern support for find/replace with regexes
-    amdRequire(['vs/editor/contrib/find/replacePattern'], function(replacePattern) {
+    amdRequire(['vs/editor/contrib/find/browser/replacePattern'], function(replacePattern) {
       monaco.cside.parseReplaceString = replacePattern.parseReplaceString;
       monaco.cside.getReplaceString = function(replaceStr, matches, preserveCase) {
         return replacePattern.parseReplaceString(replaceStr).buildReplaceString(matches, preserveCase);
