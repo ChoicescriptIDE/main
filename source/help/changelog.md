@@ -1,3 +1,10 @@
+## v1.3.3 - 21/06/2019
+
+Patch release. Upgrades ChoiceScript. Notable additions include support for the new 'create_array' and 'temp_array' commands.
+
+### Changes
+- Updated to the latest version of ChoiceScript
+
 ## v1.3.2 - 21/06/2019
 
 Patch release. Upgrades ChoiceScript to fix some issues.
