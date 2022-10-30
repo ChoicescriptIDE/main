@@ -1123,7 +1123,7 @@ body.night .tab-panel li:nth-child(even) {
     min-width: 230px;
     height: 100%;
     float: left;
-    z-index: 7;
+    z-index: 0;
     border-color: inherit;
 }
 
