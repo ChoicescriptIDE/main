@@ -1267,7 +1267,7 @@ body.night .tab-panel .search-controls-wrap {
     min-width: 230px;
     height: 100%;
     float: left;
-    z-index: 7;
+    z-index: 0;
     border-color: inherit;
 }
 
