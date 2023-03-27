@@ -2879,7 +2879,7 @@ function IDEViewModel() {
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        var wordObj = ed.getModel().getWordAtPosition(meditor.getSelection().getStartPosition());
+        var wordObj = ed.getModel().getWordAtPosition(ed.getSelection().getStartPosition());
         if (wordObj) {
           editor.trigger("", `add-words`, {uri: "", dict: "session", words: [wordObj.word]});
         }
@@ -2893,7 +2893,7 @@ function IDEViewModel() {
       precondition: null,
       keybindingContext: null,
       run: function(ed) {
-        var wordObj = ed.getModel().getWordAtPosition(meditor.getSelection().getStartPosition());
+        var wordObj = ed.getModel().getWordAtPosition(ed.getSelection().getStartPosition());
         if (wordObj) {
           editor.trigger("", `add-words`, {uri: "", dict: "persistent", words: [wordObj.word]});
         }
