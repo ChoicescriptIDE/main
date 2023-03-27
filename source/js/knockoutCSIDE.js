@@ -4190,10 +4190,7 @@ function IDEViewModel() {
         "apply": function(val) {
           var self = this;
           if (val == "default") {
-            if (usingNode) {
-              var userDir = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
-            }
-            var path = usingNode ? (userDir + "/Documents/Choicescript Projects/") : ("/Choicescript Projects/");
+            var path = usingNode ? (userDetails.path + "/Documents/Choicescript Projects/") : ("/Choicescript Projects/");
             self.setDesc(path);
             user.path = path;
           } else if (val == "select") {
