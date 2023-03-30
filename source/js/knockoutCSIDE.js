@@ -2500,7 +2500,7 @@ function IDEViewModel() {
         "spellcheck": true,
         "autosuggest": false,
         "autoformat": true,
-        "word-count": 2,
+        "word-count": 1,
         "visible-tabs": false,
         "selection-match": false,
         "cursor-match": false
