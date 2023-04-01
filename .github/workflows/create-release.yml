@@ -29,7 +29,7 @@ jobs:
         if: github.event_name == 'schedule'
         id: nightly_relnotes
         run: |
-          echo "::set-output name=relnotes::$(git log --since="24 hours ago" --pretty=format:%s | awk 'NR>1{print "- "$0} NR==1{print "- "$0}')"
+          echo "name=relnotes::$(git log --since="24 hours ago" --pretty=format:%s | awk 'NR>1{print "- "$0} NR==1{print "- "$0}')" >> $GITHUB_OUTPUT
       - name: Setup Python dependencies
         if: github.event_name != 'schedule' || steps.nightly_relnotes.outputs.relnotes != ''
         run: |
@@ -46,12 +46,12 @@ jobs:
       - name: Get Date
         id: date
         if: github.event_name != 'schedule' || steps.nightly_relnotes.outputs.relnotes != ''
-        run: echo "::set-output name=date::$(date +'%D')"
+        run: echo "name=date::$(date +'%D')" >> $GITHUB_OUTPUT
       - name: Generate nightly tag
         if: github.event_name != 'schedule' || steps.nightly_relnotes.outputs.relnotes != ''
         id: nightly_tag
         run: |
-          echo "::set-output name=tag::nightly_$(date +"%Y.%m.%d")"
+          echo "name=tag::nightly_$(date +"%Y.%m.%d")" >> $GITHUB_OUTPUT
       - name: Tag Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/v')

@@ -21,7 +21,7 @@ jobs:
         if: github.event_name == 'schedule'
         id: detect_changes
         run: |
-          echo "::set-output name=changes::$(git log --since="24 hours ago")"
+          echo "name=changes::$(git log --since="24 hours ago")" >> $GITHUB_OUTPUT
       - name: Setup Python dependencies
         if: github.event_name != 'schedule' || steps.detect_changes.outputs.changes != ''
         run: |
@@ -37,7 +37,7 @@ jobs:
       - name: Get Date
         id: date
         if: github.event_name != 'schedule' || steps.detect_changes.outputs.changes != ''
-        run: echo "::set-output name=date::$(date +'%D')"
+        run: echo "date=$(date +'%D')" >> $GITHUB_OUTPUT
       - name: Deploy
         if: github.event_name != 'schedule' || steps.detect_changes.outputs.changes != ''
         uses: JamesIves/github-pages-deploy-action@4.1.1
