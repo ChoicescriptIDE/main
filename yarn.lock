@@ -1066,9 +1066,9 @@ crypto-random-string@^2.0.0:
   resolved "https://registry.yarnpkg.com/crypto-random-string/-/crypto-random-string-2.0.0.tgz#ef2a7a966ec11083388369baa02ebead229b30d5"
   integrity sha512-v1plID3y9r/lPhviJ1wrXpLeyUIGAZ2SHNYTEapm7/8A9nLPoyvVp3RK/EPFqn5kEznyWgYZNsRtYYIWbuG8KA==
 
-"cside-choicescript@github:ChoicescriptIDE/choicescript":
+"cside-choicescript@git+https://github.com/ChoicescriptIDE/choicescript.git":
   version "1.0.0"
-  resolved "https://codeload.github.com/ChoicescriptIDE/choicescript/tar.gz/5767d886e781cfc758758041b28947dbc085d8bc"
+  resolved "git+https://github.com/ChoicescriptIDE/choicescript.git#a9c78edf3f98a8e05b3a919cf07893f4bf07d5f5"
 
 dateformat@~3.0.3:
   version "3.0.3"
@@ -1215,10 +1215,10 @@ dotenv@^9.0.2:
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-9.0.2.tgz#dacc20160935a37dea6364aa1bef819fb9b6ab05"
   integrity sha512-I9OvvrHp4pIARv4+x9iuewrWycX6CcZtoAu1XrzPxc5UygMJXJZYmBsynku8IkrJwgypE5DGNjDPmPRhDCptUg==
 
-dropbox@^10.26.0:
-  version "10.32.0"
-  resolved "https://registry.yarnpkg.com/dropbox/-/dropbox-10.32.0.tgz#f7733e423e8b7b7f7f1322f3e2ce61dad9ebe255"
-  integrity sha512-vnkcp8HNTmqYwI+VYfxE061YP9rXB2feWljAzzzF0ud4npB8H31eYKJuf6cPzFRsr8RpwVlj/SfsJkFqF2QeYA==
+dropbox@^10.34.0:
+  version "10.34.0"
+  resolved "https://registry.yarnpkg.com/dropbox/-/dropbox-10.34.0.tgz#a4b17dad4c320855fe45b5b9786a8aaf869c3ade"
+  integrity sha512-5jb5/XzU0fSnq36/hEpwT5/QIep7MgqKuxghEG44xCu7HruOAjPdOb3x0geXv5O/hd0nHpQpWO+r5MjYTpMvJg==
   dependencies:
     node-fetch "^2.6.1"
 
@@ -2745,9 +2745,9 @@ mkdirp@^1.0.3, mkdirp@~1.0.4:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
-"monaco-editor@github:ChoicescriptIDE/monaco-editor#lib":
-  version "0.34.0"
-  resolved "https://codeload.github.com/ChoicescriptIDE/monaco-editor/tar.gz/be7a148a0dbedc1f97db0b526bd4abac7c7dbc09"
+"monaco-editor@git+https://github.com/ChoicescriptIDE/monaco-editor.git#lib":
+  version "0.34.1"
+  resolved "git+https://github.com/ChoicescriptIDE/monaco-editor.git#97cc63a68bc2b7d4ca269b3038da5794e5041ded"
 
 mount-point@^3.0.0:
   version "3.0.0"

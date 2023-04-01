@@ -2829,12 +2829,8 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
     }
   }
 
-  var dropboxAuthorised = ko.observable(false);
 
   //GETTER METHODS
-  self.dbAuth = ko.computed(function() {
-    return dropboxAuthorised();
-  }, this);
   self.getProjects = projects;
   self.getActiveEditor = ko.computed(function() {
     return activeEditor();
@@ -4591,7 +4587,7 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
     return userDictionary.persistentListArray().filter(function(word) { return word.startsWith(query); } ).sort();
   }, this);
 
-  self.init = async function() {
+  self.init = async function(db) {
 
     if (usingNode) {
       window.electronAPI.handleNotification((event, message) => {
@@ -6546,16 +6542,30 @@ const _decodeError = (errObj) => {
 };
 
 const _initDropbox = async () => {
-  let db;
-  if (!!utils.parseQueryString(window.location.hash).access_token) {
-    db = new Dropbox.Dropbox({ accessToken: utils.parseQueryString(window.location.hash).access_token });
+  const REDIRECT_URI = window.location.origin + window.location.pathname;
+  const dbxAuth = new Dropbox.DropboxAuth({ clientId: "hnzfrguwoejpwbj" });
+  if (!!utils.parseQueryString(window.location.search).code) {
+    dbxAuth.setCodeVerifier(window.sessionStorage.getItem('codeVerifier'));
+    try {
+      const resp = await dbxAuth.getAccessTokenFromCode(REDIRECT_URI, utils.parseQueryString(window.location.search).code);
+      dbxAuth.setAccessToken(resp.result.access_token);
+      return new Dropbox.Dropbox({ auth: dbxAuth });
+    } catch (err) {
+      alert(window.location);
+      console.log(err);
+      alert("Error: Dropbox Access Token Failure");
+    }
   }
-  else {
-    db = new Dropbox.Dropbox({ clientId: "hnzfrguwoejpwbj" });
-    const authUrl = await db.auth.getAuthenticationUrl(window.location);
+  try {
+    const authUrl = await dbxAuth.getAuthenticationUrl(REDIRECT_URI, undefined, 'code', 'online', undefined, undefined, true);
+    window.sessionStorage.removeItem("codeVerifier");
+    window.sessionStorage.setItem("codeVerifier", dbxAuth.codeVerifier);
     window.location = authUrl;
+  } catch (err) {
+    alert(window.location);
+    console.log(err);
+    alert("Error: Dropbox AuthUrl Failure");
   }
-  return db;
 };
 
 require = amdRequire; // restore for monaco's lazy loading
@@ -6581,7 +6591,7 @@ amdRequire(['vs/editor/editor.main'], async function() {
       name: "Dropbox User",
       path: "/"
     }
-    window.db = await _initDropbox();
+    const db = await _initDropbox();
     db.usersGetCurrentAccount().then(function(acc) {
       userDetails.name = acc.name.display_name;
     }).catch(function(err) {}); // we don't mind errors, we'll just stick with the default name
