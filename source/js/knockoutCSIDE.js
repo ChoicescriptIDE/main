@@ -48,7 +48,7 @@ if (typeof nw === "object") {
 }
 
 // Overall viewmodel for this screen, along with initial state
-function IDEViewModel() {
+function IDEViewModel(db) {
 
   //EXTENDERS
   ko.extenders.normalizePaths = function(target, option) {
@@ -1901,38 +1901,11 @@ function IDEViewModel() {
     notification(title, message, options);
   };
 
-  // initiate dropbox:
-  if (platform == "web-dropbox") {
-
-    if (!!utils.parseQueryString(window.location.hash).access_token) {
-      var db = new Dropbox.Dropbox({ accessToken: utils.parseQueryString(window.location.hash).access_token });
-    }
-    else {
-      var db = new Dropbox.Dropbox({ clientId: "hnzfrguwoejpwbj" });
-      db.auth.getAuthenticationUrl(window.location).then((authUrl) => {
-        window.location = authUrl;
-      });
-    }
-
-    // try and source the DB username:
-    db.usersGetCurrentAccount().then(function(acc) {
-      user.name = acc.name.display_name;
-    })
-    .catch(function(err) {}); // we don't mind errors, we'll just stick with the default name
-
-  }
-
-  window.db = db;
-
-  var dropboxAuthorised = ko.observable(false);
   var typo = new Typo("", "", "", {
     platform: 'any'
   }); //spellchecking library var to avoid initial errors (we'll init it properly via settings)
 
   //GETTER METHODS
-  self.dbAuth = ko.computed(function() {
-    return dropboxAuthorised();
-  }, this);
   self.getProjects = projects;
   self.getSelectedScene = ko.computed(function() {
     return selectedScene();
@@ -5457,7 +5430,43 @@ function IDEViewModel() {
 
 }
 
-window.cside = new IDEViewModel();
-ko.applyBindings(cside, $('.main-wrap')[0]);
-cside.init();
+if (!usingNode) {
+  const _initDropbox = function(cb) {
+    const REDIRECT_URI = window.location.origin + window.location.pathname;
+    const dbxAuth = new Dropbox.DropboxAuth({ clientId: "hnzfrguwoejpwbj" });
+    if (!!utils.parseQueryString(window.location.search).code) {
+      dbxAuth.setCodeVerifier(window.sessionStorage.getItem('codeVerifier'));
+      window.sessionStorage.removeItem("codeVerifier");
+      if (!dbxAuth.getCodeVerifier()) {
+        window.location = REDIRECT_URI;
+      }
+      dbxAuth.getAccessTokenFromCode(REDIRECT_URI, utils.parseQueryString(window.location.search).code).then(function(resp) {
+        dbxAuth.setAccessToken(resp.result.access_token);
+        cb(new Dropbox.Dropbox({ auth: dbxAuth }));
+      }).catch(function(err) {
+        console.log(err);
+        alert("Error: Dropbox Access Token Failure");
+      });
+    } else {
+      dbxAuth.getAuthenticationUrl(REDIRECT_URI, undefined, 'code', 'online', undefined, undefined, true).then(function(authUrl) {
+        window.sessionStorage.setItem("codeVerifier", dbxAuth.codeVerifier);
+        window.location = authUrl;
+      }).catch(function(err) {
+        console.log(err);
+        alert("Error: Dropbox AuthUrl Failure");
+      });
+    }
+  }
+  _initDropbox(function(db) {
+    window.cside = new IDEViewModel(db);
+    ko.applyBindings(cside, $('.main-wrap')[0]);
+    cside.init();
+  });
+} else {
+  window.cside = new IDEViewModel(undefined);
+  ko.applyBindings(cside, $('.main-wrap')[0]);
+  cside.init();
+}
+
+
 //label finding regex: cside.projects()[0].scenes()[0].document.getValue().match(/\^*label.+$/gm,"");
