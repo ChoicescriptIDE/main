@@ -19,11 +19,11 @@
     "uglifyjs": "^2.4.10"
   },
   "dependencies": {
-    "cside-choicescript": "github:ChoicescriptIDE/choicescript",
-    "dropbox": "^10.26.0",
+    "cside-choicescript": "git+https://github.com/ChoicescriptIDE/choicescript.git",
+    "dropbox": "^10.34.0",
     "grunt-contrib-uglify": "^5.0.1",
     "knockout": "3.2.0",
-    "monaco-editor": "github:ChoicescriptIDE/monaco-editor#lib",
+    "monaco-editor": "git+https://github.com/ChoicescriptIDE/monaco-editor.git#lib",
     "mousetrap": "^1.6.0",
     "node-static": "^0.7.11",
     "noty": "^3.2.0-beta",
