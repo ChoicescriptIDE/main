@@ -6,11 +6,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
-  grunt.loadNpmTasks('grunt-contrib-compress');
-  grunt.loadNpmTasks('grunt-auto-install');
-  grunt.loadNpmTasks('grunt-nw-builder');
-  grunt.loadNpmTasks('grunt-execute');
-  grunt.loadNpmTasks('grunt-string-replace');
   grunt.initConfig({
     "shell": {
       docs: {
@@ -20,24 +15,22 @@ module.exports = function(grunt) {
               cwd: 'source/help'
           }
         }
+      },
+      create_html: {
+        command: 'node create-compile-html.js'
+      },
+      tsc: {
+        command: 'npx tsc -p .'
       }
     },
-    "auto_install": {
-      local: {},
-      build: {
-        options: {
-          cwd: 'build',
-          stdout: true,
-          stderr: true,
-          failOnError: true,
-          npm: 'trash username node-static',
-          bower: false
-        }
+    "execute": {
+      target: {
+        src: ['create-compile-html.js']
       }
     },
     "clean": {
       main: {
-        src: ['build/**', 'release/**']
+        src: ['build/**', 'release/**', 'dist/**']
       },
       package_lock: {
         src: ['build/package-lock.json']
@@ -99,26 +92,53 @@ module.exports = function(grunt) {
       choicescript: {
         files: [
           {
-            expand:true, cwd: '',
-            src: ['node_modules/cside-choicescript/**'],
+            expand:true,
+            src: ['node_modules/cside-choicescript/**/*'],
             dest: 'build'
           }
         ]
       },
-      updater: {
+      username: {
         files: [
           {
-            expand: true, cwd: 'source',
-            src: [ 'node_modules/cside-updater/**'],
+            expand: true,
+            src: ['node_modules/username/**/*'],
             dest: 'build'
           }
         ]
       },
-      server: {
+      trash: {
         files: [
           {
-            expand: true, cwd: 'source',
-            src: [ 'node_modules/cside-server/**'],
+            expand: true,
+            src: ['node_modules/trash/**/*'],
+            dest: 'build'
+          }
+        ]
+      },
+      nodeStatic: {
+        files: [
+          {
+            expand: true,
+            src: ['node_modules/node-static/**/*'],
+            dest: 'build'
+          }
+        ]
+      },
+      asar: {
+        files: [
+          {
+            expand: true,
+            src: ['node_modules/asar/**/*'],
+            dest: 'build'
+          }
+        ]
+      },
+      mkdirp: {
+        files: [
+          {
+            expand: true,
+            src: ['node_modules/mkdirp/**/*'],
             dest: 'build'
           }
         ]
@@ -127,7 +147,7 @@ module.exports = function(grunt) {
         files: [
           {
             expand: true, cwd: '',
-            src: [ 'node_modules/monaco-editor/release/min/**'],
+            src: ['node_modules/monaco-editor/release/min/**'],
             dest: 'build'
           }
         ]
@@ -188,7 +208,6 @@ module.exports = function(grunt) {
       },
       my_target: {
         files: {
-          'build/js/win_state.min.js': [  'source/js/win_state.js' ],
           'build/js/cs_override.min.js': [  'source/js/cs_override.js' ],
           'build/js/node_CSIDE.min.js': [  'source/js/node_CSIDE.js' ]
         }
@@ -218,75 +237,43 @@ module.exports = function(grunt) {
         },
       }
     },
-    'string-replace': {
-      trashPatch: {
-        files: {
-          'build/node_modules/trash/node_modules/osx-trash/index.js': 'build/node_modules/trash/node_modules/osx-trash/index.js',
-        },
-        options: {
-          replacements: [
-            {
-              pattern: 'var olderThanMountainLion = ',
-              replacement: 'var olderThanMountainLion = true; //'
-            }
-          ]
-        }
-      }
-    },
-    "compress": {
-      main: {
-        options: {
-          mode: 'zip',
-          archive: 'release/package.nw'
-        },
-        files: [
-          {cwd:'build', src: ['**'], expand:true}, // includes files in path and its subdirs
-        ]
-      }
-    },
-    "execute": {
-        target: {
-            src: ['create-compile-html.js']
-        }
-    },
-    "nwjs": {
-      mac: {
-        options: {
-          platforms: ['osx64'],
-          macIcns: './source/img/cside.icns',
-          buildDir: './nwjsBuild',
-          cacheDir: './nwjsCache',
-          version: '0.49.0'
-        },
-        src: ['./build/**/*']
+    'eslint': {
+      permissive: {
+        src: ['source/**/*.ts', 'actions/**/*.ts']
       },
-      windows: {
+      strict: {
+        src: ['source/**/*.ts', 'actions/**/*.ts'],
         options: {
-          platforms: ['win64'],
-          winIco: './source/img/cside.ico',
-          buildDir: './nwjsBuild',
-          cacheDir: './nwjsCache',
-          version: '0.49.0',
-          zip: false
-        },
-        src: ['./build/**/*']
-      },
-      linux: {
-        options: {
-          platforms: ['linux64'],
-          buildDir: 'nwjsBuild',
-          cacheDir: 'nwjsCache',
-          version: '0.49.0',
-        },
-        src: ['./build/**/*']
+          maxWarnings: 0
+        }      
       }
+
     }
   });
-  var tasks = ["clean", "shell:docs", "copy:main", "concat", "uglify", "cssmin", "auto_install:build", "clean:package_lock",
-    "copy:choicescript", "copy:updater", "copy:server", "copy:monaco", "string-replace", "execute", "compress"];
+  grunt.registerTask("create-asar-archive", "Bundles build into an Electron asar.app file", async function() {
+    const fs = require('fs');
+    const asarPath = './release/app.asar';
+    const done = this.async();
+    const asar = require('asar');
+    try {
+      fs.unlinkSync(asarPath);
+    } catch (err) {}
+    await (async () => {
+      try {
+        await asar.createPackage('./build/', asarPath);
+      } catch (err) {
+        console.log(err.message);
+        done(false);
+      } 
+    })();
+    const result = fs.existsSync('./release/app.asar'); // asar doesn't handle errors?
+    if (!result) {
+      console.log("Error: no app.asar created. Reason unknown.");
+    }
+    done(result);
+  });
+  var tasks = ["eslint:permissive", "clean", "shell:docs", "copy:main", "concat", "uglify", "cssmin", "clean:package_lock",
+    "copy:choicescript", "copy:trash", "copy:username", "copy:nodeStatic", "copy:asar", "copy:mkdirp", "copy:monaco", "shell:tsc", "create-asar-archive"];
   grunt.registerTask("default", tasks);
-  grunt.registerTask("build-with-nwjs", tasks.concat("nwjs"));
-  grunt.registerTask("build-with-windows", tasks.concat("nwjs:windows"));
-  grunt.registerTask("build-with-mac", tasks.concat("nwjs:mac"));
-  grunt.registerTask("build-with-linux", tasks.concat("nwjs:linux"));
+  grunt.registerTask("lint", ['eslint:strict']);
 };
