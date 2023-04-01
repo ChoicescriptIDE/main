@@ -201,6 +201,7 @@ body.night #left-wrap {
 #right-wrap {
     flex: 1 1 400px;
     border-color: inherit;
+    z-index: -1;
 }
 
 #tabs {
@@ -314,6 +315,7 @@ body.night #left-wrap {
     margin: auto;
     width: 10px;
     font-size: 12px;
+    z-index: -1;
 }
 
 .resize-bar:hover > i.fa {
