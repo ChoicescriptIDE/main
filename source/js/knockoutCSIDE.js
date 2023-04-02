@@ -6691,23 +6691,24 @@ amdRequire(['vs/editor/editor.main'], async function() {
       const dbxAuth = new Dropbox.DropboxAuth({ clientId: "hnzfrguwoejpwbj" });
       if (!!utils.parseQueryString(window.location.search).code) {
         dbxAuth.setCodeVerifier(window.sessionStorage.getItem('codeVerifier'));
+        window.sessionStorage.removeItem("codeVerifier");
+        if (!dbxAuth.getCodeVerifier()) {
+          window.location = REDIRECT_URI;
+        }
         try {
           const resp = await dbxAuth.getAccessTokenFromCode(REDIRECT_URI, utils.parseQueryString(window.location.search).code);
           dbxAuth.setAccessToken(resp.result.access_token);
           return new Dropbox.Dropbox({ auth: dbxAuth });
         } catch (err) {
-          alert(window.location);
           console.log(err);
           alert("Error: Dropbox Access Token Failure");
         }
       }
       try {
         const authUrl = await dbxAuth.getAuthenticationUrl(REDIRECT_URI, undefined, 'code', 'online', undefined, undefined, true);
-        window.sessionStorage.removeItem("codeVerifier");
         window.sessionStorage.setItem("codeVerifier", dbxAuth.codeVerifier);
         window.location = authUrl;
       } catch (err) {
-        alert(window.location);
         console.log(err);
         alert("Error: Dropbox AuthUrl Failure");
       }
