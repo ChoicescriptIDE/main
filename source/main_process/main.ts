@@ -56,6 +56,9 @@ app.whenReady().then(() => {
         }
         return { action: 'allow' };
     });
+    mainWindow.on('close', (evt: Event) => {
+        evt.preventDefault();
+    });
     registerHandler('dialog:openFile', handleFileOpen.bind(null, mainWindow));
     registerHandler('dialog:selectDir', handleDirSelect.bind(null, mainWindow));
     registerHandler('dialog:selectImage', handleImageSelect.bind(null, mainWindow));
@@ -91,6 +94,10 @@ app.whenReady().then(() => {
     registerHandler('shell:openExternal', handleShellOpenExternal);
     registerHandler('shell:openPath', handleShellOpenPath);
     registerHandler('shell:trashItem', handleShellTrashItem);
+});
+
+app.on('window-all-closed', () => {
+    app.quit();
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
