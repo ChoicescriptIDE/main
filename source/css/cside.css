@@ -170,6 +170,7 @@ body.night input:not([readonly]):not(.monaco-mouse-cursor-text), body.night text
     width: 100%;
     flex-grow: 10;
     flex-basis: 1px; /* prevent Safari collapsing */
+    z-index: 0;
 }
 
 #page-content-wrapper {
