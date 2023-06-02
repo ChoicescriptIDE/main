@@ -147,7 +147,7 @@ module.exports = function(grunt) {
         files: [
           {
             expand: true, cwd: '',
-            src: ['node_modules/monaco-editor/release/min/**'],
+            src: ['node_modules/monaco-editor/out/monaco-editor/min/**'],
             dest: 'build'
           }
         ]

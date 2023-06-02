@@ -1,6 +1,6 @@
 const amdRequire = require;
 amdRequire.config({
-  baseUrl: 'node_modules/monaco-editor/release/min'
+  baseUrl: 'node_modules/monaco-editor/out/monaco-editor/min'
 });
 
 //are we using node?
@@ -1932,7 +1932,6 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
 
     // initialize various monaco editor configurations
     __registerEditorActions(_monacoEditor);
-    __overrideEditorServices(_monacoEditor);
     _monacoEditor.onDidFocusEditorText(function() {
       self.makeActive();
     });
@@ -4843,79 +4842,6 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
     return monaco.languages.choicescript.diagnosticsOptions;
   }
 
-
-  // OVERRIDE INTERNAL MONACO EDITOR SERVICES
-  function __overrideEditorServices(monacoEditorInst) {
-    // Links in Monaco use a data-href attribute rather than the href attribute.
-    // This means NWJS's new-win-policy event can't determine the url/target.
-    // Thus we need to patch in an alternative handler here.
-    monacoEditorInst.getContribution('editor.linkDetector').openerService._externalOpener = {
-      openExternal: function(href) {
-        if (usingNode) {
-          // handled by electron/main.js
-        } else if (matchesScheme(href, Schemas.http) || matchesScheme(href, Schemas.https)) {
-          dom.windowOpenNoOpener(href);
-        } else {
-          window.location.href = href;
-        }
-        return Promise.resolve(true);
-      }
-    }
-
-    // Make sure Monaco will look at more than just the editor's attached model.
-    monacoEditorInst._codeEditorService.findModel = function (editor, resource) {
-      const model = editor.getModel();
-      if (!resource)
-        return model;
-      if (model && model.uri.toString() !== resource.toString()) {
-        var newModel = monaco.editor.getModel(resource.toString());
-        return newModel;
-      }
-      return model;
-    }
-
-    // Teach Monaco how to select new files in CSIDE.
-    monacoEditorInst._codeEditorService.doOpenEditor = function (editor, input) {
-      var model = this.findModel(editor, input.resource);
-      if (!model) {
-        if (input.resource) {
-          var schema = input.resource.scheme;
-          if (schema === network_1.Schemas.http || schema === network_1.Schemas.https) {
-            // This is a fully qualified http or https URL
-            // dom_1.windowOpenNoOpener(input.resource.toString());
-            return editor;
-          }
-        }
-        return null;
-      }
-      if (editor.getModel().uri.toString() !== input.resource.toString()) {
-        model.csideFile.viewInEditor(function(ed) {
-          if (ed) {
-            var med = ed.getMonacoEditor();
-            ed.waitForRender(function() {
-              var selection = (input.options ? input.options.selection : null);
-              if (selection) {
-                if (typeof selection.endLineNumber === 'number' && typeof selection.endColumn === 'number') {
-                  med.setSelection(selection);
-                  med.revealRangeInCenter(selection, 1);
-                }
-                else {
-                  var pos = {
-                    lineNumber: selection.startLineNumber,
-                    column: selection.startColumn
-                  };
-                  med.setPosition(pos);
-                  med.revealPositionInCenter(pos, 1);
-                }
-                med.focus();
-              }
-            });
-          }
-        });
-      }
-    }
-  }
-
   function __createImageScene(project, path) {
 
     var image = new Image();
@@ -6570,6 +6496,53 @@ const _initDropbox = async () => {
 
 require = amdRequire; // restore for monaco's lazy loading
 amdRequire(['vs/editor/editor.main'], async function() {
+
+  // Teach Monaco how to select new files in CSIDE.
+  monaco.editor.registerEditorOpener({ openCodeEditor: (sourceEditor, resourceUri, selectionOrPosition) => {
+    if (sourceEditor.getModel().uri.toString() !== resourceUri.toString()) {
+      const model = monaco.editor.getModels().find(m => m.uri.toString() === resourceUri.toString());
+      if (!model) {
+        return false;
+      }
+      model.csideFile.viewInEditor((ed) => {
+        if (ed) {
+          var med = ed.getMonacoEditor();
+          ed.waitForRender(function() {
+            var selection = (selectionOrPosition.options ? selectionOrPosition.options.selection : null);
+            if (selection) {
+              if (typeof selection.endLineNumber === 'number' && typeof selection.endColumn === 'number') {
+                med.setSelection(selection);
+                med.revealRangeInCenter(selection, 1);
+              }
+              else {
+                var pos = {
+                  lineNumber: selection.startLineNumber,
+                  column: selection.startColumn
+                };
+                med.setPosition(pos);
+                med.revealPositionInCenter(pos, 1);
+              }
+              med.focus();
+            }
+          });
+        }
+      });
+    }
+    return true;
+  }});
+
+  monaco.editor.registerLinkOpener({ open: (resourceUri) => {
+    if (resourceUri.scheme.indexOf('http') > -1) {
+      if (usingNode) {
+        // handled by electron/main.js
+        return false;
+      } else {
+        window.open(resourceUri.toString(), "_blank");
+      }
+    }
+    return true;
+  }});
+
   if (usingNode) {
     const initData = {
       "platform": { error: pErr, result: platform } = await window.electronAPI.getPlatform(),
@@ -6583,7 +6556,7 @@ amdRequire(['vs/editor/editor.main'], async function() {
         throw _decodeError(initData[item].error);
       }
     }
-    
+
     window.cside = new IDEViewModel(initData.platform.result, initData.versions.result, initData.userDetails.result, initData.appPath.result);
   } else {
     const platform = "web-dropbox";
