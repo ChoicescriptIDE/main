@@ -1861,7 +1861,12 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
       _dispose();
       var aEd = activeEditor();
       if (aEd === self) {
-        activeEditor(null);
+        const projectEditors = file.getProject().getEditors();
+        if (projectEditors.length > 0) {
+          projectEditors[0].makeActive();
+        } else {
+          activeEditor(null);
+        }
       }
     }
 
