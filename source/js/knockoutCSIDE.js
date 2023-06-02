@@ -4579,6 +4579,7 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
         return;
       }
       monacoConsole.trigger("", `add-words`, {uri: "", dict: "persistent", words: [self.dictWord()]});
+      self.dictWord("");
     }
   };
   self.removeFromDictionary = function(word) {
