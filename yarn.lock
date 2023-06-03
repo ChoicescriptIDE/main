@@ -1101,6 +1101,16 @@ detect-node@^2.0.4:
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.1.0.tgz#c9c70775a49c3d03bc2c06d9a73be550f978f8b1"
   integrity sha512-T0NIuQpnTvFDATNuHN5roPwSBG83rFsuO+MXXH9/3N1eFbn4wcPjttvjMLEPWJ0RGUYgQE7cGgS3tNxbqCGM7g==
 
+dictionary-en-gb@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/dictionary-en-gb/-/dictionary-en-gb-2.4.0.tgz#110bd4e8b64111487a6caa16d0b9c324c6245226"
+  integrity sha512-zwc7e6CM/+Em+v74a5/ia6663nwR9vvtEayaX5WkgvHD99al1qm/RbcdLludqX3mggYxXXFN1zN5hzyREW/DXg==
+
+dictionary-en@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/dictionary-en/-/dictionary-en-3.2.0.tgz#5d5b5a156a5b1eb26ff96c80da3b919587f16b4b"
+  integrity sha512-oujbJhuplUTlDntmOoultEcNyk8ge7cFI6yXNn7eJvpbBJOhGNhWtK0XjOJsiwl4EfIeyvDKwGB95vJXv1d+lQ==
+
 dir-compare@^2.4.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/dir-compare/-/dir-compare-2.4.0.tgz#785c41dc5f645b34343a4eafc50b79bac7f11631"

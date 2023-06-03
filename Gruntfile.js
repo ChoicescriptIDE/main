@@ -152,6 +152,18 @@ module.exports = function(grunt) {
           }
         ]
       },
+      dictionaries: {
+        files: [
+          {
+            expand: true, cwd: '',
+            src: [
+              'node_modules/dictionary-en/**',
+              'node_modules/dictionary-en-gb/**'
+            ],
+            dest: 'build'
+          }
+        ]
+      },
     },
     "concat": {
       options: {
@@ -273,7 +285,7 @@ module.exports = function(grunt) {
     done(result);
   });
   var tasks = ["eslint:permissive", "clean", "shell:docs", "copy:main", "concat", "uglify", "cssmin", "clean:package_lock",
-    "copy:choicescript", "copy:trash", "copy:username", "copy:nodeStatic", "copy:asar", "copy:mkdirp", "copy:monaco", "shell:tsc", "create-asar-archive"];
+    "copy:choicescript", "copy:trash", "copy:username", "copy:nodeStatic", "copy:asar", "copy:mkdirp", "copy:monaco", "copy:dictionaries", "shell:tsc", "create-asar-archive"];
   grunt.registerTask("default", tasks);
   grunt.registerTask("lint", ['eslint:strict']);
 };

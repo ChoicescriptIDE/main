@@ -3776,6 +3776,9 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
         "apply": function(val) {
           var monacoOptions = __getMonacoDiagnosticOptions();
           monacoOptions.spellcheck.dictionary = val;
+          const suffix = val === 'en_GB' ? 'en-gb' : 'en';
+          monacoOptions.spellcheck.paths.affix = `${appPath}/node_modules/dictionary-${suffix}/index.aff`;
+          monacoOptions.spellcheck.paths.dics = [ `${appPath}/node_modules/dictionary-${suffix}/index.dic` ];
           __updateMonacoDiagnosticOptions(monacoOptions);
         }
       }),
