@@ -220,8 +220,7 @@ module.exports = function(grunt) {
       },
       my_target: {
         files: {
-          'build/js/cs_override.min.js': [  'source/js/cs_override.js' ],
-          'build/js/node_CSIDE.min.js': [  'source/js/node_CSIDE.js' ]
+          'build/js/cs_override.min.js': [  'source/js/cs_override.js' ]
         }
       }
     },
