@@ -41,7 +41,6 @@ The CSIDE Team!
 <p><a rel="external" href="https://github.com/wooorm/nspell">nspell</a></p>
 <p><a rel="external" href="http://www.jrsoftware.org/isinfo.php">Inno Setup</a></p>
 <p><a rel="external" href="https://www.npmjs.com/package/write-file-atomic">write-file-atomic</a></p>
-<p>'Trash' and 'Username' by <a rel="external" href="https://github.com/sindresorhus">sindresorhus</a></p>
 <p><a rel="external" href="https://github.com/nwjs/grunt-nw-builder">grunt-nw-builder</a></p>
 <p><a rel="external" href="https://github.com/mishoo/UglifyJS">UglifyJS</a></p>
 <p><a rel="external" href="https://www.mkdocs.org">mkdocs</a></p>

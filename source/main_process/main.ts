@@ -5,11 +5,11 @@ import { handleReadFile, handleGetDirName, handleMkdirp, handleMoveFile, handleS
 import { handleShellOpenPath, handleShellShowItemInFolder, handleShellTrashItem, handleShellOpenExternal } from './shell';
 import { handleExecFile, handleForkProcess, handleProcessExit, handleSpawnDetatchedNodeProcess } from './process';
 
+import { userInfo } from 'os';
 import path from 'path';
 import fs from 'fs';
 import VersionManager, { CSIDEVersions, UpdateChannel } from './version-manager';
 import mediaServer from './media-server';
-import { sync as getUserName } from 'username';
 
 const versionManager = new VersionManager();
 let mainWindow: BrowserWindow;
@@ -162,7 +162,7 @@ async function handleGetAppPath(event: Electron.IpcMainInvokeEvent, name: 'app' 
 
 async function handleGetUserDetails(_: Electron.IpcMainInvokeEvent) {
     return {
-        name: getUserName(),
+        name: process.env.USER || process.env.USERNAME || process.env.LNAME || userInfo().username,
         path: app.getPath('home')
     };
 }

@@ -98,24 +98,6 @@ module.exports = function(grunt) {
           }
         ]
       },
-      username: {
-        files: [
-          {
-            expand: true,
-            src: ['node_modules/username/**/*'],
-            dest: 'build'
-          }
-        ]
-      },
-      trash: {
-        files: [
-          {
-            expand: true,
-            src: ['node_modules/trash/**/*'],
-            dest: 'build'
-          }
-        ]
-      },
       nodeStatic: {
         files: [
           {
@@ -125,11 +107,21 @@ module.exports = function(grunt) {
           }
         ]
       },
-      asar: {
+      axios: {
         files: [
           {
             expand: true,
-            src: ['node_modules/asar/**/*'],
+            src: [
+              'node_modules/axios/**/*',
+              'node_modules/follow-redirects/**/*',
+              'node_modules/form-data/**/*',
+              'node_modules/asynckit/**/*',
+              'node_modules/combined-stream/**/*',
+              'node_modules/delayed-stream/**/*',
+              'node_modules/mime-types/**/*',
+              'node_modules/mime-db/**/*',
+              'node_modules/mime/**/*',
+            ],
             dest: 'build'
           }
         ]
@@ -284,7 +276,7 @@ module.exports = function(grunt) {
     done(result);
   });
   var tasks = ["eslint:permissive", "clean", "shell:docs", "copy:main", "concat", "uglify", "cssmin", "clean:package_lock",
-    "copy:choicescript", "copy:trash", "copy:username", "copy:nodeStatic", "copy:asar", "copy:mkdirp", "copy:monaco", "copy:dictionaries", "shell:tsc", "create-asar-archive"];
+    "copy:choicescript", "copy:nodeStatic", "copy:axios", "copy:mkdirp", "copy:monaco", "copy:dictionaries", "shell:tsc", "create-asar-archive"];
   grunt.registerTask("default", tasks);
   grunt.registerTask("lint", ['eslint:strict']);
 };
