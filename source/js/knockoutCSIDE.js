@@ -1238,8 +1238,9 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
           finishLoading(err);
         } else {
           fileStats = newfileStats;
-          const { error, result } = await window.electronAPI.readFile(path());
-          finishLoading(normalizeError(error), result);
+          fh.readFile(path(), (error, result) => {
+            finishLoading(normalizeError(error), result);
+          });
         }
       });
 
@@ -3777,8 +3778,10 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
           var monacoOptions = __getMonacoDiagnosticOptions();
           monacoOptions.spellcheck.dictionary = val;
           const suffix = val === 'en_GB' ? 'en-gb' : 'en';
-          monacoOptions.spellcheck.paths.affix = `${appPath}/node_modules/dictionary-${suffix}/index.aff`;
-          monacoOptions.spellcheck.paths.dics = [ `${appPath}/node_modules/dictionary-${suffix}/index.dic` ];
+          if (usingNode) {
+            monacoOptions.spellcheck.paths.affix = `${appPath}/node_modules/dictionary-${suffix}/index.aff`;
+            monacoOptions.spellcheck.paths.dics = [ `${appPath}/node_modules/dictionary-${suffix}/index.dic` ];
+          }
           userDictionaries.sync(["persistent", "session"]);
         }
       }),
