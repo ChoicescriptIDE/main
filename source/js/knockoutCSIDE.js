@@ -2382,7 +2382,7 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
 	"justUpdated": false,
     "openProjects": [],
     "recentColours": [],
-    "userDictionary": {},
+    "userDictionaries": {},
     "tabs": [
       "game",
       "issues",
@@ -2426,7 +2426,7 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
     localStorage.setItem("CSIDE_appConfig", JSON.stringify(defaultConfig));
     config = defaultConfig;
   }
-  var userDictionary = {};
+  var userDictionaries = {};
   var fh = { //FILE HANDLER
     "writeFile": async function(path, data, callback) {
       switch (platform) {
@@ -3748,9 +3748,9 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
             this.handle = monaco.languages.choicescript.onDictionaryChange((dictEvent) => {
               for (var i = 0; i < dictEvent.words.length; i++) {
                 if (dictEvent.removed) {
-                  userDictionary.remove(dictEvent.words[i], dictEvent.dictionary);
+                  userDictionaries.remove(dictEvent.words[i], dictEvent.dictionary);
                 } else {
-                  userDictionary.add(dictEvent.words[i], dictEvent.dictionary);
+                  userDictionaries.add(dictEvent.words[i], dictEvent.dictionary);
                 }
               }
             });
@@ -3779,7 +3779,7 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
           const suffix = val === 'en_GB' ? 'en-gb' : 'en';
           monacoOptions.spellcheck.paths.affix = `${appPath}/node_modules/dictionary-${suffix}/index.aff`;
           monacoOptions.spellcheck.paths.dics = [ `${appPath}/node_modules/dictionary-${suffix}/index.dic` ];
-          __updateMonacoDiagnosticOptions(monacoOptions);
+          userDictionaries.sync(["persistent", "session"]);
         }
       }),
       new CSIDESetting({
@@ -4373,7 +4373,7 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
     }
   }
 
-  userDictionary = {
+  userDictionaries = {
     "monacoCmds": {
       //interface for Monaco's CodeAction Commands/Quick Fixes
     },
@@ -4390,27 +4390,27 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
       return word.match(/^([A-Za-z\u00C0-\u00FF\u0100-\u017F]+'[A-Za-z\u00C0-\u00FF\u0100-\u017F]+|[A-Za-z\u00C0-\u00FF\u0100-\u017F]{2,}|[AaI]'?)$/); //word chars, accented chars, apostrophes
     },
     "add": function(word, list) {
-      if (!userDictionary.validateWord(word)) {
+      if (!userDictionaries.validateWord(word)) {
         return false;
       }
-      if (userDictionary[list + "List"][word])
+      if (userDictionaries[list + "List"][word])
         return true;
-      userDictionary[list + "List"][word] = true;
-      userDictionary.update(list);
+      userDictionaries[list + "List"][word] = true;
+      userDictionaries.update(list);
       if (list == "persistent")
-        userDictionary.persistentListArray.push(word);
+        userDictionaries.persistentListArray.push(word);
       return true;
     },
     "remove": function(word, list) {
-      if (userDictionary[list + "List"]) {
-        delete userDictionary[list + "List"][word];
+      if (userDictionaries[list + "List"]) {
+        delete userDictionaries[list + "List"][word];
       }
-      userDictionary.update(list);
-      userDictionary.persistentListArray.remove(word);
+      userDictionaries.update(list);
+      userDictionaries.persistentListArray.remove(word);
     },
     "removeAll": function() {
-      userDictionary.persistentList = {};
-      userDictionary.persistentListArray.removeAll();
+      userDictionaries.persistentList = {};
+      userDictionaries.persistentListArray.removeAll();
     },
     "check": function(word) {
       var pList = this.persistentList;
@@ -4423,17 +4423,17 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
     },
     "load": function() {
       try {
-        userDictionary.persistentList = JSON.parse(localStorage.getItem("userDictionary")) || {};
-        for (var i in userDictionary.persistentList) {
-          if (userDictionary.persistentList.hasOwnProperty(i)) {
-            userDictionary.persistentListArray.push(i);
+        userDictionaries.persistentList = JSON.parse(localStorage.getItem("userDictionaries")) || {};
+        for (var i in userDictionaries.persistentList) {
+          if (userDictionaries.persistentList.hasOwnProperty(i)) {
+            userDictionaries.persistentListArray.push(i);
           }
         }
-        userDictionary.sync("persistent");
+        userDictionaries.sync(["persistent"]);
       } catch (err) {
         if (err) {
-          //no userDictionary.json file - write it:
-          userDictionary.update();
+          //no userDictionaries.json file - write it:
+          userDictionaries.update();
         } else {
           bootbox.alert("Sorry, there was a problem loading or parsing your user dictionary data.<br>" + "If you're seeing this message frequently please file a bug report.");
         }
@@ -4441,24 +4441,26 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
     },
     "update": function(list) {
       if (typeof list == 'undefined' || list == "persistent") {
-        var newDictionary = JSON.stringify(userDictionary.persistentList, null, "\t");
-        localStorage.setItem("userDictionary", newDictionary);
+        var newDictionary = JSON.stringify(userDictionaries.persistentList, null, "\t");
+        localStorage.setItem("userDictionaries", newDictionary);
       }
     },
-    "sync": function(list) {
+    "sync": function(lists) {
       // propagate to monaco for spelling validation
       var monacoOptions = __getMonacoDiagnosticOptions();
-      if (!monacoOptions.spellcheck.userDictionary)
-        monacoOptions.spellcheck.userDictionary = Object.create({});
-      monacoOptions.spellcheck.userDictionary[list] = userDictionary[list+"List"];
+      if (!monacoOptions.spellcheck.userDictionaries)
+        monacoOptions.spellcheck.userDictionaries = Object.create({});
+      for (const l of lists) {
+        monacoOptions.spellcheck.userDictionaries[l] = userDictionaries[l+"List"];
+      }
       __updateMonacoDiagnosticOptions(monacoOptions);
     },
     "sanitize": function() {
-      var arr = Object.keys(userDictionary.persistentList);
+      var arr = Object.keys(userDictionaries.persistentList);
       for (var i = 0; i < arr.length; i++)
-        if (!userDictionary.validateWord(arr[i]))
+        if (!userDictionaries.validateWord(arr[i]))
           throw new Error("Error: Invalid entry (not a word): " + arr[i]);
-        else if (userDictionary.persistentList[arr[i]] !== true)
+        else if (userDictionaries.persistentList[arr[i]] !== true)
           throw new Error("Error: Entry value should be 'true' for: " + arr[i])
     },
     "import": async function() {
@@ -4484,11 +4486,11 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
               });
             } else {
               try {
-                userDictionary.persistentList = JSON.parse(data);
-                userDictionary.sanitize();
-                userDictionary.update();
-                userDictionary.removeAll();
-                userDictionary.load();
+                userDictionaries.persistentList = JSON.parse(data);
+                userDictionaries.sanitize();
+                userDictionaries.update();
+                userDictionaries.removeAll();
+                userDictionaries.load();
                 notification("Dictionary Import Succesful", path, {
                   type: 'success'
                 });
@@ -4514,7 +4516,7 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
                 path = url + filename + ".json";
                 fh.stat(path, function(err, stats) {
                   if (err && err.code === 404) {
-                    fh.writeFile(path, localStorage.userDictionary, function(err) {
+                    fh.writeFile(path, localStorage.userDictionaries, function(err) {
                       if (err)
                         return;
                       else {
@@ -4545,18 +4547,18 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
     }
   }
   // External dictionary APIs
-  self.importDictionary = userDictionary.import;
-  self.exportDictionary = userDictionary.export;
-  self.checkUserDictionary = function(word) {
+  self.importDictionary = userDictionaries.import;
+  self.exportDictionary = userDictionaries.export;
+  self.checkuserDictionaries = function(word) {
     if (typeof word !== "string")
       return false;
-    return userDictionary.check(word);
+    return userDictionaries.check(word);
   }
   self.clearDictionary = function() {
     bootbox.confirm("Are you sure you wish to remove all words from the user dictionary?", function(result) {
       if (result) {
-        userDictionary.removeAll();
-        userDictionary.update();
+        userDictionaries.removeAll();
+        userDictionaries.update();
       }
     });
   }
@@ -4577,7 +4579,7 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
   });
   self.addToDictionary = function(obj, e) {
     if (e.type == "click" || e.type == "keyup" && e.keyCode == 13) {
-      if (!userDictionary.validateWord(self.dictWord())) {
+      if (!userDictionaries.validateWord(self.dictWord())) {
         bootbox.alert("<h3>Error</h3>Unable to add to user dictionary: not a word!");
         return;
       }
@@ -4591,8 +4593,8 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
   self.getDictionaryArray = ko.computed(function() {
     var query = self.dictWord();
     if (query == "")
-      return userDictionary.persistentListArray().sort();
-    return userDictionary.persistentListArray().filter(function(word) { return word.startsWith(query); } ).sort();
+      return userDictionaries.persistentListArray().sort();
+    return userDictionaries.persistentListArray().filter(function(word) { return word.startsWith(query); } ).sort();
   }, this);
 
   self.init = async function(db) {
@@ -4762,10 +4764,10 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
       scope[i].setValue(val);
     }
 
-    // load userDictionary
+    // load userDictionaries
     try {
-      userDictionary.sanitize();
-      userDictionary.load();
+      userDictionaries.sanitize();
+      userDictionaries.load();
     }
     catch(err) {
       bootbox.alert("Sorry, there was a problem loading or parsing your user dictionary data.<br>" + "If you're seeing this message frequently please file a bug report.");

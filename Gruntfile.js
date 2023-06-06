@@ -188,7 +188,7 @@ module.exports = function(grunt) {
           "source/lib/knockout/knockout-jqueryui.min.js",
           "source/lib/knockout/knockout-sortable.min.js",
 
-          "node_modules/monaco-editor/release/min/vs/loader.js",
+          "node_modules/monaco-editor/out/monaco-editor/min/vs/loader.js",
 
           "source/js/knockoutCSIDE.js",
 
