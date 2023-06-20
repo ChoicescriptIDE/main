@@ -69,7 +69,7 @@ function printImage(source, alignment, alt, invert) {
       }
     });
   } else {
-    img.src = source.match("data:image") ? source : cside.server + source; //interal image, don't add directory
+    img.src = source.match("data:image") ? source : 'file://' + thisProject.getPath() + source; // internal image, don't add directory
   }
   if (alt !== null && String(alt).length > 0) img.setAttribute("alt", alt);
   if (invert) {
