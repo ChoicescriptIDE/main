@@ -33,9 +33,6 @@ function compile(){
   while (doesMatch = patt.exec(game_html)) {
     console.log(doesMatch[1]);
     next_file = safeSlurpFile(rootDir+'mygame/' + doesMatch[1]);
-    if (doesMatch[1] === "../ui.js") { //Back to this old hack for that annoying encoding issue
-        next_file = next_file.substring(1, next_file.length);
-    }
     if (next_file != "undefined" && next_file !== null) {
       jsStore = jsStore + next_file;
     }
