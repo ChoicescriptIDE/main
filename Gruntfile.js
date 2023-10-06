@@ -9,7 +9,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-compress');
   grunt.loadNpmTasks('grunt-auto-install');
   grunt.loadNpmTasks('grunt-nw-builder');
-  grunt.loadNpmTasks('grunt-execute');
   grunt.loadNpmTasks('grunt-string-replace');
   grunt.initConfig({
     "shell": {
@@ -20,6 +19,9 @@ module.exports = function(grunt) {
               cwd: 'source/help'
           }
         }
+      },
+      compile_html: {
+        command: 'node create-compile-html.js',
       }
     },
     "auto_install": {
@@ -244,11 +246,6 @@ module.exports = function(grunt) {
         ]
       }
     },
-    "execute": {
-        target: {
-            src: ['create-compile-html.js']
-        }
-    },
     "nwjs": {
       mac: {
         options: {
@@ -283,7 +280,7 @@ module.exports = function(grunt) {
     }
   });
   var tasks = ["clean", "shell:docs", "copy:main", "concat", "uglify", "cssmin", "auto_install:build", "clean:package_lock",
-    "copy:choicescript", "copy:updater", "copy:server", "copy:monaco", "string-replace", "execute", "compress"];
+    "copy:choicescript", "copy:updater", "copy:server", "copy:monaco", "string-replace", "shell:compile_html", "compress"];
   grunt.registerTask("default", tasks);
   grunt.registerTask("build-with-nwjs", tasks.concat("nwjs"));
   grunt.registerTask("build-with-windows", tasks.concat("nwjs:windows"));
