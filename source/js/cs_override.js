@@ -1,6 +1,3 @@
-/* pause execution until CSIDE can pass the data */
-window.alreadyLoaded = true;
-
 function getDropboxScope() {
   var scope = window.opener ? window.opener.parent.window : parent.window;
   return scope.cside;
@@ -18,6 +15,13 @@ var cside = scope ? scope : {
   server: null,
   parent: () => {}
 };
+
+if (scope && scope.allScenes) { // web
+  window.allScenes = scope.allScenes;
+} else {
+  /* for electron pause execution until CSIDE can pass the data */
+  window.alreadyLoaded = true;
+}
 
 Scene.prototype.lineMsg = function lineMsg() {
 	return "line " + (this.lineNum + 1) + " of " + stats.sceneName + ": ";
@@ -40,7 +44,7 @@ window.addEventListener("message", (event) => {
   }
 }, false);
 
-if (cside.popout.is) window.allScenes = window.opener.allScenes;
+if (cside.popout && cside.popout.is) window.allScenes = window.opener.allScenes;
 
 /* ERROR HANDLING (FOR ISSUES) */
 window.onerror = function(msg, file, line, stack) {
@@ -131,7 +135,7 @@ if (cside.platform != 'web-dropbox') {
 
 //inject buttons:
 $(document).ready(function() {
-  if (!cside.popout.is) {
+  if (!cside.popout || !cside.popout.is) {
     //var button = document.createElement("button");
     //button.innerHTML = "Popout";
     //button.setAttribute("title", "Pop out window");

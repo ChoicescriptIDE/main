@@ -5513,10 +5513,16 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
         notification("Running", project.getName(), {
           timeout: 2000
         });
+        if (platform === "web-dropbox") {
+          cside.allScenes = allScenes;
+        }
         project.makeActive();
         __reloadTab(__getTab("game"), 'run_index.html?restart=true');
         cside.togglePanel("tab", true /* open */);
         __selectTab("game");
+        if (platform === "web-dropbox") {
+          return;
+        }
         setTimeout(async function() {
           const { result } = await window.electronAPI.mediaServer.getAddr();
           var webview = document.getElementById('game-tab-frame');
