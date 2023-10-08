@@ -2649,8 +2649,8 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
           bootbox.alert("TODO: Image scene import not yet implemented on the web-version.")
           break;
         default:
-          const { error, result: path } = await window.electronAPI.selectImage(activeProject() ? activeProject().getPath() : userDetails.path);
-          if (path) path = path[0] + '/';
+          let { error, result: path } = await window.electronAPI.selectImage(activeProject() ? activeProject().getPath() : userDetails.path);
+          if (path) path = path[0];
           callback(error, path);
       }
     },
