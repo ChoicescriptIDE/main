@@ -305,6 +305,7 @@ body.night #left-wrap {
     -o-transition: all .15s ease;
     -ms-transition: all .15s ease;
     transition: all .15s;
+    z-index: -1;
 }
 
 .resize-bar:hover {
