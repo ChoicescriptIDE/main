@@ -2677,7 +2677,7 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
             .map(function(file) {
               return file.path;
             });
-            callback(selection);
+            callback(null, selection);
         }, options);
       }
     },
@@ -4340,7 +4340,7 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
       } else if (selection && selection.length >= 1)  {
         __openFiles(selection, true);
       }
-    }, { name: 'Scenes', extensions: ['txt', 'log'] });
+    }, { name: 'Scenes', extensions: ['.txt', '.log'] });
   }
 
   function __openFiles(paths, selectLast) {
