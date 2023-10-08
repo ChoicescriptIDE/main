@@ -1,13 +1,8 @@
-function getDropboxScope() {
-  var scope = window.opener ? window.opener.parent.window : parent.window;
-  return scope.cside;
-}
-
-
 nav = new SceneNavigator(["startup"]);
 stats = {};
 isHeadless = true;
-var scope = getDropboxScope();
+var parentWindow = window.opener ? window.opener.parent.window : parent.window;
+var scope = parentWindow ? parentWindow.cside : undefined;
 var cside = scope ? scope : {
   project: {},
   getPlatform: () => {},
@@ -53,12 +48,27 @@ window.onerror = function(msg, file, line, stack) {
   if (msg) {
     // scene doesn't exist - don't bother trying to open it
     if (/file/i.test(msg) && /exist/i.test(msg)) {
-      cside.parent.postMessage({type: "logIssue", project: cside.project, error: e});
+      if (scope) {
+        parentWindow.dispatchEvent(new CustomEvent("message", { detail: { type: "logIssue",
+          project: { path: cside.getActiveProject().getPath(), name: cside.getActiveProject().getName() },
+          error: e
+        }}));
+      } else {
+        cside.parent.postMessage({type: "logIssue", project: cside.project, error: e});
+      }
       return;
     }
     //window.onerror(e.message, e.fileName, e.lineNumber, e.stack); avoid pop-ups if we can
     e.message.match(/line [0-9]+/) ? e.lineNumber = parseInt(e.message.match(/line ([0-9]+)/)[1]) : e.lineNumber = "undefined"; //attempt to source a line number (!e.lineNumber && e.message.match(/[0-9]+/))
-    cside.parent.postMessage({type: "logIssue", error: e, project: cside.project, file: { name: stats.sceneName }});
+    if (scope) {
+      parentWindow.dispatchEvent(new CustomEvent("message", { detail: { type: "logIssue",
+        project: { path: cside.getActiveProject().getPath(), name: cside.getActiveProject().getName() },
+        error: e,
+        file: { name: stats.sceneName }
+      }}));
+  } else {
+      cside.parent.postMessage({type: "logIssue", error: e, project: cside.project, file: { name: stats.sceneName }});
+    }
   }
 }
 

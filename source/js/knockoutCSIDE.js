@@ -5790,6 +5790,9 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
   }
 
   window.addEventListener("message", (event) => {
+    if (!event.data) {
+      event.data = event.detail;
+    }
     var eventProject = null;
     if (event.data.project)
       eventProject = getProject(event.data.project.path);
