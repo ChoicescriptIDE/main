@@ -4613,13 +4613,15 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
         var project = getProject(getProjectPath(uri[i].path));
         if (project) {
           var markers = monaco.editor.getModelMarkers({resource: uri[i], take: 500 });
-          var file = project.getFiles().find(function(f) {
+          var fileOpen = project.getFiles().find(function(f) {
             return f.getPath() === uri[i].path;
           });
-          var newIssues = markers.map(function(m) {
-            return new CSIDEIssue({ file: file, lineNum: m.startLineNumber, desc: m.message, severity: m.severity });
-          });
-          if (file) file.setMarkerIssues(newIssues);
+          if (fileOpen) {
+            var newIssues = markers.map(function(m) {
+              return new CSIDEIssue({ file: file, lineNum: m.startLineNumber, desc: m.message, severity: m.severity });
+            });
+            if (file) file.setMarkerIssues(newIssues);
+          }
         }
       }
     });
