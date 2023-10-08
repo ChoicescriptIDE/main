@@ -5827,15 +5827,16 @@ function IDEViewModel(platform, versions, userDetails, appPath, db) {
               issueData.canDismiss = true; // runtime errors should be dismissable
               file.logIssue(new CSIDEIssue(issueData));
             } else {
-              var issue = new CSIDEIssue({ project: issueData.project, canDismiss: true, desc: "Failed to open '" + issueData.file + "' whilst handling another issue: " + issueData.desc});
-              issueData.project.logIssue(issue);
+              notification("Unhandled Error",  "Failed to open '" + issueData.file + "' whilst handling another issue: " + issueData.desc, {
+                type: "error"
+              });
             }
           });
         }
         else {
-          issueData.canDismiss = true; // runtime errors should be dismissable
-          var issue = new CSIDEIssue(issueData);
-          issueData.project.logIssue(issue);
+          notification("Runtime Error", issueData.desc, {
+            type: "error"
+          });
         }
         break;
       case "popOut":
