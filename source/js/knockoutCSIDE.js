@@ -6493,8 +6493,11 @@ const _initDropbox = async () => {
   if (!!utils.parseQueryString(window.location.search).code) {
     dbxAuth.setCodeVerifier(window.sessionStorage.getItem('codeVerifier'));
     try {
-      const resp = await dbxAuth.getAccessTokenFromCode(REDIRECT_URI, utils.parseQueryString(window.location.search).code);
+      const code = utils.parseQueryString(window.location.search).code;
+      const resp = await dbxAuth.getAccessTokenFromCode(REDIRECT_URI, code);
       dbxAuth.setAccessToken(resp.result.access_token);
+      // remove code from url to mitigate accidental sharing
+      window.history.replaceState(null, undefined, REDIRECT_URI);
       return new Dropbox.Dropbox({ auth: dbxAuth });
     } catch (err) {
       alert(window.location);
