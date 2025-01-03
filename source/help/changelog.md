@@ -1,13 +1,17 @@
 ## v1.3.4
 
-Patch release.
+Patch release. Upgrades ChoiceScript.
 
 ### Changes
-- Upgrades ChoiceScript
+
+- Updated to the latest version of ChoiceScript
+
+### Additions
+- Support for checkpoint commands.
 
 ### Fixes
 
-- Fixes *image command
+- Fix *image command on Desktop.
 
 ## v1.3.3
 
