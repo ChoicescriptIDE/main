@@ -1,3 +1,11 @@
+## v1.3.5
+
+Patch release. Fixes auto-updates.
+
+### Fixes
+
+- Fixes "unable to get local issuer certificate" when checking for updates
+
 ## v1.3.4
 
 Patch release. Upgrades ChoiceScript.
